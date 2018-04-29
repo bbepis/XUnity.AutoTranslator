@@ -1,0 +1,92 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Visual Studio
+*.cs text diff=csharp
+*.vb text
+*.c text
+*.cpp text
+*.cxx text
+*.h text
+*.hxx text
+*.py text
+*.rb text
+*.java text
+*.html text
+*.htm text
+*.css text
+*.scss text
+*.sass text
+*.less text
+*.js text
+*.lisp text
+*.clj text
+*.sql text
+*.php text
+*.lua text
+*.m text
+*.asm text
+*.erl text
+*.fs text
+*.fsx text
+*.hs text
+*.ps1 text
+*.psm1 text
+*.md text
+*.cmd text
+
+# Visual Studio Project files
+*.csproj text merge=union 
+*.ccproj text merge=union 
+*.vbproj text merge=union 
+*.fsproj text merge=union 
+*.dbproj text merge=union 
+*.xproj text merge=union 
+*.sln text eol=crlf merge=union 
+
+# Standard to msysgit
+*.doc	 diff=astextplain
+*.DOC	 diff=astextplain
+*.docx diff=astextplain
+*.DOCX diff=astextplain
+*.dot  diff=astextplain
+*.DOT  diff=astextplain
+*.pdf  diff=astextplain
+*.PDF	 diff=astextplain
+*.rtf	 diff=astextplain
+*.RTF	 diff=astextplain
+
+# Binaries
+*.dll binary
+*.DLL binary
+*.chm binary
+*.pdb binary
+*.PDB binary
+*.exe binary
+*.EXE binary
+
+# Certificates
+*.pfx binary
+*.p12 binary
+
+# Images
+*.png binary
+*.jpeg binary
+*.jpg binary
+*.gif binary
+*.PNG binary
+*.JPEG binary
+*.JPG binary
+*.GIF binary
+
+# Fonts
+*.eot binary
+*.otf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.EOT binary
+*.OTF binary
+*.TTF binary
+*.WOFF binary
+*.WOFF2 binary

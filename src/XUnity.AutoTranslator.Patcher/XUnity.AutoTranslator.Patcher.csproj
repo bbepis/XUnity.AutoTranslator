@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ExIni">
+      <HintPath>..\..\libs\ExIni.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\libs\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Inject">
+      <HintPath>..\..\libs\Mono.Cecil.Inject.dll</HintPath>
+    </Reference>
+    <Reference Include="ReiPatcher">
+      <HintPath>..\..\libs\ReiPatcher.exe</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

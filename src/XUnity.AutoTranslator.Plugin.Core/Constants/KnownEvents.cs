@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace XUnity.AutoTranslator.Plugin.Core.Constants
+{
+   public static class KnownEvents
+   {
+      public static string OnUnableToTranslateUGUI = "OnUnableToTranslateUGUI";
+      public static string OnUnableToTranslateTextMeshPro = "OnUnableToTranslateTextMeshPro";
+      public static string OnUnableToTranslateNGUI = "OnUnableToTranslateNGUI";
+   }
+}
