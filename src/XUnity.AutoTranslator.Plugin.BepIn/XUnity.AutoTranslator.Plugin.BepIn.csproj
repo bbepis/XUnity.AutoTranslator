@@ -2,9 +2,9 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyVersion>2.3.0.0</AssemblyVersion>
-      <Version>2.3.0</Version>
-      <FileVersion>2.3.0.0</FileVersion>
+      <AssemblyVersion>2.3.1.0</AssemblyVersion>
+      <Version>2.3.1</Version>
+      <FileVersion>2.3.1.0</FileVersion>
    </PropertyGroup>
 
    <ItemGroup>
