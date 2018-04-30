@@ -48,7 +48,7 @@ The plugin can be installed in following ways:
 ### BepInEx Plugin
 REQUIRES: [BepInEx plugin manager](https://github.com/bbepis/BepInEx) (follow its installation instructions first!). 
 
- 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](https://github.com/XUnity-Plugins/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in BepInEx folder.
 
 The file structure should likke like this:
@@ -62,7 +62,7 @@ The file structure should likke like this:
 ### IPA Plugin
 REQUIRES: [IPA plugin manager](https://github.com/Eusth/IPA) (follow its installation instructions first!).
 
- 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](https://github.com/XUnity-Plugins/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in Plugins folder.
 
 The file structure should likke like this
