@@ -95,8 +95,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                                  addMethod.Invoke( component, new object[] { callback } );
                               }
 
-                              Application.Quit();
-
                               return true;
                            }
                            catch { }
