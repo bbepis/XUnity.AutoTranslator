@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    public static class TextHelper
    {
-      private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>()
+      private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
       {
          { "ja", ContainsJapaneseSymbols },
          { "ja-JP", ContainsJapaneseSymbols },

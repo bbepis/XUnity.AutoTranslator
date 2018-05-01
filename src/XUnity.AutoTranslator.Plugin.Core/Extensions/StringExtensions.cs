@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -9,10 +10,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       public static string ChangeToSingleLineForDialogue( this string that )
       {
-         if( that.Length > 18 ) // long strings often indicate dialog
+         if( that.Length > Settings.MinDialogueChars ) // long strings often indicate dialog
          {
             // Always change dialogue into one line. Otherwise translation services gets confused.
-            return that.RemoveNewlines();
+            return that.RemoveWhitespace();
          }
          else
          {
@@ -20,15 +21,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static string RemoveNewlines( this string text )
-      {
-         return text.Replace( "\n", "" ).Replace( "\r", "" );
-      }
-
       public static string RemoveWhitespace( this string text )
       {
          // Japanese whitespace, wtf
-         return text.RemoveNewlines().Replace( " ", "" ).Replace( "　", "" );
+         return text.Replace( "\n", "" ).Replace( "\r", "" ).Replace( " ", "" ).Replace( "　", "" );
       }
 
       public static string UnescapeJson( this string str )

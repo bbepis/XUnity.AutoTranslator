@@ -242,16 +242,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _translations[ key ] = value;
          _translatedTexts.Add( value );
 
-         if( Settings.IgnoreWhitespaceInKeys )
+         if( Settings.IgnoreWhitespaceInDialogue )
          {
-            var newKey = key.RemoveWhitespace();
+            var newKey = key.ChangeToSingleLineForDialogue();
             _translations[ newKey ] = value;
+         }
+      }
+
+      private void AddNewTranslation( string key, string value )
+      {
+         lock( _writeToFileSync )
+         {
+            _newTranslations[ key ] = value;
          }
       }
 
       private bool TryGetTranslation( string key, out string value )
       {
-         return _translations.TryGetValue( key, out value ) || ( Settings.IgnoreWhitespaceInKeys && _translations.TryGetValue( key.RemoveWhitespace(), out value ) );
+         return _translations.TryGetValue( key, out value ) || ( Settings.IgnoreWhitespaceInDialogue && _translations.TryGetValue( key.RemoveWhitespace(), out value ) );
       }
 
       private string Any_TextChanged( object graphic, string text )
@@ -341,6 +349,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   info?.UnresizeUI( ui );
                }
+            }
+            catch( Exception e )
+            {
+               Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while setting text on a component." + Environment.NewLine + e );
             }
             finally
             {
@@ -448,11 +460,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          // Get the trimmed text
          text = ( text ?? GetText( ui ) ).Trim();
-         info?.Reset( text );
 
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsAlreadyTranslating( info ) )
          {
+            info?.Reset( text );
+
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
             if( TryGetTranslation( text, out translation ) )
@@ -495,7 +508,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               _ongoingOperations.Remove( ui );
 
-                              if( !string.IsNullOrEmpty( stabilizedText ) )
+                              if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
                                  info?.Reset( stabilizedText );
 
@@ -644,28 +657,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            //StartCoroutine( AutoTranslateClient.TranslateByWWW( job.UntranslatedText.ChangeToSingleLineForDialogue(), Settings.FromLanguage, Settings.Language, translatedText =>
-            //{
-            //   _consecutiveErrors = 0;
-
-            //   job.TranslatedText = translatedText;
-
-            //   if( !string.IsNullOrEmpty( translatedText ) )
-            //   {
-            //      lock( _writeToFileSync )
-            //      {
-            //         _newTranslations[ job.UntranslatedText ] = translatedText;
-            //      }
-            //   }
-
-            //   _completedJobs.Add( job );
-            //},
-            //() =>
-            //{
-            //   _consecutiveErrors++;
-            //} ) );
-
-            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.UntranslatedText.ChangeToSingleLineForDialogue(), Settings.FromLanguage, Settings.Language, translatedText =>
+            job.UntranslatedDialogueText = job.UntranslatedText.ChangeToSingleLineForDialogue();
+            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.UntranslatedDialogueText, Settings.FromLanguage, Settings.Language, translatedText =>
             {
                _consecutiveErrors = 0;
 
@@ -673,10 +666,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( !string.IsNullOrEmpty( translatedText ) )
                {
-                  lock( _writeToFileSync )
-                  {
-                     _newTranslations[ job.UntranslatedText ] = translatedText;
-                  }
+                  AddNewTranslation( Settings.IgnoreWhitespaceInDialogue ? job.UntranslatedDialogueText : job.UntranslatedText, translatedText );
                }
 
                _completedJobs.Add( job );
@@ -775,11 +765,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
             foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
             {
                var ui = kvp.Key;
-               var info = (TranslationInfo)kvp.Value;
-
-               if( info != null && info.IsTranslated )
+               try
                {
-                  SetText( ui, info.TranslatedText, true, info );
+                  if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                  {
+                     var info = (TranslationInfo)kvp.Value;
+
+                     if( info != null && info.IsTranslated )
+                     {
+                        SetText( ui, info.TranslatedText, true, info );
+                     }
+                  }
+               }
+               catch( Exception )
+               {
+                  // not super pretty, no...
+                  ObjectExtensions.Remove( ui );
                }
             }
          }
@@ -789,11 +790,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
             foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
             {
                var ui = kvp.Key;
-               var info = (TranslationInfo)kvp.Value;
-
-               if( info != null )
+               try
                {
-                  SetText( ui, info.OriginalText, false, info );
+                  if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                  {
+                     var info = (TranslationInfo)kvp.Value;
+
+                     if( info != null && info.IsTranslated )
+                     {
+                        SetText( ui, info.OriginalText, true, info );
+                     }
+                  }
+               }
+               catch( Exception )
+               {
+                  // not super pretty, no...
+                  ObjectExtensions.Remove( ui );
                }
             }
          }

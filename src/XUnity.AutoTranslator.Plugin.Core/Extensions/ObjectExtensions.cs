@@ -57,5 +57,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             return DynamicFields.ToList();
          }
       }
+
+      public static void Remove( object obj )
+      {
+         lock( Sync )
+         {
+            DynamicFields.Remove( obj );
+         }
+      }
    }
 }
