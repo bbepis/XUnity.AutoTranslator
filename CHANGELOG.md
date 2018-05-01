@@ -1,3 +1,6 @@
+### 2.3.1
+ * Fixed bug that caused the application to quit if any hooks were overriden.
+
 ### 2.3.0
  * Allow usage of SSL
  * Better dialogue caching handling. Often a dialogue might get translated multiple times because of small differences in the source text in regards to whitespace.
