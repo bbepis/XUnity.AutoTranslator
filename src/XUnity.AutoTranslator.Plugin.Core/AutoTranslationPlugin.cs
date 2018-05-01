@@ -62,6 +62,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private HashSet<object> _ongoingOperations = new HashSet<object>();
       private HashSet<string> _startedOperationsForNonStabilizableComponents = new HashSet<string>();
 
+      /// <summary>
+      /// This function will check if there are symbols of a given language contained in a string.
+      /// </summary>
+      private Func<string, bool> _symbolCheck;
+
       private bool _isInTranslatedMode = true;
 
       public void Initialize()
@@ -71,6 +76,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          HooksSetup.InstallHooks( Any_TextChanged );
 
          AutoTranslateClient.Configure();
+
+         _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
 
          LoadTranslations();
 
@@ -373,7 +380,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private bool IsTranslatable( string str )
       {
-         return TextHelper.ContainsJapaneseSymbols( str ) && str.Length <= Settings.MaxCharactersPerTranslation && !_translatedTexts.Contains( str );
+         return _symbolCheck( str ) && str.Length <= Settings.MaxCharactersPerTranslation && !_translatedTexts.Contains( str );
       }
 
       public bool ShouldTranslate( object ui )
