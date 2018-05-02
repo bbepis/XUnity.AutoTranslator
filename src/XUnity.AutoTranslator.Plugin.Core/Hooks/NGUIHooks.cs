@@ -10,20 +10,11 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
-   public delegate void NGUITextChanged( object graphic );
-
    public static class NGUIHooks
    {
       public static readonly Type[] All = new[] {
          typeof( TextPropertyHook )
       };
-
-      public static event NGUITextChanged TextChanged;
-
-      public static void FireTextChanged( object graphic )
-      {
-         TextChanged?.Invoke( graphic );
-      }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
@@ -41,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         NGUIHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 }

@@ -8,9 +8,6 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 {
-   public delegate void TextMeshProChanged( object graphic );
-   public delegate void TextMeshProAwakened( object graphic );
-
    public static class TextMeshProHooks
    {
       public static readonly Type[] All = new[] {
@@ -24,19 +21,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          typeof( SetCharArrayHook2 ),
          typeof( SetCharArrayHook3 ),
       };
-
-      public static event TextMeshProChanged TextChanged;
-      public static event TextMeshProAwakened TextAwakened;
-
-      public static void FireTextAwakened( object graphic )
-      {
-         TextAwakened?.Invoke( graphic );
-      }
-
-      public static void FireTextChanged( object graphic )
-      {
-         TextChanged?.Invoke( graphic );
-      }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
@@ -54,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextAwakened( __instance );
+         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
       }
    }
 
@@ -73,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextAwakened( __instance );
+         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
       }
    }
 
@@ -92,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -111,7 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -130,7 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -149,7 +133,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -168,7 +152,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -187,7 +171,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -206,7 +190,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         TextMeshProHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 }

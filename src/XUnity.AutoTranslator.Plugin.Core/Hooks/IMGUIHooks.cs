@@ -9,8 +9,6 @@ using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 {
-   public delegate void IMGUITextChanged( object text );
-
    public static class IMGUIHooks
    {
       public static readonly Type[] All = new[] {
@@ -25,13 +23,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
          typeof( DoTextFieldHook ),
          typeof( DoToggleHook ),
       };
-
-      public static event IMGUITextChanged TextChanged;
-
-      public static void FireTextChanged( object graphic )
-      {
-         TextChanged?.Invoke( graphic );
-      }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
@@ -49,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -68,7 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
 
    }
@@ -88,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -107,7 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -126,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -145,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -164,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent title )
       {
-         IMGUIHooks.FireTextChanged( title );
+         AutoTranslationPlugin.Current.Hook_TextChanged( title );
       }
    }
 
@@ -185,7 +176,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          foreach( var content in contents )
          {
-            IMGUIHooks.FireTextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
          }
       }
    }
@@ -205,7 +196,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 
@@ -224,7 +215,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         IMGUIHooks.FireTextChanged( content );
+         AutoTranslationPlugin.Current.Hook_TextChanged( content );
       }
    }
 }

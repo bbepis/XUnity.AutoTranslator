@@ -8,28 +8,12 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
-   public delegate void UGUITextChanged( object graphic );
-   public delegate void UGUITextAwakened( object graphic );
-
    public static class UGUIHooks
    {
       public static readonly Type[] All = new[] {
          typeof( TextPropertyHook ),
          typeof( OnEnableHook ),
       };
-
-      public static event UGUITextChanged TextChanged;
-      public static event UGUITextAwakened TextAwakened;
-
-      public static void FireTextAwakened( object graphic )
-      {
-         TextAwakened?.Invoke( graphic );
-      }
-
-      public static void FireTextChanged( object graphic )
-      {
-         TextChanged?.Invoke( graphic );
-      }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
@@ -48,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         UGUIHooks.FireTextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
@@ -68,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         UGUIHooks.FireTextAwakened( __instance );
+         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
       }
    }
 }

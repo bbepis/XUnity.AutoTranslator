@@ -29,13 +29,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class AutoTranslationPlugin : MonoBehaviour
    {
-      private static readonly string TextPropertyName = "text";
+      /// <summary>
+      /// Allow the instance to be accessed statically, as only one will exist.
+      /// </summary>
+      public static AutoTranslationPlugin Current;
 
       /// <summary>
       /// These are the currently running translation jobs (being translated by an http request).
       /// </summary>
       private List<TranslationJob> _completedJobs = new List<TranslationJob>();
-      private List<TranslationJob> _unstartedJobs = new List<TranslationJob>();
+      private Dictionary<string, TranslationJob> _unstartedJobs = new Dictionary<string, TranslationJob>();
 
       /// <summary>
       /// All the translations are stored in this dictionary.
@@ -68,12 +71,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Func<string, bool> _symbolCheck;
 
       private bool _isInTranslatedMode = true;
+      private bool _hooksEnabled = true;
 
       public void Initialize()
       {
+         Current = this;
+
          Settings.Configure();
 
-         HooksSetup.InstallHooks( Any_TextChanged );
+         HooksSetup.InstallHooks( Override_TextChanged );
 
          AutoTranslateClient.Configure();
 
@@ -90,16 +96,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var t2 = new Thread( SaveTranslationsLoop );
          t2.IsBackground = true;
          t2.Start();
-
-
-         // subscribe to text changes
-         UGUIHooks.TextAwakened += UguiTextEvents_OnTextAwaken;
-         UGUIHooks.TextChanged += UguiTextEvents_OnTextChanged;
-         IMGUIHooks.TextChanged += IMGUITextEvents_GUIContentChanged;
-         NGUIHooks.TextChanged += NGUITextEvents_TextChanged;
-
-         TextMeshProHooks.TextAwakened += TextMeshProHooks_OnTextAwaken;
-         TextMeshProHooks.TextChanged += TextMeshProHooks_OnTextChanged;
       }
 
       private string[] GetTranslationFiles()
@@ -116,41 +112,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          while( true )
          {
-            //// What a brilliant solution...
-            //try
-            //{
-            //   AutoTranslateClient.RemoveUnusedClients();
-            //}
-            //catch( Exception e )
-            //{
-            //   Console.WriteLine( "An unexpected error occurred in XUnity.AutoTranslator: " + Environment.NewLine + e );
-            //}
-            //finally
-            //{
-            //   Thread.Sleep( 1000 * 20 );
-            //}
-
-            //try
-            //{
-            //   AutoTranslateClient.RemoveUnusedClients();
-            //}
-            //catch( Exception e )
-            //{
-            //   Console.WriteLine( "An unexpected error occurred in XUnity.AutoTranslator: " + Environment.NewLine + e );
-            //}
-            //finally
-            //{
-            //   Thread.Sleep( 1000 * 20 );
-            //}
-
             try
             {
-               //AutoTranslateClient.RemoveUnusedClients();
                ObjectExtensions.Cull();
             }
             catch( Exception e )
             {
-               Console.WriteLine( "An unexpected error occurred in XUnity.AutoTranslator: " + Environment.NewLine + e );
+               Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An unexpected error occurred while removing GC'ed resources." + Environment.NewLine + e );
             }
             finally
             {
@@ -192,7 +160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( e );
+            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while saving translations to disk. " + Environment.NewLine + e );
          }
       }
 
@@ -233,8 +201,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( e );
+            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while loading translations. " + Environment.NewLine + e );
          }
+      }
+
+      private TranslationJob GetOrCreateTranslationJobFor( string untranslatedText )
+      {
+         if( _unstartedJobs.TryGetValue( untranslatedText, out TranslationJob job ) )
+         {
+            return job;
+         }
+         
+         foreach( var completedJob in _completedJobs )
+         {
+            if( completedJob.UntranslatedText == untranslatedText )
+            {
+               return completedJob;
+            }
+         }
+
+         job = new TranslationJob( untranslatedText );
+         _unstartedJobs.Add( untranslatedText, job );
+
+         return job;
       }
 
       private void AddTranslation( string key, string value )
@@ -262,39 +251,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _translations.TryGetValue( key, out value ) || ( Settings.IgnoreWhitespaceInDialogue && _translations.TryGetValue( key.RemoveWhitespace(), out value ) );
       }
 
-      private string Any_TextChanged( object graphic, string text )
+      private string Override_TextChanged( object ui, string text )
       {
-         return TranslateOrQueueWebJob( graphic, text, true );
+         if( _hooksEnabled )
+         {
+            return TranslateOrQueueWebJob( ui, text, true );
+         }
+         return null;
       }
 
-      private void NGUITextEvents_TextChanged( object graphic )
+      public void Hook_TextChanged( object ui )
       {
-         TranslateOrQueueWebJob( graphic, null, true );
+         if( _hooksEnabled )
+         {
+            TranslateOrQueueWebJob( ui, null, false );
+         }
       }
 
-      private void IMGUITextEvents_GUIContentChanged( object content )
+      public void Hook_TextInitialized( object ui )
       {
-         TranslateOrQueueWebJob( content, null, true );
-      }
-
-      private void UguiTextEvents_OnTextChanged( object text )
-      {
-         TranslateOrQueueWebJob( text, null, false );
-      }
-
-      private void UguiTextEvents_OnTextAwaken( object text )
-      {
-         TranslateOrQueueWebJob( text, null, true );
-      }
-
-      private void TextMeshProHooks_OnTextChanged( object text )
-      {
-         TranslateOrQueueWebJob( text, null, false );
-      }
-
-      private void TextMeshProHooks_OnTextAwaken( object text )
-      {
-         TranslateOrQueueWebJob( text, null, true );
+         if( _hooksEnabled )
+         {
+            TranslateOrQueueWebJob( ui, null, true );
+         }
       }
 
       private void SetTranslatedText( object ui, string text, TranslationInfo info )
@@ -317,29 +296,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               UGUIHooks.TextChanged -= UguiTextEvents_OnTextChanged;
-               NGUIHooks.TextChanged -= NGUITextEvents_TextChanged;
-               TextMeshProHooks.TextChanged -= TextMeshProHooks_OnTextChanged;
+               // TODO: Disable ANY Hook
+               _hooksEnabled = false;
+
                if( info != null )
                {
                   info.IsCurrentlySettingText = true;
                }
 
-
-               if( ui is Text )
-               {
-                  ( (Text)ui ).text = text;
-               }
-               else if( ui is GUIContent )
-               {
-                  ( (GUIContent)ui ).text = text;
-               }
-               else
-               {
-                  // fallback to reflective approach
-                  var type = ui.GetType();
-                  type.GetProperty( TextPropertyName )?.GetSetMethod()?.Invoke( ui, new[] { text } );
-               }
+               ui.SetText( text );
 
                if( isTranslated )
                {
@@ -356,35 +321,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             finally
             {
-               UGUIHooks.TextChanged += UguiTextEvents_OnTextChanged;
-               NGUIHooks.TextChanged += NGUITextEvents_TextChanged;
-               TextMeshProHooks.TextChanged += TextMeshProHooks_OnTextChanged;
+               _hooksEnabled = true;
+
                if( info != null )
                {
                   info.IsCurrentlySettingText = false;
                }
             }
          }
-      }
-
-      private string GetText( object ui )
-      {
-         string text = null;
-
-         if( ui is Text )
-         {
-            text = ( (Text)ui ).text;
-         }
-         else if( ui is GUIContent )
-         {
-            text = ( (GUIContent)ui ).text;
-         }
-         else
-         {
-            text = (string)ui.GetType()?.GetProperty( TextPropertyName )?.GetValue( ui, null );
-         }
-
-         return text ?? string.Empty;
       }
 
       /// <summary>
@@ -445,7 +389,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      public static bool IsAlreadyTranslating( TranslationInfo info )
+      public static bool IsCurrentlySetting( TranslationInfo info )
       {
          if( info == null ) return false;
 
@@ -459,13 +403,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info )
       {
          // Get the trimmed text
-         text = ( text ?? GetText( ui ) ).Trim();
+         text = ( text ?? ui.GetText() ).Trim();
 
          // Ensure that we actually want to translate this text and its owning UI element. 
-         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsAlreadyTranslating( info ) )
+         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
-
+            
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
             if( TryGetTranslation( text, out translation ) )
@@ -520,14 +464,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                        SetTranslatedText( ui, translation, info );
                                     }
                                  }
-
-                                 if( translation == null )
+                                 else
                                  {
                                     // Lets try not to spam a service that might not be there...
                                     if( AutoTranslateClient.IsConfigured && _consecutiveErrors < Settings.MaxErrors )
                                     {
-                                       var job = new TranslationJob { UI = ui, UntranslatedText = stabilizedText };
-                                       _unstartedJobs.Add( job );
+                                       var job = GetOrCreateTranslationJobFor( stabilizedText );
+                                       job.Components.Add( ui );
                                     }
                                     else
                                     {
@@ -552,8 +495,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      // Lets try not to spam a service that might not be there...
                      if( AutoTranslateClient.IsConfigured && _consecutiveErrors < Settings.MaxErrors )
                      {
-                        var job = new TranslationJob { UntranslatedText = text };
-                        _unstartedJobs.Add( job );
+                        var job = GetOrCreateTranslationJobFor( text );
                      }
                      else
                      {
@@ -581,9 +523,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( currentTries < maxTries ) // shortcircuit
          {
-            var beforeText = GetText( ui );
+            var beforeText = ui.GetText();
             yield return new WaitForSeconds( delay );
-            var afterText = GetText( ui );
+            var afterText = ui.GetText();
 
             if( beforeText == afterText )
             {
@@ -636,28 +578,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( e );
+            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred in Update callback. " + Environment.NewLine + e );
          }
       }
 
+      // create this as a field instead of local var, to prevent new creation on EVERY game loop
+      private readonly List<string> _kickedOff = new List<string>();
+
       private void KickoffTranslations()
       {
-         while( AutoTranslateClient.HasAvailableClients && _unstartedJobs.Count > 0 )
+         foreach( var kvp in _unstartedJobs )
          {
-            var job = _unstartedJobs[ _unstartedJobs.Count - 1 ];
-            _unstartedJobs.RemoveAt( _unstartedJobs.Count - 1 );
+            if( !AutoTranslateClient.HasAvailableClients ) break;
+
+            var key = kvp.Key;
+            var job = kvp.Value;
+            _kickedOff.Add( key );
 
             // lets see if the text should still be translated before kicking anything off
-            if( job.UI != null )
-            {
-               var text = GetText( job.UI ).Trim();
-               if( text != job.UntranslatedText )
-               {
-                  continue; // just ignore this UI component, as the text has already changed anyway (maybe from game, maybe from other plugin)
-               }
-            }
+            if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
 
-            job.UntranslatedDialogueText = job.UntranslatedText.ChangeToSingleLineForDialogue();
             StartCoroutine( AutoTranslateClient.TranslateByWWW( job.UntranslatedDialogueText, Settings.FromLanguage, Settings.Language, translatedText =>
             {
                _consecutiveErrors = 0;
@@ -667,15 +607,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( !string.IsNullOrEmpty( translatedText ) )
                {
                   AddNewTranslation( Settings.IgnoreWhitespaceInDialogue ? job.UntranslatedDialogueText : job.UntranslatedText, translatedText );
-               }
 
-               _completedJobs.Add( job );
+                  _completedJobs.Add( job );
+               }
             },
             () =>
             {
                _consecutiveErrors++;
             } ) );
          }
+
+         for( int i = 0 ; i < _kickedOff.Count ; i++ )
+         {
+            _unstartedJobs.Remove( _kickedOff[ i ] );
+         }
+
+         _kickedOff.Clear();
       }
 
       private void FinishTranslations()
@@ -687,21 +634,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var job = _completedJobs[ i ];
                _completedJobs.RemoveAt( i );
 
-               if( !string.IsNullOrEmpty( job.TranslatedText ) )
+               foreach( var component in job.Components )
                {
-                  if( job.UI != null )
+                  // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
+                  var text = component.GetText().Trim();
+                  if( text == job.UntranslatedText )
                   {
-                     // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
-                     var text = GetText( job.UI ).Trim();
-                     if( text == job.UntranslatedText )
-                     {
-                        var info = job.UI.GetTranslationInfo( false );
-                        SetTranslatedText( job.UI, job.TranslatedText, info );
-                     }
+                     var info = component.GetTranslationInfo( false );
+                     SetTranslatedText( component, job.TranslatedText, info );
                   }
-
-                  AddTranslation( job.UntranslatedText, job.TranslatedText );
                }
+
+               AddTranslation( job.UntranslatedText, job.TranslatedText );
             }
          }
       }
