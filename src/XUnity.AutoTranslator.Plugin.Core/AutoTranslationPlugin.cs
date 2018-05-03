@@ -495,7 +495,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      // Lets try not to spam a service that might not be there...
                      if( AutoTranslateClient.IsConfigured && _consecutiveErrors < Settings.MaxErrors )
                      {
-                        var job = GetOrCreateTranslationJobFor( text );
+                        GetOrCreateTranslationJobFor( text );
                      }
                      else
                      {

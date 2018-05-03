@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       public static void Configure()
       {
-         ServiceEndpoint = Config.Current.Preferences[ "AutoTranslator" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate );
+         ServiceEndpoint = Config.Current.Preferences[ "AutoTranslator" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate, true );
          Language = Config.Current.Preferences[ "AutoTranslator" ][ "Language" ].GetOrDefault( "en" );
          FromLanguage = Config.Current.Preferences[ "AutoTranslator" ][ "FromLanguage" ].GetOrDefault( "ja", true );
          Delay = Config.Current.Preferences[ "AutoTranslator" ][ "Delay" ].GetOrDefault( 0f );
