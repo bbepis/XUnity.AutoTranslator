@@ -17,7 +17,7 @@ The mod can be installed into the following Plugin Managers:
 Installations instructions for both methods can be found below.
 
 ## Configuration
-The default configuration file, looks as such (2.4.0+ (coming soon)):
+The default configuration file, looks as such (2.4.0+ (coming tomorrow)):
 
 ```ini
 [Service]
