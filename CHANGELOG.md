@@ -1,3 +1,13 @@
+### 2.4.0 - coming soon
+ * CHANGE - Completely reworked configuration for more organization
+ * FEATURE - Added support for BaiduTranslate. User must provide AppId/AppSecret for API . Use "BaiduTranslate" as endpoint
+ * FEATURE - Force splitting translated texts into newlines, if configured
+ * BUG FIX - Fixed broken feature that allowed disabling the online Endpoint
+ * BUG FIX - Eliminated potential concurrency issues that could cause a translated string to be retranslated.
+ * BUG FIX - Better support for other 'from' languages than japanese, as the japanese symbol check has been replaced with a more generic one
+ * BUG FIX - Fixed a bug where hot key actions (toggle translation, etc.) would often fail
+ * BUG FIX - Multiline translations now partially supported. However, all texts considered dialogue will still be translated as a single line
+
 ### 2.3.1
  * Fixed bug that caused the application to quit if any hooks were overriden.
 
