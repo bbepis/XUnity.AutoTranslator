@@ -35,14 +35,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public override string ExtractTranslated( string result )
+      public override bool TryExtractTranslated( string result, out string translated )
       {
-         return result;
+         translated = result;
+         return true;
       }
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         return string.Format( ServicePointTemplateUrl, Identifier, from, to, untranslatedText );
+         return string.Format( ServicePointTemplateUrl, Identifier, from, to, WWW.EscapeURL( untranslatedText ) );
       }
    }
 }

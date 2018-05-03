@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -64,6 +65,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   case '\\':
                      escapeWith = '\\';
                      break;
+                  case 'u':
+                     escapeWith = 'u';
+                     break;
                   default:
                      found = false;
                      break;
@@ -72,9 +76,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                // remove previous char and go one back
                if( found )
                {
-                  // found proper escaping
-                  builder.Remove( --i, 2 );
-                  builder.Insert( i, escapeWith );
+                  if( escapeWith == 'u' )
+                  {
+                     // unicode crap, lets handle the next 4 characters manually
+                     int code = int.Parse( new string( new char[] { builder[ i + 1 ], builder[ i + 2 ], builder[ i + 3 ], builder[ i + 4 ] } ), NumberStyles.HexNumber );
+                     var replacingChar = (char)code;
+                     builder.Remove( --i, 6 );
+                     builder.Insert( i, replacingChar );
+                  }
+                  else
+                  {
+                     // found proper escaping
+                     builder.Remove( --i, 2 );
+                     builder.Insert( i, escapeWith );
+                  }
                }
                else
                {

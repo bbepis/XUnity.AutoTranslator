@@ -23,6 +23,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public abstract void ApplyHeaders( WebHeaderCollection headers );
 
-      public abstract string ExtractTranslated( string result );
+      public abstract bool TryExtractTranslated( string result, out string translated );
    }
 }

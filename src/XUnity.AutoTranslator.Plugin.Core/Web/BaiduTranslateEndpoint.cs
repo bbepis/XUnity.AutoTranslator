@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using SimpleJSON;
 using UnityEngine;
@@ -11,30 +12,42 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class GoogleTranslateEndpoint : KnownEndpoint
+   public class BaiduTranslateEndpoint : KnownEndpoint
    {
-      //private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
       private static ServicePoint ServicePoint;
-      private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
-      private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
+      private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
+      private static readonly string HttpsServicePointTemplateUrl = "https://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
 
-      public GoogleTranslateEndpoint()
+      private static readonly MD5 HashMD5 = MD5.Create();
+
+      public BaiduTranslateEndpoint()
          : base( KnownEndpointNames.GoogleTranslate )
       {
 
       }
 
+      private static string CreateMD5( string input )
+      {
+         byte[] inputBytes = Encoding.UTF8.GetBytes( input );
+         byte[] hashBytes = HashMD5.ComputeHash( inputBytes );
+
+         StringBuilder sb = new StringBuilder();
+         for( int i = 0 ; i < hashBytes.Length ; i++ )
+         {
+            sb.Append( hashBytes[ i ].ToString( "X2" ) );
+         }
+         return sb.ToString().ToLower();
+      }
+
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
          headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
-         headers[ "Accept" ] = "*/*";
          headers[ "Accept-Charset" ] = "UTF-8";
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
          headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
-         headers[ HttpRequestHeader.Accept ] = "*/*";
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
@@ -42,14 +55,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          try
          {
-            //ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) =>
-            //{
-            //   return certificate.Issuer == CertificateIssuer;
-            //};
-
-            ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://translate.googleapis.com" ) );
+            ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://api.fanyi.baidu.com" ) );
             ServicePoint.ConnectionLimit = 5;
-            
          }
          catch
          {
@@ -60,12 +67,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          try
          {
-            var arr = JSON.Parse( result );
+            if( result.StartsWith( "{\"error" ) )
+            {
+               translated = null;
+               return false;
+            }
+
+
+            var obj = JSON.Parse( result );
             var lineBuilder = new StringBuilder( result.Length );
 
-            foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
+            foreach( JSONNode entry in obj.AsObject[ "trans_result" ].AsArray )
             {
-               var token = entry.AsArray[ 0 ].ToString();
+               var token = entry.AsObject[ "dst" ].ToString();
                token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
                if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( " " );
@@ -76,7 +90,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             translated = lineBuilder.ToString();
             return true;
          }
-         catch
+         catch( Exception )
          {
             translated = null;
             return false;
@@ -85,7 +99,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         return string.Format( Settings.EnableSSL ? HttpsServicePointTemplateUrl : HttpServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ) );
+         string salt = DateTime.UtcNow.Millisecond.ToString();
+         var md5 = CreateMD5( Settings.BaiduAppId + untranslatedText + salt + Settings.BaiduAppSecret );
+
+         return string.Format( Settings.EnableSSL ? HttpsServicePointTemplateUrl : HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, Settings.BaiduAppId, salt, md5 );
       }
    }
 }

@@ -45,9 +45,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
-         var url = _endpoint.GetServiceUrl( WWW.EscapeURL( untranslated ), from, to );
+         var url = _endpoint.GetServiceUrl( untranslated, from, to );
          var headers = new Dictionary<string, string>();
          _endpoint.ApplyHeaders( headers );
+
          using( var www = new WWW( url, null, headers ) )
          {
             _runningTranslations++;
@@ -70,18 +71,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             }
             else
             {
-               string translatedText = null;
                var text = www.text;
                if( text != null )
                {
                   try
                   {
-                     translatedText = _endpoint.ExtractTranslated( text ) ?? string.Empty;
+                     if( _endpoint.TryExtractTranslated( text, out var translatedText ) )
+                     {
+                        translatedText = translatedText ?? string.Empty;
+                        success( translatedText );
+                     }
+                     else
+                     {
+                        failure();
+                     }
                   }
-                  catch { }
+                  catch
+                  {
+                     failure();
+                  }
                }
-
-               success( translatedText );
+               else
+               {
+                  failure();
+               }
             }
          }
       }
