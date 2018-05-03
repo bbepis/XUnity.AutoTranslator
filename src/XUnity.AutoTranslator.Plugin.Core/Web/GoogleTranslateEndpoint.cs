@@ -68,7 +68,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                var token = entry.AsArray[ 0 ].ToString();
                token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( " " );
+               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 
                lineBuilder.Append( token );
             }
