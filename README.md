@@ -17,7 +17,7 @@ The mod can be installed into the following Plugin Managers:
 Installations instructions for both methods can be found below.
 
 ## Configuration
-The default configuration file, looks as such (2.4.0+):
+The default configuration file, looks as such (2.4.0+ (coming soon)):
 
 ```ini
 [Service]
@@ -25,8 +25,8 @@ Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "B
 EnableSSL=False                  ;Whether or not to use HTTPS endpoint over standard HTTP
 
 [General]
-Language=en                      ;The original language of the game
-FromLanguage=ja                  ;The language to translate into
+Language=en                      ;The language to translate into
+FromLanguage=ja                  ;The original language of the game
 
 [Files]
 Directory=Translation                                          ;Directory to search for cached translation files
