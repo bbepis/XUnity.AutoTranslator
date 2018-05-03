@@ -238,7 +238,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void AddNewTranslation( string key, string value )
+      private void QueueNewUntranslatedForDisk( string key )
+      {
+         if( Settings.IgnoreWhitespaceInDialogue )
+         {
+            key = key.ChangeToSingleLineForDialogue();
+         }
+
+         _newUntranslated.Add( key );
+      }
+
+      private void QueueNewTranslationForDisk( string key, string value )
       {
          lock( _writeToFileSync )
          {
@@ -474,7 +484,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     }
                                     else
                                     {
-                                       _newUntranslated.Add( stabilizedText );
+                                       QueueNewUntranslatedForDisk( stabilizedText );
                                     }
                                  }
                               }
@@ -499,7 +509,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                      else
                      {
-                        _newUntranslated.Add( text );
+                        QueueNewUntranslatedForDisk( text );
                      }
                   }
                }
@@ -612,7 +622,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( !string.IsNullOrEmpty( translatedText ) )
                {
-                  AddNewTranslation( Settings.IgnoreWhitespaceInDialogue ? job.UntranslatedDialogueText : job.UntranslatedText, translatedText );
+                  QueueNewTranslationForDisk( Settings.IgnoreWhitespaceInDialogue ? job.UntranslatedDialogueText : job.UntranslatedText, translatedText );
 
                   _completedJobs.Add( job );
                }
