@@ -211,7 +211,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             return job;
          }
-         
+
          foreach( var completedJob in _completedJobs )
          {
             if( completedJob.UntranslatedText == untranslatedText )
@@ -409,7 +409,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
-            
+
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
             if( TryGetTranslation( text, out translation ) )
@@ -601,6 +601,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
             StartCoroutine( AutoTranslateClient.TranslateByWWW( job.UntranslatedDialogueText, Settings.FromLanguage, Settings.Language, translatedText =>
             {
                _consecutiveErrors = 0;
+
+               if( Settings.ForceSplitTextAfterCharacters > 0 )
+               {
+                  translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
+               }
+
 
                job.TranslatedText = translatedText;
 

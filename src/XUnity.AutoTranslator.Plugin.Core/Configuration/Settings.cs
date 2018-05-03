@@ -32,9 +32,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
       public static bool EnableSSL;
-
       public static string BaiduAppId;
       public static string BaiduAppSecret;
+      public static int ForceSplitTextAfterCharacters;
 
       public static void Configure()
       {
@@ -74,7 +74,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 150 );
          IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( true );
-         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 18 );
+         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
+         ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );

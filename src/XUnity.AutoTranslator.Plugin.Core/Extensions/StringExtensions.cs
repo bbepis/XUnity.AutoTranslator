@@ -22,6 +22,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
+      public static string SplitToLines( this string text, int maxStringLength, params char[] splitOnCharacters )
+      {
+         var sb = new StringBuilder();
+         var index = 0;
+
+         while( text.Length > index )
+         {
+            // start a new line, unless we've just started
+            if( index != 0 )
+               sb.Append( '\n' );
+
+            // get the next substring, else the rest of the string if remainder is shorter than `maxStringLength`
+            var splitAt = index + maxStringLength <= text.Length
+                ? text.Substring( index, maxStringLength ).LastIndexOfAny( splitOnCharacters )
+                : text.Length - index;
+
+            // if can't find split location, take `maxStringLength` characters
+            splitAt = ( splitAt == -1 ) ? maxStringLength : splitAt;
+
+            // add result to collection & increment index
+            sb.Append( text.Substring( index, splitAt ).Trim() );
+            index += splitAt;
+         }
+
+         return sb.ToString();
+      }
+
       public static string RemoveWhitespace( this string text )
       {
          // Japanese whitespace, wtf
