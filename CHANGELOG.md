@@ -1,4 +1,4 @@
-### 2.4.0 - coming soon
+### 2.4.0
  * CHANGE - Completely reworked configuration for more organization
  * FEATURE - Added support for BaiduTranslate. User must provide AppId/AppSecret for API . Use "BaiduTranslate" as endpoint
  * FEATURE - Force splitting translated texts into newlines, if configured
