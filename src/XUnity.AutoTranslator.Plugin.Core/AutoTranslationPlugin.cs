@@ -54,6 +54,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private HashSet<string> _translatedTexts = new HashSet<string>();
 
       /// <summary>
+      /// Keeps track of things to copy to clipboard.
+      /// </summary>
+      private List<string> _textsToCopyToClipboardOrdered = new List<string>();
+      private HashSet<string> _textsToCopyToClipboard = new HashSet<string>();
+      private float _clipboardUpdated = Time.realtimeSinceStartup;
+
+      /// <summary>
       /// The number of http translation errors that has occurred up until now.
       /// </summary>
       private int _consecutiveErrors = 0;
@@ -235,6 +242,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var newKey = key.ChangeToSingleLineForDialogue();
             _translations[ newKey ] = value;
+         }
+      }
+
+      private void QueueNewUntranslatedForClipboard( string key )
+      {
+         if( Settings.CopyToClipboard )
+         {
+            key = key.ChangeToSingleLineForDialogue();
+            if( !_textsToCopyToClipboard.Contains( key ) )
+            {
+               _textsToCopyToClipboard.Add( key );
+               _textsToCopyToClipboardOrdered.Add( key );
+
+               _clipboardUpdated = Time.realtimeSinceStartup;
+            }
          }
       }
 
@@ -424,6 +446,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string translation;
             if( TryGetTranslation( text, out translation ) )
             {
+               QueueNewUntranslatedForClipboard( text );
+
                if( !string.IsNullOrEmpty( translation ) )
                {
                   SetTranslatedText( ui, translation, info );
@@ -464,6 +488,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
+                                 QueueNewUntranslatedForClipboard( text );
+
                                  info?.Reset( stabilizedText );
 
                                  // once the text has stabilized, attempt to look it up
@@ -501,6 +527,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( !_startedOperationsForNonStabilizableComponents.Contains( text ) )
                   {
                      _startedOperationsForNonStabilizableComponents.Add( text );
+
+                     QueueNewUntranslatedForClipboard( text );
 
                      // Lets try not to spam a service that might not be there...
                      if( AutoTranslateClient.IsConfigured && _consecutiveErrors < Settings.MaxErrors )
@@ -563,6 +591,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            CopyToClipboard();
             KickoffTranslations();
             FinishTranslations();
 
@@ -767,6 +796,40 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   // not super pretty, no...
                   ObjectExtensions.Remove( ui );
                }
+            }
+         }
+      }
+
+      private void CopyToClipboard()
+      {
+         if( Settings.CopyToClipboard 
+            && _textsToCopyToClipboardOrdered.Count > 0 
+            && Time.realtimeSinceStartup - _clipboardUpdated > Settings.ClipboardDebounceTime )
+         {
+            try
+            {
+               var builder = new StringBuilder();
+               foreach( var text in _textsToCopyToClipboardOrdered )
+               {
+                  if( text.Length + builder.Length > Settings.MaxClipboardCopyCharacters ) break;
+
+                  builder.AppendLine( text );
+               }
+
+               TextEditor editor = (TextEditor)GUIUtility.GetStateObject( typeof( TextEditor ), GUIUtility.keyboardControl );
+               editor.text = builder.ToString();
+               editor.SelectAll();
+               editor.Copy();
+
+            }
+            catch( Exception e )
+            {
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error while copying text to clipboard. " + Environment.NewLine + e );
+            }
+            finally
+            {
+               _textsToCopyToClipboard.Clear();
+               _textsToCopyToClipboardOrdered.Clear();
             }
          }
       }

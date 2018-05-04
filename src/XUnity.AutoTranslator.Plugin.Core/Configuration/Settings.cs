@@ -13,6 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxErrors = 5;
       public static readonly int MaxConcurrentTranslations = 5;
       public static readonly TimeSpan WebClientLifetime = TimeSpan.FromSeconds( 20 );
+      public static readonly float ClipboardDebounceTime = 0.5f;
       
       // can be changed
       public static string ServiceEndpoint;
@@ -35,6 +36,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string BaiduAppId;
       public static string BaiduAppSecret;
       public static int ForceSplitTextAfterCharacters;
+      public static bool CopyToClipboard;
+      public static int MaxClipboardCopyCharacters;
 
       public static void Configure()
       {
@@ -76,6 +79,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( true );
          MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
+         CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
+         MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
