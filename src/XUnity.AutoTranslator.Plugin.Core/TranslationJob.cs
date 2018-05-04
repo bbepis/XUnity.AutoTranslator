@@ -10,19 +10,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationJob
    {
-      public TranslationJob( string untranslatedText )
+      public TranslationJob( TranslationKeys key )
       {
-         UntranslatedText = untranslatedText;
-         UntranslatedDialogueText = untranslatedText.ChangeToSingleLineForDialogue();
+         Keys = key;
 
          Components = new List<object>();
       }
 
       public List<object> Components { get; private set; }
-
-      public string UntranslatedText { get; private set; }
-
-      public string UntranslatedDialogueText { get; private set; }
+      
+      public TranslationKeys Keys { get; private set; }
 
       public string TranslatedText { get; set; }
 
@@ -33,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          foreach( var component in Components )
          {
             var text = component.GetText().Trim();
-            if( text == UntranslatedText )
+            if( text == Keys.OriginalKey )
             {
                return true;
             }

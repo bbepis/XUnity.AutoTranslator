@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          try
          {
-            var harmony = HarmonyInstance.Create( "com.leakim1336.autotranslator" );
+            var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
 
             bool success = false;
             if( Settings.EnableUGUI )
