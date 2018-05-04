@@ -51,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while removing legacy configuration. " + Environment.NewLine + e );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while removing legacy configuration. " + Environment.NewLine + e );
          }
 
 

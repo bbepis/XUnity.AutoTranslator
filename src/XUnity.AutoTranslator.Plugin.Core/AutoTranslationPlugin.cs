@@ -118,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An unexpected error occurred while removing GC'ed resources." + Environment.NewLine + e );
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An unexpected error occurred while removing GC'ed resources." + Environment.NewLine + e );
             }
             finally
             {
@@ -160,7 +160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while saving translations to disk. " + Environment.NewLine + e );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while saving translations to disk. " + Environment.NewLine + e );
          }
       }
 
@@ -184,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      foreach( string translation in translations )
                      {
                         string[] kvp = translation.Split( new char[] { '=', '\t' }, StringSplitOptions.None );
-                        if( kvp.Length == 2 )
+                        if( kvp.Length >= 2 )
                         {
                            string key = TextHelper.Decode( kvp[ 0 ].Trim() );
                            string value = TextHelper.Decode( kvp[ 1 ].Trim() );
@@ -201,7 +201,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while loading translations. " + Environment.NewLine + e );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while loading translations. " + Environment.NewLine + e );
          }
       }
 
@@ -327,7 +327,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred while setting text on a component." + Environment.NewLine + e );
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting text on a component." + Environment.NewLine + e );
             }
             finally
             {
@@ -588,7 +588,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[ERROR][XUnity.AutoTranslator]: An error occurred in Update callback. " + Environment.NewLine + e );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred in Update callback. " + Environment.NewLine + e );
          }
       }
 
