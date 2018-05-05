@@ -12,6 +12,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public const string Name = "XUnity Auto Translator";
 
-      public const string Version = "2.4.0";
+      public const string Version = "2.5.0";
    }
 }

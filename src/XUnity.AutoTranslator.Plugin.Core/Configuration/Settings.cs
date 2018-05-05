@@ -11,13 +11,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    {
       // cannot be changed
       public static readonly int MaxErrors = 5;
-      public static readonly int MaxConcurrentTranslations = 3;
-      public static readonly TimeSpan WebClientLifetime = TimeSpan.FromSeconds( 20 );
       public static readonly float ClipboardDebounceTime = 1f;
+      public static readonly int MaxTranslationsBeforeSlowdown = 1000;
+      public static readonly int MaxTranslationsBeforeShutdown = 6000;
+      public static readonly int MaxUnstartedJobs = 3500;
 
-      public static readonly float MaxTranslationsQueuedPerSecond = 6;
-      public static readonly int MaxSecondsAboveTranslationThreshold = 10;
-      public static readonly int TranslationQueueWatchWindow = 5;
+      public static int DefaultMaxConcurrentTranslations = 2;
+      public static int MaxConcurrentTranslations = DefaultMaxConcurrentTranslations;
+      public static bool IsShutdown = false;
+
+      public static readonly float MaxTranslationsQueuedPerSecond = 5;
+      public static readonly int MaxSecondsAboveTranslationThreshold = 30;
+      public static readonly int TranslationQueueWatchWindow = 10;
       
       // can be changed
       public static string ServiceEndpoint;
@@ -41,7 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string BaiduAppSecret;
       public static int ForceSplitTextAfterCharacters;
 
-      public static bool CopyToClipboard = false;
+      public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
 
       public static void Configure()

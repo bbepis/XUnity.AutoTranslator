@@ -14,12 +14,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public static class AutoTranslateClient
    {
-      //private static readonly object Sync = new object();
-      //private static readonly HashSet<WebClientReference> AvailableClients = new HashSet<WebClientReference>();
-      //private static readonly HashSet<WebClientReference> WorkingClients = new HashSet<WebClientReference>();
-
       private static KnownEndpoint _endpoint;
       private static int _runningTranslations = 0;
+      private static int _translationCount;
 
       public static void Configure()
       {
@@ -39,8 +36,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      //private static int CurrentClientCount => AvailableClients.Count + WorkingClients.Count;
-
       public static bool HasAvailableClients => _runningTranslations < Settings.MaxConcurrentTranslations;
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
@@ -54,6 +49,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             _runningTranslations++;
             yield return www;
             _runningTranslations--;
+
+            if( Settings.MaxConcurrentTranslations == Settings.DefaultMaxConcurrentTranslations )
+            {
+               _translationCount++;
+               if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
+               {
+                  Settings.MaxConcurrentTranslations = 1;
+                  Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
+               }
+
+               if( !Settings.IsShutdown )
+               {
+                  if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
+                  {
+                     Settings.IsShutdown = true;
+                     Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
+                  }
+               }
+            }
+
 
             string error = null;
             try
@@ -98,124 +113,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             }
          }
       }
-
-      //public static bool TranslateByWebClient( string untranslated, string from, string to, Action<string> success, Action failure )
-      //{
-      //   var url = _endpoint.GetServiceUrl( untranslated, from, to );
-      //   var reference = GetOrCreateAvailableClient();
-      //   if( reference == null )
-      //   {
-      //      return false;
-      //   }
-      //   var client = reference.Client;
-
-      //   _endpoint.ApplyHeaders( client.Headers );
-      //   client.Encoding = Encoding.UTF8;
-
-      //   Interlocked.Increment( ref _runningTranslations );
-      //   DownloadStringCompletedEventHandler callback = null;
-      //   callback = ( s, e ) =>
-      //   {
-      //      try
-      //      {
-      //         client.DownloadStringCompleted -= callback;
-
-      //         string translatedText = null;
-      //         bool failed = false;
-
-      //         if( e.Error == null )
-      //         {
-      //            if( e.Result != null )
-      //            {
-      //               try
-      //               {
-      //                  translatedText = _endpoint.ExtractTranslated( e.Result ) ?? string.Empty;
-      //               }
-      //               catch { }
-      //            }
-      //         }
-      //         else
-      //         {
-      //            failed = true;
-      //         }
-
-      //         if( failed )
-      //         {
-      //            failure();
-      //         }
-      //         else
-      //         {
-      //            success( translatedText );
-      //         }
-      //      }
-      //      finally
-      //      {
-      //         ReleaseClientAfterUse( reference );
-      //         Interlocked.Decrement( ref _runningTranslations );
-      //      }
-      //   };
-      //   client.DownloadStringCompleted += callback;
-
-      //   client.DownloadStringAsync( new Uri( url ) );
-
-      //   return true;
-      //}
-
-      //public static void ReleaseClientAfterUse( WebClientReference client )
-      //{
-      //   lock( Sync )
-      //   {
-      //      var removed = WorkingClients.Remove( client );
-      //      if( removed )
-      //      {
-      //         client.LastTimestamp = DateTime.UtcNow;
-      //         AvailableClients.Add( client );
-      //      }
-      //   }
-      //}
-
-      //public static WebClientReference GetOrCreateAvailableClient()
-      //{
-      //   lock( Sync )
-      //   {
-      //      if( AvailableClients.Count > 0 )
-      //      {
-      //         // take a already configured client...
-      //         var client = AvailableClients.First();
-      //         AvailableClients.Remove( client );
-      //         WorkingClients.Add( client );
-      //         return client;
-      //      }
-      //      else if( CurrentClientCount < Settings.MaxConcurrentTranslations )
-      //      {
-      //         var client = new WebClient();
-      //         var reference = new WebClientReference( client );
-      //         WorkingClients.Add( reference );
-      //         return reference;
-      //      }
-      //      else
-      //      {
-      //         return null;
-      //      }
-      //   }
-      //}
-
-      //public static void RemoveUnusedClients()
-      //{
-      //   lock( Sync )
-      //   {
-      //      var now = DateTime.UtcNow;
-      //      var references = AvailableClients.ToList();
-      //      foreach( var reference in references )
-      //      {
-      //         var livedFor = now - reference.LastTimestamp;
-      //         if( livedFor > Settings.WebClientLifetime )
-      //         {
-      //            AvailableClients.Remove( reference );
-      //            reference.Client.Dispose();
-      //         }
-      //      }
-      //   }
-      //}
    }
 }
