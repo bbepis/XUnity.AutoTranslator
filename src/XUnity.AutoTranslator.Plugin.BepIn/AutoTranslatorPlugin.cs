@@ -11,7 +11,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.BepIn
 {
-   [BepInPlugin( GUID: PluginInfo.Identifier, Name: PluginInfo.Name, Version: PluginInfo.Version )]
+   [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
    public class AutoTranslatorPlugin : BaseUnityPlugin, IConfiguration
    {
       private IniFile _file;

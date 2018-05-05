@@ -60,9 +60,9 @@ namespace XUnity.AutoTranslator.Plugin.IPA
          _file.Save( _configPath );
       }
 
-      public string Name => PluginInfo.Name;
+      public string Name => PluginData.Name;
 
-      public string Version => PluginInfo.Version;
+      public string Version => PluginData.Version;
 
       public void OnApplicationQuit()
       {
