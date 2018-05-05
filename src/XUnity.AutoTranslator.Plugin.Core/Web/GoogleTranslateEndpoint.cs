@@ -48,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             //};
 
             ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://translate.googleapis.com" ) );
-            ServicePoint.ConnectionLimit = 5;
+            ServicePoint.ConnectionLimit = Settings.MaxConcurrentTranslations;
             
          }
          catch

@@ -77,8 +77,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private Func<string, bool> _symbolCheck;
 
+      private int[] _currentTranslationsQueuedPerSecond = new int[ Settings.TranslationQueueWatchWindow ];
+      private float? _timeExceededThreshold;
+
       private bool _isInTranslatedMode = true;
       private bool _hooksEnabled = true;
+      private bool _forceShutdown = false;
 
       public void Initialize()
       {
@@ -231,7 +235,61 @@ namespace XUnity.AutoTranslator.Plugin.Core
          job = new TranslationJob( key );
          _unstartedJobs.Add( key.ForcedRelevantKey, job );
 
+         AddToThresholdTimeAndCheck();
+
          return job;
+      }
+
+      private void AddToThresholdTimeAndCheck()
+      {
+         var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
+         var newIdx = ( (int)Time.time ) % Settings.TranslationQueueWatchWindow;
+         if( previousIdx != newIdx )
+         {
+            _currentTranslationsQueuedPerSecond[ newIdx ] = 0;
+         }
+         _currentTranslationsQueuedPerSecond[ newIdx ]++;
+
+         var translationsInWindow = _currentTranslationsQueuedPerSecond.Sum();
+         var translationsPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
+         if( translationsPerSecond > Settings.MaxTranslationsQueuedPerSecond )
+         {
+            // ABOVE THRESHOLD, remember time
+            if( !_timeExceededThreshold.HasValue )
+            {
+               _timeExceededThreshold = Time.time;
+            }
+
+            if( Time.time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
+            {
+               _unstartedJobs.Clear();
+               _forceShutdown = true;
+
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Shutting down... spam detected." );
+            }
+         }
+         else
+         {
+            _timeExceededThreshold = null;
+         }
+      }
+
+      private void ResetThresholdTimerIfRequired()
+      {
+         var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
+         var newIdx = ( (int)Time.time ) % Settings.TranslationQueueWatchWindow;
+         if( previousIdx != newIdx )
+         {
+            _currentTranslationsQueuedPerSecond[ newIdx ] = 0;
+         }
+
+         var translationsInWindow = _currentTranslationsQueuedPerSecond.Sum();
+         var translationsPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
+
+         if( translationsPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
+         {
+            _timeExceededThreshold = null;
+         }
       }
 
       private void AddTranslation( TranslationKeys key, string value )
@@ -279,7 +337,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private string Override_TextChanged( object ui, string text )
       {
-         if( _hooksEnabled )
+         if( _hooksEnabled && !_forceShutdown )
          {
             return TranslateOrQueueWebJob( ui, text, true );
          }
@@ -288,7 +346,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextChanged( object ui )
       {
-         if( _hooksEnabled )
+         if( _hooksEnabled && !_forceShutdown )
          {
             TranslateOrQueueWebJob( ui, null, false );
          }
@@ -296,7 +354,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextInitialized( object ui )
       {
-         if( _hooksEnabled )
+         if( _hooksEnabled && !_forceShutdown )
          {
             TranslateOrQueueWebJob( ui, null, true );
          }
@@ -522,7 +580,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  if( !_startedOperationsForNonStabilizableComponents.Contains( text ) )
+                  if( !_startedOperationsForNonStabilizableComponents.Contains( text ) && !text.ContainsNumbers() )
                   {
                      _startedOperationsForNonStabilizableComponents.Add( text );
 
@@ -587,9 +645,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Update()
       {
+         if( _forceShutdown ) return;
+
          try
          {
             CopyToClipboard();
+            ResetThresholdTimerIfRequired();
+
             KickoffTranslations();
             FinishTranslations();
 
@@ -801,8 +863,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CopyToClipboard()
       {
-         if( Settings.CopyToClipboard 
-            && _textsToCopyToClipboardOrdered.Count > 0 
+         if( Settings.CopyToClipboard
+            && _textsToCopyToClipboardOrdered.Count > 0
             && Time.realtimeSinceStartup - _clipboardUpdated > Settings.ClipboardDebounceTime )
          {
             try

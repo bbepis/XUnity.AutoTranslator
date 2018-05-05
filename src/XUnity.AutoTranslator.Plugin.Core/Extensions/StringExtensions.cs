@@ -9,6 +9,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    public static class StringExtensions
    {
+      private static readonly HashSet<char> Numbers = new HashSet<char>
+      {
+         '0',
+         '1',
+         '2',
+         '3',
+         '4',
+         '5',
+         '6',
+         '7',
+         '8',
+         '9',
+         '０',
+         '１',
+         '２',
+         '３',
+         '４',
+         '５',
+         '６',
+         '７',
+         '８',
+         '９'
+      };
+
       public static string ChangeToSingleLineForDialogue( this string that )
       {
          if( that.Length > Settings.MinDialogueChars ) // long strings often indicate dialog
@@ -53,6 +77,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          // Japanese whitespace, wtf
          return text.Replace( "\n", "" ).Replace( "\r", "" ).Replace( " ", "" ).Replace( "　", "" );
+      }
+
+      public static bool ContainsNumbers( this string text )
+      {
+         foreach( var c in text )
+         {
+            if( Numbers.Contains( c ) )
+            {
+               return true;
+            }
+         }
+         return false;
       }
 
       public static string UnescapeJson( this string str )

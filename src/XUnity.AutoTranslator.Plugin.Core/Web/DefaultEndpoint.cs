@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
@@ -28,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          try
          {
             ServicePoint = ServicePointManager.FindServicePoint( new Uri( Identifier ) );
-            ServicePoint.ConnectionLimit = 100;
+            ServicePoint.ConnectionLimit = Settings.MaxConcurrentTranslations;
          }
          catch
          {
