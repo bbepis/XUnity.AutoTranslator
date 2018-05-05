@@ -50,22 +50,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             yield return www;
             _runningTranslations--;
 
+            _translationCount++;
             if( Settings.MaxConcurrentTranslations == Settings.DefaultMaxConcurrentTranslations )
             {
-               _translationCount++;
                if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
                {
                   Settings.MaxConcurrentTranslations = 1;
                   Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
                }
+            }
 
-               if( !Settings.IsShutdown )
+            if( !Settings.IsShutdown )
+            {
+               if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
                {
-                  if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
-                  {
-                     Settings.IsShutdown = true;
-                     Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
-                  }
+                  Settings.IsShutdown = true;
+                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
                }
             }
 
