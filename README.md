@@ -3,7 +3,6 @@
 ## Text Frameworks
 This is an auto translation mod that hooks into the unity game engine and attempts to provide translations for the following text frameworks for Unity:
  * UGUI
- * IMGUI
  * NGUI
  * TextMeshPro
 
