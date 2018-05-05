@@ -1,3 +1,6 @@
+### 2.4.1
+ * Disabled IMGUI hook due to bug
+
 ### 2.4.0
  * CHANGE - Completely reworked configuration for more organization
  * FEATURE - Added support for BaiduTranslate. User must provide AppId/AppSecret for API . Use "BaiduTranslate" as endpoint
