@@ -1,3 +1,7 @@
+### 2.5.0
+ * Various new rate limiting patterns to prevent spam to configured translate endpoint
+ * Copy to clipboard feature
+
 ### 2.4.1
  * Disabled IMGUI hook due to bug
 
