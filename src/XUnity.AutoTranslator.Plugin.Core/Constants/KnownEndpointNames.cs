@@ -9,6 +9,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
    {
       public const string GoogleTranslateLegacy = "GoogleTranslateLegacy";
 
+      public const string GoogleTranslateHack = "GoogleTranslateHack";
+
       public const string BaiduTranslate = "BaiduTranslate";
    }
 }
