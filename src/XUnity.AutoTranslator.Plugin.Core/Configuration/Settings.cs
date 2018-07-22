@@ -44,6 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableSSL;
       public static string BaiduAppId;
       public static string BaiduAppSecret;
+      public static string YandexAPIKey;
       public static int ForceSplitTextAfterCharacters;
 
       public static bool CopyToClipboard;
@@ -94,7 +95,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
-         
+
+         YandexAPIKey = Config.Current.Preferences["Yandex"]["YandexAPIKey"].GetOrDefault("");
+
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
 
          AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );
