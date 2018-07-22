@@ -70,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
 
          ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate, true );
-         EnableSSL = Config.Current.Preferences[ "Service" ][ "EnableSSL" ].GetOrDefault( false );
+         EnableSSL = Config.Current.Preferences[ "Service" ][ "EnableSSL" ].GetOrDefault( true);
 
          Language = Config.Current.Preferences[ "General" ][ "Language" ].GetOrDefault( "en" );
          FromLanguage = Config.Current.Preferences[ "General" ][ "FromLanguage" ].GetOrDefault( "ja", true );
