@@ -11,15 +11,15 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class GoogleTranslateEndpoint : KnownEndpoint
+   public class GoogleTranslateLegacyEndpoint : KnownEndpoint
    {
       //private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
       private static ServicePoint ServicePoint;
       private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
 
-      public GoogleTranslateEndpoint()
-         : base( KnownEndpointNames.GoogleTranslate )
+      public GoogleTranslateLegacyEndpoint()
+         : base( KnownEndpointNames.GoogleTranslateLegacy )
       {
 
       }

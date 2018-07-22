@@ -21,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private static readonly MD5 HashMD5 = MD5.Create();
 
       public BaiduTranslateEndpoint()
-         : base( KnownEndpointNames.GoogleTranslate )
+         : base( KnownEndpointNames.GoogleTranslateLegacy )
       {
 
       }

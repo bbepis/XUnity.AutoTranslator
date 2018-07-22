@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 {
    public static class KnownEndpointNames
    {
-      public const string GoogleTranslate = "GoogleTranslate";
+      public const string GoogleTranslateLegacy = "GoogleTranslateLegacy";
 
       public const string BaiduTranslate = "BaiduTranslate";
    }
