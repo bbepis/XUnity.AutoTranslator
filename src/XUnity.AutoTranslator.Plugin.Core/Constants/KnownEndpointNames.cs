@@ -14,5 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public const string BaiduTranslate = "BaiduTranslate";
 
       public const string YandexTranslate = "YandexTranslate";
+
+      public const string WatsonTranslate = "WatsonTranslate";
    }
 }
