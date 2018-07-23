@@ -18,6 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type UILabel = FindType( "UILabel" );
 
+      public static readonly Type WWW = FindType( "UnityEngine.WWW" );
 
       private static Type FindType( string name )
       {

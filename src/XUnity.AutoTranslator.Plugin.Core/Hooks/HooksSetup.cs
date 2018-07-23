@@ -21,11 +21,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       public static void InstallHooks( Func<object, string, string> defaultHook )
       {
+         var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
+
+         bool success = false;
          try
          {
-            var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
-
-            bool success = false;
             if( Settings.EnableUGUI )
             {
                success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, defaultHook );
@@ -34,7 +34,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                   harmony.PatchAll( UGUIHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for UGUI. " + Environment.NewLine + e );
+         }
 
+         try
+         {
             if( Settings.EnableTextMeshPro )
             {
                success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, defaultHook );
@@ -43,7 +50,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                   harmony.PatchAll( TextMeshProHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for TextMeshPro. " + Environment.NewLine + e );
+         }
 
+         try
+         {
             if( Settings.EnableNGUI )
             {
                success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, defaultHook );
@@ -52,7 +66,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                   harmony.PatchAll( NGUIHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for NGUI. " + Environment.NewLine + e );
+         }
 
+         try
+         {
             if( Settings.EnableIMGUI )
             {
                harmony.PatchAll( IMGUIHooks.All );
@@ -60,7 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Console.WriteLine( "ERROR WHILE INITIALIZING AUTO TRANSLATOR: " + Environment.NewLine + e );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for IMGUI. " + Environment.NewLine + e );
          }
       }
 

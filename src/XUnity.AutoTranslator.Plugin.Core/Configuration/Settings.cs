@@ -13,10 +13,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
       public static readonly int MaxTranslationsBeforeSlowdown = 1000;
-      public static readonly int MaxTranslationsBeforeShutdown = 6000;
+      public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
 
-      public static int DefaultMaxConcurrentTranslations = 2;
+      public static int DefaultMaxConcurrentTranslations = 1;
       public static int MaxConcurrentTranslations = DefaultMaxConcurrentTranslations;
       public static bool IsShutdown = false;
 

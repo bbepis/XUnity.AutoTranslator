@@ -29,20 +29,27 @@ namespace XUnity.AutoTranslator.Patcher
       {
          get
          {
-            return "2.0.1";
+            return "2.6.0";
          }
       }
 
       public override void PrePatch()
       {
-         RPConfig.RequestAssembly( "UnityEngine.dll" );
+         if( ManagedDllExists( "UnityEngine.dll" ) )
+         {
+            RPConfig.RequestAssembly( "UnityEngine.dll" );
+         }
+         if( ManagedDllExists( "UnityEngine.CoreModule.dll" ) )
+         {
+            RPConfig.RequestAssembly( "UnityEngine.CoreModule.dll" );
+         }
 
          _hookAssembly = LoadAssembly( "XUnity.AutoTranslator.Plugin.Core.dll" );
       }
 
       public override bool CanPatch( PatcherArguments args )
       {
-         return args.Assembly.Name.Name == "UnityEngine" && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
+         return ( args.Assembly.Name.Name == "UnityEngine" ) && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
       }
 
       public override void Patch( PatcherArguments args )
@@ -64,6 +71,12 @@ namespace XUnity.AutoTranslator.Patcher
          }
 
          SetPatchedAttribute( args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
+      }
+
+      public bool ManagedDllExists( string name )
+      {
+         string path = Path.Combine( RPConfig.ConfigFile.GetSection( "ReiPatcher" ).GetKey( "AssembliesDir" ).Value, name );
+         return File.Exists( path );
       }
 
       public static AssemblyDefinition LoadAssembly( string name )

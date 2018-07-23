@@ -336,7 +336,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private string Override_TextChanged( object ui, string text )
       {
-         if( _hooksEnabled && !Settings.IsShutdown )
+         if( _hooksEnabled )
          {
             return TranslateOrQueueWebJob( ui, text, true );
          }
@@ -345,7 +345,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextChanged( object ui )
       {
-         if( _hooksEnabled && !Settings.IsShutdown )
+         if( _hooksEnabled )
          {
             TranslateOrQueueWebJob( ui, null, false );
          }
@@ -353,7 +353,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextInitialized( object ui )
       {
-         if( _hooksEnabled && !Settings.IsShutdown )
+         if( _hooksEnabled )
          {
             TranslateOrQueueWebJob( ui, null, true );
          }
@@ -560,7 +560,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     // Lets try not to spam a service that might not be there...
                                     if( AutoTranslateClient.IsConfigured )
                                     {
-                                       if( _consecutiveErrors < Settings.MaxErrors )
+                                       if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                                        {
                                           var job = GetOrCreateTranslationJobFor( stabilizedTextKey );
                                           job.Components.Add( ui );
@@ -591,7 +591,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      // Lets try not to spam a service that might not be there...
                      if( AutoTranslateClient.IsConfigured )
                      {
-                        if( _consecutiveErrors < Settings.MaxErrors )
+                        if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                         {
                            GetOrCreateTranslationJobFor( textKey );
                         }

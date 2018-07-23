@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
          typeof( DoButtonHook ),
          typeof( DoModalWindowHook ),
          typeof( DoWindowHook ),
-         typeof( DoButtonGridHook ),
+         //typeof( DoButtonGridHook ),
          typeof( DoTextFieldHook ),
          typeof( DoToggleHook ),
       };
@@ -159,27 +159,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoButtonGridHook
-   {
-      static bool Prepare( HarmonyInstance instance )
-      {
-         return Constants.Types.GUI != null;
-      }
+   //[Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   //public static class DoButtonGridHook
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return Constants.Types.GUI != null;
+   //   }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
-      {
-         return AccessTools.Method( Constants.Types.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
-      }
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Method( Constants.Types.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
+   //   }
 
-      static void Prefix( GUIContent[] contents )
-      {
-         foreach( var content in contents )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
-         }
-      }
-   }
+   //   static void Prefix( GUIContent[] contents )
+   //   {
+   //      foreach( var content in contents )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+   //      }
+   //   }
+   //}
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
    public static class DoTextFieldHook
