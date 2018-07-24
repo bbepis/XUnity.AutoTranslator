@@ -725,10 +725,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                _consecutiveErrors++;
 
-               if( _consecutiveErrors > Settings.MaxErrors && !Settings.IsShutdown )
+               if( !Settings.IsShutdown )
                {
-                  Settings.IsShutdown = true;
-                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: More than 5 consecutive errors occurred. Shutting down plugin..." );
+                  if( _consecutiveErrors > Settings.MaxErrors )
+                  {
+                     if( AutoTranslateClient.Fallback() )
+                     {
+                        Console.WriteLine( "[XUnity.AutoTranslator][WARN]: More than 5 consecutive errors occurred. Entering fallback mode." );
+                        _consecutiveErrors = 0;
+                     }
+                     else
+                     {
+                        Settings.IsShutdown = true;
+                        Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: More than 5 consecutive errors occurred. Shutting down plugin." );
+                     }
+                  }
                }
             } ) );
          }

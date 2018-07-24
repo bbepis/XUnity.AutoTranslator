@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          try
          {
             ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://api.fanyi.baidu.com" ) );
-            ServicePoint.ConnectionLimit = Settings.MaxConcurrentTranslations;
+            ServicePoint.ConnectionLimit = GetMaxConcurrency();
          }
          catch
          {

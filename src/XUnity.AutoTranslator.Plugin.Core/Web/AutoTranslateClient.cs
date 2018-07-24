@@ -21,10 +21,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private static KnownEndpoint _endpoint;
       private static int _runningTranslations = 0;
       private static int _translationCount;
+      private static int _maxConcurrency;
 
       public static void Configure()
       {
          _endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
+         _maxConcurrency = _endpoint.GetMaxConcurrency();
 
          if( _endpoint != null )
          {
@@ -40,110 +42,96 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public static bool HasAvailableClients => _runningTranslations < Settings.MaxConcurrentTranslations;
+      public static bool HasAvailableClients => _runningTranslations < _maxConcurrency;
+
+      public static bool Fallback()
+      {
+         return _endpoint.Fallback();
+      }
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
-         while( true )
-         {
-            var url = _endpoint.GetServiceUrl( untranslated, from, to );
-            var headers = new Dictionary<string, string>();
-            _endpoint.ApplyHeaders( headers );
+         var url = _endpoint.GetServiceUrl( untranslated, from, to );
+         var headers = new Dictionary<string, string>();
+         _endpoint.ApplyHeaders( headers );
 
-            var failed = false;
-            object www = WwwConstructor.Invoke( new object[] { url, null, headers } );
+         object www = WwwConstructor.Invoke( new object[] { url, null, headers } );
+         try
+         {
+            _runningTranslations++;
+            yield return www;
+            _runningTranslations--;
+
+            _translationCount++;
+            if( !Settings.IsSlowdown )
+            {
+               if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
+               {
+                  Settings.IsSlowdown = true;
+                  _maxConcurrency = 1;
+
+                  Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
+               }
+            }
+
+            if( !Settings.IsShutdown )
+            {
+               if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
+               {
+                  Settings.IsShutdown = true;
+                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
+               }
+            }
+
+
+            string error = null;
             try
             {
-               _runningTranslations++;
-               yield return www;
-               _runningTranslations--;
-
-               _translationCount++;
-               //if( Settings.MaxConcurrentTranslations == Settings.DefaultMaxConcurrentTranslations )
-               //{
-               //   if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
-               //   {
-               //      Settings.MaxConcurrentTranslations = 1;
-               //      Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
-               //   }
-               //}
-
-               if( !Settings.IsShutdown )
-               {
-                  if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
-                  {
-                     Settings.IsShutdown = true;
-                     Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
-                  }
-               }
-
-
-               string error = null;
-               try
-               {
-                  error = (string)AccessTools.Property( Types.WWW, "error" ).GetValue( www, null );
-               }
-               catch( Exception e )
-               {
-                  error = e.ToString();
-               }
-
-               if( error != null )
-               {
-                  failed = true;
-               }
-               else
-               {
-                  var text = (string)AccessTools.Property( Types.WWW, "text" ).GetValue( www, null ); ;
-                  if( text != null )
-                  {
-                     try
-                     {
-                        if( _endpoint.TryExtractTranslated( text, out var translatedText ) )
-                        {
-                           translatedText = translatedText ?? string.Empty;
-                           success( translatedText );
-                        }
-                        else
-                        {
-                           failed = true;
-                        }
-                     }
-                     catch
-                     {
-                        failed = true;
-                     }
-                  }
-                  else
-                  {
-                     failed = true;
-                  }
-               }
+               error = (string)AccessTools.Property( Types.WWW, "error" ).GetValue( www, null );
             }
-            finally
+            catch( Exception e )
             {
-               var disposable = www as IDisposable;
-               if( disposable != null )
-               {
-                  disposable.Dispose();
-               }
+               error = e.ToString();
             }
 
-            if( failed )
+            if( error != null )
             {
-               if( ( _endpoint as ISupportFallback )?.Fallback() == true )
+               failure();
+            }
+            else
+            {
+               var text = (string)AccessTools.Property( Types.WWW, "text" ).GetValue( www, null ); ;
+               if( text != null )
                {
-                  // we can attempt with fallback strategy, simply retry
+                  try
+                  {
+                     if( _endpoint.TryExtractTranslated( text, out var translatedText ) )
+                     {
+                        translatedText = translatedText ?? string.Empty;
+                        success( translatedText );
+                     }
+                     else
+                     {
+                        failure();
+                     }
+                  }
+                  catch
+                  {
+                     failure();
+                  }
                }
                else
                {
                   failure();
-                  break;
                }
             }
-            else
+         }
+         finally
+         {
+            var disposable = www as IDisposable;
+            if( disposable != null )
             {
-               break;
+               disposable.Dispose();
             }
          }
       }

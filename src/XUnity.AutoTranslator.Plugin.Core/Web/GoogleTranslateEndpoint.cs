@@ -12,9 +12,10 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class GoogleTranslateEndpoint : KnownEndpoint, ISupportFallback
+   public class GoogleTranslateEndpoint : KnownEndpoint
    {
       //private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
+      private static ServicePoint ServicePoint;
       private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string FallbackHttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
@@ -104,6 +105,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ConfigureServicePointManager()
       {
+         try
+         {
+            //ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) =>
+            //{
+            //   return certificate.Issuer == CertificateIssuer;
+            //};
+
+            ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://translate.googleapis.com" ) );
+            ServicePoint.ConnectionLimit = GetMaxConcurrency();
+
+         }
+         catch
+         {
+         }
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -145,7 +160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public bool Fallback()
+      public override bool Fallback()
       {
          if( !_hasFallenBack )
          {
