@@ -1,3 +1,11 @@
+### 2.6.0
+ * Fix for current issue with gtrans (23.07.2018)
+ * Support for newer versions of unity engine (those including UnityEngine.CoreModule, etc. in Managed folder)
+ * Keeps functioning if web services fails, but no requests will be sent in such scenario. Texts will simply be translated from cache
+ * Concurrency now based on which type of endpoint. For gtrans it is set to 1
+ * Changed hooking, such that if text framework fails, the others wont also fail
+ * Bit more leniency in translation queue spam detection to prevent shutdown of plugin under normal circumstances
+
 ### 2.5.0
  * Various new rate limiting patterns to prevent spam to configured translate endpoint
  * Copy to clipboard feature

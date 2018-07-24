@@ -4,23 +4,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
-using UnityEngine;
+using Harmony;
 using UnityEngine.Networking;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public static class AutoTranslateClient
    {
+      private static readonly ConstructorInfo WwwConstructor = Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
+
       private static KnownEndpoint _endpoint;
       private static int _runningTranslations = 0;
       private static int _translationCount;
+      private static int _maxConcurrency;
 
       public static void Configure()
       {
          _endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
+         _maxConcurrency = _endpoint.GetMaxConcurrency();
 
          if( _endpoint != null )
          {
@@ -36,7 +42,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public static bool HasAvailableClients => _runningTranslations < Settings.MaxConcurrentTranslations;
+      public static bool HasAvailableClients => _runningTranslations < _maxConcurrency;
+
+      public static bool Fallback()
+      {
+         return _endpoint.Fallback();
+      }
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
@@ -44,18 +55,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var headers = new Dictionary<string, string>();
          _endpoint.ApplyHeaders( headers );
 
-         using( var www = new WWW( url, null, headers ) )
+         object www = WwwConstructor.Invoke( new object[] { url, null, headers } );
+         try
          {
             _runningTranslations++;
             yield return www;
             _runningTranslations--;
 
             _translationCount++;
-            if( Settings.MaxConcurrentTranslations == Settings.DefaultMaxConcurrentTranslations )
+            if( !Settings.IsSlowdown )
             {
                if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
                {
-                  Settings.MaxConcurrentTranslations = 1;
+                  Settings.IsSlowdown = true;
+                  _maxConcurrency = 1;
+
                   Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
                }
             }
@@ -73,7 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             string error = null;
             try
             {
-               error = www.error;
+               error = (string)AccessTools.Property( Types.WWW, "error" ).GetValue( www, null );
             }
             catch( Exception e )
             {
@@ -86,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             }
             else
             {
-               var text = www.text;
+               var text = (string)AccessTools.Property( Types.WWW, "text" ).GetValue( www, null ); ;
                if( text != null )
                {
                   try
@@ -110,6 +124,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                {
                   failure();
                }
+            }
+         }
+         finally
+         {
+            var disposable = www as IDisposable;
+            if( disposable != null )
+            {
+               disposable.Dispose();
             }
          }
       }
