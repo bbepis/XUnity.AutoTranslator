@@ -13,6 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public static readonly KnownEndpoint BaiduTranslate = new BaiduTranslateEndpoint();
       public static readonly KnownEndpoint YandexTranslate = new YandexTranslateEndpoint();
       public static readonly KnownEndpoint WatsonTranslate = new WatsonTranslateEndpoint();
+      public static readonly KnownEndpoint ExciteTranslate = new ExciteTranslateEndpoint();
 
       public static KnownEndpoint FindEndpoint( string identifier )
       {
@@ -29,7 +30,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             case KnownEndpointNames.YandexTranslate:
                return YandexTranslate;
             case KnownEndpointNames.WatsonTranslate:
-                    return WatsonTranslate;
+               return WatsonTranslate;
+            case KnownEndpointNames.ExciteTranslate:
+               return ExciteTranslate;
             default:
                return new DefaultEndpoint( identifier );
          }
