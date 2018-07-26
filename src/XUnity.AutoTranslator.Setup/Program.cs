@@ -31,23 +31,23 @@ namespace XUnity.AutoTranslator.Setup
          var patchesPath = Path.Combine( reiPath, "Patches" );
 
          // lets add any missing files
-         AddFileIfNotExists( Path.Combine( reiPath, "ExIni.dll" ), Resources.ExIni );
-         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.dll" ), Resources.Mono_Cecil );
-         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Inject.dll" ), Resources.Mono_Cecil_Inject );
-         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Mdb.dll" ), Resources.Mono_Cecil_Mdb );
-         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Pdb.dll" ), Resources.Mono_Cecil_Pdb );
-         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
-         AddFileIfNotExists( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
-         AddFileIfNotExists( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher );
+         AddFile( Path.Combine( reiPath, "ExIni.dll" ), Resources.ExIni );
+         AddFile( Path.Combine( reiPath, "Mono.Cecil.dll" ), Resources.Mono_Cecil );
+         AddFile( Path.Combine( reiPath, "Mono.Cecil.Inject.dll" ), Resources.Mono_Cecil_Inject );
+         AddFile( Path.Combine( reiPath, "Mono.Cecil.Mdb.dll" ), Resources.Mono_Cecil_Mdb );
+         AddFile( Path.Combine( reiPath, "Mono.Cecil.Pdb.dll" ), Resources.Mono_Cecil_Pdb );
+         AddFile( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
+         AddFile( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
+         AddFile( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher, true );
 
 
          foreach( var launcher in launchers )
          {
             var managedDir = Path.Combine( gamePath, launcher.Data.Name, "Managed" );
-            AddFileIfNotExists( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
-            AddFileIfNotExists( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
-            AddFileIfNotExists( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
-            AddFileIfNotExists( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core );
+            AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
+            AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
+            AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
+            AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );
@@ -99,7 +99,7 @@ namespace XUnity.AutoTranslator.Setup
          Console.ReadKey();
       }
 
-      public static void AddFileIfNotExists( string fileName, byte[] bytes )
+      public static void AddFile( string fileName, byte[] bytes, bool overwrite = false )
       {
          var fi = new FileInfo( fileName );
          if( !fi.Exists )
@@ -111,6 +111,11 @@ namespace XUnity.AutoTranslator.Setup
             }
             System.IO.File.WriteAllBytes( fi.FullName, bytes );
             Console.WriteLine( "Created file: " + fi.FullName );
+         }
+         else if( overwrite )
+         {
+            System.IO.File.WriteAllBytes( fi.FullName, bytes );
+            Console.WriteLine( "Updated file: " + fi.FullName );
          }
       }
 
