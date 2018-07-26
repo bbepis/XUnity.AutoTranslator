@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using IWshRuntimeLibrary;
+using XUnity.AutoTranslator.Setup.Properties;
 
 namespace XUnity.AutoTranslator.Setup
 {
@@ -27,33 +28,26 @@ namespace XUnity.AutoTranslator.Setup
          }
 
          var reiPath = Path.Combine( gamePath, "ReiPatcher" );
-         var reiInfo = new DirectoryInfo( reiPath );
-         if( !reiInfo.Exists )
-         {
-            Console.WriteLine( "ReiPatcher directory missing!" );
-            Console.WriteLine( "Press any key to exit..." );
-            return;
-         }
+         var patchesPath = Path.Combine( reiPath, "Patches" );
+
+         // lets add any missing files
+         AddFileIfNotExists( Path.Combine( reiPath, "ExIni.dll" ), Resources.ExIni );
+         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.dll" ), Resources.Mono_Cecil );
+         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Inject.dll" ), Resources.Mono_Cecil_Inject );
+         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Mdb.dll" ), Resources.Mono_Cecil_Mdb );
+         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Pdb.dll" ), Resources.Mono_Cecil_Pdb );
+         AddFileIfNotExists( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
+         AddFileIfNotExists( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
+         AddFileIfNotExists( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher );
+
 
          foreach( var launcher in launchers )
          {
-            var setupPath = Path.Combine( gamePath, "AutoTranslatorSetupFiles" );
-            var setupInfo = new DirectoryInfo( setupPath );
-            if( setupInfo.Exists )
-            {
-               var setupFiles = setupInfo.GetFiles( "*.dll", SearchOption.TopDirectoryOnly ).Concat( setupInfo.GetFiles( "*.exe", SearchOption.TopDirectoryOnly ) );
-               foreach( var setupFile in setupFiles )
-               {
-                  var copyToPath = Path.Combine( gamePath, launcher.Data.Name, "Managed", setupFile.Name );
-                  var copyToFile = new FileInfo( copyToPath );
-                  setupFile.CopyTo( copyToPath, true );
-                  Console.WriteLine( "Copied " + setupFile.Name + " to " + launcher.Data.FullName );
-               }
-            }
-            else
-            {
-               Console.WriteLine( "AutoTranslatorSetupFiles directory missing. Skipping copying files to managed directory..." );
-            }
+            var managedDir = Path.Combine( gamePath, launcher.Data.Name, "Managed" );
+            AddFileIfNotExists( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
+            AddFileIfNotExists( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
+            AddFileIfNotExists( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
+            AddFileIfNotExists( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );
@@ -103,6 +97,21 @@ namespace XUnity.AutoTranslator.Setup
 
          Console.WriteLine( "Setup completed. Press any key to exit." );
          Console.ReadKey();
+      }
+
+      public static void AddFileIfNotExists( string fileName, byte[] bytes )
+      {
+         var fi = new FileInfo( fileName );
+         if( !fi.Exists )
+         {
+            if( !fi.Directory.Exists )
+            {
+               Directory.CreateDirectory( fi.Directory.FullName );
+               Console.WriteLine( "Created directory: " + fi.Directory.FullName );
+            }
+            System.IO.File.WriteAllBytes( fi.FullName, bytes );
+            Console.WriteLine( "Created file: " + fi.FullName );
+         }
       }
 
       public static void CreateShortcut( string shortcutName, string shortcutPath, string targetFileLocation )

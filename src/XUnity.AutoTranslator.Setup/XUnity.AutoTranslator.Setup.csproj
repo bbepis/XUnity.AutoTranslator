@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net40</TargetFramework>
+    <AssemblyName>SetupReiPatcherAndAutoTranslator</AssemblyName>
+    <Version>2.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +23,30 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+        <Output TaskParameter="Assemblies" ItemName="Targets" />
+     </GetAssemblyIdentity>
+     <ItemGroup>
+        <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+     </ItemGroup>
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\ReiPatcher\&quot;&#xD;&#xA;   powershell Compress-Archive -Path '$(SolutionDir)dist\ReiPatcher\$(TargetName)$(TargetExt)' -DestinationPath '$(SolutionDir)dist\ReiPatcher\XUnity.AutoTranslator-ReiPatcher-@(VersionNumber).zip' -Force)&#xD;&#xA;)" />
+  </Target>
 
 </Project>

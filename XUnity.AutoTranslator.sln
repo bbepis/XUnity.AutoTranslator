@@ -11,9 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.IPA", "src\XUnity.AutoTranslator.Plugin.IPA\XUnity.AutoTranslator.Plugin.IPA.csproj", "{C749698C-9E49-4CC3-8B45-62AE3AD0C938}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Patcher", "src\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj", "{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Patcher", "src\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj", "{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Setup", "src\XUnity.AutoTranslator.Setup\XUnity.AutoTranslator.Setup.csproj", "{86BF1F46-44C1-4301-8314-6EC32F74575F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup", "src\XUnity.AutoTranslator.Setup\XUnity.AutoTranslator.Setup.csproj", "{86BF1F46-44C1-4301-8314-6EC32F74575F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {718A3B1D-A5E5-4223-AD53-45C60C874150}
+		{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD} = {0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
