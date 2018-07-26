@@ -17,11 +17,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
         private static readonly string HttpsServicePointTemplateUrl = "https://www.excite.co.jp/world/?wb_lp={0}{1}&before={2}";
 
-        private static string getExciteLangCode(string code)
-        {
-            return code.ToUpper();
-        }
-
         // Author: Johnny Cee (https://stackoverflow.com/questions/10709821/find-text-in-string-with-c-sharp)
         private static string getBetween(string strSource, string strStart, string strEnd)
         {
@@ -48,8 +43,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
         public override void ApplyHeaders(Dictionary<string, string> headers)
         {
-            headers["User-Agent"] = "Mozilla/5.0 (Linux; U; en-us; KFAPWI Build/JDQ39) AppleWebKit/535.19 (KHTML, like Gecko) Silk/3.13 Safari/535.19 Silk-Accelerated=true";
-            headers["Accept"] = "text/html,application/xhtml+xml";
+            headers["User-Agent"] = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53";
+            headers["Accept"] = "text/html";
             headers["Accept-Charset"] = "UTF-8";
             headers["DNT"] = "1";
         }
@@ -74,9 +69,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
         public override bool TryExtractTranslated(string result, out string translated)
         {
             try
-            {
-                String extracted = getBetween(result, "id=\"after\"", "</textarea>");                
-                extracted = extracted.Substring(extracted.IndexOf(">")+1);
+            {                
+                String extracted = getBetween(result, "class=\"inputText\">", "</p>");
                 if (String.IsNullOrEmpty(extracted))
                 {
                     translated = null;
