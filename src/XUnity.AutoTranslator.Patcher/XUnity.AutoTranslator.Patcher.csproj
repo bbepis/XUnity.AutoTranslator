@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="ExIni">
       <HintPath>..\..\libs\ExIni.dll</HintPath>
     </Reference>
