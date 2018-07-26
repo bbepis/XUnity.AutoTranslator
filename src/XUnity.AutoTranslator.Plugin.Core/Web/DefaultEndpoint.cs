@@ -20,10 +20,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
-      {
-      }
-
       public override void ConfigureServicePointManager()
       {
          try

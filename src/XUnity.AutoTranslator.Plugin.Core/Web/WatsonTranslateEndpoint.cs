@@ -31,14 +31,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             headers["Authorization"] = "Basic "+System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Settings.WatsonAPIUsername+":"+Settings.WatsonAPIPassword));
         }
 
-        public override void ApplyHeaders(WebHeaderCollection headers)
-        {
-            headers[HttpRequestHeader.UserAgent] = "curl/7.55.1";
-            headers[HttpRequestHeader.Accept] = "application/json";
-            headers[HttpRequestHeader.AcceptCharset] = "UTF-8";
-            headers[HttpRequestHeader.Authorization] = "Basic " + System.Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(Settings.WatsonAPIUsername + ":" + Settings.WatsonAPIPassword));
-        }
-
         public override void ConfigureServicePointManager()
         {
             try

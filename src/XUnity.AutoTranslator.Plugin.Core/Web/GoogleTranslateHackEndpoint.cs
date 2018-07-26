@@ -48,13 +48,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             headers["Accept-Charset"] = "UTF-8";
         }
 
-        public override void ApplyHeaders(WebHeaderCollection headers)
-        {
-            headers[HttpRequestHeader.UserAgent] = "Opera/9.80 (J2ME/MIDP; Opera Mini/5.1.21214/28.2725; U; en) Presto/2.8.119 Version/11.10";
-            headers[HttpRequestHeader.Accept] = "*/*";
-            headers[HttpRequestHeader.AcceptCharset] = "UTF-8";
-        }
-
         public override void ConfigureServicePointManager()
         {
             try

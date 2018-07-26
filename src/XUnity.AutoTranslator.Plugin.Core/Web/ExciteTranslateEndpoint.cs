@@ -49,10 +49,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             headers["DNT"] = "1";
         }
 
-        public override void ApplyHeaders(WebHeaderCollection headers)
-        {
-        }
-
         public override void ConfigureServicePointManager()
         {
             try

@@ -29,13 +29,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             headers["Accept-Charset"] = "UTF-8";
         }
 
-        public override void ApplyHeaders(WebHeaderCollection headers)
-        {
-            headers[HttpRequestHeader.UserAgent] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55";
-            headers[HttpRequestHeader.Accept] = "*/*";
-            headers[HttpRequestHeader.AcceptCharset] = "UTF-8";
-        }
-
         public override void ConfigureServicePointManager()
         {
             try
