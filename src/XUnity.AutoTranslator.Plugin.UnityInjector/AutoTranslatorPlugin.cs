@@ -7,10 +7,11 @@ using UnityInjector;
 using UnityInjector.Attributes;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.UnityInjector
 {
-   [PluginName( "XUnity.AutoTranslator" ), PluginVersion( "2.6.0" )]
+   [PluginName( PluginData.Name ), PluginVersion( PluginData.Version )]
    public class AutoTranslatorPlugin : PluginBase, IConfiguration
    {
       IniFile IConfiguration.ReloadConfig()
