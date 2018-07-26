@@ -1,3 +1,6 @@
+### 2.7.0
+ * Additional installation instructions for standalone installation
+
 ### 2.6.0
  * Fix for current issue with gtrans (23.07.2018)
  * Support for newer versions of unity engine (those including UnityEngine.CoreModule, etc. in Managed folder)
