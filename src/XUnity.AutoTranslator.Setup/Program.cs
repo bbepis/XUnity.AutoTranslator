@@ -122,7 +122,7 @@ namespace XUnity.AutoTranslator.Setup
 
          shortcut.WorkingDirectory = Path.GetDirectoryName( targetFileLocation );
          shortcut.TargetPath = targetFileLocation;
-         shortcut.Arguments = "-c " + Path.GetFileNameWithoutExtension( shortcutName ) + ".ini";
+         shortcut.Arguments = "-c \"" + Path.GetFileNameWithoutExtension( shortcutName ) + ".ini\"";
          shortcut.Save();
       }
    }
