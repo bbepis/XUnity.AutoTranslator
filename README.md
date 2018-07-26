@@ -68,7 +68,7 @@ The plugin can be installed in following ways:
 ### BepInEx Plugin
 REQUIRES: [BepInEx plugin manager](https://github.com/bbepis/BepInEx) (follow its installation instructions first!). 
 
- 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in BepInEx folder.
 
 The file structure should like like this:
@@ -82,7 +82,7 @@ The file structure should like like this:
 ### IPA Plugin
 REQUIRES: [IPA plugin manager](https://github.com/Eusth/IPA) (follow its installation instructions first!).
 
- 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in Plugins folder.
 
 The file structure should like like this
@@ -97,7 +97,7 @@ The file structure should like like this
 ### Standalone Installation (ReiPatcher)
 REQUIRES: Nothing, ReiPatcher is provided by this download.
 
- 1. Download XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that "SetupReiPatcherAndAutoTranslator.exe" is placed alongside other exe files.
  3. Execute "SetupReiPatcherAndAutoTranslator.exe". This will setup up ReiPatcher correctly.
  4. Execute the shortcut {GameExeName}.lnk that was created besides existing executables. This will patch and launch the game.
