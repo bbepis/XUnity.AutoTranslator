@@ -14,8 +14,8 @@ namespace XUnity.AutoTranslator.Patcher
    public class Patcher : PatchBase
    {
       private static readonly HashSet<string> EntryClasses = new HashSet<string> { "Display", "Input" };
-
       private AssemblyDefinition _hookAssembly;
+      private string _assemblyName;
 
       public override string Name
       {
@@ -35,13 +35,15 @@ namespace XUnity.AutoTranslator.Patcher
 
       public override void PrePatch()
       {
-         if( ManagedDllExists( "UnityEngine.dll" ) )
-         {
-            RPConfig.RequestAssembly( "UnityEngine.dll" );
-         }
          if( ManagedDllExists( "UnityEngine.CoreModule.dll" ) )
          {
             RPConfig.RequestAssembly( "UnityEngine.CoreModule.dll" );
+            _assemblyName = "UnityEngine.CoreModule";
+         }
+         else if( ManagedDllExists( "UnityEngine.dll" ) )
+         {
+            RPConfig.RequestAssembly( "UnityEngine.dll" );
+            _assemblyName = "UnityEngine";
          }
 
          _hookAssembly = LoadAssembly( "XUnity.AutoTranslator.Plugin.Core.dll" );
@@ -49,7 +51,7 @@ namespace XUnity.AutoTranslator.Patcher
 
       public override bool CanPatch( PatcherArguments args )
       {
-         return ( args.Assembly.Name.Name == "UnityEngine" ) && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
+         return ( args.Assembly.Name.Name == _assemblyName ) && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
       }
 
       public override void Patch( PatcherArguments args )
