@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ExIni">
+      <HintPath>..\..\libs\ExIni.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityInjector">
+      <HintPath>..\..\libs\UnityInjector.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
