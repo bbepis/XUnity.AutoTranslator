@@ -41,7 +41,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
-      // TKK Approach stolen from Translation Aggregator r190.
+      // TKK Approach stolen from Translation Aggregator r190, all credits to Sinflower
 
       private long Vi( long r, string o )
       {
@@ -58,8 +58,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       private string Tk( string r )
       {
-         long m = 425586;
-         long s = 2342038670;
+         long m = 425635;
+         long s = 1953544246;
          List<long> S = new List<long>();
 
          for( var v = 0 ; v < r.Length ; v++ )
@@ -67,18 +67,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             long A = r[ v ];
             if( 128 > A )
                S.Add( A );
-            else if( 2048 > A )
-               S.Add( A >> 6 | 192 );
-            else if( 55296 == ( 64512 & A ) && v + 1 < r.Length && 56320 == ( 64512 & r[ v + 1 ] ) )
-            {
-               A = 65536 + ( ( 1023 & A ) << 10 ) + ( 1023 & r[ ++v ] );
-               S.Add( A >> 18 | 240 );
-               S.Add( A >> 12 & 63 | 128 );
-            }
             else
             {
-               S.Add( A >> 12 | 224 );
-               S.Add( A >> 6 & 63 | 128 );
+               if( 2048 > A )
+                  S.Add( A >> 6 | 192 );
+               else if( 55296 == ( 64512 & A ) && v + 1 < r.Length && 56320 == ( 64512 & r[ v + 1 ] ) )
+               {
+                  A = 65536 + ( ( 1023 & A ) << 10 ) + ( 1023 & r[ ++v ] );
+                  S.Add( A >> 18 | 240 );
+                  S.Add( A >> 12 & 63 | 128 );
+               }
+               else
+               {
+                  S.Add( A >> 12 | 224 );
+                  S.Add( A >> 6 & 63 | 128 );
+               }
+
                S.Add( 63 & A | 128 );
             }
          }
