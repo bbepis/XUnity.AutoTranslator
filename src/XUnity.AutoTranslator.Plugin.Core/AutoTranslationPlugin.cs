@@ -201,8 +201,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
                            {
-                              var translationKey = new TranslationKeys( key );
-                              AddTranslation( translationKey, value );
+                              AddTranslation( key, value );
                            }
                         }
                      }
@@ -291,15 +290,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void AddTranslation( string key, string value )
+      {
+         _translations[ key ] = value;
+         _translatedTexts.Add( value );
+      }
+
       private void AddTranslation( TranslationKeys key, string value )
       {
-         _translations[ key.OriginalKey ] = value;
+         _translations[ key.RelevantKey ] = value;
          _translatedTexts.Add( value );
-
-         if( Settings.IgnoreWhitespaceInDialogue && key.IsDialogue )
-         {
-            _translations[ key.DialogueKey ] = value;
-         }
       }
 
       private void QueueNewUntranslatedForClipboard( TranslationKeys key )
