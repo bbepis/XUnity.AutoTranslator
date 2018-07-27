@@ -51,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
-         // allow self configuration of cache parameters by an endpoint
+         // allow self setup of async acquired info by an endpoint
          var yieldable = _endpoint.StartSetup();
          if( yieldable != null )
          {
