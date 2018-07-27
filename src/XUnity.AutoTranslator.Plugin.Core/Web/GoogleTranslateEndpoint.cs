@@ -119,6 +119,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                var parts = result.Split( '.' );
                m = int.Parse( parts[ 0 ] );
                s = int.Parse( parts[ 1 ] );
+
+               Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Successfully setup GoogleTranslate endpoint." );
             }
             catch( Exception e )
             {
