@@ -19,8 +19,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string DialogueKey { get; }
 
-      //public string ForcedRelevantKey => IsDialogue ? DialogueKey : OriginalKey;
-
       public string RelevantKey => IsDialogue && Settings.IgnoreWhitespaceInDialogue ? DialogueKey : OriginalKey;
 
       public bool IsDialogue => OriginalKey.Length > Settings.MinDialogueChars;
