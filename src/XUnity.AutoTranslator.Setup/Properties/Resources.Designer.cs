@@ -83,6 +83,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Jurassic {
+            get {
+                object obj = ResourceManager.GetObject("Jurassic", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Mono_Cecil {
             get {
                 object obj = ResourceManager.GetObject("Mono_Cecil", resourceCulture);

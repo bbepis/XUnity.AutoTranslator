@@ -6,6 +6,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Harmony;
+using Jurassic;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -106,19 +107,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
                var openClamIndex = html.IndexOf( '{', lookupIndex );
                var closeClamIndex = html.IndexOf( '}', openClamIndex );
-               var endStringEval = html.IndexOf( '\'', closeClamIndex );
-               var script = html.Substring( lookupIndex, endStringEval - lookupIndex );
+               var functionIndex = html.IndexOf( "function", lookupIndex );
+               var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
                var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
 
-               using( ScriptEngine engine = new ScriptEngine( "{16d51579-a30b-4c8b-a276-0ff4dc41e755}" ) )
-               {
-                  ParsedScript parsed = engine.Parse( decodedScript );
-                  var result = (string)parsed.CallMethod( "FuncName" );
+               ScriptEngine engine = new ScriptEngine();
+               engine.Evaluate( decodedScript );
+               var result = engine.CallGlobalFunction<string>( "FuncName" );
 
-                  var parts = result.Split( '.' );
-                  m = int.Parse( parts[ 0 ] );
-                  s = int.Parse( parts[ 1 ] );
-               }
+               var parts = result.Split( '.' );
+               m = int.Parse( parts[ 0 ] );
+               s = int.Parse( parts[ 1 ] );
             }
             catch( Exception e )
             {
@@ -131,6 +130,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
+            File.WriteAllText( "err.txt", error );
             Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (End)." + Environment.NewLine + error );
          }
       }
