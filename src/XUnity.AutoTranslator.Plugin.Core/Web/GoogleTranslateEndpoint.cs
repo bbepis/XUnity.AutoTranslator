@@ -111,6 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
                var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
 
+               // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
                ScriptEngine engine = new ScriptEngine();
                engine.Evaluate( decodedScript );
                var result = engine.CallGlobalFunction<string>( "FuncName" );
