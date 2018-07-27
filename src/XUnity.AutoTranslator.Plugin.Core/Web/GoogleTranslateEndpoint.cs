@@ -133,7 +133,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
-            File.WriteAllText( "err.txt", error );
             Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (End)." + Environment.NewLine + error );
          }
       }
