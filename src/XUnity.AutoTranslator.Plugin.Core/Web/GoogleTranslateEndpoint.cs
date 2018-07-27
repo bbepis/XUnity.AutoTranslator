@@ -31,8 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private bool _hasFallenBack = false;
       private bool _isSettingUp = false;
       private bool _hasSetup = false;
-      private int m = 425635;
-      private int s = 1953544246;
+      private long m = 425635;
+      private long s = 1953544246;
 
       public GoogleTranslateEndpoint()
          : base( KnownEndpointNames.GoogleTranslate )
@@ -117,8 +117,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                var result = engine.CallGlobalFunction<string>( "FuncName" );
 
                var parts = result.Split( '.' );
-               m = int.Parse( parts[ 0 ] );
-               s = int.Parse( parts[ 1 ] );
+               m = long.Parse( parts[ 0 ] );
+               s = long.Parse( parts[ 1 ] );
 
                Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Successfully setup GoogleTranslate endpoint." );
             }
