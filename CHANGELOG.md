@@ -1,5 +1,5 @@
 ### 2.7.0
- * Additional installation instructions for standalone installation
+ * Additional installation instructions for standalone installation through ReiPatcher
  * Fixed a bug with NGUI that caused those texts not to be translated
  * Improved fix for gtrans (23.07.2018)
 
