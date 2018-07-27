@@ -43,8 +43,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       public static string Decode( string text )
       {
          // Remove these in newer version
-         text = text.Replace( "0D", "\r" ).Replace( "\\r", "\r" );
-         text = text.Replace( "0A", "\n" ).Replace( "\\n", "\n" );
+         text = text.Replace( "\\r", "\r" );
+         text = text.Replace( "\\n", "\n" );
          return text;
       }
 
