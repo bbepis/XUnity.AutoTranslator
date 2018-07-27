@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
+using Harmony;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -14,13 +16,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public class GoogleTranslateEndpoint : KnownEndpoint
    {
+      private static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
+
       //private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
       private static ServicePoint ServicePoint;
       private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string FallbackHttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
-      private static bool _hasFallenBack = false;
+      private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
+      private static readonly string HttpTranslateUserSite = "http://translate.google.com";
+
+      private bool _hasFallenBack = false;
+      private bool _isSettingUp = false;
+      private bool _hasSetup = false;
+      private int m = 425635;
+      private int s = 1953544246;
 
       public GoogleTranslateEndpoint()
          : base( KnownEndpointNames.GoogleTranslate )
@@ -41,6 +52,89 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
+      public override bool IsSettingUp()
+      {
+         return _isSettingUp;
+      }
+
+      public override object StartSetup()
+      {
+         if( !_isSettingUp && !_hasSetup )
+         {
+            _isSettingUp = true;
+
+            var headers = new Dictionary<string, string>();
+            ApplyHeaders( headers );
+            object www = WwwConstructor.Invoke( new object[] { Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite, null, headers } );
+
+            try
+            {
+               return www;
+            }
+            catch( Exception e )
+            {
+               _hasSetup = true;
+               _isSettingUp = false;
+
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (Start)." + Environment.NewLine + e.ToString() );
+
+               return null;
+            }
+         }
+         return null;
+      }
+
+      public override void EndSetup( object www )
+      {
+         string error = null;
+         try
+         {
+            error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
+         }
+         catch( Exception e )
+         {
+            error = e.ToString();
+         }
+
+         if( error == null )
+         {
+            try
+            {
+               var html = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
+
+               const string lookup = "TKK=eval('";
+               var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
+               var openClamIndex = html.IndexOf( '{', lookupIndex );
+               var closeClamIndex = html.IndexOf( '}', openClamIndex );
+               var endStringEval = html.IndexOf( '\'', closeClamIndex );
+               var script = html.Substring( lookupIndex, endStringEval - lookupIndex );
+               var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
+
+               using( ScriptEngine engine = new ScriptEngine( "{16d51579-a30b-4c8b-a276-0ff4dc41e755}" ) )
+               {
+                  ParsedScript parsed = engine.Parse( decodedScript );
+                  var result = (string)parsed.CallMethod( "FuncName" );
+
+                  var parts = result.Split( '.' );
+                  m = int.Parse( parts[ 0 ] );
+                  s = int.Parse( parts[ 1 ] );
+               }
+            }
+            catch( Exception e )
+            {
+               error = e.ToString();
+            }
+         }
+
+         _hasSetup = true;
+         _isSettingUp = false;
+
+         if( error != null )
+         {
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (End)." + Environment.NewLine + error );
+         }
+      }
+
       // TKK Approach stolen from Translation Aggregator r190, all credits to Sinflower
 
       private long Vi( long r, string o )
@@ -58,8 +152,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       private string Tk( string r )
       {
-         long m = 425635;
-         long s = 1953544246;
          List<long> S = new List<long>();
 
          for( var v = 0 ; v < r.Length ; v++ )

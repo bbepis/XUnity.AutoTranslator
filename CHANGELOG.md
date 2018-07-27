@@ -1,6 +1,7 @@
 ### 2.7.0
  * Additional installation instructions for standalone installation
  * Fixed a bug with NGUI that caused those texts not to be translated
+ * Improved fix for gtrans (23.07.2018)
 
 ### 2.6.0
  * Fix for current issue with gtrans (23.07.2018)

@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public static bool HasAvailableClients => _runningTranslations < _maxConcurrency;
+      public static bool HasAvailableClients => !_endpoint.IsSettingUp() && _runningTranslations < _maxConcurrency;
 
       public static bool Fallback()
       {
@@ -51,6 +51,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
+         // allow self configuration of cache parameters by an endpoint
+         var yieldable = _endpoint.StartSetup();
+         if( yieldable != null )
+         {
+            yield return yieldable;
+            _endpoint.EndSetup( yieldable );
+         }
+
+
          var url = _endpoint.GetServiceUrl( untranslated, from, to );
          var headers = new Dictionary<string, string>();
          _endpoint.ApplyHeaders( headers );

@@ -34,5 +34,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          return 1;
       }
+
+      public virtual bool IsSettingUp()
+      {
+         return false;
+      }
+
+      public virtual object StartSetup()
+      {
+         return null;
+      }
+
+      public virtual void EndSetup( object obj )
+      {
+
+      }
    }
 }
