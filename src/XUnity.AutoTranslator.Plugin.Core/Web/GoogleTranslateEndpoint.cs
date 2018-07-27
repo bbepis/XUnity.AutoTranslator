@@ -64,12 +64,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          {
             _isSettingUp = true;
 
-            var headers = new Dictionary<string, string>();
-            ApplyHeaders( headers );
-            object www = WwwConstructor.Invoke( new object[] { Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite, null, headers } );
-
             try
             {
+               var headers = new Dictionary<string, string>();
+               ApplyHeaders( headers );
+               object www = WwwConstructor.Invoke( new object[] { Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite, null, headers } );
+
                return www;
             }
             catch( Exception e )
