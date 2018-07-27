@@ -218,21 +218,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private TranslationJob GetOrCreateTranslationJobFor( TranslationKeys key )
       {
-         if( _unstartedJobs.TryGetValue( key.ForcedRelevantKey, out TranslationJob job ) )
+         if( _unstartedJobs.TryGetValue( key.RelevantKey, out TranslationJob job ) )
          {
             return job;
          }
 
          foreach( var completedJob in _completedJobs )
          {
-            if( completedJob.Keys.ForcedRelevantKey == key.ForcedRelevantKey )
+            if( completedJob.Keys.RelevantKey == key.RelevantKey )
             {
                return completedJob;
             }
          }
 
          job = new TranslationJob( key );
-         _unstartedJobs.Add( key.ForcedRelevantKey, job );
+         _unstartedJobs.Add( key.RelevantKey, job );
 
          CheckThresholds();
 
@@ -306,10 +306,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( Settings.CopyToClipboard )
          {
-            if( !_textsToCopyToClipboard.Contains( key.ForcedRelevantKey ) )
+            if( !_textsToCopyToClipboard.Contains( key.RelevantKey ) )
             {
-               _textsToCopyToClipboard.Add( key.ForcedRelevantKey );
-               _textsToCopyToClipboardOrdered.Add( key.ForcedRelevantKey );
+               _textsToCopyToClipboard.Add( key.RelevantKey );
+               _textsToCopyToClipboardOrdered.Add( key.RelevantKey );
 
                _clipboardUpdated = Time.realtimeSinceStartup;
             }
@@ -331,7 +331,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool TryGetTranslation( TranslationKeys key, out string value )
       {
-         return _translations.TryGetValue( key.OriginalKey, out value ) || ( Settings.IgnoreWhitespaceInDialogue && _translations.TryGetValue( key.DialogueKey, out value ) );
+         return _translations.TryGetValue( key.OriginalKey, out value ) 
+            || ( Settings.IgnoreWhitespaceInDialogue && key.IsDialogue && _translations.TryGetValue( key.DialogueKey, out value ) );
       }
 
       private string Override_TextChanged( object ui, string text )
@@ -702,7 +703,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // lets see if the text should still be translated before kicking anything off
             if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
 
-            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.Keys.ForcedRelevantKey, Settings.FromLanguage, Settings.Language, translatedText =>
+            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.Keys.RelevantKey, Settings.FromLanguage, Settings.Language, translatedText =>
             {
                _consecutiveErrors = 0;
 

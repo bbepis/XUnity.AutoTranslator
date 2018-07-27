@@ -33,19 +33,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          '９'
       };
 
-      public static string ChangeToSingleLineForDialogue( this string that )
-      {
-         if( that.Length > Settings.MinDialogueChars ) // long strings often indicate dialog
-         {
-            // Always change dialogue into one line. Otherwise translation services gets confused.
-            return that.RemoveWhitespace();
-         }
-         else
-         {
-            return that;
-         }
-      }
-
       public static string SplitToLines( this string text, int maxStringLength, params char[] splitOnCharacters )
       {
          var sb = new StringBuilder();
