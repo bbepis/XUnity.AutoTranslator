@@ -1,3 +1,6 @@
+### 2.7.1
+ * Fixed whitespace handling to honor configuration more appropriately
+
 ### 2.7.0
  * Additional installation instructions for standalone installation through ReiPatcher
  * Fixed a bug with NGUI that caused those texts not to be translated
