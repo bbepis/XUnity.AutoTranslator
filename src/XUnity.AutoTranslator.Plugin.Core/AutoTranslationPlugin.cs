@@ -331,8 +331,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool TryGetTranslation( TranslationKeys key, out string value )
       {
-         return _translations.TryGetValue( key.OriginalKey, out value ) 
-            || ( Settings.IgnoreWhitespaceInDialogue && key.IsDialogue && _translations.TryGetValue( key.DialogueKey, out value ) );
+         return ( Settings.IgnoreWhitespaceInDialogue && key.IsDialogue && _translations.TryGetValue( key.DialogueKey, out value ) ) 
+            || _translations.TryGetValue( key.OriginalKey, out value );
       }
 
       private string Override_TextChanged( object ui, string text )
