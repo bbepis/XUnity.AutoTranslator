@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    {
       private static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
 
-      //private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
+      private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
       private static ServicePoint ServicePoint;
       private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
@@ -50,7 +50,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
          headers[ HttpRequestHeader.Accept ] = "*/*";
-         headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
       public override bool IsSettingUp()
@@ -66,11 +65,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
             try
             {
-               var headers = new Dictionary<string, string>();
-               ApplyHeaders( headers );
-               object www = WwwConstructor.Invoke( new object[] { Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite, null, headers } );
-
-               return www;
+               ApplyHeaders( UnityWebClient.Default.Headers );
+               var result = UnityWebClient.Default.GetDownloadResult( new Uri( Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite ) );
+               return result;
             }
             catch( Exception e )
             {
@@ -87,21 +84,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void EndSetup( object www )
       {
-         string error = null;
-         try
-         {
-            error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
-         }
-         catch( Exception e )
-         {
-            error = e.ToString();
-         }
+         Console.WriteLine( "EndSetup: " + www );
 
-         if( error == null )
+         var dresult = www as DownloadResult;
+         var error = dresult.Error;
+
+         if( dresult.Succeeded )
          {
             try
             {
-               var html = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
+               var html = dresult.Result;
 
                const string lookup = "TKK=eval('";
                var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
@@ -205,10 +197,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          try
          {
-            //ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) =>
-            //{
-            //   return certificate.Issuer == CertificateIssuer;
-            //};
+            ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) =>
+            {
+               return certificate.Issuer == CertificateIssuer;
+            };
 
             ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://translate.googleapis.com" ) );
             ServicePoint.ConnectionLimit = GetMaxConcurrency();

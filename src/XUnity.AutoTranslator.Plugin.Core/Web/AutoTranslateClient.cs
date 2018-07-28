@@ -59,16 +59,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             _endpoint.EndSetup( yieldable );
          }
 
-
          var url = _endpoint.GetServiceUrl( untranslated, from, to );
-         var headers = new Dictionary<string, string>();
-         _endpoint.ApplyHeaders( headers );
-
-         object www = WwwConstructor.Invoke( new object[] { url, null, headers } );
+         _endpoint.ApplyHeaders( UnityWebClient.Default.Headers );
+         var result = UnityWebClient.Default.GetDownloadResult( new Uri( url ) );
          try
          {
             _runningTranslations++;
-            yield return www;
+            yield return result;
             _runningTranslations--;
 
             _translationCount++;
@@ -92,56 +89,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                }
             }
 
-
-            string error = null;
-            try
+            if( _translationCount % 100 == 0 )
             {
-               error = (string)AccessTools.Property( Types.WWW, "error" ).GetValue( www, null );
-            }
-            catch( Exception e )
-            {
-               error = e.ToString();
+               UnityWebClient.Default.ClearCookies();
             }
 
-            if( error != null )
+
+            if( result.Succeeded )
             {
-               failure();
-            }
-            else
-            {
-               var text = (string)AccessTools.Property( Types.WWW, "text" ).GetValue( www, null ); ;
-               if( text != null )
+               if( _endpoint.TryExtractTranslated( result.Result, out var translatedText ) )
                {
-                  try
-                  {
-                     if( _endpoint.TryExtractTranslated( text, out var translatedText ) )
-                     {
-                        translatedText = translatedText ?? string.Empty;
-                        success( translatedText );
-                     }
-                     else
-                     {
-                        failure();
-                     }
-                  }
-                  catch
-                  {
-                     failure();
-                  }
+                  translatedText = translatedText ?? string.Empty;
+                  success( translatedText );
                }
                else
                {
                   failure();
                }
             }
+            else
+            {
+               failure();
+            }
          }
          finally
          {
-            var disposable = www as IDisposable;
-            if( disposable != null )
-            {
-               disposable.Dispose();
-            }
+
          }
       }
    }
