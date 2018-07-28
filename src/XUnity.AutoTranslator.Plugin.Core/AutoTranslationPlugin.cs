@@ -400,9 +400,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   info?.UnresizeUI( ui );
                }
             }
+            catch( NullReferenceException )
+            {
+               // This is likely happened due to a scene change.
+            }
             catch( Exception e )
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][WARN]: An error occurred while setting text on a component. This is likely happened due to a scene change." + Environment.NewLine + e );
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting text on a component." + Environment.NewLine + e );
             }
             finally
             {
