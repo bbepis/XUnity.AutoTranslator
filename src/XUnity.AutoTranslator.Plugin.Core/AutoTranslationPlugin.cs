@@ -217,21 +217,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private TranslationJob GetOrCreateTranslationJobFor( TranslationKeys key )
       {
-         if( _unstartedJobs.TryGetValue( key.RelevantKey, out TranslationJob job ) )
+         if( _unstartedJobs.TryGetValue( key.GetDictionaryLookupKey(), out TranslationJob job ) )
          {
             return job;
          }
 
          foreach( var completedJob in _completedJobs )
          {
-            if( completedJob.Keys.RelevantKey == key.RelevantKey )
+            if( completedJob.Keys.GetDictionaryLookupKey() == key.GetDictionaryLookupKey() )
             {
                return completedJob;
             }
          }
 
          job = new TranslationJob( key );
-         _unstartedJobs.Add( key.RelevantKey, job );
+         _unstartedJobs.Add( key.GetDictionaryLookupKey(), job );
 
          CheckThresholds();
 
@@ -298,7 +298,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void AddTranslation( TranslationKeys key, string value )
       {
-         _translations[ key.RelevantKey ] = value;
+         _translations[ key.GetDictionaryLookupKey() ] = value;
          _translatedTexts.Add( value );
       }
 
@@ -318,21 +318,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void QueueNewUntranslatedForDisk( TranslationKeys key )
       {
-         _newUntranslated.Add( key.RelevantKey );
+         _newUntranslated.Add( key.GetDictionaryLookupKey() );
       }
 
       private void QueueNewTranslationForDisk( TranslationKeys key, string value )
       {
          lock( _writeToFileSync )
          {
-            _newTranslations[ key.RelevantKey ] = value;
+            _newTranslations[ key.GetDictionaryLookupKey() ] = value;
          }
       }
 
       private bool TryGetTranslation( TranslationKeys key, out string value )
       {
-         return ( Settings.IgnoreWhitespaceInDialogue && key.IsDialogue && _translations.TryGetValue( key.DialogueKey, out value ) ) 
-            || _translations.TryGetValue( key.OriginalKey, out value );
+         return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
       }
 
       private string Override_TextChanged( object ui, string text )
@@ -360,13 +359,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void SetTranslatedText( object ui, string text, TranslationInfo info )
+      private void SetTranslatedText( object ui, string translatedText, TranslationKeys key, TranslationInfo info )
       {
-         info?.SetTranslatedText( text );
+         var untemplatedTranslatedText = key.Untemplate( translatedText );
+
+         info?.SetTranslatedText( untemplatedTranslatedText );
 
          if( _isInTranslatedMode )
          {
-            SetText( ui, text, true, info );
+            SetText( ui, untemplatedTranslatedText, true, info );
          }
       }
 
@@ -456,17 +457,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return null;
          }
 
-
-         if( Settings.Delay == 0 || !SupportsStabilization( ui ) )
+         var supportsStabilization = SupportsStabilization( ui );
+         if( Settings.Delay == 0 || !supportsStabilization )
          {
-            return TranslateOrQueueWebJobImmediate( ui, text, info );
+            return TranslateOrQueueWebJobImmediate( ui, text, info, supportsStabilization );
          }
          else
          {
             StartCoroutine(
                DelayForSeconds( Settings.Delay, () =>
                {
-                  TranslateOrQueueWebJobImmediate( ui, text, info );
+                  TranslateOrQueueWebJobImmediate( ui, text, info, supportsStabilization );
                } ) );
          }
 
@@ -484,7 +485,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Translates the string of a UI  text or queues it up to be translated
       /// by the HTTP translation service.
       /// </summary>
-      private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info )
+      private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info, bool supportsStabilization )
       {
          // Get the trimmed text
          text = ( text ?? ui.GetText() ).Trim();
@@ -494,7 +495,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             info?.Reset( text );
 
-            var textKey = new TranslationKeys( text );
+            var textKey = new TranslationKeys( text, !supportsStabilization );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
@@ -504,13 +505,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( !string.IsNullOrEmpty( translation ) )
                {
-                  SetTranslatedText( ui, translation, info );
+                  SetTranslatedText( ui, translation, textKey, info );
                   return translation;
                }
             }
             else
             {
-               if( SupportsStabilization( ui ) )
+               if( supportsStabilization )
                {
                   // if we dont know what text to translate it to, we need to figure it out.
                   // this might take a while, so add the UI text component to the ongoing operations
@@ -542,7 +543,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
-                                 var stabilizedTextKey = new TranslationKeys( stabilizedText );
+                                 var stabilizedTextKey = new TranslationKeys( stabilizedText, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
@@ -553,7 +554,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  {
                                     if( !string.IsNullOrEmpty( translation ) )
                                     {
-                                       SetTranslatedText( ui, translation, info );
+                                       SetTranslatedText( ui, translation, stabilizedTextKey, info );
                                     }
                                  }
                                  else
@@ -583,9 +584,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  if( !_startedOperationsForNonStabilizableComponents.Contains( text ) && !text.ContainsNumbers() )
+                  if( !_startedOperationsForNonStabilizableComponents.Contains( textKey.GetDictionaryLookupKey() ) )
                   {
-                     _startedOperationsForNonStabilizableComponents.Add( text );
+                     _startedOperationsForNonStabilizableComponents.Add( textKey.GetDictionaryLookupKey() );
 
                      QueueNewUntranslatedForClipboard( textKey );
 
@@ -703,7 +704,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // lets see if the text should still be translated before kicking anything off
             if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
 
-            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.Keys.RelevantKey, Settings.FromLanguage, Settings.Language, translatedText =>
+            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText =>
             {
                _consecutiveErrors = 0;
 
@@ -712,8 +713,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
                }
 
-
-               job.TranslatedText = translatedText;
+               job.TranslatedText = job.Keys.RepairTemplate( translatedText );
 
                if( !string.IsNullOrEmpty( translatedText ) )
                {
@@ -766,10 +766,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
                   var text = component.GetText().Trim();
-                  if( text == job.Keys.OriginalKey )
+                  if( text == job.Keys.OriginalText )
                   {
                      var info = component.GetTranslationInfo( false );
-                     SetTranslatedText( component, job.TranslatedText, info );
+                     SetTranslatedText( component, job.TranslatedText, job.Keys, info );
                   }
                }
 
@@ -787,10 +787,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var info = kvp.Value as TranslationInfo;
             if( info != null && !string.IsNullOrEmpty( info.OriginalText ) )
             {
-               var key = new TranslationKeys( info.OriginalText );
+               var key = new TranslationKeys( info.OriginalText, false );
                if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                {
-                  SetTranslatedText( kvp.Key, translatedText, info );
+                  SetTranslatedText( kvp.Key, translatedText, key, info );
                }
             }
          }

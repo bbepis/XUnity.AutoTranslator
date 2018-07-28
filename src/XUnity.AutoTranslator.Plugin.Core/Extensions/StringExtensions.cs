@@ -33,6 +33,128 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          '９'
       };
 
+      private static readonly HashSet<char> NumbersWithDot = new HashSet<char>
+      {
+         '0',
+         '1',
+         '2',
+         '3',
+         '4',
+         '5',
+         '6',
+         '7',
+         '8',
+         '9',
+         '０',
+         '１',
+         '２',
+         '３',
+         '４',
+         '５',
+         '６',
+         '７',
+         '８',
+         '９',
+         '.'
+      };
+
+      public static TemplatedString TemplatizeByNumbers( this string str )
+      {
+         var dict = new Dictionary<string, string>();
+         bool isNumber = false;
+         StringBuilder carg = null;
+         char arg = 'A';
+
+         for( int i = 0 ; i < str.Length ; i++ )
+         {
+            var c = str[ i ];
+            if( isNumber )
+            {
+               if( NumbersWithDot.Contains( c ) )
+               {
+                  carg.Append( c );
+               }
+               else
+               {
+                  // end current number
+                  var variable = carg.ToString();
+                  var ok = true;
+                  var c1 = variable[ 0 ];
+                  if( c1 == '.' )
+                  {
+                     if( variable.Length == 1 )
+                     {
+                        ok = false;
+                     }
+                     else
+                     {
+                        var c2 = variable[ 1 ];
+                        ok = Numbers.Contains( c2 );
+                     }
+                  }
+
+                  if( ok && !dict.ContainsKey( variable ) )
+                  {
+                     dict.Add( variable, "{{" + arg + "}}" );
+                     arg++;
+                  }
+
+                  carg = null;
+                  isNumber = false;
+               }
+            }
+            else
+            {
+               if( NumbersWithDot.Contains( c ) )
+               {
+                  isNumber = true;
+                  carg = new StringBuilder();
+                  carg.Append( c );
+               }
+            }
+         }
+
+         if( carg != null )
+         {
+            // end current number
+            var variable = carg.ToString();
+            var ok = true;
+            var c1 = variable[ 0 ];
+            if( c1 == '.' )
+            {
+               if( variable.Length == 1 )
+               {
+                  ok = false;
+               }
+               else
+               {
+                  var c2 = variable[ 1 ];
+                  ok = Numbers.Contains( c2 );
+               }
+            }
+
+            if( ok && !dict.ContainsKey( variable ) )
+            {
+               dict.Add( variable, "{{" + arg + "}}" );
+               arg++;
+            }
+         }
+
+         if( dict.Count > 0 )
+         {
+            foreach( var kvp in dict )
+            {
+               str = str.Replace( kvp.Key, kvp.Value );
+            }
+
+            return new TemplatedString( str, dict.ToDictionary( x => x.Value, x => x.Key ) );
+         }
+         else
+         {
+            return null;
+         }
+      }
+
       public static string SplitToLines( this string text, int maxStringLength, params char[] splitOnCharacters )
       {
          var sb = new StringBuilder();

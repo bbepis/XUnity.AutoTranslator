@@ -9,18 +9,62 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public struct TranslationKeys
    {
-      public TranslationKeys( string key )
+      public TranslationKeys( string key, bool templatizeByNumbers )
       {
-         OriginalKey = key;
-         DialogueKey = key.RemoveWhitespace();
+         OriginalText = key;
+
+         if( Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars )
+         {
+            RelevantKey = key.RemoveWhitespace();
+         }
+         else
+         {
+            RelevantKey = key;
+         }
+
+         if( templatizeByNumbers )
+         {
+            TemplatedKey = RelevantKey.TemplatizeByNumbers();
+         }
+         else
+         {
+            TemplatedKey = null;
+         }
       }
 
-      public string OriginalKey { get; }
+      public TemplatedString TemplatedKey { get; }
 
-      public string DialogueKey { get; }
+      public string RelevantKey { get; }
 
-      public string RelevantKey => IsDialogue && Settings.IgnoreWhitespaceInDialogue ? DialogueKey : OriginalKey;
+      public string OriginalText { get; set; }
 
-      public bool IsDialogue => OriginalKey.Length > Settings.MinDialogueChars;
+      public string GetDictionaryLookupKey()
+      {
+         if( TemplatedKey != null )
+         {
+            return TemplatedKey.Template;
+         }
+         return RelevantKey;
+      }
+
+      public string Untemplate( string text )
+      {
+         if( TemplatedKey != null )
+         {
+            return TemplatedKey.Untemplate( text );
+         }
+
+         return text;
+      }
+
+      public string RepairTemplate( string text )
+      {
+         if( TemplatedKey != null )
+         {
+            return TemplatedKey.RepairTemplate( text );
+         }
+
+         return text;
+      }
    }
 }

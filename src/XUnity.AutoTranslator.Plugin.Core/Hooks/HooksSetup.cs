@@ -76,7 +76,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               harmony.PatchAll( IMGUIHooks.All );
+               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, defaultHook );
+               if( !success )
+               {
+                  harmony.PatchAll( IMGUIHooks.All );
+
+                  // This wont work in "newer" unity versions!
+                  try
+                  {
+                     harmony.PatchType( typeof( DoButtonGridHook ) );
+                  }
+                  catch { }
+               }
             }
          }
          catch( Exception e )

@@ -1,5 +1,7 @@
-### 2.7.1
+### 2.8.0
  * Fixed whitespace handling to honor configuration more appropriately
+ * IMGUI enabled by default, now supports numbers in translated texts
+ * Support for overwriting IMGUI hook events
 
 ### 2.7.0
  * Additional installation instructions for standalone installation through ReiPatcher
