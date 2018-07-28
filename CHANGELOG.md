@@ -1,7 +1,9 @@
 ### 2.8.0
  * Fixed whitespace handling to honor configuration more appropriately
- * IMGUI enabled by default, now supports numbers in translated texts
+ * Support for IMGUI translation texts with numbers
  * Support for overwriting IMGUI hook events
+ * IMGUI is still disabled by default. Often other mods UI are implemented in IMGUI. Enabling it will allow those UIs to be translated as well. 
+  - Simply change the config, such that: EnableIMGUI=True
 
 ### 2.7.0
  * Additional installation instructions for standalone installation through ReiPatcher

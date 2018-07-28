@@ -402,7 +402,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting text on a component." + Environment.NewLine + e );
+               Console.WriteLine( "[XUnity.AutoTranslator][WARN]: An error occurred while setting text on a component. This is likely happened due to a scene change." + Environment.NewLine + e );
             }
             finally
             {
@@ -530,8 +530,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      StartCoroutine(
                         WaitForTextStablization(
                            ui: ui,
-                           delay: 0.5f,
-                           maxTries: 100, // 100 tries == 50 seconds
+                           delay: 1.2f,
+                           maxTries: 50, // 50 tries, about 1 minute
                            currentTries: 0,
                            onMaxTriesExceeded: () =>
                            {
