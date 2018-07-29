@@ -107,8 +107,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   var parts = result.Split( '.' );
                   m = long.Parse( parts[ 0 ] );
                   s = long.Parse( parts[ 1 ] );
-
-                  Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Successfully setup GoogleTranslate TKK." );
                }
                catch( Exception e )
                {
@@ -119,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK." + Environment.NewLine + error );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate Cookie/TKK." + Environment.NewLine + error );
          }
       }
 
