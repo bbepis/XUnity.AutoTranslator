@@ -24,7 +24,6 @@ The default configuration file, looks as such (2.4.0+):
 ```ini
 [Service]
 Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate"]
-EnableSSL=False                  ;Whether or not to use HTTPS endpoint over standard HTTP
 
 [General]
 Language=en                      ;The language to translate into
