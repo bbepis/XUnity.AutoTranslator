@@ -80,16 +80,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             _runningTranslations--;
 
             _translationCount++;
-            if( !Settings.IsSlowdown )
-            {
-               if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
-               {
-                  Settings.IsSlowdown = true;
-                  _maxConcurrency = 1;
 
-                  Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
-               }
-            }
+            //if( !Settings.IsSlowdown )
+            //{
+            //   if( _translationCount > Settings.MaxTranslationsBeforeSlowdown )
+            //   {
+            //      Settings.IsSlowdown = true;
+            //      _maxConcurrency = 1;
+
+            //      Console.WriteLine( "[XUnity.AutoTranslator][WARN]: Maximum translations per session reached. Entering slowdown mode." );
+            //   }
+            //}
 
             if( !Settings.IsShutdown )
             {

@@ -16,7 +16,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
 
-      public static bool IsSlowdown = false;
       public static bool IsShutdown = false;
 
       public static readonly float MaxTranslationsQueuedPerSecond = 5;
