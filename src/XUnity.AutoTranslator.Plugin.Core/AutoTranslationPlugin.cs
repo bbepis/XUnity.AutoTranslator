@@ -541,8 +541,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      StartCoroutine(
                         WaitForTextStablization(
                            ui: ui,
-                           delay: 1.2f,
-                           maxTries: 50, // 50 tries, about 1 minute
+                           delay: 1.0f, // 1 second to prevent '1 second tickers' from getting translated
+                           maxTries: 60, // 50 tries, about 1 minute
                            currentTries: 0,
                            onMaxTriesExceeded: () =>
                            {
