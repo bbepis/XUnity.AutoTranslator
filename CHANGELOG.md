@@ -1,7 +1,10 @@
 ### 2.8.0
+ * CHANGE - Whether SSL is enabled or not is now entirely based on chosen endpoint support
  * FEATURE - Support for IMGUI translation texts with numbers
  * FEATURE - Support for overwriting IMGUI hook events
+ * BUG FIX - Improved fix for gtrans (23.07.2018) by supporting persistent HTTP connections and cookies and recalculation of TKK and SSL
  * BUG FIX - Fixed whitespace handling to honor configuration more appropriately
+ * MISC - Prints out to console errors that occurrs during translation
  * MISC - IMGUI is still disabled by default. Often other mods UI are implemented in IMGUI. Enabling it will allow those UIs to be translated as well. 
    * Simply change the config, such that: EnableIMGUI=True
 

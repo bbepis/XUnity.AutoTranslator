@@ -40,7 +40,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
-      public static bool EnableSSL;
       public static string BaiduAppId;
       public static string BaiduAppSecret;
       public static int ForceSplitTextAfterCharacters;
@@ -60,6 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             }
 
             Config.Current.Preferences.DeleteSection( "AutoTranslator" );
+            Config.Current.Preferences[ "Service" ].DeleteKey( "EnableSSL" );
          }
          catch( Exception e )
          {
@@ -69,7 +69,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
 
          ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate, true );
-         EnableSSL = Config.Current.Preferences[ "Service" ][ "EnableSSL" ].GetOrDefault( false );
 
          Language = Config.Current.Preferences[ "General" ][ "Language" ].GetOrDefault( "en" );
          FromLanguage = Config.Current.Preferences[ "General" ][ "FromLanguage" ].GetOrDefault( "ja", true );

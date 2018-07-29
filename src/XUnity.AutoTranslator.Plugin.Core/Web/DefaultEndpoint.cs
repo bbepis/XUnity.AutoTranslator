@@ -26,14 +26,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ConfigureServicePointManager()
       {
-         try
-         {
-            ServicePoint = ServicePointManager.FindServicePoint( new Uri( Identifier ) );
-            ServicePoint.ConnectionLimit = GetMaxConcurrency();
-         }
-         catch
-         {
-         }
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -45,11 +37,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
          return string.Format( ServicePointTemplateUrl, Identifier, from, to, WWW.EscapeURL( untranslatedText ) );
-      }
-
-      public override int GetMaxConcurrency()
-      {
-         return 10;
       }
    }
 }

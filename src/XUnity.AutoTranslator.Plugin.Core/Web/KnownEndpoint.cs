@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -25,29 +26,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public abstract bool TryExtractTranslated( string result, out string translated );
 
+      public virtual void WriteCookies( HttpWebResponse response )
+      {
+
+      }
+
+      public virtual CookieContainer ReadCookies()
+      {
+         return null;
+      }
+
       public virtual bool Fallback()
       {
          return false;
       }
 
-      public virtual int GetMaxConcurrency()
-      {
-         return 1;
-      }
-
-      public virtual bool IsSettingUp()
-      {
-         return false;
-      }
-
-      public virtual object StartSetup()
+      public virtual IEnumerator Setup( int translationCount )
       {
          return null;
-      }
-
-      public virtual void EndSetup( object obj )
-      {
-
       }
    }
 }

@@ -16,21 +16,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public static class AutoTranslateClient
    {
-      private static readonly ConstructorInfo WwwConstructor = Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
-
-      private static KnownEndpoint _endpoint;
+      public static KnownEndpoint Endpoint;
       private static int _runningTranslations = 0;
       private static int _translationCount;
       private static int _maxConcurrency;
+      private static bool _isSettingUp = false;
 
       public static void Configure()
       {
-         _endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
-         _maxConcurrency = _endpoint.GetMaxConcurrency();
+         Endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
+         _maxConcurrency = 1; // WebClient does not support concurrency
 
-         if( _endpoint != null )
+         if( Endpoint != null )
          {
-            _endpoint.ConfigureServicePointManager();
+            Endpoint.ConfigureServicePointManager();
          }
       }
 
@@ -38,29 +37,41 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          get
          {
-            return _endpoint != null;
+            return Endpoint != null;
          }
       }
 
-      public static bool HasAvailableClients => !_endpoint.IsSettingUp() && _runningTranslations < _maxConcurrency;
+      public static bool HasAvailableClients => !_isSettingUp && _runningTranslations < _maxConcurrency;
 
       public static bool Fallback()
       {
-         return _endpoint.Fallback();
+         return Endpoint.Fallback();
       }
 
       public static IEnumerator TranslateByWWW( string untranslated, string from, string to, Action<string> success, Action failure )
       {
-         // allow self setup of async acquired info by an endpoint
-         var yieldable = _endpoint.StartSetup();
-         if( yieldable != null )
+         UnityWebClient.TouchedDefault();
+
+         try
          {
-            yield return yieldable;
-            _endpoint.EndSetup( yieldable );
+            _isSettingUp = true;
+
+            var setup = Endpoint.Setup( _translationCount );
+            if( setup != null )
+            {
+               while( setup.MoveNext() )
+               {
+                  yield return setup.Current;
+               }
+            }
+         }
+         finally
+         {
+            _isSettingUp = false;
          }
 
-         var url = _endpoint.GetServiceUrl( untranslated, from, to );
-         _endpoint.ApplyHeaders( UnityWebClient.Default.Headers );
+         var url = Endpoint.GetServiceUrl( untranslated, from, to );
+         Endpoint.ApplyHeaders( UnityWebClient.Default.Headers );
          var result = UnityWebClient.Default.GetDownloadResult( new Uri( url ) );
          try
          {
@@ -89,32 +100,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                }
             }
 
-            if( _translationCount % 100 == 0 )
-            {
-               UnityWebClient.Default.ClearCookies();
-            }
-
 
             if( result.Succeeded )
             {
-               if( _endpoint.TryExtractTranslated( result.Result, out var translatedText ) )
+               if( Endpoint.TryExtractTranslated( result.Result, out var translatedText ) )
                {
                   translatedText = translatedText ?? string.Empty;
                   success( translatedText );
                }
                else
                {
+                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Error occurred while extracting translation." );
                   failure();
                }
             }
             else
             {
+               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Error occurred while retrieving translation." + Environment.NewLine + result.Error );
                failure();
             }
          }
          finally
          {
-
+            UnityWebClient.TouchedDefault();
          }
       }
    }

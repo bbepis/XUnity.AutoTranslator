@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -17,19 +18,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public class GoogleTranslateEndpoint : KnownEndpoint
    {
-      private static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
-
       private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
-      private static ServicePoint ServicePoint;
-      private static readonly string HttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
-      private static readonly string FallbackHttpServicePointTemplateUrl = "http://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
-      private static readonly string HttpTranslateUserSite = "http://translate.google.com";
 
+      private CookieContainer _cookieContainer;
       private bool _hasFallenBack = false;
-      private bool _isSettingUp = false;
       private bool _hasSetup = false;
       private long m = 425635;
       private long s = 1953544246;
@@ -37,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public GoogleTranslateEndpoint()
          : base( KnownEndpointNames.GoogleTranslate )
       {
-
+         _cookieContainer = new CookieContainer();
       }
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
@@ -52,80 +47,79 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.Accept ] = "*/*";
       }
 
-      public override bool IsSettingUp()
+      public override IEnumerator Setup( int translationCount )
       {
-         return _isSettingUp;
+         if( !_hasSetup || translationCount % 100 == 0 )
+         {
+            _hasSetup = true;
+            // Setup TKK and cookies
+
+            return SetupTKK();
+
+         }
+         else
+         {
+            return null;
+         }
       }
 
-      public override object StartSetup()
+      public IEnumerator SetupTKK()
       {
-         if( !_isSettingUp && !_hasSetup )
+         string error = null;
+         DownloadResult downloadResult = null;
+
+         _cookieContainer = new CookieContainer();
+
+         try
          {
-            _isSettingUp = true;
-
-            try
-            {
-               ApplyHeaders( UnityWebClient.Default.Headers );
-               var result = UnityWebClient.Default.GetDownloadResult( new Uri( Settings.EnableSSL ? HttpsTranslateUserSite : HttpTranslateUserSite ) );
-               return result;
-            }
-            catch( Exception e )
-            {
-               _hasSetup = true;
-               _isSettingUp = false;
-
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (Start)." + Environment.NewLine + e.ToString() );
-
-               return null;
-            }
+            ApplyHeaders( UnityWebClient.Default.Headers );
+            downloadResult = UnityWebClient.Default.GetDownloadResult( new Uri( HttpsTranslateUserSite ) );
          }
-         return null;
-      }
-
-      public override void EndSetup( object www )
-      {
-         Console.WriteLine( "EndSetup: " + www );
-
-         var dresult = www as DownloadResult;
-         var error = dresult.Error;
-
-         if( dresult.Succeeded )
+         catch( Exception e )
          {
-            try
-            {
-               var html = dresult.Result;
-
-               const string lookup = "TKK=eval('";
-               var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
-               var openClamIndex = html.IndexOf( '{', lookupIndex );
-               var closeClamIndex = html.IndexOf( '}', openClamIndex );
-               var functionIndex = html.IndexOf( "function", lookupIndex );
-               var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
-               var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
-
-               // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
-               ScriptEngine engine = new ScriptEngine();
-               engine.Evaluate( decodedScript );
-               var result = engine.CallGlobalFunction<string>( "FuncName" );
-
-               var parts = result.Split( '.' );
-               m = long.Parse( parts[ 0 ] );
-               s = long.Parse( parts[ 1 ] );
-
-               Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Successfully setup GoogleTranslate endpoint." );
-            }
-            catch( Exception e )
-            {
-               error = e.ToString();
-            }
+            error = e.ToString();
          }
 
-         _hasSetup = true;
-         _isSettingUp = false;
+         if( downloadResult != null )
+         {
+            yield return downloadResult;
+
+            error = downloadResult.Error;
+            if( downloadResult.Succeeded )
+            {
+               try
+               {
+                  var html = downloadResult.Result;
+
+                  const string lookup = "TKK=eval('";
+                  var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
+                  var openClamIndex = html.IndexOf( '{', lookupIndex );
+                  var closeClamIndex = html.IndexOf( '}', openClamIndex );
+                  var functionIndex = html.IndexOf( "function", lookupIndex );
+                  var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
+                  var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
+
+                  // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
+                  ScriptEngine engine = new ScriptEngine();
+                  engine.Evaluate( decodedScript );
+                  var result = engine.CallGlobalFunction<string>( "FuncName" );
+
+                  var parts = result.Split( '.' );
+                  m = long.Parse( parts[ 0 ] );
+                  s = long.Parse( parts[ 1 ] );
+
+                  Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Successfully setup GoogleTranslate TKK." );
+               }
+               catch( Exception e )
+               {
+                  error = e.ToString();
+               }
+            }
+         }
 
          if( error != null )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK (End)." + Environment.NewLine + error );
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate TKK." + Environment.NewLine + error );
          }
       }
 
@@ -202,9 +196,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                return certificate.Issuer == CertificateIssuer;
             };
 
-            ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://translate.googleapis.com" ) );
-            ServicePoint.ConnectionLimit = GetMaxConcurrency();
-
          }
          catch
          {
@@ -242,11 +233,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          if( _hasFallenBack )
          {
-            return string.Format( Settings.EnableSSL ? FallbackHttpsServicePointTemplateUrl : FallbackHttpServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ) );
+            return string.Format( FallbackHttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ) );
          }
          else
          {
-            return string.Format( Settings.EnableSSL ? HttpsServicePointTemplateUrl : HttpServicePointTemplateUrl, from, to, Tk( untranslatedText ), WWW.EscapeURL( untranslatedText ) );
+            return string.Format( HttpsServicePointTemplateUrl, from, to, Tk( untranslatedText ), WWW.EscapeURL( untranslatedText ) );
          }
       }
 
@@ -259,6 +250,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
 
          return false;
+      }
+
+      public override void WriteCookies( HttpWebResponse response )
+      {
+         CookieCollection cookies = response.Cookies;
+         foreach( Cookie cookie in cookies )
+         {
+            // redirect cookie to correct domain
+            cookie.Domain = ".googleapis.com";
+         }
+
+         _cookieContainer.Add( cookies );
+      }
+
+      public override CookieContainer ReadCookies()
+      {
+         return _cookieContainer;
       }
    }
 }

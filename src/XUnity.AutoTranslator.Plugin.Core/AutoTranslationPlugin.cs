@@ -98,7 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
 
          // start a thread that will periodically removed unused references
-         var t1 = new Thread( RemovedUnusedReferences );
+         var t1 = new Thread( MaintenanceLoop );
          t1.IsBackground = true;
          t1.Start();
 
@@ -118,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             .ToArray();
       }
 
-      private void RemovedUnusedReferences( object state )
+      private void MaintenanceLoop( object state )
       {
          while( true )
          {
@@ -130,10 +130,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An unexpected error occurred while removing GC'ed resources." + Environment.NewLine + e );
             }
-            finally
-            {
-               Thread.Sleep( 1000 * 60 );
-            }
+
+            Thread.Sleep( 1000 * 60 );
          }
       }
 
@@ -660,6 +658,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
+            UnityWebClient.CleanupDefault();
+
             CopyToClipboard();
             ResetThresholdTimerIfRequired();
 
