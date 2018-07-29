@@ -37,13 +37,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
-         headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
+         headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
          headers[ "Accept" ] = "*/*";
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
-         headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
+         headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
          headers[ HttpRequestHeader.Accept ] = "*/*";
       }
 
