@@ -12,7 +12,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
-      public static readonly int MaxTranslationsBeforeSlowdown = 1000;
       public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
 

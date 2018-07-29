@@ -97,7 +97,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                if( _translationCount > Settings.MaxTranslationsBeforeShutdown )
                {
                   Settings.IsShutdown = true;
-                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Maximum translations per session reached. Shutting plugin down." );
+                  Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
                }
             }
 

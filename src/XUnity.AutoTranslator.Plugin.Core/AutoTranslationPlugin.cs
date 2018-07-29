@@ -238,6 +238,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckThresholds()
       {
+         if( _unstartedJobs.Count > Settings.MaxUnstartedJobs )
+         {
+            _unstartedJobs.Clear();
+            _completedJobs.Clear();
+            Settings.IsShutdown = true;
+
+            Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
+         }
+
          var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
          var newIdx = ( (int)Time.time ) % Settings.TranslationQueueWatchWindow;
          if( previousIdx != newIdx )
@@ -255,13 +264,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _timeExceededThreshold = Time.time;
             }
 
-            if( Time.time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold || _unstartedJobs.Count > Settings.MaxUnstartedJobs )
+            if( Time.time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
             {
                _unstartedJobs.Clear();
                _completedJobs.Clear();
                Settings.IsShutdown = true;
 
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Shutting down... spam detected." );
+               Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
             }
          }
          else
@@ -654,17 +663,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Update()
       {
-         if( Settings.IsShutdown ) return;
-
          try
          {
             UnityWebClient.CleanupDefault();
-
             CopyToClipboard();
-            ResetThresholdTimerIfRequired();
 
-            KickoffTranslations();
-            FinishTranslations();
+            if( !Settings.IsShutdown )
+            {
+               ResetThresholdTimerIfRequired();
+               KickoffTranslations();
+               FinishTranslations();
+            }
 
             if( Input.anyKey )
             {
@@ -736,13 +745,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      if( AutoTranslateClient.Fallback() )
                      {
-                        Console.WriteLine( "[XUnity.AutoTranslator][WARN]: More than 5 consecutive errors occurred. Entering fallback mode." );
+                        Console.WriteLine( $"[XUnity.AutoTranslator][WARN]: More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
                         _consecutiveErrors = 0;
                      }
                      else
                      {
                         Settings.IsShutdown = true;
-                        Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: More than 5 consecutive errors occurred. Shutting down plugin." );
+                        Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
                      }
                   }
                }
