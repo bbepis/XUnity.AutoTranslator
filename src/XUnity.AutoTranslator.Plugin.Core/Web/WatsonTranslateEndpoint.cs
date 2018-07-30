@@ -31,13 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
         public override void ConfigureServicePointManager()
         {
-            try
-            {
-                ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) => true;
-            }
-            catch
-            {
-            }
+            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( new Uri( Settings.WatsonAPIUrl ).Host );
         }
 
         public override bool TryExtractTranslated(string result, out string translated)

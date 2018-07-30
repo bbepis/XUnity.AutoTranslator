@@ -29,13 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
         public override void ConfigureServicePointManager()
         {
-            try
-            {
-                ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) => true;
-            }
-            catch
-            {
-            }
+            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.yandex.net" );
         }
 
         public override bool TryExtractTranslated(string result, out string translated)

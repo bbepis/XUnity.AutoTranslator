@@ -49,13 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
         public override void ConfigureServicePointManager()
         {
-            try
-            {
-                ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) => true;
-            }
-            catch
-            {
-            }
+            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "www.excite.co.jp", "excite.co.jp" );
         }
 
         public override bool TryExtractTranslated(string result, out string translated)
