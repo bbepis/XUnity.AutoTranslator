@@ -24,4 +24,8 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MonoHttp\" />
+  </ItemGroup>
+
 </Project>
