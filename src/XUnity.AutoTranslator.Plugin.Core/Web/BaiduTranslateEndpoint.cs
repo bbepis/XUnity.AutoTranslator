@@ -52,6 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ConfigureServicePointManager()
       {
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "api.fanyi.baidu.com" );
       }
 
       public override bool TryExtractTranslated( string result, out string translated )

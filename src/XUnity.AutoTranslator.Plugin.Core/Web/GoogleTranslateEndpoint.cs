@@ -18,7 +18,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public class GoogleTranslateEndpoint : KnownEndpoint
    {
-      private static readonly string CertificateIssuer = "CN=Google Internet Authority G3, O=Google Trust Services, C=US";
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
@@ -187,17 +186,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ConfigureServicePointManager()
       {
-         try
-         {
-            ServicePointManager.ServerCertificateValidationCallback += ( sender, certificate, chain, sslPolicyErrors ) =>
-            {
-               return certificate.Issuer == CertificateIssuer;
-            };
-
-         }
-         catch
-         {
-         }
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com", "translate.googleapis.com" );
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
