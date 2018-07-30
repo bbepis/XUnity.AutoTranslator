@@ -13,8 +13,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
     public class WatsonTranslateEndpoint : KnownEndpoint
     {
-        private static ServicePoint ServicePoint;
-
         private static readonly string HttpsServicePointTemplateUrl = Settings.WatsonAPIUrl.TrimEnd('/')+ "/v2/translate?model_id={0}-{1}&text={2}";
 
         public WatsonTranslateEndpoint()

@@ -13,8 +13,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
     public class YandexTranslateEndpoint : KnownEndpoint
     {
-        private static ServicePoint ServicePoint;
-
         private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
         public YandexTranslateEndpoint()
            : base(KnownEndpointNames.YandexTranslate)
