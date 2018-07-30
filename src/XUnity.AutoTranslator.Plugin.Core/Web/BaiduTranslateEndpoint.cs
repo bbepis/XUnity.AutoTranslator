@@ -12,16 +12,15 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class BaiduTranslateEndpoint : KnownEndpoint
+   public class BaiduTranslateEndpoint : KnownHttpEndpoint
    {
       private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
 
       private static readonly MD5 HashMD5 = MD5.Create();
 
       public BaiduTranslateEndpoint()
-         : base( KnownEndpointNames.GoogleTranslate )
       {
-
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "api.fanyi.baidu.com" );
       }
 
       private static string CreateMD5( string input )
@@ -37,21 +36,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return sb.ToString().ToLower();
       }
 
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
-         headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
-         headers[ "Accept-Charset" ] = "UTF-8";
-      }
-
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
          headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
-      }
-
-      public override void ConfigureServicePointManager()
-      {
-         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "api.fanyi.baidu.com" );
       }
 
       public override bool TryExtractTranslated( string result, out string translated )

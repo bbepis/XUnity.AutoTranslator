@@ -14,41 +14,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public class UnityWebClient : WebClient
    {
-      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 20 );
+      private KnownHttpEndpoint _httpEndpoint;
 
-      private static DateTime _defaultLastUse = DateTime.UtcNow;
-      private static UnityWebClient _default;
-
-      public static UnityWebClient Default
+      public UnityWebClient( KnownHttpEndpoint endpoint )
       {
-         get
-         {
-            if( _default == null )
-            {
-               _default = new UnityWebClient();
-               TouchedDefault();
-            }
-            return _default;
-         }
-      }
-
-      public static void TouchedDefault()
-      {
-         _defaultLastUse = DateTime.UtcNow;
-      }
-
-      public static void CleanupDefault()
-      {
-         var client = _default;
-         if( client != null && DateTime.UtcNow - _defaultLastUse > MaxUnusedLifespan )
-         {
-            _default = null;
-            client.Dispose();
-         }
-      }
-
-      public UnityWebClient()
-      {
+         _httpEndpoint = endpoint;
          Encoding = Encoding.UTF8;
          DownloadStringCompleted += UnityWebClient_DownloadStringCompleted;
       }
@@ -86,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var httpRequest = request as HttpWebRequest;
          if( httpRequest != null )
          {
-            var cookies = AutoTranslateClient.Endpoint.ReadCookies();
+            var cookies = _httpEndpoint.ReadCookies();
             httpRequest.CookieContainer = cookies;
          }
          return request;
@@ -111,7 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var response = r as HttpWebResponse;
          if( response != null )
          {
-            AutoTranslateClient.Endpoint.WriteCookies( response );
+            _httpEndpoint.WriteCookies( response );
          }
       }
 

@@ -8,10 +8,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public static class KnownEndpoints
    {
-      public static readonly KnownEndpoint GoogleTranslate = new GoogleTranslateEndpoint();
-      public static readonly KnownEndpoint BaiduTranslate = new BaiduTranslateEndpoint();
+      public static readonly KnownHttpEndpoint GoogleTranslate = new GoogleTranslateEndpoint();
+      public static readonly KnownHttpEndpoint BaiduTranslate = new BaiduTranslateEndpoint();
 
-      public static KnownEndpoint FindEndpoint( string identifier )
+      public static KnownHttpEndpoint FindEndpoint( string identifier )
       {
          if( string.IsNullOrEmpty( identifier ) ) return null;
 

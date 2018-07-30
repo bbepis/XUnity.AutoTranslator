@@ -16,7 +16,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class GoogleTranslateEndpoint : KnownEndpoint
+   public class GoogleTranslateEndpoint : KnownHttpEndpoint
    {
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
@@ -29,15 +29,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private long s = 1953544246;
 
       public GoogleTranslateEndpoint()
-         : base( KnownEndpointNames.GoogleTranslate )
       {
          _cookieContainer = new CookieContainer();
-      }
-
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
-         headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
-         headers[ "Accept" ] = "*/*";
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com", "translate.googleapis.com" );
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
@@ -46,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.Accept ] = "*/*";
       }
 
-      public override IEnumerator Setup( int translationCount )
+      public override IEnumerator OnBeforeTranslate( int translationCount )
       {
          if( !_hasSetup || translationCount % 100 == 0 )
          {
@@ -69,10 +63,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          _cookieContainer = new CookieContainer();
 
+         var client = GetClient();
          try
          {
-            ApplyHeaders( UnityWebClient.Default.Headers );
-            downloadResult = UnityWebClient.Default.GetDownloadResult( new Uri( HttpsTranslateUserSite ) );
+            ApplyHeaders( client.Headers );
+            downloadResult = client.GetDownloadResult( new Uri( HttpsTranslateUserSite ) );
          }
          catch( Exception e )
          {
@@ -184,11 +179,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return p.ToString( CultureInfo.InvariantCulture ) + "." + ( p ^ m ).ToString( CultureInfo.InvariantCulture );
       }
 
-      public override void ConfigureServicePointManager()
-      {
-         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com", "translate.googleapis.com" );
-      }
-
       public override bool TryExtractTranslated( string result, out string translated )
       {
          try
@@ -228,7 +218,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public override bool Fallback()
+      public override bool ShouldGetSecondChanceAfterFailure()
       {
          if( !_hasFallenBack )
          {

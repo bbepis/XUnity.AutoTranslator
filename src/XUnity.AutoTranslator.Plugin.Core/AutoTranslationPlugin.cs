@@ -77,6 +77,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private Func<string, bool> _symbolCheck;
 
+      private IKnownEndpoint _endpoint;
+
       private int[] _currentTranslationsQueuedPerSecondRollingWindow = new int[ Settings.TranslationQueueWatchWindow ];
       private float? _timeExceededThreshold;
 
@@ -91,7 +93,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          HooksSetup.InstallHooks( Override_TextChanged );
 
-         AutoTranslateClient.Configure();
+         try
+         {
+            _endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
+         }
+         catch( Exception e )
+         {
+            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An unexpected error occurred during initialization of endpoint." + Environment.NewLine + e );
+         }
 
          _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
 
@@ -571,7 +580,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  else
                                  {
                                     // Lets try not to spam a service that might not be there...
-                                    if( AutoTranslateClient.IsConfigured )
+                                    if( _endpoint != null )
                                     {
                                        if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                                        {
@@ -602,7 +611,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      QueueNewUntranslatedForClipboard( textKey );
 
                      // Lets try not to spam a service that might not be there...
-                     if( AutoTranslateClient.IsConfigured )
+                     if( _endpoint != null )
                      {
                         if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                         {
@@ -665,7 +674,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            UnityWebClient.CleanupDefault();
+            if( _endpoint != null )
+            {
+               _endpoint.OnUpdate();
+            }
+
             CopyToClipboard();
 
             if( !Settings.IsShutdown )
@@ -706,9 +719,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void KickoffTranslations()
       {
+         if( _endpoint == null ) return;
+
          foreach( var kvp in _unstartedJobs )
          {
-            if( !AutoTranslateClient.HasAvailableClients ) break;
+            if( _endpoint.IsBusy ) break;
 
             var key = kvp.Key;
             var job = kvp.Value;
@@ -717,8 +732,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // lets see if the text should still be translated before kicking anything off
             if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
 
-            StartCoroutine( AutoTranslateClient.TranslateByWWW( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText =>
+            StartCoroutine( _endpoint.Translate( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText =>
             {
+               Settings.TranslationCount++;
+
+               if( !Settings.IsShutdown )
+               {
+                  if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
+                  {
+                     Settings.IsShutdown = true;
+                     Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+                  }
+               }
+
                _consecutiveErrors = 0;
 
                if( Settings.ForceSplitTextAfterCharacters > 0 )
@@ -743,7 +769,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( _consecutiveErrors > Settings.MaxErrors )
                   {
-                     if( AutoTranslateClient.Fallback() )
+                     if( _endpoint.ShouldGetSecondChanceAfterFailure() )
                      {
                         Console.WriteLine( $"[XUnity.AutoTranslator][WARN]: More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
                         _consecutiveErrors = 0;
