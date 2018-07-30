@@ -16,7 +16,7 @@ The mod can be installed into the following Plugin Managers:
 
 Installations instructions for both methods can be found below.
 
-Additionally it can be installed without a dependency on a plugin manager through ReiPatcher.
+Additionally it can be installed without a dependency on a plugin manager through ReiPatcher. However, this approach is not recommended if you use one of the above mentioned Plugin Managers!
 
 ## Configuration
 The default configuration file, looks as such (2.6.0+):
