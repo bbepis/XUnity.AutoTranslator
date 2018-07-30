@@ -16,10 +16,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
       }
 
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
-      }
-
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
       }

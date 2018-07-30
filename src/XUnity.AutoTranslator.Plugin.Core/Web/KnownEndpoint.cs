@@ -20,8 +20,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public abstract string GetServiceUrl( string untranslatedText, string from, string to );
 
-      public abstract void ApplyHeaders( Dictionary<string, string> headers );
-
       public abstract void ApplyHeaders( WebHeaderCollection headers );
 
       public abstract bool TryExtractTranslated( string result, out string translated );
