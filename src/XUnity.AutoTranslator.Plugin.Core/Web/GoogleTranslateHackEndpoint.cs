@@ -63,16 +63,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             {
 
                 String extracted = getBetween(result, "class=\"t0\">", "</div>");
-                if (String.IsNullOrEmpty(extracted))
-                {
-                    translated = null;
-                    return false;
-                }
-                else
-                {
-                    translated = RestSharp.Contrib.HttpUtility.HtmlDecode(extracted);
-                    return true;
-                }
+                translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
+                return true;
             }
             catch
             {
