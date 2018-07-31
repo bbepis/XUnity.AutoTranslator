@@ -107,10 +107,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public virtual void OnUpdate()
       {
          var client = _client;
-         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan )
+         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !client.IsBusy )
          {
             _client = null;
             client.Dispose();
+            Logger.Current.Debug( "Disposing WebClient because it was not used for 20 seconds." );
          }
       }
 
