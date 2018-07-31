@@ -24,6 +24,7 @@ using XUnity.AutoTranslator.Plugin.Core.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Debug;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -90,6 +91,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Current = this;
 
          Settings.Configure();
+
+         if( Settings.EnableConsole ) DebugConsole.Enable();
+
+         Console.WriteLine( "[XUnity.AutoTranslator][INFO]: Initializing XUnity.AutoTranslator." );
 
          HooksSetup.InstallHooks( Override_TextChanged );
 

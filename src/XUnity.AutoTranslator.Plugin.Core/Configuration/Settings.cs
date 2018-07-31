@@ -31,6 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float Delay;
       public static int MaxCharactersPerTranslation;
       public static bool EnablePrintHierarchy;
+      public static bool EnableConsole;
       public static string AutoTranslationsFilePath;
       public static bool EnableIMGUI;
       public static bool EnableUGUI;
@@ -103,6 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          WatsonAPIPassword = Config.Current.Preferences["Watson"]["WatsonAPIPassword"].GetOrDefault("");
 
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
+         EnableConsole = Config.Current.Preferences[ "Debug" ][ "EnableConsole" ].GetOrDefault( false );
 
          AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );
 
