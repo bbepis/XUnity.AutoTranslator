@@ -121,6 +121,9 @@
   <data name="ExIni" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\libs\ExIni.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Jurassic" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\Jurassic.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="Mono_Cecil" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\libs\Mono.Cecil.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -143,7 +146,7 @@
     <value>..\..\XUnity.AutoTranslator.Patcher\bin\Release\net35\XUnity.AutoTranslator.Patcher.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="XUnity_AutoTranslator_Plugin_Core" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\XUnity.AutoTranslator.Patcher\bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="_0Harmony" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\libs\0Harmony.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

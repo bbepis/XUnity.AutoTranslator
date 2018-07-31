@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          foreach( var component in Components )
          {
             var text = component.GetText().Trim();
-            if( text == Keys.OriginalKey )
+            if( text == Keys.OriginalText )
             {
                return true;
             }

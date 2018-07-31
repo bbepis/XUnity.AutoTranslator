@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using IWshRuntimeLibrary;
 using XUnity.AutoTranslator.Setup.Properties;
 
 namespace XUnity.AutoTranslator.Setup
 {
    class Program
    {
+      [STAThread]
       static void Main( string[] args )
       {
          var gamePath = Environment.CurrentDirectory;
@@ -47,6 +47,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
             AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
             AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
+            AddFile( Path.Combine( managedDir, "Jurassic.dll" ), Resources.Jurassic );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
 
             // create an .ini file for each launcher, if it does not already exist
@@ -122,13 +123,22 @@ namespace XUnity.AutoTranslator.Setup
       public static void CreateShortcut( string shortcutName, string shortcutPath, string targetFileLocation )
       {
          string shortcutLocation = Path.Combine( shortcutPath, shortcutName );
-         WshShell shell = new WshShell();
-         IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut( shortcutLocation );
 
-         shortcut.WorkingDirectory = Path.GetDirectoryName( targetFileLocation );
-         shortcut.TargetPath = targetFileLocation;
-         shortcut.Arguments = "-c \"" + Path.GetFileNameWithoutExtension( shortcutName ) + ".ini\"";
-         shortcut.Save();
+         // Create empty .lnk file
+         File.WriteAllBytes( shortcutName, new byte[ 0 ] );
+
+         // Create a ShellLinkObject that references the .lnk file
+         Shell32.Shell shl = new Shell32.Shell();
+         Shell32.Folder dir = shl.NameSpace( Path.GetDirectoryName( shortcutLocation ) );
+         Shell32.FolderItem itm = dir.Items().Item( shortcutName );
+         Shell32.ShellLinkObject lnk = (Shell32.ShellLinkObject)itm.GetLink;
+
+         // Set the .lnk file properties
+         lnk.Path = targetFileLocation;
+         lnk.Arguments = "-c \"" + Path.GetFileNameWithoutExtension( shortcutName ) + ".ini\"";
+         lnk.WorkingDirectory = Path.GetDirectoryName( targetFileLocation );
+
+         lnk.Save( shortcutName );
       }
    }
 }

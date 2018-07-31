@@ -12,12 +12,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
-      public static readonly int MaxTranslationsBeforeSlowdown = 1000;
       public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
 
-      public static bool IsSlowdown = false;
       public static bool IsShutdown = false;
+      public static int TranslationCount = 0;
 
       public static readonly float MaxTranslationsQueuedPerSecond = 5;
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
@@ -40,9 +39,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
-      public static bool EnableSSL;
       public static string BaiduAppId;
       public static string BaiduAppSecret;
+      public static string YandexAPIKey;
+      public static string WatsonAPIUrl;
+      public static string WatsonAPIUsername;
+      public static string WatsonAPIPassword;
       public static int ForceSplitTextAfterCharacters;
 
       public static bool CopyToClipboard;
@@ -60,6 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             }
 
             Config.Current.Preferences.DeleteSection( "AutoTranslator" );
+            Config.Current.Preferences[ "Service" ].DeleteKey( "EnableSSL" );
          }
          catch( Exception e )
          {
@@ -69,7 +72,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
 
          ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate, true );
-         EnableSSL = Config.Current.Preferences[ "Service" ][ "EnableSSL" ].GetOrDefault( false );
 
          Language = Config.Current.Preferences[ "General" ][ "Language" ].GetOrDefault( "en" );
          FromLanguage = Config.Current.Preferences[ "General" ][ "FromLanguage" ].GetOrDefault( "ja", true );
@@ -93,7 +95,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
-         
+
+         YandexAPIKey = Config.Current.Preferences["Yandex"]["YandexAPIKey"].GetOrDefault("");
+
+         WatsonAPIUrl = Config.Current.Preferences["Watson"]["WatsonAPIUrl"].GetOrDefault("");
+         WatsonAPIUsername = Config.Current.Preferences["Watson"]["WatsonAPIUsername"].GetOrDefault("");
+         WatsonAPIPassword = Config.Current.Preferences["Watson"]["WatsonAPIPassword"].GetOrDefault("");
+
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
 
          AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );

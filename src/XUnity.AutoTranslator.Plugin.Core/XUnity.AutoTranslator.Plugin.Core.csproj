@@ -2,8 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <Version>2.6.0</Version>
+     <Version>2.8.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jurassic" Version="2.2.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -18,6 +22,10 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\libs\UnityEngine.UI.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MonoHttp\" />
   </ItemGroup>
 
 </Project>

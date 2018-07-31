@@ -4,19 +4,19 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net40</TargetFramework>
     <AssemblyName>SetupReiPatcherAndAutoTranslator</AssemblyName>
-    <Version>2.6.0</Version>
+     <Version>2.8.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary.dll">
-      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+    <COMReference Include="Shell32.dll">
+      <Guid>50a7e9b0-70ef-11d1-b75a-00a0c90564fe</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <WrapperTool>tlbimp</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <Private>false</Private>
       <EmbedInteropTypes>true</EmbedInteropTypes>
+      <Private>false</Private>
     </COMReference>
   </ItemGroup>
 
