@@ -1,3 +1,6 @@
+﻿### 2.9.0
+ * FEATURE - Installation as UnityInjector plugin
+
 ### 2.8.0
  * CHANGE - Whether SSL is enabled or not is now entirely based on chosen endpoint support
  * FEATURE - Support for IMGUI translation texts with numbers

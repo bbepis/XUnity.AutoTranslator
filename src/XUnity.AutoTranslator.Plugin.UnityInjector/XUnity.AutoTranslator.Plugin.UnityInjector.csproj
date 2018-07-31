@@ -1,23 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net35</TargetFramework>
-  </PropertyGroup>
+   <PropertyGroup>
+      <TargetFramework>net35</TargetFramework>
+      <Version>2.8.0</Version>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ExIni">
-      <HintPath>..\..\libs\ExIni.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityInjector">
-      <HintPath>..\..\libs\UnityInjector.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+   <ItemGroup>
+      <Reference Include="ExIni">
+         <HintPath>..\..\libs\ExIni.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine">
+         <HintPath>..\..\libs\UnityEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityInjector">
+         <HintPath>..\..\libs\UnityInjector.dll</HintPath>
+      </Reference>
+   </ItemGroup>
+
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+         <Output TaskParameter="Assemblies" ItemName="Targets" />
+      </GetAssemblyIdentity>
+      <ItemGroup>
+         <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+      </ItemGroup>
+      <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)ExIni.dll&quot; &quot;$(SolutionDir)dist\UnityInjector\UnityInjector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)0Harmony.dll&quot; &quot;$(SolutionDir)dist\UnityInjector\UnityInjector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)Jurassic.dll&quot; &quot;$(SolutionDir)dist\UnityInjector\UnityInjector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\UnityInjector\UnityInjector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\UnityInjector\UnityInjector\&quot;&#xD;&#xA;   powershell Compress-Archive -Path '$(SolutionDir)dist\UnityInjector\UnityInjector' -DestinationPath '$(SolutionDir)dist\UnityInjector\XUnity.AutoTranslator-UnityInjector-@(VersionNumber).zip' -Force)&#xD;&#xA;)" />
+   </Target>
 
 </Project>
