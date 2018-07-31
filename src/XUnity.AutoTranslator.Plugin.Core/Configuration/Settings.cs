@@ -31,6 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float Delay;
       public static int MaxCharactersPerTranslation;
       public static bool EnablePrintHierarchy;
+      public static bool EnableConsole;
+      public static bool EnableDebugLogs;
       public static string AutoTranslationsFilePath;
       public static bool EnableIMGUI;
       public static bool EnableUGUI;
@@ -64,10 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             Config.Current.Preferences.DeleteSection( "AutoTranslator" );
             Config.Current.Preferences[ "Service" ].DeleteKey( "EnableSSL" );
          }
-         catch( Exception e )
-         {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while removing legacy configuration. " + Environment.NewLine + e );
-         }
+         catch { }
 
 
 
@@ -103,6 +102,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          WatsonAPIPassword = Config.Current.Preferences["Watson"]["WatsonAPIPassword"].GetOrDefault("");
 
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
+         EnableConsole = Config.Current.Preferences[ "Debug" ][ "EnableConsole" ].GetOrDefault( false );
+         EnableDebugLogs = Config.Current.Preferences[ "Debug" ][ "EnableLog" ].GetOrDefault( false );
 
          AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );
 

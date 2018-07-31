@@ -24,6 +24,7 @@ using XUnity.AutoTranslator.Plugin.Core.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Debug;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -88,8 +89,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void Initialize()
       {
          Current = this;
+         Logger.Current = new ConsoleLogger();
 
          Settings.Configure();
+
+         if( Settings.EnableConsole ) DebugConsole.Enable();
 
          HooksSetup.InstallHooks( Override_TextChanged );
 
@@ -99,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An unexpected error occurred during initialization of endpoint." + Environment.NewLine + e );
+            Logger.Current.Error( e, "An unexpected error occurred during initialization of endpoint." );
          }
 
          _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
@@ -137,7 +141,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An unexpected error occurred while removing GC'ed resources." + Environment.NewLine + e );
+               Logger.Current.Error( e, "An unexpected error occurred while removing GC'ed resources." );
             }
 
             Thread.Sleep( 1000 * 60 );
@@ -177,7 +181,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while saving translations to disk. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while saving translations to disk."  );
          }
       }
 
@@ -218,7 +222,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while loading translations. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while loading translations." );
          }
       }
 
@@ -237,6 +241,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
 
+         Logger.Current.Debug( "Queued translation for: " + key.GetDictionaryLookupKey() );
+
          job = new TranslationJob( key );
          _unstartedJobs.Add( key.GetDictionaryLookupKey(), job );
 
@@ -253,7 +259,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _completedJobs.Clear();
             Settings.IsShutdown = true;
 
-            Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
+            Logger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
          }
 
          var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
@@ -279,7 +285,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _completedJobs.Clear();
                Settings.IsShutdown = true;
 
-               Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
+               Logger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
             }
          }
          else
@@ -422,7 +428,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting text on a component." + Environment.NewLine + e );
+               Logger.Current.Error( e, "An error occurred while setting text on a component." );
             }
             finally
             {
@@ -710,7 +716,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred in Update callback. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred in Update callback. " );
          }
       }
 
@@ -741,7 +747,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
                   {
                      Settings.IsShutdown = true;
-                     Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+                     Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
                   }
                }
 
@@ -771,13 +777,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      if( _endpoint.ShouldGetSecondChanceAfterFailure() )
                      {
-                        Console.WriteLine( $"[XUnity.AutoTranslator][WARN]: More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
+                        Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
                         _consecutiveErrors = 0;
                      }
                      else
                      {
                         Settings.IsShutdown = true;
-                        Console.WriteLine( $"[XUnity.AutoTranslator][ERROR]: More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+                        Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
                      }
                   }
                }
@@ -947,7 +953,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error while copying text to clipboard. " + Environment.NewLine + e );
+               Logger.Current.Error( e, "An error while copying text to clipboard." );
             }
             finally
             {

@@ -37,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for UGUI. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for UGUI."  );
          }
 
          try
@@ -53,7 +53,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for TextMeshPro. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
          }
 
          try
@@ -69,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for NGUI. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for NGUI." );
          }
 
          try
@@ -92,7 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up hooks for IMGUI. " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for IMGUI." );
          }
       }
 

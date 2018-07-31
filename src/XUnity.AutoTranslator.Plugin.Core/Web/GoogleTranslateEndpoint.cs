@@ -111,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
-            Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: An error occurred while setting up GoogleTranslate Cookie/TKK." + Environment.NewLine + error );
+            Logger.Current.Error( "An error occurred while setting up GoogleTranslate Cookie/TKK." + Environment.NewLine + error );
          }
       }
 

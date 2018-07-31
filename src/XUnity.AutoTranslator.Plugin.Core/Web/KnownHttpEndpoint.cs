@@ -45,46 +45,73 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          var client = GetClient();
          var url = GetServiceUrl( untranslatedText, from, to );
-         ApplyHeaders( client.Headers );
-         var result = client.GetDownloadResult( new Uri( url ) );
+         Logger.Current.Debug( "Starting translation for: " + untranslatedText );
+
+         DownloadResult result = null;
          try
          {
-            _runningTranslations++;
-            yield return result;
-            _runningTranslations--;
+            ApplyHeaders( client.Headers );
+            result = client.GetDownloadResult( new Uri( url ) );
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "Error occurred while retrieving translation." );
+         }
 
-            if( result.Succeeded )
+         if( result != null )
+         {
+            try
             {
-               if( TryExtractTranslated( result.Result, out var translatedText ) )
+               Logger.Current.Debug( "Yielding for translation." );
+               _runningTranslations++;
+               yield return result;
+               _runningTranslations--;
+               Logger.Current.Debug( "Yield completed." );
+
+               try
                {
-                  translatedText = translatedText ?? string.Empty;
-                  success( translatedText );
+                  if( result.Succeeded )
+                  {
+                     if( TryExtractTranslated( result.Result, out var translatedText ) )
+                     {
+                        Logger.Current.Debug( $"Translation for '{untranslatedText}' succeded. Result: {translatedText}" );
+
+                        translatedText = translatedText ?? string.Empty;
+                        success( translatedText );
+                     }
+                     else
+                     {
+                        Logger.Current.Error( "Error occurred while extracting translation." );
+                        failure();
+                     }
+                  }
+                  else
+                  {
+                     Logger.Current.Error( "Error occurred while retrieving translation." + Environment.NewLine + result.Error );
+                     failure();
+                  }
                }
-               else
+               catch( Exception e )
                {
-                  Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Error occurred while extracting translation." );
+                  Logger.Current.Error( e, "Error occurred while retrieving translation." );
                   failure();
                }
             }
-            else
+            finally
             {
-               Console.WriteLine( "[XUnity.AutoTranslator][ERROR]: Error occurred while retrieving translation." + Environment.NewLine + result.Error );
-               failure();
+               _clientLastUse = DateTime.UtcNow;
             }
-         }
-         finally
-         {
-            _clientLastUse = DateTime.UtcNow;
          }
       }
 
       public virtual void OnUpdate()
       {
          var client = _client;
-         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan )
+         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !client.IsBusy )
          {
             _client = null;
             client.Dispose();
+            Logger.Current.Debug( "Disposing WebClient because it was not used for 20 seconds." );
          }
       }
 
