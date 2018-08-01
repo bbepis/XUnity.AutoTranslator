@@ -1,21 +1,23 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
+using Harmony;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public abstract class KnownHttpEndpoint : IKnownEndpoint
+   public abstract class KnownWwwEndpoint : IKnownEndpoint
    {
-      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 20 );
+      protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
 
       private static int _runningTranslations = 0;
       private static int _maxConcurrency = 1;
       private static bool _isSettingUp = false;
-      private UnityWebClient _client;
-      private DateTime _clientLastUse = DateTime.UtcNow;
 
-      public KnownHttpEndpoint()
+      public KnownWwwEndpoint()
       {
       }
 
@@ -23,8 +25,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action failure )
       {
-         _clientLastUse = DateTime.UtcNow;
-
          try
          {
             _isSettingUp = true;
@@ -44,32 +44,49 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
 
          Logger.Current.Debug( "Starting translation for: " + untranslatedText );
-         DownloadResult result = null;
+         object www = null;
          try
          {
-            var client = GetClient();
+            var headers = new Dictionary<string, string>();
+            ApplyHeaders( headers );
             var url = GetServiceUrl( untranslatedText, from, to );
-            ApplyHeaders( client.Headers );
-            result = client.GetDownloadResult( new Uri( url ) );
+            www = WwwConstructor.Invoke( new object[] { url, null, headers } );
          }
          catch( Exception e )
          {
             Logger.Current.Debug( e, "Error occurred while setting up translation request." );
          }
 
-         if( result != null )
+         if( www != null )
          {
+            _runningTranslations++;
+            yield return www;
+            _runningTranslations--;
+
             try
             {
-               _runningTranslations++;
-               yield return result;
-               _runningTranslations--;
-
+               string error = null;
                try
                {
-                  if( result.Succeeded )
+                  error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
+               }
+               catch( Exception e )
+               {
+                  error = e.ToString();
+               }
+
+               if( error != null )
+               {
+                  Logger.Current.Error( "Error occurred while retrieving translation." + Environment.NewLine + error );
+                  failure();
+               }
+               else
+               {
+                  var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null ); ;
+
+                  if( text != null )
                   {
-                     if( TryExtractTranslated( result.Result, out var translatedText ) )
+                     if( TryExtractTranslated( text, out var translatedText ) )
                      {
                         Logger.Current.Debug( $"Translation for '{untranslatedText}' succeded. Result: {translatedText}" );
 
@@ -84,32 +101,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   }
                   else
                   {
-                     Logger.Current.Error( "Error occurred while retrieving translation." + Environment.NewLine + result.Error );
+                     Logger.Current.Error( "Error occurred while extracting text from response." );
                      failure();
                   }
                }
-               catch( Exception e )
-               {
-                  Logger.Current.Error( e, "Error occurred while retrieving translation." );
-                  failure();
-               }
             }
-            finally
+            catch( Exception e )
             {
-               _clientLastUse = DateTime.UtcNow;
+               Logger.Current.Error( e, "Error occurred while retrieving translation." );
+               failure();
             }
          }
       }
 
       public virtual void OnUpdate()
       {
-         var client = _client;
-         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !client.IsBusy )
-         {
-            _client = null;
-            client.Dispose();
-            Logger.Current.Debug( "Disposing WebClient because it was not used for 20 seconds." );
-         }
       }
 
       public virtual bool ShouldGetSecondChanceAfterFailure()
@@ -119,33 +125,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public abstract string GetServiceUrl( string untranslatedText, string from, string to );
 
-      public abstract void ApplyHeaders( WebHeaderCollection headers );
+      public abstract void ApplyHeaders( Dictionary<string, string> headers );
 
       public abstract bool TryExtractTranslated( string result, out string translated );
-
-      public virtual void WriteCookies( HttpWebResponse response )
-      {
-
-      }
-
-      public virtual CookieContainer ReadCookies()
-      {
-         return null;
-      }
 
       public virtual IEnumerator OnBeforeTranslate( int translationCount )
       {
          return null;
-      }
-
-      public UnityWebClient GetClient()
-      {
-         if( _client == null )
-         {
-            _client = new UnityWebClient( this );
-            _clientLastUse = DateTime.UtcNow;
-         }
-         return _client;
       }
    }
 }

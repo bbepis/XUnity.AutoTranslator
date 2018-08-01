@@ -11,8 +11,8 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-    public class ExciteTranslateEndpoint : KnownHttpEndpoint
-    {
+    public class ExciteTranslateEndpoint : KnownWwwEndpoint
+   {
         private static readonly string HttpsServicePointTemplateUrl = "https://www.excite.co.jp/world/?wb_lp={0}{1}&before={2}";
 
         // Author: Johnny Cee (https://stackoverflow.com/questions/10709821/find-text-in-string-with-c-sharp)
@@ -38,12 +38,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "www.excite.co.jp", "excite.co.jp" );
         }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override void ApplyHeaders( Dictionary<string, string> headers )
       {
-         headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53";
-         headers[ HttpRequestHeader.Accept ] = "text/html";
-         headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
-         headers[ "DNT" ] = "1";
+         headers[ "User-Agent" ] = "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53";
+         headers[ "Accept" ] = "text/html";
+         //headers[ "Accept-Charset" ] = "UTF-8";
+         //headers[ "DNT" ] = "1";
       }
 
         public override bool TryExtractTranslated(string result, out string translated)

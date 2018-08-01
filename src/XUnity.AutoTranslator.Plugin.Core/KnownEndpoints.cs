@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Web
+namespace XUnity.AutoTranslator.Plugin.Core
 {
    public static class KnownEndpoints
    {
-      public static KnownHttpEndpoint FindEndpoint( string identifier )
+      public static IKnownEndpoint FindEndpoint( string identifier )
       {
          if( string.IsNullOrEmpty( identifier ) ) return null;
 
