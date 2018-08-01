@@ -1,5 +1,8 @@
 ﻿### 2.9.0
  * FEATURE - Installation as UnityInjector plugin
+ * FEATURE - Support Yandex translate (requires key)
+ * FEATURE - Support Watson translate (requires key)
+ * FEATURE - Support Excite translate
 
 ### 2.8.0
  * CHANGE - Whether SSL is enabled or not is now entirely based on chosen endpoint support

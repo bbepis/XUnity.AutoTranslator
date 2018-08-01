@@ -24,7 +24,7 @@ The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "GoogleTranslateHack", "BaiduTranslate", "YandexTranslate", "WatsonTranslate"]
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "GoogleTranslateHack", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
 
 [General]
 Language=en                      ;The language to translate into
@@ -64,6 +64,8 @@ WatsonAPIPassword=               ;OPTIONAL, needed if WatsonTranslate is configu
 
 [Debug]
 EnablePrintHierarchy=False       ;Used for debugging
+EnableConsole=False              ;Enables the console. Do not enable if other plugins (managers) handles this
+EnableLog=False                  ;Enables extra logging for debugging purposes
 ```
 
 ## Key Mapping
