@@ -3,6 +3,7 @@
  * FEATURE - Support Yandex translate (requires key)
  * FEATURE - Support Watson translate (requires key)
  * FEATURE - Support Excite translate
+ * MISC - Better debugging capabilities with extra config options
 
 ### 2.8.0
  * CHANGE - Whether SSL is enabled or not is now entirely based on chosen endpoint support
