@@ -24,7 +24,7 @@ using XUnity.AutoTranslator.Plugin.Core.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Debug;
+using XUnity.AutoTranslator.Plugin.Core.Debugging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
