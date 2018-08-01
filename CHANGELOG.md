@@ -1,5 +1,7 @@
 ﻿### 2.9.0
  * FEATURE - Installation as UnityInjector plugin
+ * FEATURE - Support Yandex translate (requires key)
+ * FEATURE - Support Watson translate (requires key)
  * FEATURE - Support Excite translate
  * MISC - Better debugging capabilities with extra config options
 

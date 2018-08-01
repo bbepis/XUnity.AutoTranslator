@@ -24,7 +24,7 @@ The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "ExciteTranslate", "GoogleTranslateHack"]
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "GoogleTranslateHack", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
 
 [General]
 Language=en                      ;The language to translate into
@@ -53,6 +53,14 @@ MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard 
 [Baidu]
 BaiduAppId=                      ;OPTIONAL, needed if BaiduTranslate is configured
 BaiduAppSecret=                  ;OPTIONAL, needed if BaiduTranslate is configured
+
+[Yandex]
+YandexAPIKey=                    ;OPTIONAL, needed if YandexTranslate is configured
+
+[Watson]
+WatsonAPIUrl=                    ;OPTIONAL, needed if WatsonTranslate is configured
+WatsonAPIUsername=               ;OPTIONAL, needed if WatsonTranslate is configured
+WatsonAPIPassword=               ;OPTIONAL, needed if WatsonTranslate is configured
 
 [Debug]
 EnablePrintHierarchy=False       ;Used for debugging
