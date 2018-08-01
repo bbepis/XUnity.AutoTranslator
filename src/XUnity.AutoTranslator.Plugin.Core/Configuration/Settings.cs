@@ -95,11 +95,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
 
-         YandexAPIKey = Config.Current.Preferences["Yandex"]["YandexAPIKey"].GetOrDefault("");
+         //YandexAPIKey = Config.Current.Preferences["Yandex"]["YandexAPIKey"].GetOrDefault("");
 
-         WatsonAPIUrl = Config.Current.Preferences["Watson"]["WatsonAPIUrl"].GetOrDefault("");
-         WatsonAPIUsername = Config.Current.Preferences["Watson"]["WatsonAPIUsername"].GetOrDefault("");
-         WatsonAPIPassword = Config.Current.Preferences["Watson"]["WatsonAPIPassword"].GetOrDefault("");
+         //WatsonAPIUrl = Config.Current.Preferences["Watson"]["WatsonAPIUrl"].GetOrDefault("");
+         //WatsonAPIUsername = Config.Current.Preferences["Watson"]["WatsonAPIUsername"].GetOrDefault("");
+         //WatsonAPIPassword = Config.Current.Preferences["Watson"]["WatsonAPIPassword"].GetOrDefault("");
 
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
          EnableConsole = Config.Current.Preferences[ "Debug" ][ "EnableConsole" ].GetOrDefault( false );
