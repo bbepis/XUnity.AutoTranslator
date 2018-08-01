@@ -54,7 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
          catch( Exception e )
          {
-            Logger.Current.Debug( e, "Error occurred while setting up translation request." );
+            Logger.Current.Error( e, "Error occurred while setting up translation request." );
          }
 
          if( result != null )
