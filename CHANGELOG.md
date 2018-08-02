@@ -1,6 +1,8 @@
 ﻿### 2.10.0
  * FEATURE - Support Yandex translate (requires key)
  * FEATURE - Support Watson translate (requires key)
+ * MISC - Added automatic configuration migration support
+   * Versions of this plugin were being distributed with predefined configuration to target "GoogleTranslateHack". The first time the plugin is run under this version, it will change this value back to the default.
 
 ### 2.9.0
  * FEATURE - Installation as UnityInjector plugin

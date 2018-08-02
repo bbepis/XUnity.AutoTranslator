@@ -66,6 +66,10 @@ WatsonAPIPassword=               ;OPTIONAL, needed if WatsonTranslate is configu
 EnablePrintHierarchy=False       ;Used for debugging
 EnableConsole=False              ;Enables the console. Do not enable if other plugins (managers) handles this
 EnableLog=False                  ;Enables extra logging for debugging purposes
+
+[Migrations]
+Enable=True                      ;Used to enable automatic migrations of this configuration file
+Tag=2.9.0                        ;Tag representing the last version this plugin was executed under. Do not edit
 ```
 
 ## Key Mapping

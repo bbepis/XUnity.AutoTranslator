@@ -118,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
 
          // update tag
-         Config.Current.Preferences[ "Migrations" ][ "Tag" ].Value = PluginData.Version;
+         MigrationsTag = Config.Current.Preferences[ "Migrations" ][ "Tag" ].Value = PluginData.Version;
 
          Config.Current.SaveConfig();
       }
@@ -131,7 +131,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          // migrate from unknown version to known version. Reset to google translate
          if( string.IsNullOrEmpty( currentTag ) )
          {
-            Config.Current.Preferences[ "Service" ][ "Endpoint" ].Value = KnownEndpointNames.GoogleTranslate;
+            if( ServiceEndpoint == KnownEndpointNames.GoogleTranslateHack )
+            {
+               ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].Value = KnownEndpointNames.GoogleTranslate;
+            }
          }
       }
    }
