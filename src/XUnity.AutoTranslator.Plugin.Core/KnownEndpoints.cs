@@ -21,10 +21,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                return new GoogleTranslateHackEndpoint();
             case KnownEndpointNames.BaiduTranslate:
                return new BaiduTranslateEndpoint();
-            case KnownEndpointNames.YandexTranslate:
-               return new YandexTranslateEndpoint();
-            case KnownEndpointNames.WatsonTranslate:
-               return new WatsonTranslateEndpoint();
+            //case KnownEndpointNames.YandexTranslate:
+            //   return new YandexTranslateEndpoint();
+            //case KnownEndpointNames.WatsonTranslate:
+            //   return new WatsonTranslateEndpoint();
             case KnownEndpointNames.ExciteTranslate:
                return new ExciteTranslateEndpoint();
             default:
