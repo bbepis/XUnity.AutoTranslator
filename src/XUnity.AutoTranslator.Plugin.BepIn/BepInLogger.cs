@@ -10,7 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
    {
       protected override void Log( LogLevel level, string message )
       {
-         BepInEx.BepInLogger.Log( message );
+         BepInEx.BepInLogger.Log( "[XUnity.AutoTranslator] " + message );
       }
    }
 }
