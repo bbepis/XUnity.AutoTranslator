@@ -89,7 +89,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void Initialize()
       {
          Current = this;
-         Logger.Current = new ConsoleLogger();
+         if( Logger.Current == null )
+         {
+            Logger.Current = new ConsoleLogger();
+         }
 
          Settings.Configure();
 
@@ -181,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while saving translations to disk."  );
+            Logger.Current.Error( e, "An error occurred while saving translations to disk." );
          }
       }
 

@@ -4,9 +4,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class ConsoleLogger : Logger
    {
-      protected override void Write( string formattedMessage )
+      protected override void Log( LogLevel level, string message )
       {
-         Console.WriteLine( formattedMessage );
+         Console.WriteLine( $"{GetPrefix( level )} {message}" );
       }
    }
 }
