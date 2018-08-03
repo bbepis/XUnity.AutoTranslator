@@ -99,6 +99,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                _clientLastUse = DateTime.UtcNow;
             }
          }
+         else
+         {
+            failure();
+         }
       }
 
       public virtual void OnUpdate()

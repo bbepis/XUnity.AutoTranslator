@@ -112,6 +112,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                failure();
             }
          }
+         else
+         {
+            failure();
+         }
       }
 
       public virtual void OnUpdate()

@@ -784,6 +784,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         Settings.IsShutdown = true;
                         Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+
+                        _unstartedJobs.Clear();
+                        _completedJobs.Clear();
                      }
                   }
                }
