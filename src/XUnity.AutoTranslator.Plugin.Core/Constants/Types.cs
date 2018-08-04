@@ -20,6 +20,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type WWW = FindType( "UnityEngine.WWW" );
 
+      public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
+
       private static Type FindType( string name )
       {
          return AppDomain.CurrentDomain.GetAssemblies()

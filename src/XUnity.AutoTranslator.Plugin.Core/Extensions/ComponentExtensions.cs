@@ -14,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static string GetText( this object ui )
       {
          string text = null;
+         var type = ui.GetType();
 
          if( ui is Text )
          {
@@ -34,7 +35,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void SetText( this object ui, string text )
       {
-         if( ui is Text )
+         var type = ui.GetType();
+
+         if( type == Constants.Types.UguiNovelText )
+         {
+            Logger.Current.Info( "Setting NovelText: " + text );
+            ( (Text)ui ).text = string.Empty;
+            ( (Text)ui ).text = text;
+            type.GetProperty( "LengthOfView" )?.GetSetMethod()?.Invoke( ui, new object[] { text.Length } );
+         }
+         else if( ui is Text )
          {
             ( (Text)ui ).text = text;
          }
@@ -45,7 +55,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          else
          {
             // fallback to reflective approach
-            var type = ui.GetType();
             type.GetProperty( TextPropertyName )?.GetSetMethod()?.Invoke( ui, new[] { text } );
          }
       }
