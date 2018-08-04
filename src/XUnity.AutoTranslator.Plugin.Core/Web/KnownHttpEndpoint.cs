@@ -21,6 +21,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public bool IsBusy => _isBusy;
 
+      public virtual bool SupportsLineSplitting
+      {
+         get
+         {
+            return false;
+         }
+      }
+
       protected void SetupServicePoints( params string[] endpoints )
       {
          _servicePoints = new ServicePoint[ endpoints.Length ];

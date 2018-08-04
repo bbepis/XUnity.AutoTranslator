@@ -21,6 +21,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public bool IsBusy => _isBusy;
 
+      public virtual bool SupportsLineSplitting
+      {
+         get
+         {
+            return false;
+         }
+      }
+
       public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action failure )
       {
          _isBusy = true;

@@ -85,6 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool _isInTranslatedMode = true;
       private bool _hooksEnabled = true;
+      private bool _batchLogicHasFailed = false;
 
       public void Initialize()
       {
@@ -181,7 +182,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while saving translations to disk."  );
+            Logger.Current.Error( e, "An error occurred while saving translations to disk." );
          }
       }
 
@@ -727,70 +728,52 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         foreach( var kvp in _unstartedJobs )
+         if( _endpoint.SupportsLineSplitting && !_batchLogicHasFailed )
          {
-            if( _endpoint.IsBusy ) break;
-
-            var key = kvp.Key;
-            var job = kvp.Value;
-            _kickedOff.Add( key );
-
-            // lets see if the text should still be translated before kicking anything off
-            if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
-
-            StartCoroutine( _endpoint.Translate( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText =>
+            while( _unstartedJobs.Count > 0 )
             {
-               Settings.TranslationCount++;
+               if( _endpoint.IsBusy ) break;
 
-               if( !Settings.IsShutdown )
+               var kvps = _unstartedJobs.Take( 20 ).ToList();
+               var batch = new TranslationBatch();
+               bool addedAny = false;
+
+               foreach( var kvp in kvps )
                {
-                  if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
-                  {
-                     Settings.IsShutdown = true;
-                     Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
-                  }
+                  var key = kvp.Key;
+                  var job = kvp.Value;
+                  _kickedOff.Add( key );
+
+                  batch.Add( job );
+
+                  if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
+
+                  addedAny = true;
                }
 
-               _consecutiveErrors = 0;
-
-               if( Settings.ForceSplitTextAfterCharacters > 0 )
+               if( addedAny )
                {
-                  translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
+                  StartCoroutine( _endpoint.Translate( batch.GetFullTranslationKey(), Settings.FromLanguage, Settings.Language, translatedText => OnBatchTranslationCompleted( batch, translatedText ),
+                  () => OnTranslationFailed() ) );
                }
-
-               job.TranslatedText = job.Keys.RepairTemplate( translatedText );
-
-               if( !string.IsNullOrEmpty( translatedText ) )
-               {
-                  QueueNewTranslationForDisk( job.Keys, translatedText );
-
-                  _completedJobs.Add( job );
-               }
-            },
-            () =>
+            }
+         }
+         else
+         {
+            foreach( var kvp in _unstartedJobs )
             {
-               _consecutiveErrors++;
+               if( _endpoint.IsBusy ) break;
 
-               if( !Settings.IsShutdown )
-               {
-                  if( _consecutiveErrors > Settings.MaxErrors )
-                  {
-                     if( _endpoint.ShouldGetSecondChanceAfterFailure() )
-                     {
-                        Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
-                        _consecutiveErrors = 0;
-                     }
-                     else
-                     {
-                        Settings.IsShutdown = true;
-                        Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+               var key = kvp.Key;
+               var job = kvp.Value;
+               _kickedOff.Add( key );
 
-                        _unstartedJobs.Clear();
-                        _completedJobs.Clear();
-                     }
-                  }
-               }
-            } ) );
+               // lets see if the text should still be translated before kicking anything off
+               if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
+
+               StartCoroutine( _endpoint.Translate( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
+               () => OnTranslationFailed() ) );
+            }
          }
 
          for( int i = 0 ; i < _kickedOff.Count ; i++ )
@@ -799,6 +782,111 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          _kickedOff.Clear();
+      }
+
+      public void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
+      {
+         Settings.TranslationCount++;
+
+         if( !Settings.IsShutdown )
+         {
+            if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
+            {
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+            }
+         }
+
+         _consecutiveErrors = 0;
+
+         var succeeded = batch.MatchWithTranslations( translatedTextBatch );
+         if( succeeded )
+         {
+            foreach( var tracker in batch.Trackers )
+            {
+               var job = tracker.Job;
+               var translatedText = tracker.RawTranslatedText;
+               if( !string.IsNullOrEmpty( translatedText ) )
+               {
+                  if( Settings.ForceSplitTextAfterCharacters > 0 )
+                  {
+                     translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
+                  }
+                  job.TranslatedText = job.Keys.RepairTemplate( translatedText );
+
+                  QueueNewTranslationForDisk( job.Keys, translatedText );
+                  _completedJobs.Add( job );
+               }
+            }
+         }
+         else
+         {
+            // might as well re-add all translation jobs, and never do this again!
+            _batchLogicHasFailed = true;
+            foreach( var tracker in batch.Trackers )
+            {
+               var key = tracker.Job.Keys.GetDictionaryLookupKey();
+               if( !_unstartedJobs.ContainsKey( key ) )
+               {
+                  _unstartedJobs[ key ] = tracker.Job;
+               }
+            }
+
+            Logger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
+         }
+      }
+
+      private void OnSingleTranslationCompleted( TranslationJob job, string translatedText )
+      {
+         Settings.TranslationCount++;
+
+         if( !Settings.IsShutdown )
+         {
+            if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
+            {
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+            }
+         }
+
+         _consecutiveErrors = 0;
+
+         if( !string.IsNullOrEmpty( translatedText ) )
+         {
+            if( Settings.ForceSplitTextAfterCharacters > 0 )
+            {
+               translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
+            }
+            job.TranslatedText = job.Keys.RepairTemplate( translatedText );
+
+            QueueNewTranslationForDisk( job.Keys, translatedText );
+            _completedJobs.Add( job );
+         }
+      }
+
+      private void OnTranslationFailed()
+      {
+         _consecutiveErrors++;
+
+         if( !Settings.IsShutdown )
+         {
+            if( _consecutiveErrors > Settings.MaxErrors )
+            {
+               if( _endpoint.ShouldGetSecondChanceAfterFailure() )
+               {
+                  Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
+                  _consecutiveErrors = 0;
+               }
+               else
+               {
+                  Settings.IsShutdown = true;
+                  Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+
+                  _unstartedJobs.Clear();
+                  _completedJobs.Clear();
+               }
+            }
+         }
       }
 
       private void FinishTranslations()
