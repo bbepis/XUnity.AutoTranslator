@@ -25,6 +25,7 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
+using XUnity.AutoTranslator.Plugin.Core.Batching;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -728,13 +729,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         if( _endpoint.SupportsLineSplitting && !_batchLogicHasFailed )
+         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 )
          {
             while( _unstartedJobs.Count > 0 )
             {
                if( _endpoint.IsBusy ) break;
 
-               var kvps = _unstartedJobs.Take( 20 ).ToList();
+               var kvps = _unstartedJobs.Take( Settings.BatchSize ).ToList();
                var batch = new TranslationBatch();
                bool addedAny = false;
 
