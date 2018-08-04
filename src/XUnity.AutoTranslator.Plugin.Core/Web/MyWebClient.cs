@@ -84,8 +84,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       }
    }
 
-   public class MyWebClient : Component
+   public class MyWebClient
    {
+      public static readonly string ConnectionGroupName = Guid.NewGuid().ToString();
+
       private bool async;
       private Uri baseAddress;
       private string baseString;
@@ -268,6 +270,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             WebResponse webResponse = this.GetWebResponse( request );
             Stream responseStream = webResponse.GetResponseStream();
             buffer = this.ReadAll( responseStream, (int)webResponse.ContentLength, userToken );
+            responseStream.Close();
+            webResponse.Close();
          }
          catch( ThreadInterruptedException )
          {
@@ -880,6 +884,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private WebRequest SetupRequest( Uri uri )
       {
          WebRequest webRequest = this.GetWebRequest( uri );
+         webRequest.ConnectionGroupName = ConnectionGroupName;
          if( this.Proxy != null )
          {
             webRequest.Proxy = this.Proxy;
