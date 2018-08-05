@@ -196,6 +196,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ) );
                Directory.CreateDirectory( Path.GetDirectoryName( Path.Combine( Config.Current.DataPath, Settings.OutputFile ) ) );
+               var tab = new char[] { '\t' };
+               var equals = new char[] { '=' };
+               var splitters = new char[][] { tab, equals };
 
                foreach( var fullFileName in GetTranslationFiles() )
                {
@@ -204,15 +207,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
                      foreach( string translation in translations )
                      {
-                        string[] kvp = translation.Split( new char[] { '=', '\t' }, StringSplitOptions.None );
-                        if( kvp.Length >= 2 )
+                        for( int i = 0 ; i < splitters.Length ; i++ )
                         {
-                           string key = TextHelper.Decode( kvp[ 0 ].Trim() );
-                           string value = TextHelper.Decode( kvp[ 1 ].Trim() );
-
-                           if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                           var splitter = splitters[ i ];
+                           string[] kvp = translation.Split( splitter, StringSplitOptions.None );
+                           if( kvp.Length >= 2 )
                            {
-                              AddTranslation( key, value );
+                              string key = TextHelper.Decode( kvp[ 0 ].Trim() );
+                              string value = TextHelper.Decode( kvp[ 1 ].Trim() );
+
+                              if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                              {
+                                 AddTranslation( key, value );
+                                 break;
+                              }
                            }
                         }
                      }
