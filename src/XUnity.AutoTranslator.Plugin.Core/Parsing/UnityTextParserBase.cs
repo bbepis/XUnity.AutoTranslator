@@ -6,15 +6,6 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-
-   public class UtageTextParser : UnityTextParserBase
-   {
-      public UtageTextParser()
-      {
-         AddIgnoredTag( "ruby" );
-      }
-   }
-
    public abstract class UnityTextParserBase
    {
       private static readonly HashSet<char> ValidTagNameChars = new HashSet<char>
@@ -29,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       }
 
-      public void AddIgnoredTag( string name )
+      protected void AddIgnoredTag( string name )
       {
          _ignored.Add( name );
       }
@@ -202,7 +193,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return new ParserResult( templateString, args );
       }
 
-      public string TakeAllButLast( StringBuilder builder )
+      private string TakeAllButLast( StringBuilder builder )
       {
          if( builder.Length > 0 )
          {
@@ -213,7 +204,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return string.Empty;
       }
 
-      public ParsingState ParseText( string s, ref int i )
+      private ParsingState ParseText( string s, ref int i )
       {
          if( s[ i ] == '<' )
          {
@@ -232,7 +223,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
       }
 
-      public ParsingState ParseNamingStartTag( string s, ref int i )
+      private ParsingState ParseNamingStartTag( string s, ref int i )
       {
          if( ValidTagNameChars.Contains( s[ i ] ) )
          {
@@ -249,7 +240,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
       }
 
-      public ParsingState ParseNamingEndTag( string s, ref int i )
+      private ParsingState ParseNamingEndTag( string s, ref int i )
       {
          if( ValidTagNameChars.Contains( s[ i ] ) )
          {
@@ -266,7 +257,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
       }
 
-      public ParsingState ParseFinishingStartTag( string s, ref int i )
+      private ParsingState ParseFinishingStartTag( string s, ref int i )
       {
          if( s[ i ] == '>' )
          {
@@ -278,7 +269,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
       }
 
-      public ParsingState ParseFinishingEndTag( string s, ref int i )
+      private ParsingState ParseFinishingEndTag( string s, ref int i )
       {
          if( s[ i ] == '>' )
          {
@@ -290,7 +281,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
       }
 
-      public enum ParsingState
+      private enum ParsingState
       {
          Text,
          NamingStartTag,
@@ -298,18 +289,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          FinishingStartTag,
          FinishingEndTag
       }
-   }
-
-   public class ParserResult
-   {
-      public ParserResult( string template, Dictionary<string, string> args )
-      {
-         Template = template;
-         Arguments = args;
-      }
-
-      public string Template { get; set; }
-
-      public Dictionary<string, string> Arguments { get; set; }
    }
 }
