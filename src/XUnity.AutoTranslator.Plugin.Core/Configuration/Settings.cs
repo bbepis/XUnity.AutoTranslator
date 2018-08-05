@@ -22,6 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
       public static readonly int TranslationQueueWatchWindow = 6;
 
+      public static readonly int BatchSize = 20;
+
       // can be changed
       public static string ServiceEndpoint;
       public static string Language;
@@ -50,6 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
       public static string MigrationsTag;
+      public static bool EnableBatching;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -93,6 +96,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
+         EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );

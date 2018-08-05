@@ -10,9 +10,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationJob
    {
-      public TranslationJob( TranslationKeys key )
+      public TranslationJob( TranslationKey key )
       {
-         Keys = key;
+         Key = key;
 
          Components = new List<object>();
          OriginalSources = new HashSet<object>();
@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public HashSet<object> OriginalSources { get; private set; }
       
-      public TranslationKeys Keys { get; private set; }
+      public TranslationKey Key { get; private set; }
 
       public string TranslatedText { get; set; }
 
@@ -33,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          foreach( var component in Components )
          {
             var text = component.GetText().Trim();
-            if( text == Keys.OriginalText )
+            if( text == Key.OriginalText )
             {
                return true;
             }

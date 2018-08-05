@@ -7,51 +7,51 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public struct TranslationKeys
+   public struct TranslationKey
    {
-      public TranslationKeys( string key, bool templatizeByNumbers )
+      public TranslationKey( string key, bool templatizeByNumbers )
       {
          OriginalText = key;
 
          if( Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars )
          {
-            RelevantKey = key.RemoveWhitespace();
+            RelevantText = key.RemoveWhitespace();
          }
          else
          {
-            RelevantKey = key;
+            RelevantText = key;
          }
 
          if( templatizeByNumbers )
          {
-            TemplatedKey = RelevantKey.TemplatizeByNumbers();
+            TemplatedText = RelevantText.TemplatizeByNumbers();
          }
          else
          {
-            TemplatedKey = null;
+            TemplatedText = null;
          }
       }
 
-      public TemplatedString TemplatedKey { get; }
+      public TemplatedString TemplatedText { get; }
 
-      public string RelevantKey { get; }
+      public string RelevantText { get; }
 
       public string OriginalText { get; set; }
 
       public string GetDictionaryLookupKey()
       {
-         if( TemplatedKey != null )
+         if( TemplatedText != null )
          {
-            return TemplatedKey.Template;
+            return TemplatedText.Template;
          }
-         return RelevantKey;
+         return RelevantText;
       }
 
       public string Untemplate( string text )
       {
-         if( TemplatedKey != null )
+         if( TemplatedText != null )
          {
-            return TemplatedKey.Untemplate( text );
+            return TemplatedText.Untemplate( text );
          }
 
          return text;
@@ -59,9 +59,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string RepairTemplate( string text )
       {
-         if( TemplatedKey != null )
+         if( TemplatedText != null )
          {
-            return TemplatedKey.RepairTemplate( text );
+            return TemplatedText.RepairTemplate( text );
          }
 
          return text;

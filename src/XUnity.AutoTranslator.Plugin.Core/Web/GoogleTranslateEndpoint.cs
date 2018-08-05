@@ -31,13 +31,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public GoogleTranslateEndpoint()
       {
          _cookieContainer = new CookieContainer();
+
+         // Configure service points / service point manager
          ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com", "translate.googleapis.com" );
+         SetupServicePoints( "https://translate.googleapis.com", "https://translate.google.com" );
       }
+
+      public override bool SupportsLineSplitting => true;
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
          headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
          headers[ HttpRequestHeader.Accept ] = "*/*";
+         headers[ HttpRequestHeader.Referer ] = "https://translate.google.com/";
       }
 
       public override IEnumerator OnBeforeTranslate( int translationCount )
@@ -67,6 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          try
          {
             ApplyHeaders( client.Headers );
+            client.Headers.Remove( HttpRequestHeader.Referer );
             downloadResult = client.GetDownloadResult( new Uri( HttpsTranslateUserSite ) );
          }
          catch( Exception e )
