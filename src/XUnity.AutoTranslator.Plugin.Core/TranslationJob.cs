@@ -15,9 +15,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Keys = key;
 
          Components = new List<object>();
+         OriginalSources = new HashSet<object>();
       }
 
       public List<object> Components { get; private set; }
+
+      public HashSet<object> OriginalSources { get; private set; }
       
       public TranslationKeys Keys { get; private set; }
 

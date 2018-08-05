@@ -25,6 +25,7 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
+using Harmony;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -77,6 +78,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// This function will check if there are symbols of a given language contained in a string.
       /// </summary>
       private Func<string, bool> _symbolCheck;
+
+      private object _advEngine;
+      private float? _nextAdvUpdate;
 
       private IKnownEndpoint _endpoint;
 
@@ -181,7 +185,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while saving translations to disk."  );
+            Logger.Current.Error( e, "An error occurred while saving translations to disk." );
          }
       }
 
@@ -234,7 +238,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private TranslationJob GetOrCreateTranslationJobFor( TranslationKeys key )
+      private TranslationJob GetOrCreateTranslationJobFor( object ui, TranslationKeys key )
       {
          if( _unstartedJobs.TryGetValue( key.GetDictionaryLookupKey(), out TranslationJob job ) )
          {
@@ -252,6 +256,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Logger.Current.Debug( "Queued translation for: " + key.GetDictionaryLookupKey() );
 
          job = new TranslationJob( key );
+         job.OriginalSources.Add( ui );
+
          _unstartedJobs.Add( key.GetDictionaryLookupKey(), job );
 
          CheckThresholds();
@@ -364,7 +370,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
       }
 
-      private string Override_TextChanged( object ui, string text )
+      public string Override_TextChanged( object ui, string text )
       {
          if( _hooksEnabled )
          {
@@ -491,7 +497,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return null;
          }
 
-         var supportsStabilization = SupportsStabilization( ui );
+         var supportsStabilization = ui.SupportsStabilization();
          if( Settings.Delay == 0 || !supportsStabilization )
          {
             return TranslateOrQueueWebJobImmediate( ui, text, info, supportsStabilization );
@@ -598,7 +604,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     {
                                        if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                                        {
-                                          var job = GetOrCreateTranslationJobFor( stabilizedTextKey );
+                                          var job = GetOrCreateTranslationJobFor( ui, stabilizedTextKey );
                                           job.Components.Add( ui );
                                        }
                                     }
@@ -629,7 +635,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
                         {
-                           GetOrCreateTranslationJobFor( textKey );
+                           GetOrCreateTranslationJobFor( ui, textKey );
                         }
                      }
                      else
@@ -642,11 +648,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          return null;
-      }
-
-      public bool SupportsStabilization( object ui )
-      {
-         return !( ui is GUIContent );
       }
 
       /// <summary>
@@ -700,6 +701,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ResetThresholdTimerIfRequired();
                KickoffTranslations();
                FinishTranslations();
+
+               if( _nextAdvUpdate.HasValue && Time.time > _nextAdvUpdate )
+               {
+                  _nextAdvUpdate = null;
+                  UpdateUtageText();
+               }
             }
 
             if( Input.anyKey )
@@ -826,8 +833,30 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
+               //Logger.Current.Debug( "FINISH: " + job.TranslatedText + ", " + string.Join( ", ", job.OriginalSources.Select( x => x.GetType().Name ).ToArray() ) );
+
+               // Utage support
+               if( Constants.Types.AdvCommand != null && Constants.Types.AdvEngine != null
+                  && job.OriginalSources.Any( x => Constants.Types.AdvCommand.IsAssignableFrom( x.GetType() ) ) )
+               {
+                  _nextAdvUpdate = Time.time + 0.5f;
+               }
+
                AddTranslation( job.Keys, job.TranslatedText );
             }
+         }
+      }
+
+      private void UpdateUtageText()
+      {
+         if( _advEngine == null )
+         {
+            _advEngine = GameObject.FindObjectOfType( Constants.Types.AdvEngine );
+         }
+
+         if( _advEngine != null )
+         {
+            AccessTools.Method( Constants.Types.AdvEngine, "ChangeLanguage" )?.Invoke( _advEngine, new object[ 0 ] );
          }
       }
 

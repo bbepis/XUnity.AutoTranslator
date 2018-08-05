@@ -16,7 +16,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          string text = null;
          var type = ui.GetType();
 
-         if( ui is Text )
+         if( type == Constants.Types.UguiNovelText && ( (Component)ui ).gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.AdvUguiSelection ) != null )
+         {
+            // these texts are handled by AdvCommand, unless it is a selection
+            text = ( (Text)ui ).text;
+         }
+         else if( ui is Text )
          {
             text = ( (Text)ui ).text;
          }
@@ -37,12 +42,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          var type = ui.GetType();
 
-         if( type == Constants.Types.UguiNovelText )
+         if( type == Constants.Types.UguiNovelText && ( ( Component ) ui ).gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.AdvUguiSelection ) != null )
          {
-            Logger.Current.Info( "Setting NovelText: " + text );
-            ( (Text)ui ).text = string.Empty;
+            // these texts are handled by AdvCommand, unless it is a selection
             ( (Text)ui ).text = text;
-            type.GetProperty( "LengthOfView" )?.GetSetMethod()?.Invoke( ui, new object[] { text.Length } );
          }
          else if( ui is Text )
          {

@@ -22,6 +22,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
 
+      public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );
+
+      public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
+
+      public static readonly Type AdvUguiSelection = FindType( "Utage.AdvUguiSelection" );
+
       private static Type FindType( string name )
       {
          return AppDomain.CurrentDomain.GetAssemblies()

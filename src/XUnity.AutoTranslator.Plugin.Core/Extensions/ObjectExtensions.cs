@@ -12,10 +12,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
+      
+      public static bool SupportsStabilization( this object ui )
+      {
+         var type = ui.GetType();
+         return !( ui is GUIContent || Constants.Types.AdvCommand.IsAssignableFrom( type ) ) ;
+      }
 
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
-         if( obj is GUIContent ) return null;
+         if( !obj.SupportsStabilization() ) return null;
 
          var info = obj.Get<TranslationInfo>();
 
