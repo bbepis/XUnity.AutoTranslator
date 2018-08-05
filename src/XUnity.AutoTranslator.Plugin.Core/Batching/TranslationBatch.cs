@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Batching
          for( int i = 0 ; i < Trackers.Count ; i++ )
          {
             var tracker = Trackers[ i ];
-            builder.Append( tracker.Job.Keys.GetDictionaryLookupKey() );
+            builder.Append( tracker.Job.Key.GetDictionaryLookupKey() );
 
             if( !( i == Trackers.Count - 1 ) )
             {

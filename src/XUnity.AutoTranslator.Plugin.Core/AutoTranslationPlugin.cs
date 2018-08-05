@@ -229,7 +229,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private TranslationJob GetOrCreateTranslationJobFor( TranslationKeys key )
+      private TranslationJob GetOrCreateTranslationJobFor( TranslationKey key )
       {
          if( _unstartedJobs.TryGetValue( key.GetDictionaryLookupKey(), out TranslationJob job ) )
          {
@@ -238,7 +238,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          foreach( var completedJob in _completedJobs )
          {
-            if( completedJob.Keys.GetDictionaryLookupKey() == key.GetDictionaryLookupKey() )
+            if( completedJob.Key.GetDictionaryLookupKey() == key.GetDictionaryLookupKey() )
             {
                return completedJob;
             }
@@ -321,32 +321,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _translatedTexts.Add( value );
       }
 
-      private void AddTranslation( TranslationKeys key, string value )
+      private void AddTranslation( TranslationKey key, string value )
       {
          _translations[ key.GetDictionaryLookupKey() ] = value;
          _translatedTexts.Add( value );
       }
 
-      private void QueueNewUntranslatedForClipboard( TranslationKeys key )
+      private void QueueNewUntranslatedForClipboard( TranslationKey key )
       {
          if( Settings.CopyToClipboard )
          {
-            if( !_textsToCopyToClipboard.Contains( key.RelevantKey ) )
+            if( !_textsToCopyToClipboard.Contains( key.RelevantText ) )
             {
-               _textsToCopyToClipboard.Add( key.RelevantKey );
-               _textsToCopyToClipboardOrdered.Add( key.RelevantKey );
+               _textsToCopyToClipboard.Add( key.RelevantText );
+               _textsToCopyToClipboardOrdered.Add( key.RelevantText );
 
                _clipboardUpdated = Time.realtimeSinceStartup;
             }
          }
       }
 
-      private void QueueNewUntranslatedForDisk( TranslationKeys key )
+      private void QueueNewUntranslatedForDisk( TranslationKey key )
       {
          _newUntranslated.Add( key.GetDictionaryLookupKey() );
       }
 
-      private void QueueNewTranslationForDisk( TranslationKeys key, string value )
+      private void QueueNewTranslationForDisk( TranslationKey key, string value )
       {
          lock( _writeToFileSync )
          {
@@ -354,7 +354,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private bool TryGetTranslation( TranslationKeys key, out string value )
+      private bool TryGetTranslation( TranslationKey key, out string value )
       {
          return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
       }
@@ -384,7 +384,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void SetTranslatedText( object ui, string translatedText, TranslationKeys key, TranslationInfo info )
+      private void SetTranslatedText( object ui, string translatedText, TranslationKey key, TranslationInfo info )
       {
          var untemplatedTranslatedText = key.Untemplate( translatedText );
 
@@ -524,7 +524,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             info?.Reset( text );
 
-            var textKey = new TranslationKeys( text, !supportsStabilization );
+            var textKey = new TranslationKey( text, !supportsStabilization );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
@@ -572,7 +572,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
-                                 var stabilizedTextKey = new TranslationKeys( stabilizedText, false );
+                                 var stabilizedTextKey = new TranslationKey( stabilizedText, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
@@ -773,7 +773,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // lets see if the text should still be translated before kicking anything off
                if( !job.AnyComponentsStillHasOriginalUntranslatedText() ) continue;
 
-               StartCoroutine( _endpoint.Translate( job.Keys.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
+               StartCoroutine( _endpoint.Translate( job.Key.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
                () => OnTranslationFailed() ) );
             }
          }
@@ -814,9 +814,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
                   }
-                  job.TranslatedText = job.Keys.RepairTemplate( translatedText );
+                  job.TranslatedText = job.Key.RepairTemplate( translatedText );
 
-                  QueueNewTranslationForDisk( job.Keys, translatedText );
+                  QueueNewTranslationForDisk( job.Key, translatedText );
                   _completedJobs.Add( job );
                }
             }
@@ -827,7 +827,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _batchLogicHasFailed = true;
             foreach( var tracker in batch.Trackers )
             {
-               var key = tracker.Job.Keys.GetDictionaryLookupKey();
+               var key = tracker.Job.Key.GetDictionaryLookupKey();
                if( !_unstartedJobs.ContainsKey( key ) )
                {
                   _unstartedJobs[ key ] = tracker.Job;
@@ -859,9 +859,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
             }
-            job.TranslatedText = job.Keys.RepairTemplate( translatedText );
+            job.TranslatedText = job.Key.RepairTemplate( translatedText );
 
-            QueueNewTranslationForDisk( job.Keys, translatedText );
+            QueueNewTranslationForDisk( job.Key, translatedText );
             _completedJobs.Add( job );
          }
       }
@@ -904,14 +904,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
                   var text = component.GetText().Trim();
-                  if( text == job.Keys.OriginalText )
+                  if( text == job.Key.OriginalText )
                   {
                      var info = component.GetTranslationInfo( false );
-                     SetTranslatedText( component, job.TranslatedText, job.Keys, info );
+                     SetTranslatedText( component, job.TranslatedText, job.Key, info );
                   }
                }
 
-               AddTranslation( job.Keys, job.TranslatedText );
+               AddTranslation( job.Key, job.TranslatedText );
             }
          }
       }
@@ -925,7 +925,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var info = kvp.Value as TranslationInfo;
             if( info != null && !string.IsNullOrEmpty( info.OriginalText ) )
             {
-               var key = new TranslationKeys( info.OriginalText, false );
+               var key = new TranslationKey( info.OriginalText, false );
                if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                {
                   SetTranslatedText( kvp.Key, translatedText, key, info );

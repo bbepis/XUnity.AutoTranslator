@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Batching
       public TranslationLineTracker( TranslationJob job )
       {
          Job = job;
-         LinesCount = job.Keys.GetDictionaryLookupKey().Count( c => c == '\n' ) + 1;
+         LinesCount = job.Key.GetDictionaryLookupKey().Count( c => c == '\n' ) + 1;
       }
 
       public string RawTranslatedText { get; set; }
