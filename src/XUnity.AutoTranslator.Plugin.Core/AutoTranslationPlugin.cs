@@ -83,6 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int[] _currentTranslationsQueuedPerSecondRollingWindow = new int[ Settings.TranslationQueueWatchWindow ];
       private float? _timeExceededThreshold;
+      private float _translationsQueuedPerSecond;
 
       private bool _isInTranslatedMode = true;
       private bool _hooksEnabled = true;
@@ -273,8 +274,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ]++;
 
          var translationsInWindow = _currentTranslationsQueuedPerSecondRollingWindow.Sum();
-         var translationsPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
-         if( translationsPerSecond > Settings.MaxTranslationsQueuedPerSecond )
+         _translationsQueuedPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
+         if( _translationsQueuedPerSecond > Settings.MaxTranslationsQueuedPerSecond )
          {
             if( !_timeExceededThreshold.HasValue )
             {
@@ -306,9 +307,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          var translationsInWindow = _currentTranslationsQueuedPerSecondRollingWindow.Sum();
-         var translationsPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
+         _translationsQueuedPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
 
-         if( translationsPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
+         if( _translationsQueuedPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
          {
             _timeExceededThreshold = null;
          }
@@ -729,7 +730,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 )
+         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _translationsQueuedPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
          {
             while( _unstartedJobs.Count > 0 )
             {
