@@ -32,9 +32,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationJobState State { get; set; }
 
-      public bool AnyComponentsStillHasOriginalUntranslatedText()
+      public bool AnyComponentsStillHasOriginalUntranslatedTextOrContextual()
       {
-         if( Components.Count == 0 ) return true; // we do not know
+         if( Components.Count == 0 || Contexts.Count > 0 ) return true; // we do not know
 
          foreach( var component in Components )
          {

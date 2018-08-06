@@ -31,6 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void ResizeUI( object graphic )
       {
+         if( graphic == null ) return;
+
          if( graphic is Text )
          {
             var ui = (Text)graphic;
@@ -84,6 +86,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void UnresizeUI( object graphic )
       {
+         if( graphic == null ) return;
+
          _reset?.Invoke( graphic );
          _reset = null;
       }

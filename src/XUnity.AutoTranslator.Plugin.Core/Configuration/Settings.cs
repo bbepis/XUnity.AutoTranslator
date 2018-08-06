@@ -40,6 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUGUI;
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
+      public static bool EnableUtage;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
@@ -87,6 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableUGUI = Config.Current.Preferences[ "TextFrameworks" ][ "EnableUGUI" ].GetOrDefault( true );
          EnableNGUI = Config.Current.Preferences[ "TextFrameworks" ][ "EnableNGUI" ].GetOrDefault( true );
          EnableTextMeshPro = Config.Current.Preferences[ "TextFrameworks" ][ "EnableTextMeshPro" ].GetOrDefault( true );
+         EnableUtage = Config.Current.Preferences[ "TextFrameworks" ][ "EnableUtage" ].GetOrDefault( true );
          AllowPluginHookOverride = Config.Current.Preferences[ "TextFrameworks" ][ "AllowPluginHookOverride" ].GetOrDefault( true );
 
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );

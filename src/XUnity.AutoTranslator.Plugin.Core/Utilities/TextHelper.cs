@@ -49,10 +49,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Decode( string text )
       {
-         // Remove these in newer version
-         text = text.Replace( "\\r", "\r" );
-         text = text.Replace( "\\n", "\n" );
-         return text;
+         return text.Replace( "\\r", "\r" )
+            .Replace( "\\n", "\n" )
+            .Replace( "%3D", "=" );
       }
 
       /// <summary>
@@ -62,9 +61,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Encode( string text )
       {
-         text = text.Replace( "\r", "\\r" );
-         text = text.Replace( "\n", "\\n" );
-         return text;
+         return text.Replace( "\r", "\\r" )
+            .Replace( "\n", "\\n" )
+            .Replace( "=", "%3D" );
       }
    }
 }

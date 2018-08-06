@@ -14,6 +14,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public Dictionary<string, string> Arguments { get; private set; }
 
+      public bool HasRichSyntax => Template.Length > 5; // {{A}} <-- 5 chars
+
       public string Untemplate( Dictionary<string, string> arguments )
       {
          string result = Template;

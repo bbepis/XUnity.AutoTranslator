@@ -13,6 +13,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static string GetText( this object ui )
       {
+         if( ui == null ) return null;
+
          string text = null;
          var type = ui.GetType();
 
@@ -40,6 +42,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void SetText( this object ui, string text )
       {
+         if( ui == null ) return;
+
          var type = ui.GetType();
 
          if( type == Constants.Types.UguiNovelText && ( ( Component ) ui ).gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.AdvUguiSelection ) != null )

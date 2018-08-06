@@ -12,6 +12,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Batching
 
       public List<TranslationLineTracker> Trackers { get; private set; }
 
+      public bool IsEmpty => Trackers.Count == 0;
+
       public int TotalLinesCount { get; set; }
 
       public void Add( TranslationJob job )

@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static void Postfix( object __instance, ref string __result )
       {
-         var result = AutoTranslationPlugin.Current.Override_TextChanged( __instance, __result );
+         var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, __result );
          if( !string.IsNullOrEmpty( result ) )
          {
             __result = result;
