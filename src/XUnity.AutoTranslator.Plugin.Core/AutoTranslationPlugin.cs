@@ -1050,11 +1050,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                foreach( var component in job.Components )
                {
                   // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
-                  var text = component.GetText().Trim();
-                  if( text == job.Key.OriginalText )
+                  try
                   {
-                     var info = component.GetTranslationInfo( false );
-                     SetTranslatedText( component, job.TranslatedText, job.Key, info );
+                     var text = component.GetText().Trim();
+                     if( text == job.Key.OriginalText )
+                     {
+                        var info = component.GetTranslationInfo( false );
+                        SetTranslatedText( component, job.TranslatedText, job.Key, info );
+                     }
+                  }
+                  catch( NullReferenceException )
+                  {
+                     // might fail if compoent is no longer associated to game
                   }
                }
 

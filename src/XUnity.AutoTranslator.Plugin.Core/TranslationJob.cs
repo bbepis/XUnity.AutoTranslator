@@ -36,12 +36,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( Components.Count == 0 || Contexts.Count > 0 ) return true; // we do not know
 
-         foreach( var component in Components )
+         for( int i = Components.Count - 1 ; i >= 0 ; i-- )
          {
-            var text = component.GetText().Trim();
-            if( text == Key.OriginalText )
+            var component = Components[ i ];
+            try
             {
-               return true;
+               var text = component.GetText().Trim(); 
+               if( text == Key.OriginalText )
+               {
+                  return true;
+               }
+            }
+            catch( NullReferenceException )
+            {
+               // might fail if compoent is no longer associated to game
+               Components.RemoveAt( i );
             }
          }
 
