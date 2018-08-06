@@ -10,11 +10,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    public static class UtageHooks
    {
       public static readonly Type[] All = new[] {
-         typeof( AdvCommand_ParseCellLocalizedTextHook )
+         typeof( AdvCommand_ParseCellLocalizedTextHook ),
+         typeof( AdvEngine_JumpScenario ),
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony]
    public static class AdvCommand_ParseCellLocalizedTextHook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -33,6 +34,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          if( !string.IsNullOrEmpty( result ) )
          {
             __result = result;
+         }
+      }
+   }
+
+   [Harmony]
+   public static class AdvEngine_JumpScenario
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return Constants.Types.AdvEngine != null;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Method( Constants.Types.AdvEngine, "JumpScenario", new Type[] { typeof( string ) } );
+      }
+
+      static void Prefix( ref string label )
+      {
+         if( AutoTranslationPlugin.Current.TryGetReverseTranslation( label, out string key ) )
+         {
+            label = key;
          }
       }
    }

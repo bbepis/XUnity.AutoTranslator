@@ -49,6 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// All the translations are stored in this dictionary.
       /// </summary>
       private Dictionary<string, string> _translations = new Dictionary<string, string>();
+      private Dictionary<string, string> _reverseTranslations = new Dictionary<string, string>();
 
       /// <summary>
       /// These are the new translations that has not yet been persisted to the file system.
@@ -349,12 +350,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void AddTranslation( string key, string value )
       {
          _translations[ key ] = value;
+         _reverseTranslations[ value ] = key;
          _translatedTexts.Add( value );
       }
 
       private void AddTranslation( TranslationKey key, string value )
       {
          _translations[ key.GetDictionaryLookupKey() ] = value;
+         _reverseTranslations[ value ] = key.GetDictionaryLookupKey();
          _translatedTexts.Add( value );
       }
 
@@ -388,6 +391,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool TryGetTranslation( TranslationKey key, out string value )
       {
          return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
+      }
+
+      public bool TryGetReverseTranslation( string value, out string key )
+      {
+         return _reverseTranslations.TryGetValue( value, out key );
       }
 
       public string Hook_TextChanged_WithResult( object ui, string text )
