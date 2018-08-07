@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
       public static readonly int TranslationQueueWatchWindow = 6;
 
-      public static readonly int BatchSize = 20;
+      public static readonly int BatchSize = 10;
 
       // can be changed
       public static string ServiceEndpoint;
