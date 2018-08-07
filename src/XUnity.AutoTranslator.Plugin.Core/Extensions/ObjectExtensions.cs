@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
