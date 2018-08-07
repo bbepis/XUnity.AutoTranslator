@@ -94,6 +94,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _hooksEnabled = true;
       private bool _batchLogicHasFailed = false;
 
+      private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
+      private float _batchOperationSecondCounter = 0;
+
       public void Initialize()
       {
          Current = this;
@@ -325,6 +328,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          else
          {
             _timeExceededThreshold = null;
+         }
+      }
+
+      private void IncrementBatchOperations()
+      {
+         _batchOperationSecondCounter += Time.deltaTime;
+
+         if( _batchOperationSecondCounter > Settings.IncreaseBatchOperationsEvery )
+         {
+            if( _availableBatchOperations < Settings.MaxAvailableBatchOperations )
+            {
+               _availableBatchOperations++;
+            }
+
+            _batchOperationSecondCounter = 0;
          }
       }
 
@@ -796,6 +814,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !Settings.IsShutdown )
             {
+               IncrementBatchOperations();
                ResetThresholdTimerIfRequired();
                KickoffTranslations();
                FinishTranslations();
@@ -840,9 +859,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _translationsQueuedPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
+         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _availableBatchOperations > 0 )
          {
-            while( _unstartedJobs.Count > 0 )
+            while( _unstartedJobs.Count > 0 && _availableBatchOperations > 0 )
             {
                if( _endpoint.IsBusy ) break;
 
@@ -856,13 +875,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   _kickedOff.Add( key );
 
                   if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
-
+                  
                   batch.Add( job );
                   _ongoingJobs[ key ] = job;
                }
 
                if( !batch.IsEmpty )
                {
+                  _availableBatchOperations--;
+
                   StartCoroutine( _endpoint.Translate( batch.GetFullTranslationKey(), Settings.FromLanguage, Settings.Language, translatedText => OnBatchTranslationCompleted( batch, translatedText ),
                   () => OnTranslationFailed( batch ) ) );
                }

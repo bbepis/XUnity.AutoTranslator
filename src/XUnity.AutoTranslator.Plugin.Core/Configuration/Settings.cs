@@ -14,9 +14,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly float ClipboardDebounceTime = 1f;
       public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
+      public static readonly float IncreaseBatchOperationsEvery = 30;
+      public static readonly bool EnableObjectTracking = true;
 
       public static bool IsShutdown = false;
       public static int TranslationCount = 0;
+      public static int MaxAvailableBatchOperations = 40;
 
       public static readonly float MaxTranslationsQueuedPerSecond = 5;
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
@@ -56,7 +59,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableBatching;
       public static bool TrimAllText;
       public static bool EnableUIResizing;
-      public static bool EnableObjectTracking;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -102,7 +104,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
          EnableUIResizing = Config.Current.Preferences[ "Behaviour" ][ "EnableUIResizing" ].GetOrDefault( true );
-         EnableObjectTracking = Config.Current.Preferences[ "Behaviour" ][ "EnableObjectTracking" ].GetOrDefault( true );
          EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
          
