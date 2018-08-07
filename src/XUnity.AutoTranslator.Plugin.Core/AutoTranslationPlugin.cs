@@ -578,7 +578,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
-            var textKey = new TranslationKey( text, context == null && !supportsStabilization, context != null );
+            var textKey = new TranslationKey( text, ui.IsSpammingComponent(), context != null );
 
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text

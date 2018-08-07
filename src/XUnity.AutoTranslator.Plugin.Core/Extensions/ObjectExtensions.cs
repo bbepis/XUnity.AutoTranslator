@@ -36,6 +36,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) );
       }
 
+      public static bool IsSpammingComponent( this object ui )
+      {
+         if( ui == null ) return false;
+
+         return ui is UnityEngine.GUIContent;
+      }
+
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
          if( !Settings.EnableObjectTracking ) return null;
