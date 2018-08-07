@@ -41,7 +41,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var component = Components[ i ];
             try
             {
-               var text = component.GetText().Trim(); 
+               var text = component.GetText().TrimIfConfigured(); 
                if( text == Key.OriginalText )
                {
                   return true;

@@ -190,7 +190,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
 
 
-         return new ParserResult( templateString, args );
+         return new ParserResult( input, templateString, args );
       }
 
       private string TakeAllButLast( StringBuilder builder )

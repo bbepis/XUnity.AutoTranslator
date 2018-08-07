@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Harmony;
+using XUnity.AutoTranslator.Plugin.Core.UtageSupport;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
@@ -53,10 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static void Prefix( ref string label )
       {
-         if( AutoTranslationPlugin.Current.TryGetReverseTranslation( label, out string key ) )
-         {
-            label = key;
-         }
+         UtageHelpers.FixLabel( ref label );
       }
    }
 }

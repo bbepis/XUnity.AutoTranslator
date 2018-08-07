@@ -4,11 +4,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    public class ParserResult
    {
-      public ParserResult( string template, Dictionary<string, string> args )
+      public ParserResult( string originalText, string template, Dictionary<string, string> args )
       {
+         OriginalText = originalText;
          Template = template;
          Arguments = args;
       }
+
+      public string OriginalText { get; set; }
 
       public string Template { get; private set; }
 

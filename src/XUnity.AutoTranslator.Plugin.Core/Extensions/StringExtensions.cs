@@ -182,6 +182,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return sb.ToString();
       }
 
+      public static string TrimIfConfigured( this string text )
+      {
+         if( text == null ) return text;
+
+         if( Settings.TrimAllText )
+         {
+            return text.Trim();
+         }
+         return text;
+      }
+
       public static string RemoveWhitespace( this string text )
       {
          // Japanese whitespace, wtf

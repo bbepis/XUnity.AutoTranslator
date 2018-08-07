@@ -25,6 +25,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) );
       }
 
+      public static bool SupportsRichText( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return ( ui as Text )?.supportRichText == true
+            || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) );
+      }
+
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
          if( !obj.SupportsStabilization() ) return null;
