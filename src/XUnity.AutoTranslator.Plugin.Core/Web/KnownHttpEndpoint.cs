@@ -1,34 +1,51 @@
 ﻿using System;
 using System.Collections;
 using System.Net;
+using System.Threading;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public abstract class KnownHttpEndpoint : IKnownEndpoint
    {
-      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 20 );
+      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 25 );
 
-      private static int _runningTranslations = 0;
-      private static int _maxConcurrency = 1;
-      private static bool _isSettingUp = false;
+      private ServicePoint[] _servicePoints;
+      private bool _isBusy = false;
       private UnityWebClient _client;
-      private DateTime _clientLastUse = DateTime.UtcNow;
+      private DateTime? _clientLastUse = null;
 
       public KnownHttpEndpoint()
       {
       }
 
-      public bool IsBusy => _isSettingUp || _runningTranslations >= _maxConcurrency;
+      public bool IsBusy => _isBusy;
+
+      public virtual bool SupportsLineSplitting
+      {
+         get
+         {
+            return false;
+         }
+      }
+
+      protected void SetupServicePoints( params string[] endpoints )
+      {
+         _servicePoints = new ServicePoint[ endpoints.Length ];
+         
+         for( int i = 0 ; i < endpoints.Length ; i++ )
+         {
+            var endpoint = endpoints[ i ];
+            var servicePoint = ServicePointManager.FindServicePoint( new Uri( endpoint ) );
+            _servicePoints[ i ] = servicePoint;
+         }
+      }
 
       public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action failure )
       {
-         _clientLastUse = DateTime.UtcNow;
-
+         _isBusy = true;
          try
          {
-            _isSettingUp = true;
-
             var setup = OnBeforeTranslate( Settings.TranslationCount );
             if( setup != null )
             {
@@ -37,33 +54,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   yield return setup.Current;
                }
             }
-         }
-         finally
-         {
-            _isSettingUp = false;
-         }
-
-         Logger.Current.Debug( "Starting translation for: " + untranslatedText );
-         DownloadResult result = null;
-         try
-         {
-            var client = GetClient();
-            var url = GetServiceUrl( untranslatedText, from, to );
-            ApplyHeaders( client.Headers );
-            result = client.GetDownloadResult( new Uri( url ) );
-         }
-         catch( Exception e )
-         {
-            Logger.Current.Error( e, "Error occurred while setting up translation request." );
-         }
-
-         if( result != null )
-         {
+            Logger.Current.Debug( "Starting translation for: " + untranslatedText );
+            DownloadResult result = null;
             try
             {
-               _runningTranslations++;
+               var client = GetClient();
+               var url = GetServiceUrl( untranslatedText, from, to );
+               ApplyHeaders( client.Headers );
+               result = client.GetDownloadResult( new Uri( url ) );
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "Error occurred while setting up translation request." );
+            }
+
+            if( result != null )
+            {
                yield return result;
-               _runningTranslations--;
 
                try
                {
@@ -94,21 +101,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   failure();
                }
             }
-            finally
+            else
             {
-               _clientLastUse = DateTime.UtcNow;
+               failure();
             }
+         }
+         finally
+         {
+            _clientLastUse = DateTime.UtcNow;
+            _isBusy = false;
          }
       }
 
       public virtual void OnUpdate()
       {
-         var client = _client;
-         if( client != null && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !client.IsBusy )
+         if( !_isBusy && _clientLastUse.HasValue && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !_client.IsBusy
+            && _servicePoints != null && _servicePoints.Length > 0 )
          {
-            _client = null;
-            client.Dispose();
-            Logger.Current.Debug( "Disposing WebClient because it was not used for 20 seconds." );
+            Logger.Current.Debug( "Closing service points because they were not used for 25 seconds." );
+
+            _isBusy = true;
+            _clientLastUse = null;
+
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               // never do a job like this on the game loop thread
+               try
+               {
+                  foreach( var servicePoint in _servicePoints )
+                  {
+                     servicePoint.CloseConnectionGroup( MyWebClient.ConnectionGroupName );
+                  }
+               }
+               finally
+               {
+                  _isBusy = false;
+               }
+            } );
          }
       }
 

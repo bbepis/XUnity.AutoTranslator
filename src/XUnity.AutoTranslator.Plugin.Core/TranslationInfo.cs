@@ -31,59 +31,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void ResizeUI( object graphic )
       {
-         if( graphic is Text )
+         if( graphic == null ) return;
+
+         var type = graphic.GetType();
+
+         // special handling for NGUI to better handle textbox sizing
+         if( type.Name == UILabelClassName )
          {
-            var ui = (Text)graphic;
+            var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+            var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
 
-            // text is likely to be longer than there is space for, simply expand out anyway then
-            var width = ( (RectTransform)ui.transform ).rect.width;
-            var quarterScreenSize = Screen.width / 5;
-
-            // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
-            // the idea is, if the UI element is larger than the width of half the screen, there is a larger
-            // likelihood that it will go into multiple lines too.
-            var originalHorizontalOverflow = ui.horizontalOverflow;
-            if( ui.verticalOverflow == VerticalWrapMode.Truncate && width < quarterScreenSize && !ui.resizeTextForBestFit )
-            {
-               // will prevent the text from going into multiple lines and from "dispearing" if there is not enough room on a single line
-               ui.horizontalOverflow = HorizontalWrapMode.Overflow;
-            }
-            else
-            {
-               ui.horizontalOverflow = HorizontalWrapMode.Wrap;
-            }
+            type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
+            type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
 
             _reset = g =>
             {
-               var gui = (Text)g;
-               gui.horizontalOverflow = originalHorizontalOverflow;
+               var gtype = g.GetType();
+               gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
+               gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
             };
-         }
-         else
-         {
-            var type = graphic.GetType();
-
-            // special handling for NGUI to better handle textbox sizing
-            if( type.Name == UILabelClassName )
-            {
-               var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
-               var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
-
-               type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
-               type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
-
-               _reset = g =>
-               {
-                  var gtype = g.GetType();
-                  gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
-                  gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
-               };
-            }
          }
       }
 
       public void UnresizeUI( object graphic )
       {
+         if( graphic == null ) return;
+
          _reset?.Invoke( graphic );
          _reset = null;
       }

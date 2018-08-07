@@ -1,4 +1,4 @@
-﻿### 2.10.0
+### 2.10.0
  * FEATURE - Support Yandex translate (requires key)
  * FEATURE - Support Watson translate (requires key)
 

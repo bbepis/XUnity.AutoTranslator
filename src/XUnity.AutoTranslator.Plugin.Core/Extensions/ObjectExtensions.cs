@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
@@ -12,10 +14,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
+      
+      public static bool SupportsStabilization( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return ui is Text
+            || ( Types.UILabel != null && Types.UILabel.IsAssignableFrom( type ) )
+            || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) );
+      }
+
+      public static bool SupportsRichText( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return ( ui as Text )?.supportRichText == true
+            || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) );
+      }
 
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
-         if( obj is GUIContent ) return null;
+         if( !Settings.EnableObjectTracking ) return null;
+
+         if( !obj.SupportsStabilization() ) return null;
 
          var info = obj.Get<TranslationInfo>();
 
@@ -50,7 +75,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static IEnumerable<KeyValuePair<object, object>> GetAllRegisteredObjects()
+      public static List<KeyValuePair<object, object>> GetAllRegisteredObjects()
       {
          lock( Sync )
          {

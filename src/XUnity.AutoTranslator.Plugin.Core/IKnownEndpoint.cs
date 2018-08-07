@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -13,7 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// in an async fashion.
       /// </summary>
       IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action failure );
-      
+
       /// <summary>
       /// Gets a boolean indicating if we are allowed to call "Translate".
       /// </summary>
@@ -30,5 +30,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// "Update" game loop method.
       /// </summary>
       void OnUpdate();
+
+      /// <summary>
+      /// Gets a bool indicating if the plugin is capable of distinguishing between the untranslated text
+      /// on a line per line basis.
+      /// </summary>
+      bool SupportsLineSplitting { get; }
    }
 }

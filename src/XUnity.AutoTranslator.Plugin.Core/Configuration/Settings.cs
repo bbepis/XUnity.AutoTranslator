@@ -14,13 +14,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly float ClipboardDebounceTime = 1f;
       public static readonly int MaxTranslationsBeforeShutdown = 10000;
       public static readonly int MaxUnstartedJobs = 3500;
+      public static readonly float IncreaseBatchOperationsEvery = 30;
+      public static readonly bool EnableObjectTracking = true;
 
       public static bool IsShutdown = false;
       public static int TranslationCount = 0;
+      public static int MaxAvailableBatchOperations = 40;
 
       public static readonly float MaxTranslationsQueuedPerSecond = 5;
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
       public static readonly int TranslationQueueWatchWindow = 6;
+
+      public static readonly int BatchSize = 20;
 
       // can be changed
       public static string ServiceEndpoint;
@@ -38,6 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUGUI;
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
+      public static bool EnableUtage;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
@@ -50,6 +56,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
       public static string MigrationsTag;
+      public static bool EnableBatching;
+      public static bool TrimAllText;
+      public static bool EnableUIResizing;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -84,15 +93,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableUGUI = Config.Current.Preferences[ "TextFrameworks" ][ "EnableUGUI" ].GetOrDefault( true );
          EnableNGUI = Config.Current.Preferences[ "TextFrameworks" ][ "EnableNGUI" ].GetOrDefault( true );
          EnableTextMeshPro = Config.Current.Preferences[ "TextFrameworks" ][ "EnableTextMeshPro" ].GetOrDefault( true );
+         EnableUtage = Config.Current.Preferences[ "TextFrameworks" ][ "EnableUtage" ].GetOrDefault( true );
          AllowPluginHookOverride = Config.Current.Preferences[ "TextFrameworks" ][ "AllowPluginHookOverride" ].GetOrDefault( true );
 
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 150 );
-         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( true );
+         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( Types.AdvEngine == null );
          MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
+         EnableUIResizing = Config.Current.Preferences[ "Behaviour" ][ "EnableUIResizing" ].GetOrDefault( true );
+         EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
+         TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
+         
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );

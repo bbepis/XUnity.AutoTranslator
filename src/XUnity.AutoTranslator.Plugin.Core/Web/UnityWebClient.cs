@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class UnityWebClient : WebClient
+   public class UnityWebClient : MyWebClient
    {
       private KnownHttpEndpoint _httpEndpoint;
 
@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          DownloadStringCompleted += UnityWebClient_DownloadStringCompleted;
       }
 
-      private void UnityWebClient_DownloadStringCompleted( object sender, DownloadStringCompletedEventArgs ev )
+      private void UnityWebClient_DownloadStringCompleted( object sender, MyDownloadStringCompletedEventArgs ev )
       {
          var handle = ev.UserState as DownloadResult;
 

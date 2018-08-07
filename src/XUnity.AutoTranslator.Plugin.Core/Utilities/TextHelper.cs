@@ -24,10 +24,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       public static bool ContainsJapaneseSymbols( string text )
       {
-         // Japenese regex: [\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]
+         // Unicode Kanji Table:
+         // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
          foreach( var c in text )
          {
-            if( ( c >= '\u3040' && c <= '\u30ff' ) || ( c >= '\uff00' && c <= '\uff9f' ) || ( c >= '\u4e00' && c <= '\u9faf' ) || ( c >= '\u3400' && c <= '\u4dbf' ) )
+            if( ( c >= '\u3021' && c <= '\u3029' ) // kana-like symbols
+               || ( c >= '\u3031' && c <= '\u3035' ) // kana-like symbols
+               || ( c >= '\u3041' && c <= '\u3096' ) // hiragana
+               || ( c >= '\u30a1' && c <= '\u30fa' ) // katakana
+               || ( c >= '\uff66' && c <= '\uff9d' ) // half-width katakana
+               || ( c >= '\u4e00' && c <= '\u9faf' ) // CJK unifed ideographs - Common and uncommon kanji
+               || ( c >= '\u3400' && c <= '\u4db5' ) ) // CJK unified ideographs Extension A - Rare kanji ( 3400 - 4dbf)
             {
                return true;
             }
@@ -42,10 +49,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Decode( string text )
       {
-         // Remove these in newer version
-         text = text.Replace( "\\r", "\r" );
-         text = text.Replace( "\\n", "\n" );
-         return text;
+         return text.Replace( "\\r", "\r" )
+            .Replace( "\\n", "\n" )
+            .Replace( "%3D", "=" );
       }
 
       /// <summary>
@@ -55,9 +61,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Encode( string text )
       {
-         text = text.Replace( "\r", "\\r" );
-         text = text.Replace( "\n", "\\n" );
-         return text;
+         return text.Replace( "\r", "\\r" )
+            .Replace( "\n", "\\n" )
+            .Replace( "=", "%3D" );
       }
    }
 }

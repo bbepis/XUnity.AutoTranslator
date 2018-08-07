@@ -13,9 +13,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static string GetText( this object ui )
       {
-         string text = null;
+         if( ui == null ) return null;
 
-         if( ui is Text )
+         string text = null;
+         var type = ui.GetType();
+
+         if( type == Constants.Types.UguiNovelText && ( (Component)ui ).gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.AdvUguiSelection ) != null )
+         {
+            // these texts are handled by AdvCommand, unless it is a selection
+            text = ( (Text)ui ).text;
+         }
+         else if( ui is Text )
          {
             text = ( (Text)ui ).text;
          }
@@ -34,7 +42,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void SetText( this object ui, string text )
       {
-         if( ui is Text )
+         if( ui == null ) return;
+
+         var type = ui.GetType();
+
+         if( type == Constants.Types.UguiNovelText && ( ( Component ) ui ).gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.AdvUguiSelection ) != null )
+         {
+            // these texts are handled by AdvCommand, unless it is a selection
+            ( (Text)ui ).text = text;
+         }
+         else if( ui is Text )
          {
             ( (Text)ui ).text = text;
          }
@@ -45,7 +62,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          else
          {
             // fallback to reflective approach
-            var type = ui.GetType();
             type.GetProperty( TextPropertyName )?.GetSetMethod()?.Invoke( ui, new[] { text } );
          }
       }
