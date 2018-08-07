@@ -49,6 +49,9 @@ MinDialogueChars=20              ;The length of the text for it to be considered
 ForceSplitTextAfterCharacters=0  ;Split text into multiple lines once the translated text exceeds this number of characters
 CopyToClipboard=False            ;Whether or not to copy hooked texts to clipboard
 MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard at a time
+EnableUIResizing=True            ;Whether or not the plugin should provide a "best attempt" at resizing UI components upon translation. Only work for NGUI
+EnableBatching=True              ;Indicates whether batching of translations should be enabled for supported endpoints
+TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
 
 [Baidu]
 BaiduAppId=                      ;OPTIONAL, needed if BaiduTranslate is configured

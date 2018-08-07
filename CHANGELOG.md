@@ -1,6 +1,16 @@
-### 2.10.0
+﻿### 2.10.0
  * FEATURE - Support Yandex translate (requires key)
  * FEATURE - Support Watson translate (requires key)
+ * FEATURE - Batching support for selected endpoints (makes translations much faster and requires lesser request)
+ * FEATURE - Experimental Utage support
+ * BUG FIX - Fixed minor bug during reading of text translation cache
+ * BUG FIX - Now escapes the '='-sign in the translation file, so texts containing this character can be translated
+ * BUG FIX - Fixed kana check when testing if a text is a candidate for translation
+ * MISC - No longer creating a new thread for each translation
+ * MISC - Proactive closing of unused TCP connections
+ * CONFIG - TrimAllText, to indicate whether whitespace in front of and behind translation candidates should be removed
+ * CONFIG - EnableBatching, to indicate whether batching should be enabled for supported endpoints
+ * CONFIG - EnableUIResizing, to indicate whether the plugin should make a "best attempt" at resizing the UI upon translation. Current only work for NGUI
 
 ### 2.9.1
  * MISC - Added automatic configuration migration support
