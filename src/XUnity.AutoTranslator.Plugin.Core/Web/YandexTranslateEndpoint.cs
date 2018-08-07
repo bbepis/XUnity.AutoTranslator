@@ -11,13 +11,13 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-    public class YandexTranslateEndpoint : KnownHttpEndpoint
-    {
-        private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
-        public YandexTranslateEndpoint()
-        {
-            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.yandex.net" );
-        }
+   public class YandexTranslateEndpoint : KnownHttpEndpoint
+   {
+      private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
+      public YandexTranslateEndpoint()
+      {
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.yandex.net" );
+      }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
@@ -26,47 +26,48 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
-        public override bool TryExtractTranslated(string result, out string translated)
-        {
-            try
+      public override bool TryExtractTranslated( string result, out string translated )
+      {
+         try
+         {
+
+            var obj = JSON.Parse( result );
+            var lineBuilder = new StringBuilder( result.Length );
+
+            var code = obj.AsObject[ "code" ].ToString();
+
+            if( code == "200" )
             {
+               var token = obj.AsObject[ "text" ].ToString();
+               token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
+               if( String.IsNullOrEmpty( token ) )
+               {
+                  translated = null;
+                  return false;
+               }
 
-                var obj = JSON.Parse(result);
-                var lineBuilder = new StringBuilder(result.Length);
+               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+               lineBuilder.Append( token );
 
-                var code = obj.AsObject["code"].ToString();
-
-                if (code == "200")
-                {
-                    var token = obj.AsObject["text"].ToString();
-                    token = token.Substring(2, token.Length - 4).UnescapeJson();
-                    if (String.IsNullOrEmpty(token))
-                    {
-                        translated = null;
-                        return false;
-                    }
-
-                    if (!lineBuilder.EndsWithWhitespaceOrNewline()) lineBuilder.Append("\n");
-                    lineBuilder.Append(token);
-
-                    translated = lineBuilder.ToString();
-                    return true;
-                } else
-                {
-                    translated = null;
-                    return false;
-                }                
+               translated = lineBuilder.ToString();
+               return true;
             }
-            catch (Exception)
+            else
             {
-                translated = null;
-                return false;
+               translated = null;
+               return false;
             }
-        }
+         }
+         catch( Exception )
+         {
+            translated = null;
+            return false;
+         }
+      }
 
-        public override string GetServiceUrl(string untranslatedText, string from, string to)
-        {
-            return string.Format(HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL(untranslatedText), Settings.YandexAPIKey);
-        }
-    }
+      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      {
+         return string.Format( HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ), Settings.YandexAPIKey );
+      }
+   }
 }
