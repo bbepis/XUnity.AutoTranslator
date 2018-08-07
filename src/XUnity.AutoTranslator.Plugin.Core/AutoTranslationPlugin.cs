@@ -450,13 +450,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                ui.SetText( text );
 
-               if( isTranslated )
+               if( Settings.EnableUIResizing )
                {
-                  info?.ResizeUI( ui );
-               }
-               else
-               {
-                  info?.UnresizeUI( ui );
+                  if( isTranslated )
+                  {
+                     info?.ResizeUI( ui );
+                  }
+                  else
+                  {
+                     info?.UnresizeUI( ui );
+                  }
                }
             }
             catch( NullReferenceException )
@@ -1176,11 +1179,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void ToggleTranslation()
       {
          _isInTranslatedMode = !_isInTranslatedMode;
+         var objects = ObjectExtensions.GetAllRegisteredObjects();
+
+         Logger.Current.Info( $"Toggling translations of {objects.Count} objects." );
 
          if( _isInTranslatedMode )
          {
             // make sure we use the translated version of all texts
-            foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
+            foreach( var kvp in objects )
             {
                var ui = kvp.Key;
                try
@@ -1205,7 +1211,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          else
          {
             // make sure we use the original version of all texts
-            foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
+            foreach( var kvp in objects )
             {
                var ui = kvp.Key;
                try

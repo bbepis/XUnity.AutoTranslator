@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
@@ -37,6 +39,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
+         if( !Settings.EnableObjectTracking ) return null;
+
          if( !obj.SupportsStabilization() ) return null;
 
          var info = obj.Get<TranslationInfo>();
@@ -72,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static IEnumerable<KeyValuePair<object, object>> GetAllRegisteredObjects()
+      public static List<KeyValuePair<object, object>> GetAllRegisteredObjects()
       {
          lock( Sync )
          {

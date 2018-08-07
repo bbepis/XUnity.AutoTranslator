@@ -55,6 +55,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string MigrationsTag;
       public static bool EnableBatching;
       public static bool TrimAllText;
+      public static bool EnableUIResizing;
+      public static bool EnableObjectTracking;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -99,6 +101,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
+         EnableUIResizing = Config.Current.Preferences[ "Behaviour" ][ "EnableUIResizing" ].GetOrDefault( true );
+         EnableObjectTracking = Config.Current.Preferences[ "Behaviour" ][ "EnableObjectTracking" ].GetOrDefault( true );
          EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
          
