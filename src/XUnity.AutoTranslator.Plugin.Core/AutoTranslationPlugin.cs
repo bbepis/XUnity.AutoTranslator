@@ -403,6 +403,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void QueueNewTranslationForDisk( string key, string value )
+      {
+         lock( _writeToFileSync )
+         {
+            _newTranslations[ key ] = value;
+         }
+      }
+
       private bool TryGetTranslation( TranslationKey key, out string value )
       {
          return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
@@ -875,7 +883,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   _kickedOff.Add( key );
 
                   if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
-                  
+
                   batch.Add( job );
                   _ongoingJobs[ key ] = job;
                }
@@ -1102,17 +1110,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      try
                      {
+
                         var text = context.Component.GetText().TrimIfConfigured();
                         var result = context.Result;
+                        Dictionary<string, string> translations = new Dictionary<string, string>();
+                        var translatedText = TranslateOrQueueWebJobImmediateByParserResult( null, result, false );
 
-                        if( text == result.OriginalText )
+                        if( !string.IsNullOrEmpty( translatedText ) )
                         {
-                           Dictionary<string, string> translations = new Dictionary<string, string>();
-                           var translatedText = TranslateOrQueueWebJobImmediateByParserResult( null, result, false );
-                           if( translatedText != null )
+                           if( !_translations.ContainsKey( context.Result.OriginalText ) )
                            {
-                              var info = context.Component.GetTranslationInfo( false );
-                              SetTranslatedText( context.Component, translatedText, info );
+                              AddTranslation( context.Result.OriginalText, translatedText );
+                              QueueNewTranslationForDisk( context.Result.OriginalText, translatedText );
+                           }
+
+                           if( text == result.OriginalText )
+                           {
+                              if( translatedText != null )
+                              {
+                                 var info = context.Component.GetTranslationInfo( false );
+                                 SetTranslatedText( context.Component, translatedText, info );
+                              }
                            }
                         }
                      }

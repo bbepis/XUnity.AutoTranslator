@@ -32,8 +32,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
 
-      public static readonly Type AdvUguiSelection = FindType( "Utage.AdvUguiSelection" );
-
       private static Type FindType( string name )
       {
          return AppDomain.CurrentDomain.GetAssemblies()
