@@ -14,7 +14,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
-      
+
+      public static bool IsKnownType( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return ui is Text
+            || ui is UnityEngine.GUIContent
+            || ( Types.UILabel != null && Types.UILabel.IsAssignableFrom( type ) )
+            || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) )
+            || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) );
+      }
+
       public static bool SupportsStabilization( this object ui )
       {
          if( ui == null ) return false;
