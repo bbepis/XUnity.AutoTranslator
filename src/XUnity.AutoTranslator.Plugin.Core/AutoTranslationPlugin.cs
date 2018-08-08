@@ -434,8 +434,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextChanged( object ui )
       {
-         if( !ui.IsKnownType() ) return;
-
          if( _hooksEnabled )
          {
             TranslateOrQueueWebJob( ui, null, false );
@@ -444,8 +442,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextInitialized( object ui )
       {
-         if( !ui.IsKnownType() ) return;
-
          if( _hooksEnabled )
          {
             TranslateOrQueueWebJob( ui, null, true );
