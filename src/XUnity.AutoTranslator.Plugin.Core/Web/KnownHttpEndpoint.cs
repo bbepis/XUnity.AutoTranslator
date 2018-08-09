@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       protected void SetupServicePoints( params string[] endpoints )
       {
          _servicePoints = new ServicePoint[ endpoints.Length ];
-         
+
          for( int i = 0 ; i < endpoints.Length ; i++ )
          {
             var endpoint = endpoints[ i ];
@@ -60,8 +60,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             {
                var client = GetClient();
                var url = GetServiceUrl( untranslatedText, from, to );
+               var request = GetRequestObject( untranslatedText, from, to );
                ApplyHeaders( client.Headers );
-               result = client.GetDownloadResult( new Uri( url ) );
+
+               if( request != null )
+               {
+                  result = client.GetDownloadResult( new Uri( url ), request );
+               }
+               else
+               {
+                  result = client.GetDownloadResult( new Uri( url ) );
+               }
             }
             catch( Exception e )
             {
@@ -151,6 +160,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public abstract void ApplyHeaders( WebHeaderCollection headers );
 
       public abstract bool TryExtractTranslated( string result, out string translated );
+
+      public virtual string GetRequestObject( string untranslatedText, string from, string to )
+      {
+         return null;
+      }
 
       public virtual void WriteCookies( HttpWebResponse response )
       {

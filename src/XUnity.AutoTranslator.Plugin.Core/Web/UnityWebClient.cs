@@ -21,6 +21,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          _httpEndpoint = endpoint;
          Encoding = Encoding.UTF8;
          DownloadStringCompleted += UnityWebClient_DownloadStringCompleted;
+         UploadStringCompleted += UnityWebClient_UploadStringCompleted;
+      }
+
+      private void UnityWebClient_UploadStringCompleted( object sender, MyUploadStringCompletedEventArgs ev )
+      {
+         var handle = ev.UserState as DownloadResult;
+
+         // obtain result, error, etc.
+         string text = null;
+         string error = null;
+
+         try
+         {
+            if( ev.Error == null )
+            {
+               text = ev.Result ?? string.Empty;
+            }
+            else
+            {
+               error = ev.Error.ToString();
+            }
+         }
+         catch( Exception e )
+         {
+            error = e.ToString();
+         }
+
+         handle.SetCompleted( text, error );
       }
 
       private void UnityWebClient_DownloadStringCompleted( object sender, MyDownloadStringCompletedEventArgs ev )
@@ -89,6 +117,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          var handle = new DownloadResult();
          DownloadStringAsync( address, handle );
+         return handle;
+      }
+
+      public DownloadResult GetDownloadResult( Uri address, string request )
+      {
+         var handle = new DownloadResult();
+         UploadStringAsync( address, "POST", request, handle );
          return handle;
       }
    }

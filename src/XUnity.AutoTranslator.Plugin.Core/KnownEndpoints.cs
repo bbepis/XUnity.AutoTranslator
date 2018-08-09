@@ -17,6 +17,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             case KnownEndpointNames.GoogleTranslate:
                return new GoogleTranslateEndpoint();
+            case KnownEndpointNames.GoogleTranslateLegitimate:
+               return new GoogleTranslateLegitimateEndpoint();
             case KnownEndpointNames.GoogleTranslateHack:
                return new GoogleTranslateHackEndpoint();
             case KnownEndpointNames.BaiduTranslate:
