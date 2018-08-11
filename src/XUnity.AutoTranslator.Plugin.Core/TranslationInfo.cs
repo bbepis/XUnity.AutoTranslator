@@ -33,23 +33,54 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( graphic == null ) return;
 
-         var type = graphic.GetType();
-
-         // special handling for NGUI to better handle textbox sizing
-         if( type.Name == UILabelClassName )
+         if( graphic is Text )
          {
-            var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
-            var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+            var ui = (Text)graphic;
 
-            type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
-            type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
+            // text is likely to be longer than there is space for, simply expand out anyway then
+            var componentWidth = ( (RectTransform)ui.transform ).rect.width;
+            var quarterScreenSize = Screen.width / 4;
+            var isComponentWide = componentWidth > quarterScreenSize;
 
-            _reset = g =>
+            // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
+            // the idea is, if the UI element is larger than the width of half the screen, there is a larger
+            // likelihood that it will go into multiple lines too.
+            var originalHorizontalOverflow = ui.horizontalOverflow;
+            var originalVerticalOverflow = ui.verticalOverflow;
+
+            if( isComponentWide && !ui.resizeTextForBestFit )
             {
-               var gtype = g.GetType();
-               gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
-               gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
-            };
+               ui.horizontalOverflow = HorizontalWrapMode.Wrap;
+               ui.verticalOverflow = VerticalWrapMode.Overflow;
+
+               _reset = g =>
+               {
+                  var gui = (Text)g;
+                  gui.horizontalOverflow = originalHorizontalOverflow;
+                  gui.verticalOverflow = originalVerticalOverflow;
+               };
+            }
+         }
+         else
+         {
+            var type = graphic.GetType();
+
+            // special handling for NGUI to better handle textbox sizing
+            if( type.Name == UILabelClassName )
+            {
+               var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+               var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+
+               type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
+               type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
+
+               _reset = g =>
+               {
+                  var gtype = g.GetType();
+                  gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
+                  gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
+               };
+            }
          }
       }
 
