@@ -1,4 +1,7 @@
-﻿### 2.10.0
+﻿### 2.10.1
+ * BUG FIX - Reintroduced fix to prevent text overflow for large component for UGUI
+
+### 2.10.0
  * FEATURE - Support Yandex translate (requires key)
  * FEATURE - Support Watson translate (requires key)
  * FEATURE - Batching support for selected endpoints (makes translations much faster and requires lesser request)
