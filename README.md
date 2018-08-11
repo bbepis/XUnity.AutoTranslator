@@ -6,6 +6,7 @@ This is an auto translation mod that hooks into the unity game engine and attemp
  * NGUI
  * TextMeshPro
  * IMGUI
+ * Utage (VN Game Engine)
 
 It does go to the internet, in order to provide the translation, so if you are not comfortable with that, dont use it.
  
