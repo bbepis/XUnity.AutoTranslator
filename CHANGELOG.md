@@ -1,5 +1,5 @@
 ﻿### 2.10.1
- * BUG FIX - Reintroduced fix to prevent text overflow for large component for UGUI
+ * BUG FIX - Fix to prevent text overflow for large component for UGUI
 
 ### 2.10.0
  * FEATURE - Support Yandex translate (requires key)
