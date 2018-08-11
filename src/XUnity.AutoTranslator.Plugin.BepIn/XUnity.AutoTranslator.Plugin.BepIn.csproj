@@ -1,10 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyVersion>2.5.0.0</AssemblyVersion>
-      <FileVersion>2.5.0.0</FileVersion>
-      <Version>2.5.0</Version>
+      <Version>2.10.1</Version>
    </PropertyGroup>
 
    <ItemGroup>
@@ -33,7 +31,7 @@
       <ItemGroup>
          <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
       </ItemGroup>
-     <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)ExIni.dll&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   powershell Compress-Archive -Path '$(SolutionDir)dist\BepIn\BepInEx' -DestinationPath '$(SolutionDir)dist\BepIn\XUnity.AutoTranslator-BepIn-@(VersionNumber).zip' -Force)&#xD;&#xA;)" />
+     <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)ExIni.dll&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)Jurassic.dll&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\BepIn\BepInEx\&quot;&#xD;&#xA;   powershell Compress-Archive -Path '$(SolutionDir)dist\BepIn\BepInEx' -DestinationPath '$(SolutionDir)dist\BepIn\XUnity.AutoTranslator-BepIn-@(VersionNumber).zip' -Force)&#xD;&#xA;)" />
    </Target>
 
 </Project>

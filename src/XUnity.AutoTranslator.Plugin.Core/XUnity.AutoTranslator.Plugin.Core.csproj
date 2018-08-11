@@ -1,11 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <AssemblyVersion>2.5.0.0</AssemblyVersion>
-    <FileVersion>2.5.0.0</FileVersion>
-    <Version>2.5.0</Version>
+     <Version>2.10.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jurassic" Version="2.2.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -20,6 +22,10 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\libs\UnityEngine.UI.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="MonoHttp\" />
   </ItemGroup>
 
 </Project>

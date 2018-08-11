@@ -31,33 +31,35 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void ResizeUI( object graphic )
       {
+         if( graphic == null ) return;
+
          if( graphic is Text )
          {
             var ui = (Text)graphic;
 
             // text is likely to be longer than there is space for, simply expand out anyway then
-            var width = ( (RectTransform)ui.transform ).rect.width;
-            var quarterScreenSize = Screen.width / 5;
+            var componentWidth = ( (RectTransform)ui.transform ).rect.width;
+            var quarterScreenSize = Screen.width / 4;
+            var isComponentWide = componentWidth > quarterScreenSize;
 
             // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
             // the idea is, if the UI element is larger than the width of half the screen, there is a larger
             // likelihood that it will go into multiple lines too.
             var originalHorizontalOverflow = ui.horizontalOverflow;
-            if( ui.verticalOverflow == VerticalWrapMode.Truncate && width < quarterScreenSize && !ui.resizeTextForBestFit )
-            {
-               // will prevent the text from going into multiple lines and from "dispearing" if there is not enough room on a single line
-               ui.horizontalOverflow = HorizontalWrapMode.Overflow;
-            }
-            else
+            var originalVerticalOverflow = ui.verticalOverflow;
+
+            if( isComponentWide && !ui.resizeTextForBestFit )
             {
                ui.horizontalOverflow = HorizontalWrapMode.Wrap;
-            }
+               ui.verticalOverflow = VerticalWrapMode.Overflow;
 
-            _reset = g =>
-            {
-               var gui = (Text)g;
-               gui.horizontalOverflow = originalHorizontalOverflow;
-            };
+               _reset = g =>
+               {
+                  var gui = (Text)g;
+                  gui.horizontalOverflow = originalHorizontalOverflow;
+                  gui.verticalOverflow = originalVerticalOverflow;
+               };
+            }
          }
          else
          {
@@ -84,6 +86,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void UnresizeUI( object graphic )
       {
+         if( graphic == null ) return;
+
          _reset?.Invoke( graphic );
          _reset = null;
       }

@@ -11,9 +11,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.IPA", "src\XUnity.AutoTranslator.Plugin.IPA\XUnity.AutoTranslator.Plugin.IPA.csproj", "{C749698C-9E49-4CC3-8B45-62AE3AD0C938}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Patcher", "src\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj", "{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Patcher", "src\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj", "{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Setup", "src\XUnity.AutoTranslator.Setup\XUnity.AutoTranslator.Setup.csproj", "{86BF1F46-44C1-4301-8314-6EC32F74575F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup", "src\XUnity.AutoTranslator.Setup\XUnity.AutoTranslator.Setup.csproj", "{86BF1F46-44C1-4301-8314-6EC32F74575F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {718A3B1D-A5E5-4223-AD53-45C60C874150}
+		{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD} = {0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.UnityInjector", "src\XUnity.AutoTranslator.Plugin.UnityInjector\XUnity.AutoTranslator.Plugin.UnityInjector.csproj", "{12F1D16B-B8E1-4A9D-B65A-044650F15440}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ACADAE2C-1642-428A-84D4-CC53E24F1348}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +51,10 @@ Global
 		{86BF1F46-44C1-4301-8314-6EC32F74575F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86BF1F46-44C1-4301-8314-6EC32F74575F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86BF1F46-44C1-4301-8314-6EC32F74575F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12F1D16B-B8E1-4A9D-B65A-044650F15440}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12F1D16B-B8E1-4A9D-B65A-044650F15440}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12F1D16B-B8E1-4A9D-B65A-044650F15440}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12F1D16B-B8E1-4A9D-B65A-044650F15440}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +65,7 @@ Global
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{86BF1F46-44C1-4301-8314-6EC32F74575F} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
+		{12F1D16B-B8E1-4A9D-B65A-044650F15440} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}

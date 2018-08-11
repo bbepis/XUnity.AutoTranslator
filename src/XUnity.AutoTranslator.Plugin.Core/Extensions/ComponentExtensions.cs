@@ -13,7 +13,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static string GetText( this object ui )
       {
+         if( ui == null ) return null;
+
          string text = null;
+         var type = ui.GetType();
 
          if( ui is Text )
          {
@@ -34,6 +37,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void SetText( this object ui, string text )
       {
+         if( ui == null ) return;
+
+         var type = ui.GetType();
+
          if( ui is Text )
          {
             ( (Text)ui ).text = text;
@@ -45,7 +52,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          else
          {
             // fallback to reflective approach
-            var type = ui.GetType();
             type.GetProperty( TextPropertyName )?.GetSetMethod()?.Invoke( ui, new[] { text } );
          }
       }

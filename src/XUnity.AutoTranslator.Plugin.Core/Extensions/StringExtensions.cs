@@ -33,16 +33,125 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          '９'
       };
 
-      public static string ChangeToSingleLineForDialogue( this string that )
+      private static readonly HashSet<char> NumbersWithDot = new HashSet<char>
       {
-         if( that.Length > Settings.MinDialogueChars ) // long strings often indicate dialog
+         '0',
+         '1',
+         '2',
+         '3',
+         '4',
+         '5',
+         '6',
+         '7',
+         '8',
+         '9',
+         '０',
+         '１',
+         '２',
+         '３',
+         '４',
+         '５',
+         '６',
+         '７',
+         '８',
+         '９',
+         '.'
+      };
+
+      public static TemplatedString TemplatizeByNumbers( this string str )
+      {
+         var dict = new Dictionary<string, string>();
+         bool isNumber = false;
+         StringBuilder carg = null;
+         char arg = 'A';
+
+         for( int i = 0 ; i < str.Length ; i++ )
          {
-            // Always change dialogue into one line. Otherwise translation services gets confused.
-            return that.RemoveWhitespace();
+            var c = str[ i ];
+            if( isNumber )
+            {
+               if( NumbersWithDot.Contains( c ) )
+               {
+                  carg.Append( c );
+               }
+               else
+               {
+                  // end current number
+                  var variable = carg.ToString();
+                  var ok = true;
+                  var c1 = variable[ 0 ];
+                  if( c1 == '.' )
+                  {
+                     if( variable.Length == 1 )
+                     {
+                        ok = false;
+                     }
+                     else
+                     {
+                        var c2 = variable[ 1 ];
+                        ok = Numbers.Contains( c2 );
+                     }
+                  }
+
+                  if( ok && !dict.ContainsKey( variable ) )
+                  {
+                     dict.Add( variable, "{{" + arg + "}}" );
+                     arg++;
+                  }
+
+                  carg = null;
+                  isNumber = false;
+               }
+            }
+            else
+            {
+               if( NumbersWithDot.Contains( c ) )
+               {
+                  isNumber = true;
+                  carg = new StringBuilder();
+                  carg.Append( c );
+               }
+            }
+         }
+
+         if( carg != null )
+         {
+            // end current number
+            var variable = carg.ToString();
+            var ok = true;
+            var c1 = variable[ 0 ];
+            if( c1 == '.' )
+            {
+               if( variable.Length == 1 )
+               {
+                  ok = false;
+               }
+               else
+               {
+                  var c2 = variable[ 1 ];
+                  ok = Numbers.Contains( c2 );
+               }
+            }
+
+            if( ok && !dict.ContainsKey( variable ) )
+            {
+               dict.Add( variable, "{{" + arg + "}}" );
+               arg++;
+            }
+         }
+
+         if( dict.Count > 0 )
+         {
+            foreach( var kvp in dict )
+            {
+               str = str.Replace( kvp.Key, kvp.Value );
+            }
+
+            return new TemplatedString( str, dict.ToDictionary( x => x.Value, x => x.Key ) );
          }
          else
          {
-            return that;
+            return null;
          }
       }
 
@@ -71,6 +180,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
 
          return sb.ToString();
+      }
+
+      public static string TrimIfConfigured( this string text )
+      {
+         if( text == null ) return text;
+
+         if( Settings.TrimAllText )
+         {
+            return text.Trim();
+         }
+         return text;
       }
 
       public static string RemoveWhitespace( this string text )

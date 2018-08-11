@@ -1,4 +1,4 @@
-# XUnity Auto Translator
+﻿# XUnity Auto Translator
 
 ## Text Frameworks
 This is an auto translation mod that hooks into the unity game engine and attempts to provide translations for the following text frameworks for Unity:
@@ -6,6 +6,7 @@ This is an auto translation mod that hooks into the unity game engine and attemp
  * NGUI
  * TextMeshPro
  * IMGUI
+ * Utage (VN Game Engine)
 
 It does go to the internet, in order to provide the translation, so if you are not comfortable with that, dont use it.
  
@@ -13,16 +14,18 @@ It does go to the internet, in order to provide the translation, so if you are n
 The mod can be installed into the following Plugin Managers:
  * [BepInEx](https://github.com/bbepis/BepInEx)
  * [IPA](https://github.com/Eusth/IPA)
+ * UnityInjector
 
 Installations instructions for both methods can be found below.
 
+Additionally it can be installed without a dependency on a plugin manager through ReiPatcher. However, this approach is not recommended if you use one of the above mentioned Plugin Managers!
+
 ## Configuration
-The default configuration file, looks as such (2.4.0+):
+The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate"]
-EnableSSL=False                  ;Whether or not to use HTTPS endpoint over standard HTTP
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "GoogleTranslateHack", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
 
 [General]
 Language=en                      ;The language to translate into
@@ -47,13 +50,30 @@ MinDialogueChars=20              ;The length of the text for it to be considered
 ForceSplitTextAfterCharacters=0  ;Split text into multiple lines once the translated text exceeds this number of characters
 CopyToClipboard=False            ;Whether or not to copy hooked texts to clipboard
 MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard at a time
+EnableUIResizing=True            ;Whether or not the plugin should provide a "best attempt" at resizing UI components upon translation. Only work for NGUI
+EnableBatching=True              ;Indicates whether batching of translations should be enabled for supported endpoints
+TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
 
 [Baidu]
 BaiduAppId=                      ;OPTIONAL, needed if BaiduTranslate is configured
 BaiduAppSecret=                  ;OPTIONAL, needed if BaiduTranslate is configured
 
+[Yandex]
+YandexAPIKey=                    ;OPTIONAL, needed if YandexTranslate is configured
+
+[Watson]
+WatsonAPIUrl=                    ;OPTIONAL, needed if WatsonTranslate is configured
+WatsonAPIUsername=               ;OPTIONAL, needed if WatsonTranslate is configured
+WatsonAPIPassword=               ;OPTIONAL, needed if WatsonTranslate is configured
+
 [Debug]
 EnablePrintHierarchy=False       ;Used for debugging
+EnableConsole=False              ;Enables the console. Do not enable if other plugins (managers) handles this
+EnableLog=False                  ;Enables extra logging for debugging purposes
+
+[Migrations]
+Enable=True                      ;Used to enable automatic migrations of this configuration file
+Tag=2.9.0                        ;Tag representing the last version this plugin was executed under. Do not edit
 ```
 
 ## Key Mapping
@@ -68,10 +88,10 @@ The plugin can be installed in following ways:
 ### BepInEx Plugin
 REQUIRES: [BepInEx plugin manager](https://github.com/bbepis/BepInEx) (follow its installation instructions first!). 
 
- 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in BepInEx folder.
 
-The file structure should likke like this:
+The file structure should like like this:
 ```
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.BepInEx.dll
@@ -82,10 +102,10 @@ The file structure should likke like this:
 ### IPA Plugin
 REQUIRES: [IPA plugin manager](https://github.com/Eusth/IPA) (follow its installation instructions first!).
 
- 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](https://github.com/bbepis/XUnity.AutoTranslator/releases).
+ 1. Download XUnity.AutoTranslator-IPA-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in Plugins folder.
 
-The file structure should likke like this
+The file structure should like like this
 ```
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.Core.IPA.dll
@@ -93,6 +113,50 @@ The file structure should likke like this
 {GameDirectory}/Plugins/ExIni.dll
 {GameDirectory}/Plugins/Translation/AnyTranslationFile.txt (this files will be auto generated by plugin!)
  ```
+
+### UnityInjector Plugin
+REQUIRES: UnityInjector (follow its installation instructions first!).
+
+ 1. Download XUnity.AutoTranslator-UnityInjector-{VERSION}.zip from [releases](../../releases).
+ 2. Extract directly into the game directory, such that the plugin dlls are placed in UnityInjector folder. **This may not be game root directory!**
+
+The file structure should like like this
+```
+{GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.Core.dll
+{GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.Core.UnityInjector.dll
+{GameDirectory}/UnityInjector/0Harmony.dll
+{GameDirectory}/UnityInjector/ExIni.dll
+{GameDirectory}/UnityInjector/Translation/AnyTranslationFile.txt (this files will be auto generated by plugin!)
+ ```
+ 
+### Standalone Installation (ReiPatcher)
+REQUIRES: Nothing, ReiPatcher is provided by this download.
+
+ 1. Download XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip from [releases](../../releases).
+ 2. Extract directly into the game directory, such that "SetupReiPatcherAndAutoTranslator.exe" is placed alongside other exe files.
+ 3. Execute "SetupReiPatcherAndAutoTranslator.exe". This will setup up ReiPatcher correctly.
+ 4. Execute the shortcut {GameExeName}.lnk that was created besides existing executables. This will patch and launch the game.
+ 5. From now on you can launch the game from the {GameExeName}.exe instead.
+
+The file structure should like like this
+```
+{GameDirectory}/ReiPatcher/Patches/XUnity.AutoTranslator.Patcher.dll
+{GameDirectory}/ReiPatcher/ExIni.dll
+{GameDirectory}/ReiPatcher/Mono.Cecil.dll
+{GameDirectory}/ReiPatcher/Mono.Cecil.Inject.dll
+{GameDirectory}/ReiPatcher/Mono.Cecil.Mdb.dll
+{GameDirectory}/ReiPatcher/Mono.Cecil.Pdb.dll
+{GameDirectory}/ReiPatcher/Mono.Cecil.Rocks.dll
+{GameDirectory}/ReiPatcher/ReiPatcher.exe
+{GameDirectory}/{GameExeName}_Data/Managed/ReiPatcher.exe
+{GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
+{GameDirectory}/{GameExeName}_Data/Managed/0Harmony.dll
+{GameDirectory}/{GameExeName}_Data/Managed/ExIni.dll
+{GameDirectory}/AutoTranslator/AnyTranslationFile.txt (this files will be auto generated by plugin!)
+ ```
+
+## Translating Mods
+Often other mods UI are implemented through IMGUI. As you can see above, this is disabled by default. By changing the "EnableIMGUI" value to "True", it will start translating IMGUI as well, which likely means that other mods UI will be translated.
 
 ## Integrating with Auto Translator
 I have implemented a system that allows other dedicated translation mods to integrate with XUnity AutoTranslator.
@@ -109,4 +173,5 @@ Here's how it works, and what is required:
     1. UGUI: public static event Func<object, string, string> OnUnableToTranslateUGUI
     2. TextMeshPro: public static event Func<object, string, string> OnUnableToTranslateTextMeshPro
     3. NGUI: public static event Func<object, string, string> OnUnableToTranslateNGUI
+    3. IMGUI: public static event Func<object, string, string> OnUnableToTranslateIMGUI
  * Also, the events can be either instance based or static.

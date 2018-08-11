@@ -18,6 +18,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type UILabel = FindType( "UILabel" );
 
+      public static readonly Type WWW = FindType( "UnityEngine.WWW" );
+
+      public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
+
+      public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );
+
+      public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
+
+      public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
+
+      public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
+
+      public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
 
       private static Type FindType( string name )
       {

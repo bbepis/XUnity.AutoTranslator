@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
       }
    }
 }
