@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public abstract class KnownHttpEndpoint : IKnownEndpoint
    {
-      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 25 );
+      private static readonly TimeSpan MaxUnusedLifespan = TimeSpan.FromSeconds( 50 );
 
       private ServicePoint[] _servicePoints;
       private bool _isBusy = false;
@@ -127,7 +127,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          if( !_isBusy && _clientLastUse.HasValue && DateTime.UtcNow - _clientLastUse > MaxUnusedLifespan && !_client.IsBusy
             && _servicePoints != null && _servicePoints.Length > 0 )
          {
-            Logger.Current.Debug( "Closing service points because they were not used for 25 seconds." );
+            Logger.Current.Debug( "Closing service points because they were not used for 50 seconds." );
 
             _isBusy = true;
             _clientLastUse = null;

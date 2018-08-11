@@ -37,18 +37,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       {
          try
          {
-            var obj = JsonUtility.FromJson<GResponse>( result );
-            var translations = obj?.data?.translations;
-            if( translations != null && translations.Count > 0 )
+            var obj = JSON.Parse( result );
+            var lineBuilder = new StringBuilder( result.Length );
+
+            foreach( JSONNode entry in obj.AsObject[ "data" ].AsObject[ "translations" ].AsArray )
             {
-               translated = translations[ 0 ]?.translatedText;
-               return true;
+               var token = entry.AsObject[ "translatedText" ].ToString();
+               token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+
+               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+
+               lineBuilder.Append( token );
             }
-            else
-            {
-               translated = string.Empty;
-               return true;
-            }
+
+            translated = lineBuilder.ToString();
+            return true;
          }
          catch
          {
@@ -64,13 +67,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetRequestObject( string untranslatedText, string from, string to )
       {
-         return JsonUtility.ToJson( new GRequest
-         {
-            q = untranslatedText,
-            target = to,
-            source = from,
-            format = "text"
-         } );
+         var b = new StringBuilder();
+         b.Append( "{" );
+         b.Append( "\"q\":\"" ).Append( untranslatedText.EscapeJson() ).Append( "\"," );
+         b.Append( "\"target\":\"" ).Append( to ).Append( "\"," );
+         b.Append( "\"source\":\"" ).Append( from ).Append( "\"," );
+         b.Append( "\"format\":\"text\"" );
+         b.Append( "}" );
+         return b.ToString();
       }
 
       public override bool ShouldGetSecondChanceAfterFailure()
@@ -78,32 +82,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return false;
       }
    }
+   
+   //public class GRequest
+   //{
+   //   public string q { get; set; }
 
-   [Serializable]
-   public class GRequest
-   {
-      public string q { get; set; }
+   //   public string target { get; set; }
 
-      public string target { get; set; }
+   //   public string source { get; set; }
 
-      public string source { get; set; }
+   //   public string format { get; set; }
+   //}
 
-      public string format { get; set; }
-   }
+   //public class GResponse
+   //{
+   //   public GData data { get; set; }
+   //}
 
-   public class GResponse
-   {
-      public GData data { get; set; }
-   }
+   //public class GData
+   //{
+   //   public List<GTranslation> translations { get; set; }
+   //}
 
-   public class GData
-   {
-      public List<GTranslation> translations { get; set; }
-   }
-
-   public class GTranslation
-   {
-      public string translatedText { get; set; }
-   }
-
+   //public class GTranslation
+   //{
+   //   public string translatedText { get; set; }
+   //}
 }

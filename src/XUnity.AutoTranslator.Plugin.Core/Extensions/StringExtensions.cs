@@ -289,5 +289,52 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return builder.ToString();
       }
+
+      public static string EscapeJson( this string str )
+      {
+         if( str == null || str.Length == 0 )
+         {
+            return "";
+         }
+
+         char c;
+         int len = str.Length;
+         StringBuilder sb = new StringBuilder( len + 4 );
+         for( int i = 0 ; i < len ; i += 1 )
+         {
+            c = str[ i ];
+            switch( c )
+            {
+               case '\\':
+               case '"':
+                  sb.Append( '\\' );
+                  sb.Append( c );
+                  break;
+               case '/':
+                  sb.Append( '\\' );
+                  sb.Append( c );
+                  break;
+               case '\b':
+                  sb.Append( "\\b" );
+                  break;
+               case '\t':
+                  sb.Append( "\\t" );
+                  break;
+               case '\n':
+                  sb.Append( "\\n" );
+                  break;
+               case '\f':
+                  sb.Append( "\\f" );
+                  break;
+               case '\r':
+                  sb.Append( "\\r" );
+                  break;
+               default:
+                  sb.Append( c );
+                  break;
+            }
+         }
+         return sb.ToString();
+      }
    }
 }
