@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void ResizeUI( object graphic )
       {
          // do not resize if there is no object of ir it is already resized
-         if( graphic == null || _reset != null ) return;
+         if( graphic == null ) return;
 
          if( graphic is Text )
          {
@@ -54,12 +54,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ui.horizontalOverflow = HorizontalWrapMode.Wrap;
                ui.verticalOverflow = VerticalWrapMode.Overflow;
 
-               _reset = g =>
+               if( _reset == null )
                {
-                  var gui = (Text)g;
-                  gui.horizontalOverflow = originalHorizontalOverflow;
-                  gui.verticalOverflow = originalVerticalOverflow;
-               };
+                  _reset = g =>
+                  {
+                     var gui = (Text)g;
+                     gui.horizontalOverflow = originalHorizontalOverflow;
+                     gui.verticalOverflow = originalVerticalOverflow;
+                  };
+               }
             }
          }
          else
