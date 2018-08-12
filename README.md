@@ -4,8 +4,8 @@
 This is an auto translation mod that hooks into the unity game engine and attempts to provide translations for the following text frameworks for Unity:
  * UGUI
  * NGUI
- * TextMeshPro
  * IMGUI
+ * TextMeshPro
  * Utage (VN Game Engine)
 
 It does go to the internet, in order to provide the translation, so if you are not comfortable with that, dont use it.
