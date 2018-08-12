@@ -781,7 +781,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public IEnumerator WaitForTextStablization( object ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
       {
-         if( currentTries < maxTries ) // shortcircuit
+         yield return 0; // wait a single frame to allow any external plugins to complete their hooking logic
+
+         bool succeeded = false;
+         while( currentTries < maxTries ) // shortcircuit
          {
             var beforeText = ui.GetText();
             yield return new WaitForSeconds( delay );
@@ -790,13 +793,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( beforeText == afterText )
             {
                onTextStabilized( afterText.TrimIfConfigured() );
+               succeeded = true;
+               break;
             }
-            else
-            {
-               StartCoroutine( WaitForTextStablization( ui, delay, maxTries, currentTries + 1, onTextStabilized, onMaxTriesExceeded ) );
-            }
+
+            currentTries++;
          }
-         else
+
+         if( !succeeded )
          {
             onMaxTriesExceeded();
          }
