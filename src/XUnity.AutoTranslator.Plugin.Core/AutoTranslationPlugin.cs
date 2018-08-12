@@ -48,6 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <summary>
       /// All the translations are stored in this dictionary.
       /// </summary>
+      private Dictionary<string, string> _staticTranslations = new Dictionary<string, string>();
       private Dictionary<string, string> _translations = new Dictionary<string, string>();
       private Dictionary<string, string> _reverseTranslations = new Dictionary<string, string>();
 
@@ -120,6 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
 
          LoadTranslations();
+         LoadStaticTranslations();
 
          // start a thread that will periodically removed unused references
          var t1 = new Thread( MaintenanceLoop );
@@ -242,6 +244,38 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception e )
          {
             Logger.Current.Error( e, "An error occurred while loading translations." );
+         }
+      }
+
+      private void LoadStaticTranslations()
+      {
+         if( Settings.UseStaticTranslations && Settings.FromLanguage == Settings.DefaultFromLanguage && Settings.Language == Settings.DefaultLanguage )
+         {
+            var tab = new char[] { '\t' };
+            var equals = new char[] { '=' };
+            var splitters = new char[][] { tab, equals };
+
+            // load static translations from previous titles
+            string[] translations = Properties.Resources.StaticTranslations.Split( new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries );
+            foreach( string translation in translations )
+            {
+               for( int i = 0 ; i < splitters.Length ; i++ )
+               {
+                  var splitter = splitters[ i ];
+                  string[] kvp = translation.Split( splitter, StringSplitOptions.None );
+                  if( kvp.Length >= 2 )
+                  {
+                     string key = TextHelper.Decode( kvp[ 0 ].TrimIfConfigured() );
+                     string value = TextHelper.Decode( kvp[ 1 ].TrimIfConfigured() );
+
+                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                     {
+                        _staticTranslations[ key ] = value;
+                        break;
+                     }
+                  }
+               }
+            }
          }
       }
 
@@ -413,7 +447,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool TryGetTranslation( TranslationKey key, out string value )
       {
-         return _translations.TryGetValue( key.GetDictionaryLookupKey(), out value );
+         var lookup = key.GetDictionaryLookupKey();
+         var result = _translations.TryGetValue( lookup, out value );
+         if( result )
+         {
+            return result;
+         }
+         else if( _staticTranslations.Count > 0 )
+         {
+            if( _staticTranslations.TryGetValue( lookup, out value ) )
+            {
+               QueueNewTranslationForDisk( lookup, value );
+               AddTranslation( lookup, value );
+               return true;
+            }
+         }
+         return result;
       }
 
       public bool TryGetReverseTranslation( string value, out string key )
