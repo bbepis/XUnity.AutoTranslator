@@ -1,6 +1,7 @@
 ﻿### 2.11.0
  * FEATURE - Support for legitimate Google Cloud Translate API (requires key)
  * BUG FIX - Fixed situations where a text would not be translated on a component if a operation is ongoing on the component
+ * BUG FIX - Less delay on translation in certain situations
  * MISC - Plugin seeded with ~10000 manually translated texts for commonly used translations to avoid hitting the configured endpoint too much (enable or disable with "UseStaticTranslations")
    * Only applies when configured for Japanese to English (default)
 
