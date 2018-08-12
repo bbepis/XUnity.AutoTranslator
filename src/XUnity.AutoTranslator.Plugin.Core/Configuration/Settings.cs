@@ -59,6 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableBatching;
       public static bool TrimAllText;
       public static bool EnableUIResizing;
+      public static string GoogleAPIKey;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -106,7 +107,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableUIResizing = Config.Current.Preferences[ "Behaviour" ][ "EnableUIResizing" ].GetOrDefault( true );
          EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
-         
+
+         GoogleAPIKey = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
