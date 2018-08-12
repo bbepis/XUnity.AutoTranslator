@@ -31,7 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void ResizeUI( object graphic )
       {
-         if( graphic == null ) return;
+         // do not resize if there is no object of ir it is already resized
+         if( graphic == null || _reset != null ) return;
 
          if( graphic is Text )
          {
