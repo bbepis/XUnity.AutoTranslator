@@ -25,7 +25,7 @@ The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate", "GoogleTranslateHack"]
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
 
 [General]
 Language=en                      ;The language to translate into
