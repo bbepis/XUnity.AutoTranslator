@@ -25,7 +25,7 @@ The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "GoogleLegitimateTranslate", "BaiduTranslate", "GoogleTranslateHack", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "GoogleTranslateLegitimate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate"]
 
 [General]
 Language=en                      ;The language to translate into
@@ -55,7 +55,7 @@ EnableBatching=True              ;Indicates whether batching of translations sho
 TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
 
 [GoogleLegitimate]
-GoogleAPIKey=                    ;OPTIONAL, needed if GoogleLegitimateTranslate is configured
+GoogleAPIKey=                    ;OPTIONAL, needed if GoogleTranslateLegitimate is configured
 
 [Baidu]
 BaiduAppId=                      ;OPTIONAL, needed if BaiduTranslate is configured
