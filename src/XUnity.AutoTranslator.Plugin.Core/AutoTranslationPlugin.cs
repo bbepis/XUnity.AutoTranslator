@@ -544,9 +544,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             return null;
          }
+
          if( _ongoingOperations.Contains( ui ) )
          {
-            return null;
+            return TranslateImmediate( ui, text, info );
          }
 
          var supportsStabilization = ui.SupportsStabilization();
@@ -571,6 +572,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( info == null ) return false;
 
          return info.IsCurrentlySettingText;
+      }
+
+      private string TranslateImmediate( object ui, string text, TranslationInfo info )
+      {
+         // Get the trimmed text
+         text = ( text ?? ui.GetText() ).TrimIfConfigured();
+
+         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
+         {
+            info?.Reset( text );
+
+            var textKey = new TranslationKey( text, ui.IsSpammingComponent(), false );
+
+            // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+            string translation;
+            if( TryGetTranslation( textKey, out translation ) )
+            {
+               if( !string.IsNullOrEmpty( translation ) )
+               {
+                  SetTranslatedText( ui, textKey.Untemplate( translation ), info );
+                  return translation;
+               }
+            }
+         }
+
+         return null;
       }
 
       /// <summary>
