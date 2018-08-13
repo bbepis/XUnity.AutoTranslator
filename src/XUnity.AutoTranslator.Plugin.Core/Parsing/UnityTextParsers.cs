@@ -8,15 +8,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    public static class UnityTextParsers
    {
-      private static readonly UtageTextParser UtageTextParser = new UtageTextParser();
+      private static readonly RichTextParser RichTextParser = new RichTextParser();
 
-      public static UnityTextParserBase GetTextParserByGameEngine()
+      public static RichTextParser GetTextParserByGameEngine()
       {
-         if( Types.AdvEngine != null )
-         {
-            return UtageTextParser;
-         }
-         return null;
+         return RichTextParser;
       }
    }
 }
