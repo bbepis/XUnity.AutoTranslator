@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
    public class RichTextParser
    {
-      private static readonly Regex TagRegex = new Regex( "<.*?>", RegexOptions.Compiled );
+      private static readonly Regex TagRegex = new Regex( "<.*?>" );
       private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "group" };
       private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound" };
 
