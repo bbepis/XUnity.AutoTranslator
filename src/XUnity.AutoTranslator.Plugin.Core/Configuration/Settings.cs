@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly float IncreaseBatchOperationsEvery = 30;
       public static readonly bool EnableObjectTracking = true;
       public static readonly int MaximumStaggers = 5;
-      public static readonly int MaximumConcurrentFrameTranslations = 60;
+      public static readonly int MaximumConcurrentFrameTranslations = 40;
 
       public static bool IsShutdown = false;
       public static int TranslationCount = 0;
