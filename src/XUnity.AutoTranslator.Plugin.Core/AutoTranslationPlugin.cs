@@ -97,6 +97,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
       private float _batchOperationSecondCounter = 0;
+      private int _frameForLastQueuedTranslation = -1;
+      private int _consecutiveFramesQueued = 0;
 
       public void Initialize()
       {
@@ -315,9 +317,45 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          _unstartedJobs.Add( lookupKey, ongoingJob );
 
+         CheckConsecutiveFrames();
          CheckThresholds();
 
          return ongoingJob;
+      }
+
+      public void CheckConsecutiveFrames()
+      {
+         var currentFrame = Time.frameCount;
+         var lastFrame = currentFrame - 1;
+
+         if( lastFrame == _frameForLastQueuedTranslation )
+         {
+            // we also queued something last frame, lets increment our counter
+            _consecutiveFramesQueued++;
+
+            if( _consecutiveFramesQueued > Settings.MaximumConcurrentFrameTranslations )
+            {
+               // Shutdown, this wont be tolerated!!!
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
+
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConcurrentFrameTranslations} consecutive frames. Shutting down plugin." );
+            }
+
+         }
+         else if( currentFrame == _frameForLastQueuedTranslation )
+         {
+            // do nothing, there may be multiple translations per frame, that wont increase this counter
+         }
+         else
+         {
+            // but if multiple Update frames has passed, we will reset the counter
+            _consecutiveFramesQueued = 0;
+         }
+
+         _frameForLastQueuedTranslation = currentFrame;
       }
 
       private void CheckThresholds()
