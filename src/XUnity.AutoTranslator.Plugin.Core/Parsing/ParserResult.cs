@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          Arguments = args;
       }
 
-      public string OriginalText { get; set; }
+      public string OriginalText { get; private set; }
 
       public string Template { get; private set; }
 
