@@ -4,10 +4,12 @@ using System.Text.RegularExpressions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
+
    public class RichTextParser
    {
       private static readonly Regex TagRegex = new Regex( "<.*?>", RegexOptions.Compiled );
-      private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "/ruby" };
+      private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "group" };
+      private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound" };
 
       public RichTextParser()
       {
@@ -18,6 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       {
          var matches = TagRegex.Matches( input );
 
+         var accumulation = new StringBuilder();
          var args = new Dictionary<string, string>();
          var template = new StringBuilder( input.Length );
          var offset = 0;
@@ -38,21 +41,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             {
                value = parts[ 0 ];
             }
+            var isKnown = KnownTags.Contains( value );
+            var isIgnored = IgnoreTags.Contains( value );
 
             // add normal text
             var end = m.Index;
             var start = offset;
             var text = input.Substring( start, end - start );
-            var argument = "{{" + ( arg++ ) + "}}";
-            args.Add( argument, text );
-            template.Append( argument );
-
             offset = end + m.Length;
 
-            var ignoreTag = IgnoreTags.Contains( value );
-            if( !ignoreTag )
+            // if the tag is not known, we want to include as normal text in the NEXT iteration
+            if( !isKnown )
             {
-               template.Append( m.Value );
+               accumulation.Append( text );
+               accumulation.Append( m.Value );
+            }
+            else
+            {
+               text += accumulation;
+               accumulation.Length = 0;
+
+               if( !string.IsNullOrEmpty( text ) )
+               {
+                  var argument = "{{" + ( arg++ ) + "}}";
+                  args.Add( argument, text );
+                  template.Append( argument );
+               }
+
+               if( !isIgnored )
+               {
+                  template.Append( m.Value );
+               }
             }
          }
 
