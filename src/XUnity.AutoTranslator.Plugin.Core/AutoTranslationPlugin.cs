@@ -120,6 +120,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             Logger.Current.Error( e, "An unexpected error occurred during initialization of endpoint." );
          }
 
+         if( !TextHelper.IsFromLanguageSupported( Settings.FromLanguage ) )
+         {
+            Logger.Current.Error( $"The plugin has been configured to use the 'FromLanguage={Settings.FromLanguage}'. This language is not supported. Shutting plugin down." );
+
+            _endpoint = null;
+            Settings.IsShutdown = true;
+         }
+
          _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
 
          LoadTranslations();

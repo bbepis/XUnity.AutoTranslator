@@ -10,8 +10,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
       {
          { "ja", ContainsJapaneseSymbols },
-         { "ja-JP", ContainsJapaneseSymbols },
+         { "ru", ContainsRussianSymbols },
+         { "zh-CN", ContainsChineseSymbols },
+         { "zh-TW", ContainsChineseSymbols },
+         { "ko", ContainsKoreanSymbols },
       };
+
+      public static bool IsFromLanguageSupported( string code )
+      {
+         return LanguageSymbolChecks.ContainsKey( code );
+      }
 
       public static Func<string, bool> GetSymbolCheck( string language )
       {
@@ -34,7 +42,52 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                || ( c >= '\u30a1' && c <= '\u30fa' ) // katakana
                || ( c >= '\uff66' && c <= '\uff9d' ) // half-width katakana
                || ( c >= '\u4e00' && c <= '\u9faf' ) // CJK unifed ideographs - Common and uncommon kanji
-               || ( c >= '\u3400' && c <= '\u4db5' ) ) // CJK unified ideographs Extension A - Rare kanji ( 3400 - 4dbf)
+               || ( c >= '\u3400' && c <= '\u4dbf' ) // CJK unified ideographs Extension A - Rare kanji ( 3400 - 4dbf)
+               || ( c >= '\uf900' && c <= '\ufaff' ) ) // CJK Compatibility Ideographs
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsKoreanSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\uac00' && c <= '\ud7af' ) ) // Hangul Syllables
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsChineseSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u4e00' && c <= '\u9faf' )
+               || ( c >= '\u3400' && c <= '\u4dbf' )
+               || ( c >= '\uf900' && c <= '\ufaff' ) )
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsRussianSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u0400' && c <= '\u04ff' )
+               || ( c >= '\u0500' && c <= '\u052f' )
+               || ( c >= '\u2de0' && c <= '\u2dff' )
+               || ( c >= '\ua640' && c <= '\ua69f' )
+               || ( c >= '\u1c80' && c <= '\u1c88' )
+               || ( c >= '\ufe2e' && c <= '\ufe2f' )
+               || ( c == '\u1d2b' || c == '\u1d78' ) )
             {
                return true;
             }
