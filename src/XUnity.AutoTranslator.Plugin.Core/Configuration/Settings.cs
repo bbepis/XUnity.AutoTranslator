@@ -18,6 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxUnstartedJobs = 3500;
       public static readonly float IncreaseBatchOperationsEvery = 30;
       public static readonly bool EnableObjectTracking = true;
+      public static readonly int MaximumStaggers = 5;
 
       public static bool IsShutdown = false;
       public static int TranslationCount = 0;
