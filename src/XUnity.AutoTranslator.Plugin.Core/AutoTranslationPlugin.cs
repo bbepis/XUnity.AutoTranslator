@@ -97,6 +97,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
       private float _batchOperationSecondCounter = 0;
+      private string _previouslyQueuedText = null;
+      private int _concurrentStaggers = 0;
       private int _frameForLastQueuedTranslation = -1;
       private int _consecutiveFramesQueued = 0;
 
@@ -325,6 +327,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          _unstartedJobs.Add( lookupKey, ongoingJob );
 
+         CheckStaggerText( lookupKey );
          CheckConsecutiveFrames();
          CheckThresholds();
 
@@ -366,6 +369,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _frameForLastQueuedTranslation = currentFrame;
       }
 
+      private void CheckStaggerText( string untranslatedText )
+      {
+         if( _previouslyQueuedText != null )
+         {
+            if( untranslatedText.StartsWith( _previouslyQueuedText ) )
+            {
+               _concurrentStaggers++;
+               if( _concurrentStaggers > Settings.MaximumStaggers )
+               {
+                  _unstartedJobs.Clear();
+                  _completedJobs.Clear();
+                  _ongoingJobs.Clear();
+
+                  Settings.IsShutdown = true;
+                  Logger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+               }
+            }
+            else
+            {
+               _concurrentStaggers = 0;
+            }
+
+         }
+         _previouslyQueuedText = untranslatedText;
+      }
+
       private void CheckThresholds()
       {
          if( _unstartedJobs.Count > Settings.MaxUnstartedJobs )
@@ -373,8 +402,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _unstartedJobs.Clear();
             _completedJobs.Clear();
             _ongoingJobs.Clear();
-            Settings.IsShutdown = true;
 
+            Settings.IsShutdown = true;
             Logger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
          }
 
