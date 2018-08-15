@@ -14,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          { "zh-CN", ContainsChineseSymbols },
          { "zh-TW", ContainsChineseSymbols },
          { "ko", ContainsKoreanSymbols },
+         { "en", ContainsStandardLatinSymbols },
       };
 
       public static bool IsFromLanguageSupported( string code )
@@ -88,6 +89,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                || ( c >= '\u1c80' && c <= '\u1c88' )
                || ( c >= '\ufe2e' && c <= '\ufe2f' )
                || ( c == '\u1d2b' || c == '\u1d78' ) )
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsStandardLatinSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u0041' && c <= '\u005a' )
+               || ( c >= '\u0061' && c <= '\u007a' ) )
             {
                return true;
             }
