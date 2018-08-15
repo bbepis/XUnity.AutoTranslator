@@ -67,6 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUIResizing;
       public static string GoogleAPIKey;
       public static bool UseStaticTranslations;
+      public static string OverrideFont;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -115,6 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
+         OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
 
          GoogleAPIKey = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
 

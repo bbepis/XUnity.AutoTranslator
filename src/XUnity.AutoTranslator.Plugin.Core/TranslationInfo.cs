@@ -4,16 +4,22 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Fonts;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationInfo
    {
+      private static readonly string FontSizePropertyName = "fontSize";
+      private static readonly string TrueTypeFontPropertyName = "trueTypeFont";
+      private static readonly string BitmapFontPropertyName = "bitmapFont";
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
       private static readonly string UILabelClassName = "UILabel";
 
-      private Action<object> _reset;
+      private Action<object> _unresize;
+      private Action<object> _unfont;
 
       public TranslationInfo()
       {
@@ -28,6 +34,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsAwake { get; set; }
 
       public bool IsCurrentlySettingText { get; set; }
+
+      public void ChangeFont( object graphic )
+      {
+         if( graphic == null ) return;
+
+         if( graphic is Text )
+         {
+            var ui = graphic as Text;
+
+            var previousFont = ui.font;
+            var newFont = FontCache.GetOrCreate( previousFont.fontSize );
+
+            ui.font = newFont;
+            if( _unfont == null )
+            {
+               _unfont = obj =>
+               {
+                  ( (Text)obj ).font = previousFont;
+               };
+            }
+         }
+      }
+
+      public void UnchangeFont( object graphic )
+      {
+         if( graphic == null ) return;
+
+         _unfont?.Invoke( graphic );
+         _unfont = null;
+      }
 
       public void ResizeUI( object graphic )
       {
@@ -54,9 +90,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ui.horizontalOverflow = HorizontalWrapMode.Wrap;
                ui.verticalOverflow = VerticalWrapMode.Overflow;
 
-               if( _reset == null )
+               if( _unresize == null )
                {
-                  _reset = g =>
+                  _unresize = g =>
                   {
                      var gui = (Text)g;
                      gui.horizontalOverflow = originalHorizontalOverflow;
@@ -78,12 +114,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
                type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
 
-               _reset = g =>
+               if( _unresize == null )
                {
-                  var gtype = g.GetType();
-                  gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
-                  gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
-               };
+                  _unresize = g =>
+                  {
+                     var gtype = g.GetType();
+                     gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
+                     gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
+                  };
+               }
             }
          }
       }
@@ -92,8 +131,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( graphic == null ) return;
 
-         _reset?.Invoke( graphic );
-         _reset = null;
+         _unresize?.Invoke( graphic );
+         _unresize = null;
       }
 
       public TranslationInfo Reset( string newText )

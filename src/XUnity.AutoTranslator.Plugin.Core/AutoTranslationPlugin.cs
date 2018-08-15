@@ -107,6 +107,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _secondForQueuedTranslation = -1;
       private int _consecutiveSecondsTranslated = 0;
 
+      private bool _changeFont = false;
+
       public void Initialize()
       {
          Current = this;
@@ -139,6 +141,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
+
+         if( !string.IsNullOrEmpty( Settings.OverrideFont ) )
+         {
+            var available = Font.GetOSInstalledFontNames();
+            if( !available.Contains( Settings.OverrideFont ) )
+            {
+               Logger.Current.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
+               Settings.OverrideFont = null;
+            }
+            else
+            {
+               _changeFont = true;
+            }
+         }
 
          LoadTranslations();
          LoadStaticTranslations();
@@ -645,6 +661,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                ui.SetText( text );
+
+               if( _changeFont )
+               {
+                  if( isTranslated )
+                  {
+                     info?.ChangeFont( ui );
+                  }
+                  else
+                  {
+                     info?.UnchangeFont( ui );
+                  }
+               }
 
                if( Settings.EnableUIResizing )
                {
