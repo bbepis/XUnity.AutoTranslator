@@ -97,10 +97,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
       private float _batchOperationSecondCounter = 0;
+
       private string _previouslyQueuedText = null;
       private int _concurrentStaggers = 0;
+
       private int _frameForLastQueuedTranslation = -1;
-      private int _consecutiveFramesQueued = 0;
+      private int _consecutiveFramesTranslated = 0;
+
+      private int _secondForQueuedTranslation = -1;
+      private int _consecutiveSecondsTranslated = 0;
 
       public void Initialize()
       {
@@ -329,22 +334,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          CheckStaggerText( lookupKey );
          CheckConsecutiveFrames();
+         CheckConsecutiveSeconds();
          CheckThresholds();
 
          return ongoingJob;
       }
 
-      public void CheckConsecutiveFrames()
+      private void CheckConsecutiveSeconds()
       {
-         var currentFrame = Time.frameCount;
-         var lastFrame = currentFrame - 1;
+         var currentSecond = (int)Time.time;
+         var lastSecond = currentSecond - 1;
 
-         if( lastFrame == _frameForLastQueuedTranslation )
+         if( lastSecond == _secondForQueuedTranslation )
          {
             // we also queued something last frame, lets increment our counter
-            _consecutiveFramesQueued++;
+            _consecutiveSecondsTranslated++;
 
-            if( _consecutiveFramesQueued > Settings.MaximumConcurrentFrameTranslations )
+            if( _consecutiveSecondsTranslated > Settings.MaximumConsecutiveSecondsTranslated )
             {
                // Shutdown, this wont be tolerated!!!
                _unstartedJobs.Clear();
@@ -352,7 +358,42 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _ongoingJobs.Clear();
 
                Settings.IsShutdown = true;
-               Logger.Current.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConcurrentFrameTranslations} consecutive frames. Shutting down plugin." );
+               Logger.Current.Error( $"SPAM DETECTED: Translations were queued every second for more than {Settings.MaximumConsecutiveSecondsTranslated} consecutive seconds. Shutting down plugin." );
+            }
+
+         }
+         else if( currentSecond == _secondForQueuedTranslation )
+         {
+            // do nothing, there may be multiple translations per frame, that wont increase this counter
+         }
+         else
+         {
+            // but if multiple Update frames has passed, we will reset the counter
+            _consecutiveSecondsTranslated = 0;
+         }
+
+         _secondForQueuedTranslation = currentSecond;
+      }
+
+      private void CheckConsecutiveFrames()
+      {
+         var currentFrame = Time.frameCount;
+         var lastFrame = currentFrame - 1;
+
+         if( lastFrame == _frameForLastQueuedTranslation )
+         {
+            // we also queued something last frame, lets increment our counter
+            _consecutiveFramesTranslated++;
+
+            if( _consecutiveFramesTranslated > Settings.MaximumConsecutiveFramesTranslated )
+            {
+               // Shutdown, this wont be tolerated!!!
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
+
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConsecutiveFramesTranslated} consecutive frames. Shutting down plugin." );
             }
 
          }
@@ -360,10 +401,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             // do nothing, there may be multiple translations per frame, that wont increase this counter
          }
-         else
+         else if( _consecutiveFramesTranslated > 0 )
          {
             // but if multiple Update frames has passed, we will reset the counter
-            _consecutiveFramesQueued = 0;
+            _consecutiveFramesTranslated--;
          }
 
          _frameForLastQueuedTranslation = currentFrame;
