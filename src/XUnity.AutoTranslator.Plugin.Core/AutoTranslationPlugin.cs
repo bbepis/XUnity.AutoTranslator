@@ -660,8 +660,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   info.IsCurrentlySettingText = true;
                }
 
-               ui.SetText( text );
-
                if( _changeFont )
                {
                   if( isTranslated )
@@ -685,6 +683,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      info?.UnresizeUI( ui );
                   }
                }
+
+               // NGUI only behaves if you set the text after the resize behaviour
+               ui.SetText( text );
             }
             catch( NullReferenceException )
             {
@@ -781,7 +782,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             info?.Reset( text );
 
-            var textKey = new TranslationKey( text, ui.IsSpammingComponent(), false );
+            var textKey = new TranslationKey( ui, text, ui.IsSpammingComponent(), false );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
@@ -811,7 +812,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
-            var textKey = new TranslationKey( text, ui.IsSpammingComponent(), context != null );
+            var textKey = new TranslationKey( ui, text, ui.IsSpammingComponent(), context != null );
 
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
@@ -878,7 +879,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
-                                 var stabilizedTextKey = new TranslationKey( stabilizedText, false );
+                                 var stabilizedTextKey = new TranslationKey( ui, stabilizedText, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
@@ -969,7 +970,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var value = kvp.Value.TrimIfConfigured();
             if( !string.IsNullOrEmpty( value ) && IsTranslatable( value ) )
             {
-               var valueKey = new TranslationKey( value, false, true );
+               var valueKey = new TranslationKey( ui, value, false, true );
                string partTranslation;
                if( TryGetTranslation( valueKey, out partTranslation ) )
                {
@@ -1403,7 +1404,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var info = kvp.Value as TranslationInfo;
             if( info != null && !string.IsNullOrEmpty( info.OriginalText ) )
             {
-               var key = new TranslationKey( info.OriginalText, false );
+               var key = new TranslationKey( kvp.Key, info.OriginalText, false );
                if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                {
                   SetTranslatedText( kvp.Key, translatedText, info ); // no need to untemplatize the translated text
@@ -1557,7 +1558,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var objects = GameObject.FindObjectsOfType<GameObject>();
          foreach( var obj in objects )
          {
-            if( obj.transform.parent == null )
+            if( obj.transform != null && obj.transform.parent == null )
             {
                yield return obj;
             }
@@ -1566,18 +1567,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void TraverseChildren( StreamWriter writer, GameObject obj, string identation )
       {
-         var layer = LayerMask.LayerToName( obj.gameObject.layer );
-         var components = string.Join( ", ", obj.GetComponents<Component>().Select( x => x.GetType().Name ).ToArray() );
-         var line = string.Format( "{0,-50} {1,100}",
-            identation + obj.gameObject.name + " [" + layer + "]",
-            components );
-
-         writer.WriteLine( line );
-
-         for( int i = 0 ; i < obj.transform.childCount ; i++ )
+         if( obj != null )
          {
-            var child = obj.transform.GetChild( i );
-            TraverseChildren( writer, child.gameObject, identation + " " );
+            var layer = LayerMask.LayerToName( obj.layer );
+            var components = string.Join( ", ", obj.GetComponents<Component>().Select( x => x?.GetType()?.Name ).Where( x => x != null ).ToArray() );
+            var line = string.Format( "{0,-50} {1,100}",
+               identation + obj.name + " [" + layer + "]",
+               components );
+
+            writer.WriteLine( line );
+
+            if( obj.transform != null )
+            {
+               for( int i = 0 ; i < obj.transform.childCount ; i++ )
+               {
+                  var child = obj.transform.GetChild( i );
+                  TraverseChildren( writer, child.gameObject, identation + " " );
+               }
+            }
          }
       }
    }

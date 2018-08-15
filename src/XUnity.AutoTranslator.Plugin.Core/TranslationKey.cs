@@ -9,11 +9,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public struct TranslationKey
    {
-      public TranslationKey( string key, bool templatizeByNumbers, bool neverRemoveWhitespace = false )
+      public TranslationKey( object ui, string key, bool templatizeByNumbers, bool neverRemoveWhitespace = false )
       {
          OriginalText = key;
 
-         if( !neverRemoveWhitespace && Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars )
+         if( !neverRemoveWhitespace
+            && ( ( Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars ) || ( ui.IgnoreAllWhitespace() ) ) )
          {
             RelevantText = key.RemoveWhitespace();
          }

@@ -52,6 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUtage;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
+      public static bool IgnoreWhitespaceInNGUI;
       public static int MinDialogueChars;
       public static string BaiduAppId;
       public static string BaiduAppSecret;
@@ -108,6 +109,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 150 );
          IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( Types.AdvEngine == null );
+         IgnoreWhitespaceInNGUI = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInNGUI" ].GetOrDefault( true );
          MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );

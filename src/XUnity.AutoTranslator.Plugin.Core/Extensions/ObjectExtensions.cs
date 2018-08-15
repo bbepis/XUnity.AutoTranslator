@@ -57,6 +57,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ui is UnityEngine.GUIContent;
       }
 
+      public static bool IgnoreAllWhitespace( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return Types.UILabel != null && Types.UILabel.IsAssignableFrom( type );
+      }
+
       public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
       {
          if( !Settings.EnableObjectTracking ) return null;
