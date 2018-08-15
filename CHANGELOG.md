@@ -1,4 +1,12 @@
-﻿### 2.11.0
+﻿### 2.12.0
+ * FEATURE - General support for rich text in relation to UGUI and Utage
+ * FEATURE - Experimental support for custom fonts for UGUI
+ * CHANGE - Support only source languages with predefined character checks - for now (ja, zh-CN, zh-TW, ru, ko, en)
+ * BUG FIX - Dramatically improved resize behaviour for NGUI
+ * MISC - 3 additional spam prevention checks
+ * MISC - Uses BepInLogger for BepInEx implementation (requires 4.0.0+)
+
+### 2.11.0
  * FEATURE - Support for legitimate Google Cloud Translate API (requires key)
  * BUG FIX - Fixed situations where a text would not be translated on a component if a operation is ongoing on the component
  * BUG FIX - Less delay on translation in certain situations
