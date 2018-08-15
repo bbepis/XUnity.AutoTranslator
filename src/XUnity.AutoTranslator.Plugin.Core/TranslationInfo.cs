@@ -11,9 +11,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationInfo
    {
-      private static readonly string FontSizePropertyName = "fontSize";
-      private static readonly string TrueTypeFontPropertyName = "trueTypeFont";
-      private static readonly string BitmapFontPropertyName = "bitmapFont";
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
       private static readonly string UILabelClassName = "UILabel";
