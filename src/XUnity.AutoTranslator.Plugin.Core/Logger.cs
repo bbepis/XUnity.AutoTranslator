@@ -63,15 +63,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          switch( level )
          {
             case LogLevel.Debug:
-               return "[XUnity.AutoTranslator][DEBUG]: ";
+               return "[DEBUG][XUnity.AutoTranslator]: ";
             case LogLevel.Info:
-               return "[XUnity.AutoTranslator][INFO]: ";
+               return "[INFO][XUnity.AutoTranslator]: ";
             case LogLevel.Warn:
-               return "[XUnity.AutoTranslator][WARN]: ";
+               return "[WARN][XUnity.AutoTranslator]: ";
             case LogLevel.Error:
-               return "[XUnity.AutoTranslator][ERROR]: ";
+               return "[ERROR][XUnity.AutoTranslator]: ";
             default:
-               return "[XUnity.AutoTranslator][UNKNOW]: ";
+               return "[UNKNOW][XUnity.AutoTranslator]: ";
          }
       }
    }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BepInEx;
 using ExIni;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -11,8 +10,8 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.BepIn
 {
-   [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
-   public class AutoTranslatorPlugin : BaseUnityPlugin, IConfiguration
+   [BepInEx.BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
+   public class AutoTranslatorPlugin : BepInEx.BaseUnityPlugin, IConfiguration
    {
       private IniFile _file;
       private string _configPath;
