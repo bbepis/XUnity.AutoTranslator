@@ -2,7 +2,9 @@
  * FEATURE - General support for rich text in relation to UGUI and Utage
  * FEATURE - Experimental support for custom fonts for UGUI
  * CHANGE - Support only source languages with predefined character checks - for now (ja, zh-CN, zh-TW, ru, ko, en)
+ * CHANGE - Slightly different translation load priority from files
  * BUG FIX - Dramatically improved resize behaviour for NGUI
+ * BUG FIX - Fixed a bug where hook overrides would not always be honored depending on mod load order
  * MISC - 3 additional spam prevention checks
  * MISC - Uses BepInLogger for BepInEx implementation (requires 4.0.0+)
 

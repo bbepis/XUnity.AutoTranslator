@@ -37,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for UGUI."  );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for UGUI." );
          }
 
          try
@@ -139,6 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                                  addMethod.Invoke( component, new object[] { callback } );
                               }
 
+                              Logger.Current.Info( eventName + " was hooked by external plugin." );
                               return true;
                            }
                            catch { }

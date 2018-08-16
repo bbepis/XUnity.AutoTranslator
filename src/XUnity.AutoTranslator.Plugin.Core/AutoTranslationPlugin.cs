@@ -33,6 +33,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class AutoTranslationPlugin : MonoBehaviour
    {
+      private static readonly char[][] TranslationSplitters = new char[][] { new char[] { '\t' }, new char[] { '=' } };
+
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
       /// </summary>
@@ -108,6 +110,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _consecutiveSecondsTranslated = 0;
 
       private bool _changeFont = false;
+      private bool _initialized = false;
 
       public void Initialize()
       {
@@ -170,14 +173,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          t2.Start();
       }
 
-      private string[] GetTranslationFiles()
+      private IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ), $"*.txt", SearchOption.AllDirectories ) // FIXME: Add $"*{Language}.txt"
-            .Union( new[] { Settings.AutoTranslationsFilePath } )
-            .Select( x => x.Replace( "/", "\\" ) )
-            .Distinct()
-            .OrderBy( x => x )
-            .ToArray();
+         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ), $"*.txt", SearchOption.AllDirectories )
+            .Select( x => x.Replace( "/", "\\" ) );
       }
 
       private void MaintenanceLoop( object state )
@@ -245,41 +244,47 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ) );
                Directory.CreateDirectory( Path.GetDirectoryName( Path.Combine( Config.Current.DataPath, Settings.OutputFile ) ) );
-               var tab = new char[] { '\t' };
-               var equals = new char[] { '=' };
-               var splitters = new char[][] { tab, equals };
 
-               foreach( var fullFileName in GetTranslationFiles() )
+               var mainTranslationFile = Settings.AutoTranslationsFilePath.Replace( "/", "\\" );
+               LoadTranslationsInFile( mainTranslationFile );
+               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile } ) )
                {
-                  if( File.Exists( fullFileName ) )
-                  {
-                     string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
-                     foreach( string translation in translations )
-                     {
-                        for( int i = 0 ; i < splitters.Length ; i++ )
-                        {
-                           var splitter = splitters[ i ];
-                           string[] kvp = translation.Split( splitter, StringSplitOptions.None );
-                           if( kvp.Length >= 2 )
-                           {
-                              string key = TextHelper.Decode( kvp[ 0 ].TrimIfConfigured() );
-                              string value = TextHelper.Decode( kvp[ 1 ].TrimIfConfigured() );
-
-                              if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
-                              {
-                                 AddTranslation( key, value );
-                                 break;
-                              }
-                           }
-                        }
-                     }
-                  }
+                  LoadTranslationsInFile( fullFileName );
                }
             }
          }
          catch( Exception e )
          {
             Logger.Current.Error( e, "An error occurred while loading translations." );
+         }
+      }
+
+      private void LoadTranslationsInFile( string fullFileName )
+      {
+         if( File.Exists( fullFileName ) )
+         {
+            Logger.Current.Debug( $"Loading translations from {fullFileName}." );
+
+            string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
+            foreach( string translation in translations )
+            {
+               for( int i = 0 ; i < TranslationSplitters.Length ; i++ )
+               {
+                  var splitter = TranslationSplitters[ i ];
+                  string[] kvp = translation.Split( splitter, StringSplitOptions.None );
+                  if( kvp.Length == 2 )
+                  {
+                     string key = TextHelper.Decode( kvp[ 0 ].TrimIfConfigured() );
+                     string value = TextHelper.Decode( kvp[ 1 ].TrimIfConfigured() );
+
+                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && IsTranslatable( key ) )
+                     {
+                        AddTranslation( key, value );
+                        break;
+                     }
+                  }
+               }
+            }
          }
       }
 
@@ -1037,6 +1042,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          yield return new WaitForSeconds( delay );
 
          onContinue();
+      }
+
+      public void Start()
+      {
+         if( !_initialized )
+         {
+            _initialized = true;
+            Initialize();
+         }
       }
 
       public void Update()
