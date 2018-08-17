@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Patcher
       {
          get
          {
-            return "2.11.0";
+            return "2.12.0";
          }
       }
 
