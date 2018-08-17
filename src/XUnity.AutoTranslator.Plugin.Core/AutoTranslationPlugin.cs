@@ -720,6 +720,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _symbolCheck( str ) && str.Length <= Settings.MaxCharactersPerTranslation && !_reverseTranslations.ContainsKey( str );
       }
 
+      private bool IsShortText( string str )
+      {
+         return str.Length <= ( Settings.MaxCharactersPerTranslation / 2 );
+      }
+
       public bool ShouldTranslate( object ui )
       {
          var cui = ui as Component;
@@ -817,7 +822,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
-            var textKey = new TranslationKey( ui, text, ui.IsSpammingComponent(), context != null );
+            var isSpammer = ui.IsSpammingComponent();
+            var textKey = new TranslationKey( ui, text, isSpammer, context != null );
 
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
@@ -943,7 +949,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      _ongoingOperations.Remove( ui );
                   }
                }
-               else
+               else if ( !isSpammer || ( isSpammer && IsShortText( text ) ) )
                {
                   // Lets try not to spam a service that might not be there...
                   if( _endpoint != null )
