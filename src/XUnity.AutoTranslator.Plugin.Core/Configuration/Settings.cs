@@ -69,6 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string GoogleAPIKey;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
+      public static string UserAgent;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -120,6 +121,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
 
+         UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );
+
          GoogleAPIKey = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
@@ -164,6 +167,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].Value = KnownEndpointNames.GoogleTranslate;
             }
          }
+      }
+
+      public static string GetUserAgent( string defaultUserAgent )
+      {
+         if( !string.IsNullOrEmpty( UserAgent ) )
+         {
+            return UserAgent;
+         }
+         return defaultUserAgent;
       }
    }
 }

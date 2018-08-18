@@ -57,6 +57,9 @@ TrimAllText=True                 ;Indicates whether spaces in front and behind t
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
 
+[Http]
+UserAgent=                       ;Override the user agent used by APIs requiring a user agent
+
 [GoogleLegitimate]
 GoogleAPIKey=                    ;OPTIONAL, needed if GoogleTranslateLegitimate is configured
 

@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public class GoogleTranslateEndpoint : KnownHttpEndpoint
    {
-      protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
+      //protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private bool _hasFallenBack = false;
       private bool _hasSetup = false;
       private bool _hasSetupCustomUserAgent = false;
-      private string _popularUserAgent;
+      //private string _popularUserAgent;
       private long m = 425635;
       private long s = 1953544246;
 
@@ -46,7 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
-         headers[ HttpRequestHeader.UserAgent ] = _popularUserAgent ?? DefaultUserAgent;
+         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( DefaultUserAgent );
          headers[ HttpRequestHeader.AcceptLanguage ] = "en-US,en;q=0.9";
          headers[ HttpRequestHeader.Accept ] = "*/*";
          headers[ HttpRequestHeader.Referer ] = "https://translate.google.com/";
@@ -54,18 +54,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override IEnumerator OnBeforeTranslate( int translationCount )
       {
-         if( !_hasSetupCustomUserAgent )
-         {
-            _hasSetupCustomUserAgent = true;
+         //if( !_hasSetupCustomUserAgent )
+         //{
+         //   _hasSetupCustomUserAgent = true;
 
-            // setup dynamic user agent
-            var enumerator = SetupDynamicUserAgent();
-            while( enumerator.MoveNext() )
-            {
-               var current = enumerator.Current;
-               if( current != null ) yield return current;
-            }
-         }
+         //   // setup dynamic user agent
+         //   var enumerator = SetupDynamicUserAgent();
+         //   while( enumerator.MoveNext() )
+         //   {
+         //      var current = enumerator.Current;
+         //      if( current != null ) yield return current;
+         //   }
+         //}
 
          if( !_hasSetup || translationCount % 100 == 0 )
          {
@@ -82,62 +82,62 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public IEnumerator SetupDynamicUserAgent()
-      {
-         // have to use WWW for this because unity mono is broken
+      //public IEnumerator SetupDynamicUserAgent()
+      //{
+      //   // have to use WWW for this because unity mono is broken
 
-         if( WwwConstructor != null )
-         {
-            object www;
-            try
-            {
-               var headers = new Dictionary<string, string>();
-               www = WwwConstructor.Invoke( new object[] { UserAgentRepository, null, headers } );
-            }
-            catch( Exception e )
-            {
-               Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
-               yield break;
-            }
+      //   if( WwwConstructor != null )
+      //   {
+      //      object www;
+      //      try
+      //      {
+      //         var headers = new Dictionary<string, string>();
+      //         www = WwwConstructor.Invoke( new object[] { UserAgentRepository, null, headers } );
+      //      }
+      //      catch( Exception e )
+      //      {
+      //         Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
+      //         yield break;
+      //      }
 
-            yield return www;
+      //      yield return www;
 
-            try
-            {
-               var error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
-               if( error == null )
-               {
-                  var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
-                  var userAgents = text.GetBetween( "<textarea rows=\"10\" class=\"get-the-list\" onclick=\"this.select()\" readonly=\"readonly\">", "</textarea>" );
-                  if( userAgents.Length > 42 )
-                  {
-                     var reader = new StringReader( userAgents );
-                     var popularUserAgent = reader.ReadLine();
-                     if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/" ) )
-                     {
-                        _popularUserAgent = popularUserAgent;
-                     }
-                     else
-                     {
-                        Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
-                     }
-                  }
-                  else
-                  {
-                     Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
-                  }
-               }
-               else
-               {
-                  Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Request failed: " + Environment.NewLine + error );
-               }
-            }
-            catch( Exception e )
-            {
-               Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
-            }
-         }
-      }
+      //      try
+      //      {
+      //         var error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
+      //         if( error == null )
+      //         {
+      //            var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
+      //            var userAgents = text.GetBetween( "<textarea rows=\"10\" class=\"get-the-list\" onclick=\"this.select()\" readonly=\"readonly\">", "</textarea>" );
+      //            if( userAgents.Length > 42 )
+      //            {
+      //               var reader = new StringReader( userAgents );
+      //               var popularUserAgent = reader.ReadLine();
+      //               if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/" ) )
+      //               {
+      //                  _popularUserAgent = popularUserAgent;
+      //               }
+      //               else
+      //               {
+      //                  Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
+      //               }
+      //            }
+      //            else
+      //            {
+      //               Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
+      //            }
+      //         }
+      //         else
+      //         {
+      //            Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Request failed: " + Environment.NewLine + error );
+      //         }
+      //      }
+      //      catch( Exception e )
+      //      {
+      //         Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
+      //      }
+      //   }
+      //}
 
       public IEnumerator SetupTKK()
       {

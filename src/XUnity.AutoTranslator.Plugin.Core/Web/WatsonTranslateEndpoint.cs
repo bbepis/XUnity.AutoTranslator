@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
-         headers[ "User-Agent" ] = "curl/7.55.1";
+         headers[ "User-Agent" ] = Settings.GetUserAgent( "curl/7.55.1" );
          headers[ "Accept" ] = "application/json";
          headers[ "Accept-Charset" ] = "UTF-8";
          headers[ "Authorization" ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( Settings.WatsonAPIUsername + ":" + Settings.WatsonAPIPassword ) );

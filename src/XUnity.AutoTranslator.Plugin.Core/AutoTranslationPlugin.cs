@@ -434,6 +434,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _frameForLastQueuedTranslation = currentFrame;
       }
 
+      public void PeriodicResetFrameCheck()
+      {
+         var currentSecond = (int)Time.time;
+         if( currentSecond % 100 == 0 )
+         {
+            _consecutiveFramesTranslated = 0;
+         }
+      }
+
       private void CheckStaggerText( string untranslatedText )
       {
          if( _previouslyQueuedText != null )
@@ -949,7 +958,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      _ongoingOperations.Remove( ui );
                   }
                }
-               else if ( !isSpammer || ( isSpammer && IsShortText( text ) ) )
+               else if( !isSpammer || ( isSpammer && IsShortText( text ) ) )
                {
                   // Lets try not to spam a service that might not be there...
                   if( _endpoint != null )
@@ -1072,6 +1081,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !Settings.IsShutdown )
             {
+               PeriodicResetFrameCheck();
                IncrementBatchOperations();
                ResetThresholdTimerIfRequired();
                KickoffTranslations();
@@ -1278,7 +1288,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( _endpoint.ShouldGetSecondChanceAfterFailure() )
                {
                   Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
-                  _consecutiveErrors = 0;
+                  _consecutiveErrors = Settings.MaxErrors;
                }
                else
                {
@@ -1310,7 +1320,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( _endpoint.ShouldGetSecondChanceAfterFailure() )
                {
                   Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
-                  _consecutiveErrors = 0;
+                  _consecutiveErrors = Settings.MaxErrors;
                }
                else
                {
