@@ -336,5 +336,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          return sb.ToString();
       }
+      public static string GetBetween( this string strSource, string strStart, string strEnd )
+      {
+         const int kNotFound = -1;
+
+         var startIdx = strSource.IndexOf( strStart );
+         if( startIdx != kNotFound )
+         {
+            startIdx += strStart.Length;
+            var endIdx = strSource.IndexOf( strEnd, startIdx );
+            if( endIdx > startIdx )
+            {
+               return strSource.Substring( startIdx, endIdx - startIdx );
+            }
+         }
+         return String.Empty;
+      }
    }
 }

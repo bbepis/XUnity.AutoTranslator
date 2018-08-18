@@ -84,6 +84,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var httpRequest = request as HttpWebRequest;
          if( httpRequest != null )
          {
+            httpRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
             var cookies = _httpEndpoint.ReadCookies();
             httpRequest.CookieContainer = cookies;
          }

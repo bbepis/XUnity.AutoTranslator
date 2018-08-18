@@ -11,32 +11,14 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-    public class ExciteTranslateEndpoint : KnownWwwEndpoint
+   public class ExciteTranslateEndpoint : KnownWwwEndpoint
    {
-        private static readonly string HttpsServicePointTemplateUrl = "https://www.excite.co.jp/world/?wb_lp={0}{1}&before={2}";
+      private static readonly string HttpsServicePointTemplateUrl = "https://www.excite.co.jp/world/?wb_lp={0}{1}&before={2}";
 
-        // Author: Johnny Cee (https://stackoverflow.com/questions/10709821/find-text-in-string-with-c-sharp)
-        private static string getBetween(string strSource, string strStart, string strEnd)
-        {
-            const int kNotFound = -1;
-
-            var startIdx = strSource.IndexOf(strStart);
-            if (startIdx != kNotFound)
-            {
-                startIdx += strStart.Length;
-                var endIdx = strSource.IndexOf(strEnd, startIdx);
-                if (endIdx > startIdx)
-                {
-                    return strSource.Substring(startIdx, endIdx - startIdx);
-                }
-            }
-            return String.Empty;
-        }
-
-        public ExciteTranslateEndpoint()
-        {
-            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "www.excite.co.jp", "excite.co.jp" );
-        }
+      public ExciteTranslateEndpoint()
+      {
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "www.excite.co.jp", "excite.co.jp" );
+      }
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
@@ -46,24 +28,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          //headers[ "DNT" ] = "1";
       }
 
-        public override bool TryExtractTranslated(string result, out string translated)
-        {
-            try
-            {                
-                String extracted = getBetween(result, "class=\"inputText\">", "</p>");
-                translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
-                return true;
-            }
-            catch
-            {
-                translated = null;
-                return false;
-            }
-        }
+      public override bool TryExtractTranslated( string result, out string translated )
+      {
+         try
+         {
+            string extracted = result.GetBetween( "class=\"inputText\">", "</p>" );
+            translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
+            return true;
+         }
+         catch
+         {
+            translated = null;
+            return false;
+         }
+      }
 
-        public override string GetServiceUrl(string untranslatedText, string from, string to)
-        {
-            return string.Format(HttpsServicePointTemplateUrl, from.ToUpper(), to.ToUpper(), WWW.EscapeURL(untranslatedText));
-        }
-    }
+      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      {
+         return string.Format( HttpsServicePointTemplateUrl, from.ToUpper(), to.ToUpper(), WWW.EscapeURL( untranslatedText ) );
+      }
+   }
 }

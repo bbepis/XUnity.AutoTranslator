@@ -16,11 +16,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          switch( identifier )
          {
             case KnownEndpointNames.GoogleTranslate:
+            case KnownEndpointNames.GoogleTranslateHack:
                return new GoogleTranslateEndpoint();
+               //return new GoogleTranslateHackEndpoint();
             case KnownEndpointNames.GoogleTranslateLegitimate:
                return new GoogleTranslateLegitimateEndpoint();
-            case KnownEndpointNames.GoogleTranslateHack:
-               return new GoogleTranslateHackEndpoint();
             case KnownEndpointNames.BaiduTranslate:
                return new BaiduTranslateEndpoint();
             case KnownEndpointNames.YandexTranslate:

@@ -7,6 +7,7 @@
  * BUG FIX - Fixed a bug where hook overrides would not always be honored depending on mod load order
  * MISC - 3 additional spam prevention checks
  * MISC - Uses BepInLogger for BepInEx implementation (requires 4.0.0+)
+ * MISC - Redirect "GoogleTranslateHack" to "GoogleTranslate" because instructions were being distributed to use this, and it is not very friendly towards their APIs
 
 ### 2.11.0
  * FEATURE - Support for legitimate Google Cloud Translate API (requires key)

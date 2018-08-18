@@ -15,24 +15,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
     {
         private static readonly string HttpsServicePointTemplateUrl = "https://translate.google.com/m?hl=pl&sl={0}&tl={1}&ie=UTF-8&q={2}";
 
-        // Author: Johnny Cee (https://stackoverflow.com/questions/10709821/find-text-in-string-with-c-sharp)
-        private static string getBetween(string strSource, string strStart, string strEnd)
-        {
-            const int kNotFound = -1;
-
-            var startIdx = strSource.IndexOf(strStart);
-            if (startIdx != kNotFound)
-            {
-                startIdx += strStart.Length;
-                var endIdx = strSource.IndexOf(strEnd, startIdx);
-                if (endIdx > startIdx)
-                {
-                    return strSource.Substring(startIdx, endIdx - startIdx);
-                }
-            }
-            return String.Empty;
-        }
-
         public GoogleTranslateHackEndpoint()
         {
             ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com" );
@@ -50,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             try
             {
 
-                String extracted = getBetween(result, "class=\"t0\">", "</div>");
+                String extracted = result.GetBetween( "class=\"t0\">", "</div>");
                 translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
                 return true;
             }

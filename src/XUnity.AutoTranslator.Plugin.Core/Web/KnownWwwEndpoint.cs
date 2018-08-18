@@ -80,7 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   }
                   else
                   {
-                     var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null ); ;
+                     var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
 
                      if( text != null )
                      {
