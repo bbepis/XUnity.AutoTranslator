@@ -113,7 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   {
                      var reader = new StringReader( userAgents );
                      var popularUserAgent = reader.ReadLine();
-                     if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/5.0" ) )
+                     if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/" ) )
                      {
                         _popularUserAgent = popularUserAgent;
                      }
