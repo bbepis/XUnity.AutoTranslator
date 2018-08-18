@@ -45,7 +45,8 @@ AllowPluginHookOverride=True     ;Allow other text translation plugins to overri
 [Behaviour]
 Delay=0                          ;Delay to wait before attempting to translate a text in seconds
 MaxCharactersPerTranslation=150  ;Max characters per text to translate
-IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, such as newlines, in dialogue keys
+IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
+IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
 MinDialogueChars=20              ;The length of the text for it to be considered a dialogue
 ForceSplitTextAfterCharacters=0  ;Split text into multiple lines once the translated text exceeds this number of characters
 CopyToClipboard=False            ;Whether or not to copy hooked texts to clipboard
@@ -53,6 +54,8 @@ MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard 
 EnableUIResizing=True            ;Whether or not the plugin should provide a "best attempt" at resizing UI components upon translation. Only work for NGUI
 EnableBatching=True              ;Indicates whether batching of translations should be enabled for supported endpoints
 TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
+UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
+OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
 
 [GoogleLegitimate]
 GoogleAPIKey=                    ;OPTIONAL, needed if GoogleTranslateLegitimate is configured
