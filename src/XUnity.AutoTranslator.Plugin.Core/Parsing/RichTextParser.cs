@@ -43,6 +43,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             }
             var isKnown = KnownTags.Contains( value );
             var isIgnored = IgnoreTags.Contains( value );
+            if( !isKnown )
+            {
+               var endIdx = value.IndexOf( '=' );
+               if( endIdx < 0 )
+               {
+                  endIdx = value.Length;
+               }
+               bool allLatin = true;
+               for( int j = 0 ; j < endIdx ; j++ )
+               {
+                  var c = value[ j ];
+                  if( !( ( c >= '\u0041' && c <= '\u005a' ) || ( c >= '\u0061' && c <= '\u007a' ) ) )
+                  {
+                     allLatin = false;
+                     break;
+                  }
+               }
+               isKnown = allLatin;
+            }
 
             // add normal text
             var end = m.Index;
