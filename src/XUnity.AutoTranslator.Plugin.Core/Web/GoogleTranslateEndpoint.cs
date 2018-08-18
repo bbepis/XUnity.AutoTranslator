@@ -113,7 +113,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   {
                      var reader = new StringReader( userAgents );
                      var popularUserAgent = reader.ReadLine();
-                     _popularUserAgent = popularUserAgent;
+                     if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/5.0" ) )
+                     {
+                        _popularUserAgent = popularUserAgent;
+                     }
+                     else
+                     {
+                        Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
+                     }
                   }
                   else
                   {
