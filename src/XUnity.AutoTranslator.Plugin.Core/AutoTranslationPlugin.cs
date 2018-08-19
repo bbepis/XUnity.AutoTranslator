@@ -1191,8 +1191,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
       {
-         Settings.TranslationCount++;
-
          if( !Settings.IsShutdown )
          {
             if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
@@ -1209,6 +1207,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             foreach( var tracker in batch.Trackers )
             {
+               Settings.TranslationCount++;
+
                var job = tracker.Job;
                var translatedText = tracker.RawTranslatedText;
                if( !string.IsNullOrEmpty( translatedText ) )
@@ -1234,6 +1234,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _batchLogicHasFailed = true;
             foreach( var tracker in batch.Trackers )
             {
+               Settings.TranslationCount++;
+
                var key = tracker.Job.Key.GetDictionaryLookupKey();
                if( !_unstartedJobs.ContainsKey( key ) )
                {

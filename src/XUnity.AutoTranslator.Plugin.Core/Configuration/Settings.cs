@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly string DefaultFromLanguage = "ja";
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
-      public static readonly int MaxTranslationsBeforeShutdown = 10000;
+      public static readonly int MaxTranslationsBeforeShutdown = 8000;
       public static readonly int MaxUnstartedJobs = 3500;
       public static readonly float IncreaseBatchOperationsEvery = 30;
       public static readonly bool EnableObjectTracking = true;
