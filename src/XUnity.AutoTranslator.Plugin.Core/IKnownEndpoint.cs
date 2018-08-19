@@ -20,13 +20,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       bool IsBusy { get; }
 
       /// <summary>
-      /// Called before plugin shutdown and can return true to prevent plugin shutdown, if the plugin
-      /// can provide a secondary strategy for translation.
-      /// </summary>
-      /// <returns></returns>
-      bool ShouldGetSecondChanceAfterFailure();
-
-      /// <summary>
       /// "Update" game loop method.
       /// </summary>
       void OnUpdate();

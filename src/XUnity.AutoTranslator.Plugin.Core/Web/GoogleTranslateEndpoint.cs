@@ -20,13 +20,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    {
       //protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
-      private static readonly string FallbackHttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
       private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
       private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
+      private static readonly System.Random RandomNumbers = new System.Random();
+
+      private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
+      private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US,en", "en-US", "en" };
+      private static readonly string[] Referers = new string[] { null, "https://translate.google.com/" };
+      private static readonly string[] AcceptCharsets = new string[] { null, Encoding.UTF8.WebName };
+
+      private static readonly string Accept = Accepts[ RandomNumbers.Next( Accepts.Length ) ];
+      private static readonly string AcceptLanguage = AcceptLanguages[ RandomNumbers.Next( AcceptLanguages.Length ) ];
+      private static readonly string Referer = Referers[ RandomNumbers.Next( Referers.Length ) ];
+      private static readonly string AcceptCharset = AcceptCharsets[ RandomNumbers.Next( AcceptCharsets.Length ) ];
 
       private CookieContainer _cookieContainer;
-      private bool _hasFallenBack = false;
       private bool _hasSetup = false;
       private bool _hasSetupCustomUserAgent = false;
       //private string _popularUserAgent;
@@ -47,9 +56,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
          headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( DefaultUserAgent );
-         headers[ HttpRequestHeader.AcceptLanguage ] = "en-US,en;q=0.9";
-         headers[ HttpRequestHeader.Accept ] = "*/*";
-         headers[ HttpRequestHeader.Referer ] = "https://translate.google.com/";
+
+         if( AcceptLanguage != null )
+         {
+            headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
+         }
+         if( Accept != null )
+         {
+            headers[ HttpRequestHeader.Accept ] = Accept;
+         }
+         if( Referer != null )
+         {
+            headers[ HttpRequestHeader.Referer ] = Referer;
+         }
+         if( AcceptCharset != null )
+         {
+            headers[ HttpRequestHeader.AcceptCharset ] = AcceptCharset;
+         }
       }
 
       public override IEnumerator OnBeforeTranslate( int translationCount )
@@ -292,25 +315,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         if( _hasFallenBack )
-         {
-            return string.Format( FallbackHttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ) );
-         }
-         else
-         {
-            return string.Format( HttpsServicePointTemplateUrl, from, to, Tk( untranslatedText ), WWW.EscapeURL( untranslatedText ) );
-         }
-      }
-
-      public override bool ShouldGetSecondChanceAfterFailure()
-      {
-         if( !_hasFallenBack )
-         {
-            _hasFallenBack = true;
-            return true;
-         }
-
-         return false;
+         return string.Format( HttpsServicePointTemplateUrl, from, to, Tk( untranslatedText ), WWW.EscapeURL( untranslatedText ) );
       }
 
       public override void WriteCookies( HttpWebResponse response )

@@ -938,7 +938,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     // Lets try not to spam a service that might not be there...
                                     if( _endpoint != null )
                                     {
-                                       if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
+                                       if( !Settings.IsShutdown )
                                        {
                                           var job = GetOrCreateTranslationJobFor( ui, stabilizedTextKey, context );
                                           job.Components.Add( ui );
@@ -963,7 +963,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   // Lets try not to spam a service that might not be there...
                   if( _endpoint != null )
                   {
-                     if( _consecutiveErrors < Settings.MaxErrors && !Settings.IsShutdown )
+                     if( !Settings.IsShutdown )
                      {
                         var job = GetOrCreateTranslationJobFor( ui, textKey, context );
                      }
@@ -1276,6 +1276,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnTranslationFailed( TranslationJob job )
       {
+         Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
 
          job.State = TranslationJobState.Failed;
@@ -1283,28 +1284,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !Settings.IsShutdown )
          {
-            if( _consecutiveErrors > Settings.MaxErrors )
+            if( _consecutiveErrors >= Settings.MaxErrors )
             {
-               if( _endpoint.ShouldGetSecondChanceAfterFailure() )
-               {
-                  Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
-                  _consecutiveErrors = Settings.MaxErrors;
-               }
-               else
-               {
-                  Settings.IsShutdown = true;
-                  Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down plugin." );
 
-                  _unstartedJobs.Clear();
-                  _completedJobs.Clear();
-                  _ongoingJobs.Clear();
-               }
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
             }
          }
       }
 
       private void OnTranslationFailed( TranslationBatch batch )
       {
+         Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
 
          foreach( var tracker in batch.Trackers )
@@ -1315,22 +1309,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !Settings.IsShutdown )
          {
-            if( _consecutiveErrors > Settings.MaxErrors )
+            if( _consecutiveErrors >= Settings.MaxErrors )
             {
-               if( _endpoint.ShouldGetSecondChanceAfterFailure() )
-               {
-                  Logger.Current.Warn( $"More than {Settings.MaxErrors} consecutive errors occurred. Entering fallback mode." );
-                  _consecutiveErrors = Settings.MaxErrors;
-               }
-               else
-               {
-                  Settings.IsShutdown = true;
-                  Logger.Current.Error( $"More than {Settings.MaxErrors} consecutive errors occurred. Shutting down plugin." );
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down plugin." );
 
-                  _unstartedJobs.Clear();
-                  _completedJobs.Clear();
-                  _ongoingJobs.Clear();
-               }
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
             }
          }
       }
