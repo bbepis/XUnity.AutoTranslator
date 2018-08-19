@@ -67,7 +67,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             }
 
             translated = lineBuilder.ToString();
-            return true;
+
+            var success = !string.IsNullOrEmpty( translated );
+            return success;
          }
          catch( Exception )
          {

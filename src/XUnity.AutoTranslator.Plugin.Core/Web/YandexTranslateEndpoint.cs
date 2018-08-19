@@ -50,7 +50,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                lineBuilder.Append( token );
 
                translated = lineBuilder.ToString();
-               return true;
+
+               var success = !string.IsNullOrEmpty( translated );
+               return success;
             }
             else
             {
