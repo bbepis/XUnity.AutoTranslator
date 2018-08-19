@@ -34,7 +34,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          {
             string extracted = result.GetBetween( "class=\"inputText\">", "</p>" );
             translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
-            return true;
+
+            var success = !string.IsNullOrEmpty( translated );
+            return success;
          }
          catch
          {

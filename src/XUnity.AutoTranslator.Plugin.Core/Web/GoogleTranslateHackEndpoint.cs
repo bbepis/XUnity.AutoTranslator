@@ -11,14 +11,14 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-    public class GoogleTranslateHackEndpoint : KnownHttpEndpoint
-    {
-        private static readonly string HttpsServicePointTemplateUrl = "https://translate.google.com/m?hl=pl&sl={0}&tl={1}&ie=UTF-8&q={2}";
+   public class GoogleTranslateHackEndpoint : KnownHttpEndpoint
+   {
+      private static readonly string HttpsServicePointTemplateUrl = "https://translate.google.com/m?hl=pl&sl={0}&tl={1}&ie=UTF-8&q={2}";
 
-        public GoogleTranslateHackEndpoint()
-        {
-            ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com" );
-        }
+      public GoogleTranslateHackEndpoint()
+      {
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.google.com" );
+      }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
@@ -27,25 +27,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 
-        public override bool TryExtractTranslated(string result, out string translated)
-        {
-            try
-            {
+      public override bool TryExtractTranslated( string result, out string translated )
+      {
+         try
+         {
 
-                String extracted = result.GetBetween( "class=\"t0\">", "</div>");
-                translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
-                return true;
-            }
-            catch
-            {
-                translated = null;
-                return false;
-            }
-        }
+            String extracted = result.GetBetween( "class=\"t0\">", "</div>" );
+            translated = RestSharp.Contrib.HttpUtility.HtmlDecode( extracted ?? string.Empty );
 
-        public override string GetServiceUrl(string untranslatedText, string from, string to)
-        {
-            return string.Format(HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL(untranslatedText));
-        }
-    }
+            var success = !string.IsNullOrEmpty( translated );
+            return success;
+         }
+         catch
+         {
+            translated = null;
+            return false;
+         }
+      }
+
+      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      {
+         return string.Format( HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ) );
+      }
+   }
 }
