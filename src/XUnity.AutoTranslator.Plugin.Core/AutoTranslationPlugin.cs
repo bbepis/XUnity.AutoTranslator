@@ -701,6 +701,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // NGUI only behaves if you set the text after the resize behaviour
                ui.SetText( text );
             }
+            catch( TargetInvocationException )
+            {
+               // might happen with NGUI
+            }
             catch( NullReferenceException )
             {
                // This is likely happened due to a scene change.
