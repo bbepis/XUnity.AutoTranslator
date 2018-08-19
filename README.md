@@ -1,4 +1,8 @@
 ﻿# XUnity Auto Translator
+This is a fork that aims at:
+ * Increasing the potential uses of the plugin
+ * Providing legitimate alternatives to the default translation API (some of which requires payment)
+ * Ensuring the plugin does not exhibit "spammy" behaviour towards any endpoint
 
 ## Text Frameworks
 This is an auto translation mod that hooks into the unity game engine and attempts to provide translations for the following text frameworks for Unity:
