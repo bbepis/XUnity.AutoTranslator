@@ -10,6 +10,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public static Logger Current;
 
+      public Logger()
+      {
+         RespectSettings = true;
+      }
+
+      public bool RespectSettings { get; protected set; }
+
       public void Error( Exception e, string message )
       {
          Log( LogLevel.Error, message + Environment.NewLine + e );
@@ -42,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Debug( Exception e, string message )
       {
-         if( Settings.EnableDebugLogs )
+         if( Settings.EnableDebugLogs || !RespectSettings )
          {
             Log( LogLevel.Debug, message + Environment.NewLine + e );
          }
@@ -50,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Debug( string message )
       {
-         if( Settings.EnableDebugLogs )
+         if( Settings.EnableDebugLogs || !RespectSettings )
          {
             Log( LogLevel.Debug, message );
          }

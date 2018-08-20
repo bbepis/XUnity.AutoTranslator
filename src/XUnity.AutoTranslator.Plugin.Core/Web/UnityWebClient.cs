@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using Harmony;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Shim;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
@@ -128,7 +129,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       }
    }
 
-   public class DownloadResult : CustomYieldInstruction
+   public class DownloadResult : CustomYieldInstructionShim
    {
       private bool _isCompleted = false;
 
@@ -144,6 +145,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public string Result { get; set; }
 
       public string Error { get; set; }
+
+      public bool IsCompleted => _isCompleted;
 
       public bool Succeeded => Error == null;
    }

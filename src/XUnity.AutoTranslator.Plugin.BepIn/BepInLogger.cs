@@ -8,6 +8,11 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
 {
    public class BepInLogger : Logger
    {
+      public BepInLogger()
+      {
+         RespectSettings = false;
+      }
+
       protected override void Log( LogLevel level, string message )
       {
          BepInEx.Logger.CurrentLogger.Log( Convert( level ), "[XUnity.AutoTranslator] " + message );

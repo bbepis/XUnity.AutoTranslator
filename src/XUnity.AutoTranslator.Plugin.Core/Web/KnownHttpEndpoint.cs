@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Net;
 using System.Threading;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
@@ -55,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                }
             }
             Logger.Current.Debug( "Starting translation for: " + untranslatedText );
-            DownloadResult result = null;
+            DownloadResult downloadResult = null;
             try
             {
                var client = GetClient();
@@ -65,11 +66,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
                if( request != null )
                {
-                  result = client.GetDownloadResult( new Uri( url ), request );
+                  downloadResult = client.GetDownloadResult( new Uri( url ), request );
                }
                else
                {
-                  result = client.GetDownloadResult( new Uri( url ) );
+                  downloadResult = client.GetDownloadResult( new Uri( url ) );
                }
             }
             catch( Exception e )
@@ -77,15 +78,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                Logger.Current.Error( e, "Error occurred while setting up translation request." );
             }
 
-            if( result != null )
+            if( downloadResult != null )
             {
-               yield return result;
+               if( Features.SupportsCustomYieldInstruction )
+               {
+                  yield return downloadResult;
+               }
+               else
+               {
+                  while( !downloadResult.IsCompleted )
+                  {
+                     yield return new WaitForSeconds( 0.2f );
+                  }
+               }
 
                try
                {
-                  if( result.Succeeded )
+                  if( downloadResult.Succeeded && downloadResult.Result != null )
                   {
-                     if( TryExtractTranslated( result.Result, out var translatedText ) )
+                     if( TryExtractTranslated( downloadResult.Result, out var translatedText ) )
                      {
                         Logger.Current.Debug( $"Translation for '{untranslatedText}' succeded. Result: {translatedText}" );
 
@@ -100,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   }
                   else
                   {
-                     Logger.Current.Error( "Error occurred while retrieving translation." + Environment.NewLine + result.Error );
+                     Logger.Current.Error( "Error occurred while retrieving translation." + Environment.NewLine + downloadResult.Error );
                      failure();
                   }
                }

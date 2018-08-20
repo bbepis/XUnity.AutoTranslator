@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -10,11 +10,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public static readonly bool SupportsClipboard = false;
 
+      public static readonly bool SupportsCustomYieldInstruction = false;
+
       static Features()
       {
          try
          {
-            SupportsClipboard = typeof( TextEditor )?.GetProperty( "text" )?.GetSetMethod() != null;
+            SupportsClipboard = Types.TextEditor?.GetProperty( "text" )?.GetSetMethod() != null;
+         }
+         catch( Exception )
+         {
+            
+         }
+
+         try
+         {
+            SupportsCustomYieldInstruction = Types.CustomYieldInstruction != null;
          }
          catch( Exception )
          {

@@ -85,8 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          //   var enumerator = SetupDynamicUserAgent();
          //   while( enumerator.MoveNext() )
          //   {
-         //      var current = enumerator.Current;
-         //      if( current != null ) yield return current;
+         //      yield return enumerator.Current;
          //   }
          //}
 
@@ -98,8 +97,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             var enumerator = SetupTKK();
             while( enumerator.MoveNext() )
             {
-               var current = enumerator.Current;
-               if( current != null ) yield return current;
+               yield return enumerator.Current;
             }
 
          }
@@ -183,10 +181,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( downloadResult != null )
          {
-            yield return downloadResult;
+            if( Features.SupportsCustomYieldInstruction )
+            {
+               yield return downloadResult;
+            }
+            else
+            {
+               while( !downloadResult.IsCompleted )
+               {
+                  yield return new WaitForSeconds( 0.2f );
+               }
+            }
 
             error = downloadResult.Error;
-            if( downloadResult.Succeeded )
+            if( downloadResult.Succeeded && downloadResult.Result != null )
             {
                try
                {

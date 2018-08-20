@@ -6,6 +6,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 {
    public static class Types
    {
+      public static readonly Type TextEditor = FindType( "UnityEngine.TextEditor" );
+      public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
+
       public static readonly Type TMP_InputField = FindType( "TMPro.TMP_InputField" );
       public static readonly Type TMP_Text = FindType( "TMPro.TMP_Text" );
       public static readonly Type TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
