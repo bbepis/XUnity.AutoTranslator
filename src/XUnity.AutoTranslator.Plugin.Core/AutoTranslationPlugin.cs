@@ -561,7 +561,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void QueueNewUntranslatedForClipboard( TranslationKey key )
       {
-         if( Settings.CopyToClipboard )
+         if( Settings.CopyToClipboard && Features.SupportsClipboard )
          {
             if( !_textsToCopyToClipboard.Contains( key.RelevantText ) )
             {
@@ -1081,7 +1081,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _endpoint.OnUpdate();
             }
 
-            CopyToClipboard();
+            if( Features.SupportsClipboard )
+            {
+               CopyToClipboard();
+            }
 
             if( !Settings.IsShutdown )
             {
