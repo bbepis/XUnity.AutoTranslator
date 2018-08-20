@@ -1,7 +1,7 @@
 ﻿### 2.13.0
  * FEATURE - Support for older Unity Engine versions
  * BUG FIX - Respect BepInEx logger config over own config
- * BUG FIX - Exception that could occur in relation to NGUI
+ * BUG FIX - Fix exception that could occur in relation to NGUI
  * MISC - Less leniency in what constitutes an error when translating
 
 ### 2.12.0
