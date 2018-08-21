@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
       private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
-      private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
+      //private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
       private static readonly System.Random RandomNumbers = new System.Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
@@ -37,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       private CookieContainer _cookieContainer;
       private bool _hasSetup = false;
-      private bool _hasSetupCustomUserAgent = false;
+      //private bool _hasSetupCustomUserAgent = false;
       //private string _popularUserAgent;
       private long m = 425635;
       private long s = 1953544246;
