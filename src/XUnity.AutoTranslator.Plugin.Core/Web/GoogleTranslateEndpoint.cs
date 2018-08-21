@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private static readonly System.Random RandomNumbers = new System.Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
-      private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US,en", "en-US", "en" };
+      private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US", "en" };
       private static readonly string[] Referers = new string[] { null, "https://translate.google.com/" };
       private static readonly string[] AcceptCharsets = new string[] { null, Encoding.UTF8.WebName };
 
