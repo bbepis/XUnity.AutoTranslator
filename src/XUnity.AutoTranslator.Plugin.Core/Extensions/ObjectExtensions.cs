@@ -12,6 +12,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    public static class ObjectExtensions
    {
+      private static readonly string RichTextPropertyName = "richText";
+
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
 
@@ -46,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetType();
 
          return ( ui as Text )?.supportRichText == true
-            || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( "richText" )?.GetValue( ui, null ), true ) )
+            || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( RichTextPropertyName )?.GetValue( ui, null ), true ) )
             || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) )
             || ( Types.UguiNovelText != null && Types.UguiNovelText.IsAssignableFrom( type ) );
       }
