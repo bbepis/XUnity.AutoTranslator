@@ -7,6 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
    public class RichTextParser
    {
+      private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
       private static readonly Regex TagRegex = new Regex( "<.*?>" );
       private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "group" };
       private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound" };
@@ -36,8 +37,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                value = value.Substring( 1, value.Length - 1 );
             }
 
-            var parts = value.Split( '=' );
-            if( parts.Length == 2 )
+            var parts = value.Split( TagNameEnders );
+            if( parts.Length >= 2 )
             {
                value = parts[ 0 ];
             }
@@ -45,11 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             var isIgnored = IgnoreTags.Contains( value );
             if( !isKnown )
             {
-               var endIdx = value.IndexOf( '=' );
-               if( endIdx < 0 )
-               {
-                  endIdx = value.Length;
-               }
+               var endIdx = value.Length;
                bool allLatin = true;
                for( int j = 0 ; j < endIdx ; j++ )
                {
