@@ -46,6 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetType();
 
          return ( ui as Text )?.supportRichText == true
+            || ( Types.TMP_Text != null && Types.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( "richText" )?.GetValue( ui, null ), true ) )
             || ( Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type ) )
             || ( Types.UguiNovelText != null && Types.UguiNovelText.IsAssignableFrom( type ) );
       }
