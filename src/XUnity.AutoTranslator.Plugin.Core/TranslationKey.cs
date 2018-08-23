@@ -14,9 +14,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          OriginalText = key;
 
          if( !neverRemoveWhitespace
-            && ( ( Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars ) || ( ui.IgnoreAllWhitespace() ) ) )
+            && ( ( Settings.IgnoreWhitespaceInDialogue && key.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && ui.IgnoreAllWhitespace() ) ) )
          {
-            RelevantText = key.RemoveWhitespace();
+            RelevantText = key.RemoveWhitespaceAndNewlines();
          }
          else
          {

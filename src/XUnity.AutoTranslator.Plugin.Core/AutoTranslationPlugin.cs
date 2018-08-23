@@ -120,7 +120,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
             Logger.Current = new ConsoleLogger();
          }
 
-         Settings.Configure();
+         try
+         {
+            Settings.Configure();
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred during configuration. Shutting plugin down." );
+
+            _endpoint = null;
+            Settings.IsShutdown = true;
+
+            return;
+         }
 
          if( Settings.EnableConsole ) DebugConsole.Enable();
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Debugging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
@@ -70,6 +71,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool UseStaticTranslations;
       public static string OverrideFont;
       public static string UserAgent;
+      public static WhitespaceHandlingStrategy WhitespaceHandlingStrategy;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -111,7 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 200 );
          IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( Types.AdvEngine == null );
          IgnoreWhitespaceInNGUI = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInNGUI" ].GetOrDefault( true );
-         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
+         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 18 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
@@ -120,6 +122,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
+
+         // special handling because of P/Invoke / exe name handling
+         try
+         {
+            WhitespaceHandlingStrategy = Config.Current.Preferences[ "Behaviour" ][ "WhitespaceHandlingStrategy" ].GetOrDefault( GetDefaultWhitespaceHandlingStrategy() );
+         }
+         catch( Exception e )
+         {
+            WhitespaceHandlingStrategy = WhitespaceHandlingStrategy.TrimPerNewline;
+
+            Logger.Current.Warn( e, "An error occurred while configuring 'WhitespaceHandlingStrategy'. Using default." );
+         }
 
          UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );
 
@@ -176,6 +190,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             return UserAgent;
          }
          return defaultUserAgent;
+      }
+
+      public static WhitespaceHandlingStrategy GetDefaultWhitespaceHandlingStrategy()
+      {
+         string exe = Path.GetFileNameWithoutExtension( Kernel32.ApplicationPath );
+         if( exe.StartsWith( "charastudio", StringComparison.OrdinalIgnoreCase )
+            || exe.StartsWith( "koikatu", StringComparison.OrdinalIgnoreCase ) )
+         {
+            // for legacy reasons, lets not change all the keys of existing translations
+            return WhitespaceHandlingStrategy.AllOccurrences;
+         }
+         return WhitespaceHandlingStrategy.TrimPerNewline;
       }
    }
 }

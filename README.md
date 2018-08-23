@@ -60,6 +60,7 @@ EnableBatching=True              ;Indicates whether batching of translations sho
 TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
+WhitespaceHandlingStrategy=TrimPerNewline ;Indicates how whitespace/newline removal should be handled before attempting translation. Can be ["TrimPerNewline", "AllOccurrences"]
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent

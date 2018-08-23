@@ -58,6 +58,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          '.'
       };
 
+      private static readonly char[] NewlinesCharacters = new char[] { '\r', '\n' };
+      private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
+
       public static TemplatedString TemplatizeByNumbers( this string str )
       {
          var dict = new Dictionary<string, string>();
@@ -193,10 +196,41 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return text;
       }
 
-      public static string RemoveWhitespace( this string text )
+      public static string RemoveWhitespaceAndNewlines( this string text )
       {
-         // Japanese whitespace, wtf
-         return text.Replace( "\n", "" ).Replace( "\r", "" ).Replace( " ", "" ).Replace( "　", "" );
+         var builder = new StringBuilder( text.Length );
+         if( Settings.WhitespaceHandlingStrategy == WhitespaceHandlingStrategy.AllOccurrences )
+         {
+            for( int i = 0 ; i < text.Length ; i++ )
+            {
+               var c = text[ i ];
+               switch( c )
+               {
+                  case '\n':
+                  case '\r':
+                  case ' ':
+                  case '　':
+                     break;
+                  default:
+                     builder.Append( c );
+                     break;
+               }
+            }
+         }
+         else // if( Settings.WhitespaceHandlingStrategy == WhitespaceHandlingStrategy.TrimPerNewline )
+         {
+            var lines = text.Split( NewlinesCharacters, StringSplitOptions.RemoveEmptyEntries );
+            for( int i = 0 ; i < lines.Length ; i++ )
+            {
+               var line = lines[ i ].Trim( WhitespacesAndNewlines );
+               for( int j = 0 ; j < line.Length ; j++ )
+               {
+                  var c = line[ j ];
+                  builder.Append( c );
+               }
+            }
+         }
+         return builder.ToString();
       }
 
       public static bool ContainsNumbers( this string text )
