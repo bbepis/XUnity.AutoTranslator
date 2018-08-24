@@ -1,4 +1,9 @@
-﻿### 2.13.0
+﻿### 2.13.1
+ * BUG FIX - Minor bug fix in rich text parser
+ * MISC - Enable Rich Text for TextMeshPro
+ * MISC - Improved whitespace handling with additional configuration option
+
+### 2.13.0
  * FEATURE - Support for older Unity Engine versions
  * BUG FIX - Respect BepInEx logger config over own config
  * BUG FIX - Fix exception that could occur in relation to NGUI
