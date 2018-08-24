@@ -71,7 +71,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool UseStaticTranslations;
       public static string OverrideFont;
       public static string UserAgent;
-      public static WhitespaceHandlingStrategy WhitespaceHandlingStrategy;
+      public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -113,7 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 200 );
          IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( Types.AdvEngine == null );
          IgnoreWhitespaceInNGUI = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInNGUI" ].GetOrDefault( true );
-         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 18 );
+         MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
          CopyToClipboard = Config.Current.Preferences[ "Behaviour" ][ "CopyToClipboard" ].GetOrDefault( false );
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
@@ -126,13 +126,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          // special handling because of P/Invoke / exe name handling
          try
          {
-            WhitespaceHandlingStrategy = Config.Current.Preferences[ "Behaviour" ][ "WhitespaceHandlingStrategy" ].GetOrDefault( GetDefaultWhitespaceHandlingStrategy() );
+            WhitespaceRemovalStrategy = Config.Current.Preferences[ "Behaviour" ][ "WhitespaceRemovalStrategy" ].GetOrDefault( GetDefaultWhitespaceHandlingStrategy() );
          }
          catch( Exception e )
          {
-            WhitespaceHandlingStrategy = WhitespaceHandlingStrategy.TrimPerNewline;
+            WhitespaceRemovalStrategy = WhitespaceHandlingStrategy.TrimPerNewline;
 
-            Logger.Current.Warn( e, "An error occurred while configuring 'WhitespaceHandlingStrategy'. Using default." );
+            Logger.Current.Warn( e, "An error occurred while configuring 'WhitespaceRemovalStrategy'. Using default." );
          }
 
          UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );

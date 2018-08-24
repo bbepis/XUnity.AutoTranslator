@@ -60,7 +60,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ui is UnityEngine.GUIContent;
       }
 
-      public static bool IgnoreAllWhitespace( this object ui )
+      public static bool IsNGUI( this object ui )
       {
          if( ui == null ) return false;
 

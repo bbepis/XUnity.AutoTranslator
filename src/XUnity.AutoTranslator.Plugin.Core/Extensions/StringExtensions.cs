@@ -199,7 +199,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static string RemoveWhitespaceAndNewlines( this string text )
       {
          var builder = new StringBuilder( text.Length );
-         if( Settings.WhitespaceHandlingStrategy == WhitespaceHandlingStrategy.AllOccurrences )
+         if( Settings.WhitespaceRemovalStrategy == WhitespaceHandlingStrategy.AllOccurrences )
          {
             for( int i = 0 ; i < text.Length ; i++ )
             {
