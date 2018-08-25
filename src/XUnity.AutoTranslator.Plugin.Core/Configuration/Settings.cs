@@ -13,6 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
+      public static readonly string EnglishLanguage = "en";
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
@@ -123,10 +124,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
 
-         // special handling because of P/Invoke / exe name handling
+         // special handling because of enum parsing
          try
          {
-            WhitespaceRemovalStrategy = Config.Current.Preferences[ "Behaviour" ][ "WhitespaceRemovalStrategy" ].GetOrDefault( GetDefaultWhitespaceHandlingStrategy() );
+            WhitespaceRemovalStrategy = Config.Current.Preferences[ "Behaviour" ][ "WhitespaceRemovalStrategy" ].GetOrDefault( WhitespaceHandlingStrategy.TrimPerNewline );
          }
          catch( Exception e )
          {
@@ -190,18 +191,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             return UserAgent;
          }
          return defaultUserAgent;
-      }
-
-      public static WhitespaceHandlingStrategy GetDefaultWhitespaceHandlingStrategy()
-      {
-         string exe = Path.GetFileNameWithoutExtension( Kernel32.ApplicationPath );
-         if( exe.StartsWith( "charastudio", StringComparison.OrdinalIgnoreCase )
-            || exe.StartsWith( "koikatu", StringComparison.OrdinalIgnoreCase ) )
-         {
-            // for legacy reasons, lets not change all the keys of existing translations
-            return WhitespaceHandlingStrategy.AllOccurrences;
-         }
-         return WhitespaceHandlingStrategy.TrimPerNewline;
       }
    }
 }

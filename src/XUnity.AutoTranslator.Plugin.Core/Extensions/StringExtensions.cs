@@ -220,6 +220,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          else // if( Settings.WhitespaceHandlingStrategy == WhitespaceHandlingStrategy.TrimPerNewline )
          {
             var lines = text.Split( NewlinesCharacters, StringSplitOptions.RemoveEmptyEntries );
+            var lastLine = lines.Length - 1;
             for( int i = 0 ; i < lines.Length ; i++ )
             {
                var line = lines[ i ].Trim( WhitespacesAndNewlines );
@@ -227,6 +228,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                {
                   var c = line[ j ];
                   builder.Append( c );
+               }
+
+               // if source language is ENGLISH; Add space, if not last line, so words are not merged
+               if( Settings.FromLanguage == Settings.EnglishLanguage && i != lastLine )
+               {
+                  builder.Append( ' ' );
                }
             }
          }

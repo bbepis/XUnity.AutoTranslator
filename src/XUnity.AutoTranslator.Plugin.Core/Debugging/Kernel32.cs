@@ -8,9 +8,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 {
    public static class Kernel32
    {
-      [DllImport( "kernel32.dll", CharSet = CharSet.Unicode )]
-      public static extern int GetModuleFileNameW( HandleRef hModule, StringBuilder buffer, int length );
-
       [DllImport( "kernel32.dll", SetLastError = true )]
       public static extern bool AllocConsole();
 
@@ -35,15 +32,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 
       [DllImport( "kernel32.dll", ExactSpelling = true, SetLastError = true )]
       public static extern bool CloseHandle( IntPtr handle );
-
-      public static string ApplicationPath
-      {
-         get
-         {
-            StringBuilder stringBuilder = new StringBuilder( 260 );
-            GetModuleFileNameW( new HandleRef( null, IntPtr.Zero ), stringBuilder, stringBuilder.Capacity );
-            return stringBuilder.ToString();
-         }
-      }
    }
 }
