@@ -230,8 +230,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   builder.Append( c );
                }
 
-               // if source language is ENGLISH; Add space, if not last line, so words are not merged
-               if( Settings.FromLanguage == Settings.EnglishLanguage && i != lastLine )
+               // do we need to add a space when merging lines?
+               if( Settings.UsesWhitespaceBetweenWords && i != lastLine ) // en, ru, ko?
                {
                   builder.Append( ' ' );
                }

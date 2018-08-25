@@ -17,9 +17,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          { "en", ContainsStandardLatinSymbols },
       };
 
+      private static readonly HashSet<string> WhitespaceLanguages = new HashSet<string>
+      {
+         "ru", "ko", "en"
+      };
+
       public static bool IsFromLanguageSupported( string code )
       {
          return LanguageSymbolChecks.ContainsKey( code );
+      }
+
+      public static bool RequiresWhitespaceUponLineMerging( string code )
+      {
+         return WhitespaceLanguages.Contains( code );
       }
 
       public static Func<string, bool> GetSymbolCheck( string language )

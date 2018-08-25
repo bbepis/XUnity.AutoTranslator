@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
@@ -23,6 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaximumStaggers = 6;
       public static readonly int MaximumConsecutiveFramesTranslated = 90;
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
+      public static bool UsesWhitespaceBetweenWords = false;
 
 
       public static bool IsShutdown = false;
@@ -157,6 +159,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          MigrationsTag = Config.Current.Preferences[ "Migrations" ][ "Tag" ].GetOrDefault( string.Empty );
 
          AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );
+         UsesWhitespaceBetweenWords = TextHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
 
          if( EnableMigrations )
          {
