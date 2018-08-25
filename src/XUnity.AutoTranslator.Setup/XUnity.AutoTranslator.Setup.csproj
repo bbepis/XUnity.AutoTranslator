@@ -4,7 +4,7 @@
       <OutputType>Exe</OutputType>
       <TargetFramework>net40</TargetFramework>
       <AssemblyName>SetupReiPatcherAndAutoTranslator</AssemblyName>
-      <Version>2.13.1</Version>
+      <Version>2.14.0</Version>
    </PropertyGroup>
 
    <ItemGroup>

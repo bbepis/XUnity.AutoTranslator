@@ -13,7 +13,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    public static class NGUIHooks
    {
       public static readonly Type[] All = new[] {
-         typeof( TextPropertyHook )
+         typeof( TextPropertyHook ),
+         typeof( OnStartHook )
       };
    }
 
@@ -28,6 +29,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
          return AccessTools.Property( Constants.Types.UILabel, "text" ).GetSetMethod();
+      }
+
+      public static void Postfix( object __instance )
+      {
+         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+      }
+   }
+
+   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   public static class OnStartHook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return Constants.Types.UILabel != null;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Method( Constants.Types.UILabel, "OnStart" );
       }
 
       public static void Postfix( object __instance )

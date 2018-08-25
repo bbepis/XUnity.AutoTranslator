@@ -1,4 +1,7 @@
-﻿### 2.13.1
+﻿### 2.14.0
+ * FEATURE - Dramatically improved the text hooking capability for NGUI to much better handle static elements
+
+### 2.13.1
  * BUG FIX - Minor bug fix in rich text parser
  * MISC - Enable Rich Text for TextMeshPro
  * MISC - Improved whitespace handling with additional configuration option
