@@ -6,34 +6,19 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class DefaultEndpoint : KnownEndpoint
+   public class DefaultEndpoint : KnownHttpEndpoint
    {
-      private static ServicePoint ServicePoint;
       private static readonly string ServicePointTemplateUrl = "{0}?from={1}&to={2}&text={3}";
+      private string _endpoint;
 
       public DefaultEndpoint( string endpoint )
-         : base( endpoint )
       {
-      }
-
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
+         _endpoint = endpoint;
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( new Uri( _endpoint ).Host );
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
-      }
-
-      public override void ConfigureServicePointManager()
-      {
-         try
-         {
-            ServicePoint = ServicePointManager.FindServicePoint( new Uri( Identifier ) );
-            ServicePoint.ConnectionLimit = Settings.MaxConcurrentTranslations;
-         }
-         catch
-         {
-         }
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -44,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         return string.Format( ServicePointTemplateUrl, Identifier, from, to, WWW.EscapeURL( untranslatedText ) );
+         return string.Format( ServicePointTemplateUrl, _endpoint, from, to, WWW.EscapeURL( untranslatedText ) );
       }
    }
 }

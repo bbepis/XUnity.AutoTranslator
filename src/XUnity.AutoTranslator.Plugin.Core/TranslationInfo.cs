@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Fonts;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -13,7 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
       private static readonly string UILabelClassName = "UILabel";
 
-      private Action<object> _reset;
+      private Action<object> _unresize;
+      private Action<object> _unfont;
 
       public TranslationInfo()
       {
@@ -29,35 +32,71 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool IsCurrentlySettingText { get; set; }
 
+      public void ChangeFont( object graphic )
+      {
+         if( graphic == null ) return;
+
+         if( graphic is Text )
+         {
+            var ui = graphic as Text;
+
+            var previousFont = ui.font;
+            var newFont = FontCache.GetOrCreate( previousFont.fontSize );
+
+            ui.font = newFont;
+            if( _unfont == null )
+            {
+               _unfont = obj =>
+               {
+                  ( (Text)obj ).font = previousFont;
+               };
+            }
+         }
+      }
+
+      public void UnchangeFont( object graphic )
+      {
+         if( graphic == null ) return;
+
+         _unfont?.Invoke( graphic );
+         _unfont = null;
+      }
+
       public void ResizeUI( object graphic )
       {
+         // do not resize if there is no object of ir it is already resized
+         if( graphic == null ) return;
+
          if( graphic is Text )
          {
             var ui = (Text)graphic;
 
             // text is likely to be longer than there is space for, simply expand out anyway then
-            var width = ( (RectTransform)ui.transform ).rect.width;
-            var quarterScreenSize = Screen.width / 5;
+            var componentWidth = ( (RectTransform)ui.transform ).rect.width;
+            var quarterScreenSize = Screen.width / 4;
+            var isComponentWide = componentWidth > quarterScreenSize;
 
             // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
             // the idea is, if the UI element is larger than the width of half the screen, there is a larger
             // likelihood that it will go into multiple lines too.
             var originalHorizontalOverflow = ui.horizontalOverflow;
-            if( ui.verticalOverflow == VerticalWrapMode.Truncate && width < quarterScreenSize && !ui.resizeTextForBestFit )
-            {
-               // will prevent the text from going into multiple lines and from "dispearing" if there is not enough room on a single line
-               ui.horizontalOverflow = HorizontalWrapMode.Overflow;
-            }
-            else
+            var originalVerticalOverflow = ui.verticalOverflow;
+
+            if( isComponentWide && !ui.resizeTextForBestFit )
             {
                ui.horizontalOverflow = HorizontalWrapMode.Wrap;
-            }
+               ui.verticalOverflow = VerticalWrapMode.Overflow;
 
-            _reset = g =>
-            {
-               var gui = (Text)g;
-               gui.horizontalOverflow = originalHorizontalOverflow;
-            };
+               if( _unresize == null )
+               {
+                  _unresize = g =>
+                  {
+                     var gui = (Text)g;
+                     gui.horizontalOverflow = originalHorizontalOverflow;
+                     gui.verticalOverflow = originalVerticalOverflow;
+                  };
+               }
+            }
          }
          else
          {
@@ -72,20 +111,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
                type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
                type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
 
-               _reset = g =>
+               if( _unresize == null )
                {
-                  var gtype = g.GetType();
-                  gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
-                  gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
-               };
+                  _unresize = g =>
+                  {
+                     var gtype = g.GetType();
+                     gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
+                     gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
+                  };
+               }
             }
          }
       }
 
       public void UnresizeUI( object graphic )
       {
-         _reset?.Invoke( graphic );
-         _reset = null;
+         if( graphic == null ) return;
+
+         _unresize?.Invoke( graphic );
+         _unresize = null;
       }
 
       public TranslationInfo Reset( string newText )

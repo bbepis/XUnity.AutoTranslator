@@ -19,7 +19,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
          typeof( DoButtonHook ),
          typeof( DoModalWindowHook ),
          typeof( DoWindowHook ),
-         typeof( DoButtonGridHook ),
          typeof( DoTextFieldHook ),
          typeof( DoToggleHook ),
       };

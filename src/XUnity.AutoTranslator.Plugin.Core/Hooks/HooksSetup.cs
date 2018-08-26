@@ -19,48 +19,92 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
    public static class HooksSetup
    {
-      public static void InstallHooks( Func<object, string, string> defaultHook )
+      public static void InstallHooks()
       {
+         var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
+
+         bool success = false;
          try
          {
-            var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
-
-            bool success = false;
-            if( Settings.EnableUGUI )
+            if( Settings.EnableUGUI || Settings.EnableUtage )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, defaultHook );
+               success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( UGUIHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up hooks for UGUI." );
+         }
 
+         try
+         {
             if( Settings.EnableTextMeshPro )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, defaultHook );
+               success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( TextMeshProHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
+         }
 
+         try
+         {
             if( Settings.EnableNGUI )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, defaultHook );
+               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( NGUIHooks.All );
                }
             }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up hooks for NGUI." );
+         }
 
+         try
+         {
             if( Settings.EnableIMGUI )
             {
-               harmony.PatchAll( IMGUIHooks.All );
+               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
+               if( !success )
+               {
+                  harmony.PatchAll( IMGUIHooks.All );
+
+                  // This wont work in "newer" unity versions!
+                  try
+                  {
+                     harmony.PatchType( typeof( DoButtonGridHook ) );
+                  }
+                  catch { }
+               }
             }
          }
          catch( Exception e )
          {
-            Console.WriteLine( "ERROR WHILE INITIALIZING AUTO TRANSLATOR: " + Environment.NewLine + e );
+            Logger.Current.Error( e, "An error occurred while setting up hooks for IMGUI." );
+         }
+
+         try
+         {
+            if( Settings.EnableUtage )
+            {
+               harmony.PatchAll( UtageHooks.All );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
          }
       }
 
@@ -95,6 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                                  addMethod.Invoke( component, new object[] { callback } );
                               }
 
+                              Logger.Current.Info( eventName + " was hooked by external plugin." );
                               return true;
                            }
                            catch { }

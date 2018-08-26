@@ -10,8 +10,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
       {
          { "ja", ContainsJapaneseSymbols },
-         { "ja-JP", ContainsJapaneseSymbols },
+         { "ru", ContainsRussianSymbols },
+         { "zh-CN", ContainsChineseSymbols },
+         { "zh-TW", ContainsChineseSymbols },
+         { "ko", ContainsKoreanSymbols },
+         { "en", ContainsStandardLatinSymbols },
       };
+
+      private static readonly HashSet<string> WhitespaceLanguages = new HashSet<string>
+      {
+         "ru", "ko", "en"
+      };
+
+      public static bool IsFromLanguageSupported( string code )
+      {
+         return LanguageSymbolChecks.ContainsKey( code );
+      }
+
+      public static bool RequiresWhitespaceUponLineMerging( string code )
+      {
+         return WhitespaceLanguages.Contains( code );
+      }
 
       public static Func<string, bool> GetSymbolCheck( string language )
       {
@@ -24,10 +43,75 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       public static bool ContainsJapaneseSymbols( string text )
       {
-         // Japenese regex: [\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]
+         // Unicode Kanji Table:
+         // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
          foreach( var c in text )
          {
-            if( ( c >= '\u3040' && c <= '\u30ff' ) || ( c >= '\uff00' && c <= '\uff9f' ) || ( c >= '\u4e00' && c <= '\u9faf' ) || ( c >= '\u3400' && c <= '\u4dbf' ) )
+            if( ( c >= '\u3021' && c <= '\u3029' ) // kana-like symbols
+               || ( c >= '\u3031' && c <= '\u3035' ) // kana-like symbols
+               || ( c >= '\u3041' && c <= '\u3096' ) // hiragana
+               || ( c >= '\u30a1' && c <= '\u30fa' ) // katakana
+               || ( c >= '\uff66' && c <= '\uff9d' ) // half-width katakana
+               || ( c >= '\u4e00' && c <= '\u9faf' ) // CJK unifed ideographs - Common and uncommon kanji
+               || ( c >= '\u3400' && c <= '\u4dbf' ) // CJK unified ideographs Extension A - Rare kanji ( 3400 - 4dbf)
+               || ( c >= '\uf900' && c <= '\ufaff' ) ) // CJK Compatibility Ideographs
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsKoreanSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\uac00' && c <= '\ud7af' ) ) // Hangul Syllables
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsChineseSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u4e00' && c <= '\u9faf' )
+               || ( c >= '\u3400' && c <= '\u4dbf' )
+               || ( c >= '\uf900' && c <= '\ufaff' ) )
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsRussianSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u0400' && c <= '\u04ff' )
+               || ( c >= '\u0500' && c <= '\u052f' )
+               || ( c >= '\u2de0' && c <= '\u2dff' )
+               || ( c >= '\ua640' && c <= '\ua69f' )
+               || ( c >= '\u1c80' && c <= '\u1c88' )
+               || ( c >= '\ufe2e' && c <= '\ufe2f' )
+               || ( c == '\u1d2b' || c == '\u1d78' ) )
+            {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      public static bool ContainsStandardLatinSymbols( string text )
+      {
+         foreach( var c in text )
+         {
+            if( ( c >= '\u0041' && c <= '\u005a' )
+               || ( c >= '\u0061' && c <= '\u007a' ) )
             {
                return true;
             }
@@ -42,10 +126,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Decode( string text )
       {
-         // Remove these in newer version
-         text = text.Replace( "0D", "\r" ).Replace( "\\r", "\r" );
-         text = text.Replace( "0A", "\n" ).Replace( "\\n", "\n" );
-         return text;
+         return text.Replace( "\\r", "\r" )
+            .Replace( "\\n", "\n" )
+            .Replace( "%3D", "=" );
       }
 
       /// <summary>
@@ -55,9 +138,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Encode( string text )
       {
-         text = text.Replace( "\r", "\\r" );
-         text = text.Replace( "\n", "\\n" );
-         return text;
+         return text.Replace( "\r", "\\r" )
+            .Replace( "\n", "\\n" )
+            .Replace( "=", "%3D" );
       }
    }
 }

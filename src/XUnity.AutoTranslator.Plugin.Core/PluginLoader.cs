@@ -23,7 +23,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var obj = new GameObject( "Auto Translator" );
             var instance = obj.AddComponent<AutoTranslationPlugin>();
             GameObject.DontDestroyOnLoad( obj );
-            instance.Initialize();
          }
       }
 
@@ -46,19 +45,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          Load();
       }
+   }
 
-      class Bootstrapper : MonoBehaviour
+   class Bootstrapper : MonoBehaviour
+   {
+      public event Action Destroyed = delegate { };
+
+      void Start()
       {
-         public event Action Destroyed = delegate { };
-
-         void Start()
-         {
-            Destroy( gameObject );
-         }
-         void OnDestroy()
-         {
-            Destroyed?.Invoke();
-         }
+         Destroy( gameObject );
+      }
+      void OnDestroy()
+      {
+         Destroyed?.Invoke();
       }
    }
 }

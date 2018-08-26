@@ -16,12 +16,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             var value = that.Value;
             if( string.IsNullOrEmpty( value ) )
             {
-               that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+               if( typeof( T ).IsEnum )
+               {
+                  that.Value = Enum.GetName( typeof( T ), defaultValue );
+               }
+               else
+               {
+                  that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+               }
                return defaultValue;
             }
             else
             {
-               return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+               if( typeof( T ).IsEnum )
+               {
+                  return (T)Enum.Parse( typeof( T ), that.Value, true );
+               }
+               else
+               {
+                  return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+               }
             }
          }
          else
@@ -29,12 +43,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             var value = that.Value;
             if( value == null )
             {
-               that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+               if( typeof( T ).IsEnum )
+               {
+                  that.Value = Enum.GetName( typeof( T ), defaultValue );
+               }
+               else
+               {
+                  that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+               }
                return defaultValue;
             }
             else
             {
-               return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+               if( typeof( T ).IsEnum )
+               {
+                  return (T)Enum.Parse( typeof( T ), that.Value, true );
+               }
+               else
+               {
+                  return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+               }
             }
          }
       }

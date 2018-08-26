@@ -12,18 +12,15 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class BaiduTranslateEndpoint : KnownEndpoint
+   public class BaiduTranslateEndpoint : KnownHttpEndpoint
    {
-      private static ServicePoint ServicePoint;
       private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
-      private static readonly string HttpsServicePointTemplateUrl = "https://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
 
       private static readonly MD5 HashMD5 = MD5.Create();
 
       public BaiduTranslateEndpoint()
-         : base( KnownEndpointNames.GoogleTranslate )
       {
-
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "api.fanyi.baidu.com" );
       }
 
       private static string CreateMD5( string input )
@@ -39,28 +36,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return sb.ToString().ToLower();
       }
 
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
-         headers[ "User-Agent" ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
-         headers[ "Accept-Charset" ] = "UTF-8";
-      }
-
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
-         headers[ HttpRequestHeader.UserAgent ] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36";
+         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36" );
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
-      }
-
-      public override void ConfigureServicePointManager()
-      {
-         try
-         {
-            ServicePoint = ServicePointManager.FindServicePoint( new Uri( "http://api.fanyi.baidu.com" ) );
-            ServicePoint.ConnectionLimit = Settings.MaxConcurrentTranslations;
-         }
-         catch
-         {
-         }
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -88,7 +67,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             }
 
             translated = lineBuilder.ToString();
-            return true;
+
+            var success = !string.IsNullOrEmpty( translated );
+            return success;
          }
          catch( Exception )
          {
@@ -102,7 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          string salt = DateTime.UtcNow.Millisecond.ToString();
          var md5 = CreateMD5( Settings.BaiduAppId + untranslatedText + salt + Settings.BaiduAppSecret );
 
-         return string.Format( Settings.EnableSSL ? HttpsServicePointTemplateUrl : HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, Settings.BaiduAppId, salt, md5 );
+         return string.Format( HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, Settings.BaiduAppId, salt, md5 );
       }
    }
 }
