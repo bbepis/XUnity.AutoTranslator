@@ -1,4 +1,8 @@
-﻿### 2.14.0
+﻿### 2.14.1
+ * BUG FIX - Never allow text to be queued for translation before stabilization check for rich text 
+ * MISC - Improved a spam detection check
+
+### 2.14.0
  * FEATURE - Dramatically improved the text hooking capability for NGUI to much better handle static elements
 
 ### 2.13.1

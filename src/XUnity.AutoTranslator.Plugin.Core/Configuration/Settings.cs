@@ -22,6 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly float IncreaseBatchOperationsEvery = 30;
       public static readonly bool EnableObjectTracking = true;
       public static readonly int MaximumStaggers = 6;
+      public static readonly int PreviousTextStaggerCount = 3;
       public static readonly int MaximumConsecutiveFramesTranslated = 90;
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
       public static bool UsesWhitespaceBetweenWords = false;

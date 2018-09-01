@@ -100,7 +100,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
       private float _batchOperationSecondCounter = 0;
 
-      private string _previouslyQueuedText = null;
+      private string[] _previouslyQueuedText = new string[ Settings.PreviousTextStaggerCount ];
+      private int _staggerTextCursor = 0;
       private int _concurrentStaggers = 0;
 
       private int _frameForLastQueuedTranslation = -1;
@@ -457,28 +458,44 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckStaggerText( string untranslatedText )
       {
-         if( _previouslyQueuedText != null )
+         bool wasProblematic = false;
+
+         for( int i = 0 ; i < _previouslyQueuedText.Length ; i++ )
          {
-            if( untranslatedText.StartsWith( _previouslyQueuedText ) )
+            var previouslyQueuedText = _previouslyQueuedText[ i ];
+
+            if( previouslyQueuedText != null )
             {
-               _concurrentStaggers++;
-               if( _concurrentStaggers > Settings.MaximumStaggers )
+               if( untranslatedText.StartsWith( previouslyQueuedText ) || previouslyQueuedText.StartsWith( untranslatedText )
+                  || untranslatedText.EndsWith( previouslyQueuedText ) || previouslyQueuedText.EndsWith( untranslatedText ) )
                {
-                  _unstartedJobs.Clear();
-                  _completedJobs.Clear();
-                  _ongoingJobs.Clear();
-
-                  Settings.IsShutdown = true;
-                  Logger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+                  wasProblematic = true;
+                  break;
                }
-            }
-            else
-            {
-               _concurrentStaggers = 0;
-            }
 
+            }
          }
-         _previouslyQueuedText = untranslatedText;
+
+         if( wasProblematic )
+         {
+            _concurrentStaggers++;
+            if( _concurrentStaggers > Settings.MaximumStaggers )
+            {
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
+
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+            }
+         }
+         else
+         {
+            _concurrentStaggers = 0;
+         }
+
+         _previouslyQueuedText[ _staggerTextCursor % _previouslyQueuedText.Length ] = untranslatedText;
+         _staggerTextCursor++;
       }
 
       private void CheckThresholds()
@@ -873,12 +890,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var result = parser.Parse( text );
                      if( result.HasRichSyntax )
                      {
-                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, true );
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
                         if( translation != null )
                         {
-                           SetTranslatedText( ui, translation, info ); // get rid of textKey here!!
+                           SetTranslatedText( ui, translation, info );
+                           return translation;
                         }
-                        return translation;
                      }
                   }
                }
