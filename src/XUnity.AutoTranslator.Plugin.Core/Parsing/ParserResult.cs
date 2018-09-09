@@ -4,10 +4,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    public class ParserResult
    {
-      public ParserResult( string originalText, string template, Dictionary<string, string> args )
+      public ParserResult( string originalText, string template, bool hasRichText, Dictionary<string, string> args )
       {
          OriginalText = originalText;
          Template = template;
+         HasRichSyntax = hasRichText;
          Arguments = args;
       }
 
@@ -17,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public Dictionary<string, string> Arguments { get; private set; }
 
-      public bool HasRichSyntax => Template.Length > 5; // {{A}} <-- 5 chars
+      public bool HasRichSyntax { get; private set; }
 
       public string Untemplate( Dictionary<string, string> arguments )
       {

@@ -11,8 +11,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    public static class TextMeshProHooks
    {
       public static readonly Type[] All = new[] {
-         typeof( TeshMeshProUGUIAwakeHook ),
-         typeof( TeshMeshProAwakeHook ),
+         typeof( TeshMeshProUGUIOnEnableHook ),
+         typeof( TeshMeshProOnEnableHook ),
          typeof( TextPropertyHook ),
          typeof( SetTextHook1 ),
          typeof( SetTextHook2 ),
@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TeshMeshProUGUIAwakeHook
+   public static class TeshMeshProUGUIOnEnableHook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -33,17 +33,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TextMeshProUGUI, "Awake" );
+         return AccessTools.Method( Types.TextMeshProUGUI, "OnEnable" );
       }
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TeshMeshProAwakeHook
+   public static class TeshMeshProOnEnableHook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -52,12 +52,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TextMeshPro, "Awake" );
+         return AccessTools.Method( Types.TextMeshPro, "OnEnable" );
       }
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 

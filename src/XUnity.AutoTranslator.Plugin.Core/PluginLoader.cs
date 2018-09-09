@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _loaded = true;
             Config.Current = config;
 
-            var obj = new GameObject( "Auto Translator" );
+            var obj = new GameObject( "___XUnityAutoTranslator" );
             var instance = obj.AddComponent<AutoTranslationPlugin>();
             GameObject.DontDestroyOnLoad( obj );
          }

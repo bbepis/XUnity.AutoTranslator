@@ -23,6 +23,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       public static readonly Type WWW = FindType( "UnityEngine.WWW" );
 
+      public static readonly Type Typewriter = FindType( "Typewriter" );
+
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
 
       public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );

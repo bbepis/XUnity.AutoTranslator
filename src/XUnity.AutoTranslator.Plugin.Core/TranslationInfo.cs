@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Harmony;
 using UnityEngine;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -11,12 +12,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationInfo
    {
+      private static readonly string OnEnableMethodName = "OnEnable";
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
       private static readonly string UILabelClassName = "UILabel";
 
       private Action<object> _unresize;
       private Action<object> _unfont;
+
+      private bool _hasCheckedTypeWriter;
+      private MonoBehaviour _typewriter;
 
       public TranslationInfo()
       {
@@ -28,9 +33,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool IsTranslated { get; set; }
 
-      public bool IsAwake { get; set; }
-
       public bool IsCurrentlySettingText { get; set; }
+
+      public void ResetScrollIn( object graphic )
+      {
+         if( !_hasCheckedTypeWriter )
+         {
+            _hasCheckedTypeWriter = true;
+
+            if( Constants.Types.Typewriter != null )
+            {
+               var ui = graphic as Component;
+               if( ui != null )
+               {
+                  _typewriter = (MonoBehaviour)ui.GetComponent( Constants.Types.Typewriter );
+               }
+            }
+         }
+
+         if( _typewriter != null )
+         {
+            AccessTools.Method( Constants.Types.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
+         }
+      }
 
       public void ChangeFont( object graphic )
       {

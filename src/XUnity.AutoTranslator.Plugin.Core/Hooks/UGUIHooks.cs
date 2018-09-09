@@ -52,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 }

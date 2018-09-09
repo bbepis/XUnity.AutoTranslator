@@ -1,4 +1,11 @@
-﻿### 2.14.1
+﻿### 2.15.0
+ * FEATURE - Manual hooking - press ALT + U. This will lookup all game objects and attempt translation immediately
+ * FEATURE - Capability for other plugins to tell the Auto Translator not to translate texts
+ * BUG FIX - Initialization hooking that will attempt to hook any game object that was missed during game initialization
+ * BUG FIX - Minor fixes to handling of rich text to better support tags that should be ignored, such as ruby, group
+ * MISC - Generally better hooking capabilities
+
+### 2.14.1
  * BUG FIX - Never allow text to be queued for translation before stabilization check for rich text 
  * MISC - Improved a spam detection check
 

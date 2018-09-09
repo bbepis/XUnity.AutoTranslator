@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    {
       public static readonly Type[] All = new[] {
          typeof( TextPropertyHook ),
-         typeof( OnStartHook )
+         typeof( OnEnableHook )
       };
    }
 
@@ -33,12 +33,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class OnStartHook
+   public static class OnEnableHook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -47,12 +47,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.UILabel, "OnStart" );
+         return AccessTools.Method( Constants.Types.UILabel, "OnEnable" );
       }
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextInitialized( __instance );
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
       }
    }
 }

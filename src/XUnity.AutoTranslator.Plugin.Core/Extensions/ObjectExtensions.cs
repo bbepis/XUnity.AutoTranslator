@@ -60,6 +60,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ui is UnityEngine.GUIContent;
       }
 
+      public static bool IsWhitelistedForImmediateRichTextTranslation( this object ui )
+      {
+         if( ui == null ) return false;
+
+         var type = ui.GetType();
+
+         return Types.AdvCommand != null && Types.AdvCommand.IsAssignableFrom( type );
+      }
+
       public static bool IsNGUI( this object ui )
       {
          if( ui == null ) return false;
@@ -69,15 +78,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return Types.UILabel != null && Types.UILabel.IsAssignableFrom( type );
       }
 
-      public static TranslationInfo GetTranslationInfo( this object obj, bool isAwakening )
+      public static TranslationInfo GetTranslationInfo( this object obj )
       {
          if( !Settings.EnableObjectTracking ) return null;
 
          if( !obj.SupportsStabilization() ) return null;
 
          var info = obj.Get<TranslationInfo>();
-
-         info.IsAwake = info.IsAwake || isAwakening;
 
          return info;
       }

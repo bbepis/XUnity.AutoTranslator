@@ -9,6 +9,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    public static class GameObjectExtensions
    {
       private static readonly string DummyName = "Dummy";
+      private static readonly string XuaIgnore = "XUAIGNORE";
 
       public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Type type )
       {
@@ -30,9 +31,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return null;
       }
 
-      public static bool IsDummy( this GameObject go )
+      public static bool HasIgnoredName( this GameObject go )
       {
-         return go.name.EndsWith( DummyName ) || go?.transform?.parent?.name.EndsWith( DummyName ) == true;
+         return go.name.EndsWith( DummyName ) || go.name.Contains( XuaIgnore ) || go.transform?.parent?.name.EndsWith( DummyName ) == true;
       }
    }
 }

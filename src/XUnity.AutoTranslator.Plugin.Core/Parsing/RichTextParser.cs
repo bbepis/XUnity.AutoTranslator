@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-
    public class RichTextParser
    {
       private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
@@ -94,7 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          // catch any remaining text
          if( offset < input.Length )
          {
-            var argument = "{{" + ( arg++ ) + "}}";
+            var argument = "{{" + ( arg ) + "}}";
             var text = input.Substring( offset, input.Length - offset );
             args.Add( argument, text );
             template.Append( argument );
@@ -116,7 +115,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
             var fullText = text1 + text2;
             var fullKey = key1 + key2;
-            var newKey = "{{" + ( ++arg ) + "}}";
+            var newKey = "{{" + ( arg1 ) + "}}";
 
             args.Remove( key1 );
             args.Remove( key2 );
@@ -124,7 +123,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             templateString = templateString.Replace( fullKey, newKey );
          }
 
-         return new ParserResult( input, templateString, args );
+         return new ParserResult( input, templateString, arg != 'A', args );
       }
    }
 }

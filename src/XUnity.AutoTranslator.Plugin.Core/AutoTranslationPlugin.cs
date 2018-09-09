@@ -112,6 +112,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool _changeFont = false;
       private bool _initialized = false;
+      private bool _temporarilyDisabled = false;
 
       public void Initialize()
       {
@@ -625,18 +626,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool TryGetTranslation( TranslationKey key, out string value )
       {
-         var lookup = key.GetDictionaryLookupKey();
-         var result = _translations.TryGetValue( lookup, out value );
+         return TryGetTranslation( key.GetDictionaryLookupKey(), out value );
+      }
+
+      private bool TryGetTranslation( string key, out string value )
+      {
+         var result = _translations.TryGetValue( key, out value );
          if( result )
          {
             return result;
          }
          else if( _staticTranslations.Count > 0 )
          {
-            if( _staticTranslations.TryGetValue( lookup, out value ) )
+            if( _staticTranslations.TryGetValue( key, out value ) )
             {
-               QueueNewTranslationForDisk( lookup, value );
-               AddTranslation( lookup, value );
+               QueueNewTranslationForDisk( key, value );
+               AddTranslation( key, value );
                return true;
             }
          }
@@ -652,26 +657,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( !ui.IsKnownType() ) return null;
 
-         if( _hooksEnabled )
+         if( _hooksEnabled && !_temporarilyDisabled )
          {
-            return TranslateOrQueueWebJob( ui, text, true );
+            return TranslateOrQueueWebJob( ui, text );
          }
          return null;
       }
 
       public void Hook_TextChanged( object ui )
       {
-         if( _hooksEnabled )
+         if( _hooksEnabled && !_temporarilyDisabled )
          {
-            TranslateOrQueueWebJob( ui, null, false );
-         }
-      }
-
-      public void Hook_TextInitialized( object ui )
-      {
-         if( _hooksEnabled )
-         {
-            TranslateOrQueueWebJob( ui, null, true );
+            TranslateOrQueueWebJob( ui, null );
          }
       }
 
@@ -729,6 +726,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                // NGUI only behaves if you set the text after the resize behaviour
                ui.SetText( text );
+
+               info?.ResetScrollIn( ui );
             }
             catch( TargetInvocationException )
             {
@@ -769,18 +768,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool ShouldTranslate( object ui )
       {
-         var cui = ui as Component;
-         if( cui != null )
+         var component = ui as Component;
+         if( component != null )
          {
-            var go = cui.gameObject;
-            var isDummy = go.IsDummy();
-            if( isDummy )
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
             {
                return false;
             }
 
-            var inputField = cui.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.InputField )
-               ?? cui.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.TMP_InputField );
+            var behaviour = component as Behaviour;
+            if( behaviour?.isActiveAndEnabled == false )
+            {
+               return false;
+            }
+
+            var inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.InputField )
+               ?? component.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.TMP_InputField );
 
             return inputField == null;
          }
@@ -788,13 +794,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return true;
       }
 
-      private string TranslateOrQueueWebJob( object ui, string text, bool isAwakening )
+      private string TranslateOrQueueWebJob( object ui, string text )
       {
-         var info = ui.GetTranslationInfo( isAwakening );
-         if( !info?.IsAwake ?? false )
-         {
-            return null;
-         }
+         var info = ui.GetTranslationInfo();
 
          if( _ongoingOperations.Contains( ui ) )
          {
@@ -857,8 +859,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info, bool supportsStabilization, TranslationContext context = null )
       {
-         // Get the trimmed text
-         text = ( text ?? ui.GetText() ).TrimIfConfigured();
+         // make sure text exists
+         text = text ?? ui.GetText();
+         if( context == null )
+         {
+            // Get the trimmed text
+            text = text.TrimIfConfigured();
+         }
+
+         //Logger.Current.Debug( ui.GetType().Name + ": " + text );
 
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui ) && !IsCurrentlySetting( info ) )
@@ -866,7 +875,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             info?.Reset( text );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = new TranslationKey( ui, text, isSpammer, context != null );
-
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
@@ -876,7 +884,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( !string.IsNullOrEmpty( translation ) )
                {
-                  SetTranslatedText( ui, textKey.Untemplate( translation ), info );
+                  if( context == null ) // never set text if operation is contextualized (only a part translation)
+                  {
+                     SetTranslatedText( ui, textKey.Untemplate( translation ), info );
+                  }
                   return translation;
                }
             }
@@ -890,11 +901,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var result = parser.Parse( text );
                      if( result.HasRichSyntax )
                      {
-                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                        var isWhitelisted = ui.IsWhitelistedForImmediateRichTextTranslation();
+
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, isWhitelisted );
                         if( translation != null )
                         {
                            SetTranslatedText( ui, translation, info );
                            return translation;
+                        }
+                        else if( isWhitelisted )
+                        {
+                           return null;
                         }
                      }
                   }
@@ -1023,9 +1040,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var value = kvp.Value.TrimIfConfigured();
             if( !string.IsNullOrEmpty( value ) && IsTranslatable( value ) )
             {
-               var valueKey = new TranslationKey( ui, value, false, true );
                string partTranslation;
-               if( TryGetTranslation( valueKey, out partTranslation ) )
+               if( TryGetTranslation( value, out partTranslation ) )
                {
                   translations.Add( key, partTranslation );
                }
@@ -1033,7 +1049,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   // incomplete, must start job
                   var context = new TranslationContext( ui, result );
-                  TranslateOrQueueWebJobImmediate( null, value, null, false, context );
+                  TranslateOrQueueWebJobImmediate( ui, value, null, false, context );
                }
             }
             else
@@ -1097,7 +1113,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !_initialized )
          {
             _initialized = true;
-            Initialize();
+
+            try
+            {
+               Initialize();
+               ManualHook();
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "An unexpected error occurred during plugin initialization." );
+            }
          }
       }
 
@@ -1147,6 +1172,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                else if( ( Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt ) ) && Input.GetKeyDown( KeyCode.R ) )
                {
                   ReloadTranslations();
+               }
+               else if( ( Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt ) ) && Input.GetKeyDown( KeyCode.U ) )
+               {
+                  ManualHook();
                }
             }
          }
@@ -1376,7 +1405,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var text = component.GetText().TrimIfConfigured();
                      if( text == job.Key.OriginalText )
                      {
-                        var info = component.GetTranslationInfo( false );
+                        var info = component.GetTranslationInfo();
                         SetTranslatedText( component, job.TranslatedText, info );
                      }
                   }
@@ -1398,7 +1427,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var text = context.Component.GetText().TrimIfConfigured();
                         var result = context.Result;
                         Dictionary<string, string> translations = new Dictionary<string, string>();
-                        var translatedText = TranslateOrQueueWebJobImmediateByParserResult( null, result, false );
+                        var translatedText = TranslateOrQueueWebJobImmediateByParserResult( context.Component, result, false );
 
                         if( !string.IsNullOrEmpty( translatedText ) )
                         {
@@ -1412,7 +1441,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               if( translatedText != null )
                               {
-                                 var info = context.Component.GetTranslationInfo( false );
+                                 var info = context.Component.GetTranslationInfo();
                                  SetTranslatedText( context.Component, translatedText, info );
                               }
                            }
@@ -1607,6 +1636,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void ManualHook()
+      {
+         foreach( var root in GetAllRoots() )
+         {
+            TraverseChildrenManualHook( root );
+         }
+      }
+
       private IEnumerable<GameObject> GetAllRoots()
       {
          var objects = GameObject.FindObjectsOfType<GameObject>();
@@ -1640,6 +1677,40 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
          }
+      }
+
+      private void TraverseChildrenManualHook( GameObject obj )
+      {
+         if( obj != null )
+         {
+            var components = obj.GetComponents<Component>();
+            foreach( var component in components )
+            {
+               if( component.IsKnownType() )
+               {
+                  Hook_TextChanged( component );
+               }
+            }
+
+            if( obj.transform != null )
+            {
+               for( int i = 0 ; i < obj.transform.childCount ; i++ )
+               {
+                  var child = obj.transform.GetChild( i );
+                  TraverseChildrenManualHook( child.gameObject );
+               }
+            }
+         }
+      }
+
+      public void DisableAutoTranslator()
+      {
+         _temporarilyDisabled = true;
+      }
+
+      public void EnableAutoTranslator()
+      {
+         _temporarilyDisabled = false;
       }
    }
 }
