@@ -1,4 +1,7 @@
-﻿### 2.15.0
+﻿### 2.15.1
+ * BUG FIX - Updated TKK retrieval logic. Improved error message if it cannot be retrieved.
+
+### 2.15.0
  * FEATURE - Manual hooking - press ALT + U. This will lookup all game objects and attempt translation immediately
  * FEATURE - Capability for other plugins to tell the Auto Translator not to translate texts
  * BUG FIX - Initialization hooking that will attempt to hook any game object that was missed during game initialization

@@ -21,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       //protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
-      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
+      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
       //private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
       private static readonly System.Random RandomNumbers = new System.Random();
 
@@ -201,21 +201,58 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   var html = downloadResult.Result;
 
                   const string lookup = "TKK=eval('";
-                  var lookupIndex = html.IndexOf( lookup ) + lookup.Length;
-                  var openClamIndex = html.IndexOf( '{', lookupIndex );
-                  var closeClamIndex = html.IndexOf( '}', openClamIndex );
-                  var functionIndex = html.IndexOf( "function", lookupIndex );
-                  var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
-                  var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
+                  var index = html.IndexOf( lookup );
+                  if( index > -1 ) // jurassic approach
+                  {
+                     var lookupIndex = index + lookup.Length;
+                     var openClamIndex = html.IndexOf( '{', lookupIndex );
+                     var closeClamIndex = html.IndexOf( '}', openClamIndex );
+                     var functionIndex = html.IndexOf( "function", lookupIndex );
+                     var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
+                     var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
 
-                  // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
-                  ScriptEngine engine = new ScriptEngine();
-                  engine.Evaluate( decodedScript );
-                  var result = engine.CallGlobalFunction<string>( "FuncName" );
+                     // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
+                     ScriptEngine engine = new ScriptEngine();
+                     engine.Evaluate( decodedScript );
+                     var result = engine.CallGlobalFunction<string>( "FuncName" );
 
-                  var parts = result.Split( '.' );
-                  m = long.Parse( parts[ 0 ] );
-                  s = long.Parse( parts[ 1 ] );
+                     var parts = result.Split( '.' );
+                     if( parts.Length == 2 )
+                     {
+                        m = long.Parse( parts[ 0 ] );
+                        s = long.Parse( parts[ 1 ] );
+                     }
+                     else
+                     {
+                        Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
+                     }
+                  }
+                  else
+                  {
+                     const string lookup2 = "TKK='";
+                     index = html.IndexOf( lookup2 );
+                     if( index > -1 ) // simple string approach
+                     {
+                        var startIndex = index + lookup2.Length;
+                        var endIndex = html.IndexOf( "'", startIndex );
+                        var result = html.Substring( startIndex, endIndex - startIndex );
+
+                        var parts = result.Split( '.' );
+                        if( parts.Length == 2 )
+                        {
+                           m = long.Parse( parts[ 0 ] );
+                           s = long.Parse( parts[ 1 ] );
+                        }
+                        else
+                        {
+                           Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
+                        }
+                     }
+                     else
+                     {
+                        Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
+                     }
+                  }
                }
                catch( Exception e )
                {
@@ -226,7 +263,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
-            Logger.Current.Error( "An error occurred while setting up GoogleTranslate Cookie/TKK." + Environment.NewLine + error );
+            Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Using fallback TKK values instead." + Environment.NewLine + error );
          }
       }
 
