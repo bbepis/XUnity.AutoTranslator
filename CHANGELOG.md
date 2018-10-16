@@ -1,4 +1,7 @@
-﻿### 2.15.1
+﻿### 2.15.2
+ * BUG FIX - Fixed bug that could cause hooking not to work when hooks were overriden by external plugin
+
+### 2.15.1
  * BUG FIX - Updated TKK retrieval logic. Improved error message if it cannot be retrieved.
 
 ### 2.15.0

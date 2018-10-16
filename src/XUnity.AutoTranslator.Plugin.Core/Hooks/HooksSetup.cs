@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUGUI || Settings.EnableUtage )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
+               success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( UGUIHooks.All );
@@ -44,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMeshPro )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
+               success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( TextMeshProHooks.All );
@@ -60,7 +60,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableNGUI )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
+               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( NGUIHooks.All );
@@ -76,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.Hook_TextChanged_WithResult );
+               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( IMGUIHooks.All );
