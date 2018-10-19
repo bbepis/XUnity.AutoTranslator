@@ -66,7 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private List<string> _textsToCopyToClipboardOrdered = new List<string>();
       private HashSet<string> _textsToCopyToClipboard = new HashSet<string>();
-      private float _clipboardUpdated = Time.realtimeSinceStartup;
+      private float _clipboardUpdated = 0.0f;
 
       /// <summary>
       /// The number of http translation errors that has occurred up until now.
@@ -83,6 +83,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// This function will check if there are symbols of a given language contained in a string.
       /// </summary>
       private Func<string, bool> _symbolCheck;
+
+      /// <summary>
+      /// Texts currently being scheduled for translation by 'immediate' components.
+      /// </summary>
+      private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
       private object _advEngine;
       private float? _nextAdvUpdate;
@@ -110,7 +115,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _secondForQueuedTranslation = -1;
       private int _consecutiveSecondsTranslated = 0;
 
-      private bool _changeFont = false;
+      private bool _hasOverrideFont = false;
+      private bool _overrideFont = false;
       private bool _initialized = false;
       private bool _temporarilyDisabled = false;
 
@@ -169,8 +175,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               _changeFont = true;
+               _hasOverrideFont = true;
             }
+
+            _overrideFont = _hasOverrideFont;
          }
 
          LoadTranslations();
@@ -467,8 +475,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( previouslyQueuedText != null )
             {
-               if( untranslatedText.StartsWith( previouslyQueuedText ) || previouslyQueuedText.StartsWith( untranslatedText )
-                  || untranslatedText.EndsWith( previouslyQueuedText ) || previouslyQueuedText.EndsWith( untranslatedText ) )
+               if( untranslatedText.RemindsOf( previouslyQueuedText ) )
                {
                   wasProblematic = true;
                   break;
@@ -693,6 +700,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      public void Hook_HandleFont( object ui )
+      {
+         if( _hasOverrideFont )
+         {
+            var info = ui.GetTranslationInfo();
+            if( _overrideFont )
+            {
+               info?.ChangeFont( ui );
+            }
+            else
+            {
+               info?.UnchangeFont( ui );
+            }
+         }
+      }
 
       /// <summary>
       /// Sets the text of a UI  text, while ensuring this will not fire a text changed event.
@@ -703,24 +725,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               // TODO: Disable ANY Hook
                _hooksEnabled = false;
 
                if( info != null )
                {
                   info.IsCurrentlySettingText = true;
-               }
-
-               if( _changeFont )
-               {
-                  if( isTranslated )
-                  {
-                     info?.ChangeFont( ui );
-                  }
-                  else
-                  {
-                     info?.UnchangeFont( ui );
-                  }
                }
 
                if( Settings.EnableUIResizing )
@@ -1024,18 +1033,49 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else if( !isSpammer || ( isSpammer && IsShortText( text ) ) )
                {
-                  // Lets try not to spam a service that might not be there...
-                  if( _endpoint != null )
+                  if( context != null )
                   {
-                     if( !Settings.IsShutdown )
+                     // if there is a context, this is a part-translation, which means it is not a candidate for scrolling-in text
+                     if( _endpoint != null )
                      {
-                        var job = GetOrCreateTranslationJobFor( ui, textKey, context );
+                        if( !Settings.IsShutdown )
+                        {
+                           // once the text has stabilized, attempt to look it up
+                           var job = GetOrCreateTranslationJobFor( ui, textKey, context );
+                        }
+                     }
+                     else
+                     {
+                        QueueNewUntranslatedForDisk( textKey );
                      }
                   }
                   else
                   {
-                     QueueNewUntranslatedForDisk( textKey );
+                     StartCoroutine(
+                        WaitForTextStablization(
+                           textKey: textKey,
+                           delay: 1.0f,
+                           onTextStabilized: () =>
+                           {
+                              // Lets try not to spam a service that might not be there...
+                              if( _endpoint != null )
+                              {
+                                 // once the text has stabilized, attempt to look it up
+                                 if( !Settings.IsShutdown )
+                                 {
+                                    if( !TryGetTranslation( textKey, out translation ) )
+                                    {
+                                       var job = GetOrCreateTranslationJobFor( ui, textKey, context );
+                                    }
+                                 }
+                              }
+                              else
+                              {
+                                 QueueNewUntranslatedForDisk( textKey );
+                              }
+                           } ) );
                   }
+
                }
             }
          }
@@ -1115,6 +1155,53 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      /// <summary>
+      /// Utility method that allows me to wait to call an action, until
+      /// the text has stopped changing. This is important for 'story'
+      /// mode text, which 'scrolls' into place slowly. This version is
+      /// for global text, where the component cannot tell us if the text
+      /// has changed itself.
+      /// </summary>
+      public IEnumerator WaitForTextStablization( TranslationKey textKey, float delay, Action onTextStabilized, Action onFailed = null )
+      {
+         var text = textKey.GetDictionaryLookupKey();
+
+         if( !_immediatelyTranslating.Contains( text ) )
+         {
+            _immediatelyTranslating.Add( text );
+            try
+            {
+               yield return new WaitForSeconds( delay );
+
+               bool succeeded = true;
+               foreach( var otherImmediatelyTranslating in _immediatelyTranslating )
+               {
+                  if( text != otherImmediatelyTranslating )
+                  {
+                     if( text.RemindsOf( otherImmediatelyTranslating ) )
+                     {
+                        succeeded = false;
+                        break;
+                     }
+                  }
+               }
+
+               if( succeeded )
+               {
+                  onTextStabilized();
+               }
+               else
+               {
+                  onFailed?.Invoke();
+               }
+            }
+            finally
+            {
+               _immediatelyTranslating.Remove( text );
+            }
+         }
+      }
+
       public IEnumerator DelayForSeconds( float delay, Action onContinue )
       {
          yield return new WaitForSeconds( delay );
@@ -1178,6 +1265,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                else if( ( Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt ) ) && Input.GetKeyDown( KeyCode.T ) )
                {
                   ToggleTranslation();
+               }
+               else if( ( Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt ) ) && Input.GetKeyDown( KeyCode.F ) )
+               {
+                  ToggleFont();
                }
                else if( ( Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt ) ) && Input.GetKeyDown( KeyCode.D ) )
                {
@@ -1539,6 +1630,60 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             _newUntranslated.Clear();
+         }
+      }
+
+      private void ToggleFont()
+      {
+         if( _hasOverrideFont )
+         {
+            _overrideFont = !_overrideFont;
+
+            var objects = ObjectExtensions.GetAllRegisteredObjects();
+            Logger.Current.Info( $"Toggling fonts of {objects.Count} objects." );
+
+            if( _overrideFont )
+            {
+               // make sure we use the translated version of all texts
+               foreach( var kvp in objects )
+               {
+                  var ui = kvp.Key;
+                  try
+                  {
+                     if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                     {
+                        var info = (TranslationInfo)kvp.Value;
+                        info?.ChangeFont( ui );
+                     }
+                  }
+                  catch( Exception )
+                  {
+                     // not super pretty, no...
+                     ObjectExtensions.Remove( ui );
+                  }
+               }
+            }
+            else
+            {
+               // make sure we use the original version of all texts
+               foreach( var kvp in objects )
+               {
+                  var ui = kvp.Key;
+                  try
+                  {
+                     if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                     {
+                        var info = (TranslationInfo)kvp.Value;
+                        info?.UnchangeFont( ui );
+                     }
+                  }
+                  catch( Exception )
+                  {
+                     // not super pretty, no...
+                     ObjectExtensions.Remove( ui );
+                  }
+               }
+            }
          }
       }
 

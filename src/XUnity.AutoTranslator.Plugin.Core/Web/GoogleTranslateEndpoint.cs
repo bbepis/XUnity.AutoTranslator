@@ -39,8 +39,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private bool _hasSetup = false;
       //private bool _hasSetupCustomUserAgent = false;
       //private string _popularUserAgent;
-      private long m = 425635;
-      private long s = 1953544246;
+      private long m = 427761;
+      private long s = 1179739010;
 
       public GoogleTranslateEndpoint()
       {
@@ -99,7 +99,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             {
                yield return enumerator.Current;
             }
-
          }
       }
 

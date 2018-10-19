@@ -393,5 +393,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          return String.Empty;
       }
+
+      public static bool RemindsOf( this string that, string other )
+      {
+         return that.StartsWith( other ) || other.StartsWith( that ) || that.EndsWith( other ) || other.EndsWith( that );
+      }
    }
 }

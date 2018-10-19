@@ -28,11 +28,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUGUI || Settings.EnableUtage )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               if( !success )
-               {
-                  harmony.PatchAll( UGUIHooks.All );
-               }
+               UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+               harmony.PatchAll( UGUIHooks.All );
             }
          }
          catch( Exception e )

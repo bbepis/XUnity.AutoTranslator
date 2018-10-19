@@ -92,6 +92,7 @@ The following key inputs are mapped:
  * ALT + D: Dump untranslated texts (if no endpoint is configured)
  * ALT + R: Reload translation files. Useful if you change the text files on the fly.
  * ALT + U: Manual hooking. The default hooks wont always pick up texts. This will attempt to make lookups manually.
+ * ALT + F: If OverrideFont is configured, will toggle between overridden and default font.
 
 ## Installation
 The plugin can be installed in following ways:
