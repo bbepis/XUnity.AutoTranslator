@@ -66,9 +66,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var ui = graphic as Text;
 
             var previousFont = ui.font;
-            var newFont = FontCache.GetOrCreate( previousFont.fontSize );
+            var newFont = FontCache.GetOrCreate( previousFont?.fontSize ?? ui.fontSize );
 
-            if( newFont != previousFont )
+            if( !ReferenceEquals( newFont, previousFont ) )
             {
                ui.font = newFont;
                _unfont = obj =>
