@@ -6,22 +6,22 @@ using Harmony;
 using UnityEngine;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TranslationInfo
    {
-      private static readonly string OnEnableMethodName = "OnEnable";
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
-      private static readonly string UILabelClassName = "UILabel";
 
       private Action<object> _unresize;
       private Action<object> _unfont;
 
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
+      private object _alteredSpacing;
 
       public TranslationInfo()
       {
@@ -106,11 +106,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // likelihood that it will go into multiple lines too.
             var originalHorizontalOverflow = ui.horizontalOverflow;
             var originalVerticalOverflow = ui.verticalOverflow;
+            var originalLineSpacing = ui.lineSpacing;
 
             if( isComponentWide && !ui.resizeTextForBestFit )
             {
                ui.horizontalOverflow = HorizontalWrapMode.Wrap;
                ui.verticalOverflow = VerticalWrapMode.Overflow;
+               if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalLineSpacing ) )
+               {
+                  var alteredSpacing = originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
+                  _alteredSpacing = alteredSpacing;
+                  ui.lineSpacing = alteredSpacing;
+               }
 
                if( _unresize == null )
                {
@@ -119,6 +126,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var gui = (Text)g;
                      gui.horizontalOverflow = originalHorizontalOverflow;
                      gui.verticalOverflow = originalVerticalOverflow;
+                     if( Settings.ResizeUILineSpacingScale.HasValue )
+                     {
+                        gui.lineSpacing = originalLineSpacing;
+                     }
                   };
                }
             }
@@ -128,13 +139,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var type = graphic.GetType();
 
             // special handling for NGUI to better handle textbox sizing
-            if( type.Name == UILabelClassName )
+            if( type == Constants.Types.UILabel )
             {
                var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
                var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+               //var originalSpacingY = graphic.GetSpacingY();
 
                type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
                type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
+               //if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalSpacingY ) )
+               //{
+               //   var alteredSpacing = originalSpacingY.Multiply( Settings.ResizeUILineSpacingScale.Value );
+               //   _alteredSpacing = alteredSpacing;
+               //   graphic.SetSpacingY( alteredSpacing );
+               //}
 
                if( _unresize == null )
                {
@@ -143,6 +161,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var gtype = g.GetType();
                      gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
                      gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
+                     //if( Settings.ResizeUILineSpacingScale.HasValue )
+                     //{
+                     //   g.SetSpacingY( originalSpacingY );
+                     //}
                   };
                }
             }

@@ -592,8 +592,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void AddTranslation( TranslationKey key, string value )
       {
-         _translations[ key.GetDictionaryLookupKey() ] = value;
-         _reverseTranslations[ value ] = key.GetDictionaryLookupKey();
+         var lookup = key.GetDictionaryLookupKey();
+         _translations[ lookup ] = value;
+         _reverseTranslations[ value ] = lookup;
       }
 
       private void QueueNewUntranslatedForClipboard( TranslationKey key )
@@ -700,7 +701,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Hook_HandleFont( object ui )
+      public void Hook_HandleComponent( object ui )
       {
          if( _hasOverrideFont )
          {
@@ -712,6 +713,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             else
             {
                info?.UnchangeFont( ui );
+            }
+         }
+
+         if( Settings.ForceUIResizing )
+         {
+            var info = ui.GetTranslationInfo();
+            if( info?.IsCurrentlySettingText == false )
+            {
+               // force UI resizing is highly problematic for NGUI because text should somehow
+               // be set after changing "resize" properties... brilliant stuff
+               if( ui.GetType() != Constants.Types.UILabel )
+               {
+                  info?.ResizeUI( ui );
+               }
             }
          }
       }
@@ -732,9 +747,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   info.IsCurrentlySettingText = true;
                }
 
-               if( Settings.EnableUIResizing )
+               if( Settings.EnableUIResizing || Settings.ForceUIResizing )
                {
-                  if( isTranslated )
+                  if( isTranslated || Settings.ForceUIResizing )
                   {
                      info?.ResizeUI( ui );
                   }
@@ -883,6 +898,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info, bool supportsStabilization, bool ignoreComponentState, TranslationContext context = null )
       {
          // make sure text exists
+         var originalText = text;
          text = text ?? ui.GetText();
          if( context == null )
          {
@@ -895,7 +911,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
-            info?.Reset( text );
+            info?.Reset( originalText );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = new TranslationKey( ui, text, isSpammer, context != null );
 
@@ -972,11 +988,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
+                                 originalText = stabilizedText;
+                                 stabilizedText = stabilizedText.TrimIfConfigured();
+
                                  var stabilizedTextKey = new TranslationKey( ui, stabilizedText, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
-                                 info?.Reset( stabilizedText );
+                                 info?.Reset( originalText );
 
                                  // once the text has stabilized, attempt to look it up
                                  if( TryGetTranslation( stabilizedTextKey, out translation ) )
@@ -1141,7 +1160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( beforeText == afterText )
             {
-               onTextStabilized( afterText.TrimIfConfigured() );
+               onTextStabilized( afterText );
                succeeded = true;
                break;
             }

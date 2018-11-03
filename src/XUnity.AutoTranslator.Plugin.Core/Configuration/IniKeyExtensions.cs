@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using ExIni;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
@@ -11,57 +12,72 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    {
       public static T GetOrDefault<T>( this IniKey that, T defaultValue, bool allowEmpty = false )
       {
+         var typeOfT = typeof( T ).UnwrapNullable();
          if( !allowEmpty )
          {
             var value = that.Value;
             if( string.IsNullOrEmpty( value ) )
             {
-               if( typeof( T ).IsEnum )
+               if( defaultValue != null )
                {
-                  that.Value = Enum.GetName( typeof( T ), defaultValue );
+                  if( typeOfT.IsEnum )
+                  {
+                     that.Value = Enum.GetName( typeOfT, defaultValue );
+                  }
+                  else
+                  {
+                     that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+                  }
                }
                else
                {
-                  that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+                  that.Value = string.Empty;
                }
                return defaultValue;
             }
             else
             {
-               if( typeof( T ).IsEnum )
+               if( typeOfT.IsEnum )
                {
-                  return (T)Enum.Parse( typeof( T ), that.Value, true );
+                  return (T)Enum.Parse( typeOfT, that.Value, true );
                }
                else
                {
-                  return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+                  return (T)Convert.ChangeType( that.Value, typeOfT, CultureInfo.InvariantCulture );
                }
             }
          }
          else
          {
             var value = that.Value;
-            if( value == null )
+            if( string.IsNullOrEmpty( value ) )
             {
-               if( typeof( T ).IsEnum )
+               if( defaultValue != null )
                {
-                  that.Value = Enum.GetName( typeof( T ), defaultValue );
+                  if( typeOfT.IsEnum )
+                  {
+                     that.Value = Enum.GetName( typeOfT, defaultValue );
+                  }
+                  else
+                  {
+                     that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+                  }
                }
                else
                {
-                  that.Value = Convert.ToString( defaultValue, CultureInfo.InvariantCulture );
+                  that.Value = string.Empty;
                }
                return defaultValue;
             }
             else
             {
-               if( typeof( T ).IsEnum )
+               if( typeOfT.IsEnum )
                {
-                  return (T)Enum.Parse( typeof( T ), that.Value, true );
+                  return (T)Enum.Parse( typeOfT, that.Value, true );
                }
                else
                {
-                  return (T)Convert.ChangeType( that.Value, typeof( T ), CultureInfo.InvariantCulture );
+                  return (T)Convert.ChangeType( that.Value, typeOfT, CultureInfo.InvariantCulture );
                }
             }
          }

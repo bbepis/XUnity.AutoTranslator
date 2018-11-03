@@ -57,6 +57,8 @@ TrimAllText=True                 ;Indicates whether spaces in front and behind t
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
 WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline removal should be handled before attempting translation. Can be ["TrimPerNewline", "AllOccurrences"]
+ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
+ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent

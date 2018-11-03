@@ -10,6 +10,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 {
    public static class TextMeshProHooks
    {
+      public static bool HooksOverriden = false;
+
       public static readonly Type[] All = new[] {
          typeof( TeshMeshProUGUIOnEnableHook ),
          typeof( TeshMeshProOnEnableHook ),
@@ -38,7 +40,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -57,7 +63,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -76,7 +86,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -95,7 +109,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -114,7 +132,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -133,7 +155,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -152,7 +178,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -171,7 +201,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -190,7 +224,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 }

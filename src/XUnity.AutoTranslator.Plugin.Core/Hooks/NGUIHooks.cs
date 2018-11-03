@@ -12,6 +12,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
    public static class NGUIHooks
    {
+      public static bool HooksOverriden = false;
+
       public static readonly Type[] All = new[] {
          typeof( TextPropertyHook ),
          typeof( OnEnableHook )
@@ -33,7 +35,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !NGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -52,7 +58,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         if( !NGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 }

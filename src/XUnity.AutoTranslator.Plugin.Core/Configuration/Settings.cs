@@ -76,6 +76,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string OverrideFont;
       public static string UserAgent;
       public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
+      public static float? ResizeUILineSpacingScale;
+      public static bool ForceUIResizing;
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
@@ -126,6 +128,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
+         ResizeUILineSpacingScale = Config.Current.Preferences[ "Behaviour" ][ "ResizeUILineSpacingScale" ].GetOrDefault<float?>( null, true );
+         ForceUIResizing = Config.Current.Preferences[ "Behaviour" ][ "ForceUIResizing" ].GetOrDefault( false );
 
          // special handling because of enum parsing
          try

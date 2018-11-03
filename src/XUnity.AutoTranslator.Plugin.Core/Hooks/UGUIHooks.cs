@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
          }
-         AutoTranslationPlugin.Current.Hook_HandleFont( __instance );
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 
@@ -62,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
          }
-         AutoTranslationPlugin.Current.Hook_HandleFont( __instance );
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
    }
 }

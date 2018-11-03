@@ -1,4 +1,8 @@
-﻿### 2.15.3
+﻿### 2.15.4
+ * MISC - Added configuration option to apply 'UI resize behaviour' to all components regardless of them being translated: ForceUIResizing
+ * MISC - Added configuration option to change line spacing for UGUI within the 'UI resize behaviour': ResizeUILineSpacingScale
+
+### 2.15.3
  * BUG FIX - Potential crash during startup where potentially 'illegal' property was being read.
  * MISC - Support 'scrolling text' for immediate components such as IMGUI. Previously such behaviour would shut down the plugin.
  * MISC - Changed behaviour of font overriding. All found Text instances will now have their fonts changed.
