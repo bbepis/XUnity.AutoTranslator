@@ -23,13 +23,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
 
-         bool success = false;
          try
          {
             if( Settings.EnableUGUI || Settings.EnableUtage )
             {
                UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                harmony.PatchAll( UGUIHooks.All );
+               harmony.PatchAll( UGUIImageHooks.All );
             }
          }
          catch( Exception e )
@@ -41,11 +41,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMeshPro )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               if( !success )
-               {
-                  harmony.PatchAll( TextMeshProHooks.All );
-               }
+               TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+               harmony.PatchAll( TextMeshProHooks.All );
             }
          }
          catch( Exception e )
@@ -57,11 +54,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableNGUI )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               if( !success )
-               {
-                  harmony.PatchAll( NGUIHooks.All );
-               }
+               NGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+               harmony.PatchAll( NGUIHooks.All );
+               harmony.PatchAll( NGUIImageHooks.All );
             }
          }
          catch( Exception e )
@@ -73,7 +68,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+               var success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                if( !success )
                {
                   harmony.PatchAll( IMGUIHooks.All );
@@ -103,6 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             Logger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
          }
+
       }
 
       public static bool SetupHook( string eventName, Func<object, string, string> callback )

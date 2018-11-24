@@ -30,12 +30,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TextMeshProUGUI != null;
+         return ClrTypes.TextMeshProUGUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TextMeshProUGUI, "OnEnable" );
+         return AccessTools.Method( ClrTypes.TextMeshProUGUI, "OnEnable" );
       }
 
       static void Postfix( object __instance )
@@ -53,12 +53,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TextMeshPro != null;
+         return ClrTypes.TextMeshPro != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TextMeshPro, "OnEnable" );
+         return AccessTools.Method( ClrTypes.TextMeshPro, "OnEnable" );
       }
 
       static void Postfix( object __instance )
@@ -76,12 +76,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( Types.TMP_Text, "text" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.TMP_Text, "text" ).GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -99,12 +99,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetText", new[] { typeof( StringBuilder ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetText", new[] { typeof( StringBuilder ) } );
       }
 
       static void Postfix( object __instance )
@@ -122,12 +122,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetText", new[] { typeof( string ), typeof( bool ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetText", new[] { typeof( string ), typeof( bool ) } );
       }
 
       static void Postfix( object __instance )
@@ -145,12 +145,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetText", new[] { typeof( string ), typeof( float ), typeof( float ), typeof( float ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetText", new[] { typeof( string ), typeof( float ), typeof( float ), typeof( float ) } );
       }
 
       static void Postfix( object __instance )
@@ -168,12 +168,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetCharArray", new[] { typeof( char[] ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetCharArray", new[] { typeof( char[] ) } );
       }
 
       static void Postfix( object __instance )
@@ -191,12 +191,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
       }
 
       static void Postfix( object __instance )
@@ -214,12 +214,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.TMP_Text != null;
+         return ClrTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Types.TMP_Text, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
+         return AccessTools.Method( ClrTypes.TMP_Text, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
       }
 
       static void Postfix( object __instance )

@@ -16,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            SupportsClipboard = Types.TextEditor?.GetProperty( "text" )?.GetSetMethod() != null;
+            SupportsClipboard = ClrTypes.TextEditor?.GetProperty( "text" )?.GetSetMethod() != null;
          }
          catch( Exception )
          {
@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
-            SupportsCustomYieldInstruction = Types.CustomYieldInstruction != null;
+            SupportsCustomYieldInstruction = ClrTypes.CustomYieldInstruction != null;
          }
          catch( Exception )
          {

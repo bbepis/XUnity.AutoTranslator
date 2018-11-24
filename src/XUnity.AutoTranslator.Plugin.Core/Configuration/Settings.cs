@@ -79,6 +79,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
 
+      public static string TextureDirectory;
+      public static bool EnableTextureTranslation;
+      public static bool EnableTextureDumping;
+      public static bool EnableTextureToggling;
+      public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
+
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
 
@@ -117,7 +123,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 200 );
-         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( Types.AdvEngine == null );
+         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( ClrTypes.AdvEngine == null );
          IgnoreWhitespaceInNGUI = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInNGUI" ].GetOrDefault( true );
          MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
@@ -125,11 +131,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          MaxClipboardCopyCharacters = Config.Current.Preferences[ "Behaviour" ][ "MaxClipboardCopyCharacters" ].GetOrDefault( 450 );
          EnableUIResizing = Config.Current.Preferences[ "Behaviour" ][ "EnableUIResizing" ].GetOrDefault( true );
          EnableBatching = Config.Current.Preferences[ "Behaviour" ][ "EnableBatching" ].GetOrDefault( true );
-         TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( Types.AdvEngine == null );
+         TrimAllText = Config.Current.Preferences[ "Behaviour" ][ "TrimAllText" ].GetOrDefault( ClrTypes.AdvEngine == null );
          UseStaticTranslations = Config.Current.Preferences[ "Behaviour" ][ "UseStaticTranslations" ].GetOrDefault( true );
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
          ResizeUILineSpacingScale = Config.Current.Preferences[ "Behaviour" ][ "ResizeUILineSpacingScale" ].GetOrDefault<float?>( null, true );
          ForceUIResizing = Config.Current.Preferences[ "Behaviour" ][ "ForceUIResizing" ].GetOrDefault( false );
+
+
+         TextureDirectory = Config.Current.Preferences[ "Texture" ][ "TextureDirectory" ].GetOrDefault( @"Translation\Texture" );
+         EnableTextureTranslation = Config.Current.Preferences[ "Texture" ][ "EnableTextureTranslation" ].GetOrDefault( false );
+         EnableTextureDumping = Config.Current.Preferences[ "Texture" ][ "EnableTextureDumping" ].GetOrDefault( false );
+         EnableTextureToggling = Config.Current.Preferences[ "Texture" ][ "EnableTextureToggling" ].GetOrDefault( false );
+         TextureHashGenerationStrategy = Config.Current.Preferences[ "Texture" ][ "TextureHashGenerationStrategy" ].GetOrDefault( TextureHashGenerationStrategy.FromImageNameThenData );
 
          // special handling because of enum parsing
          try

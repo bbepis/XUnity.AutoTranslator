@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -57,9 +58,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          '９',
          '.'
       };
+      private static readonly HashSet<char> InvalidFileNameChars = new HashSet<char>( Path.GetInvalidFileNameChars() );
 
       private static readonly char[] NewlinesCharacters = new char[] { '\r', '\n' };
       private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
+
+
+
+      public static string SanitizeForFileSystem( this string path )
+      {
+         var builder = new StringBuilder( path.Length );
+         foreach( var c in path )
+         {
+            if( !InvalidFileNameChars.Contains( c ) )
+            {
+               builder.Append( c );
+            }
+         }
+         return builder.ToString();
+      }
 
       public static TemplatedString TemplatizeByNumbers( this string str )
       {

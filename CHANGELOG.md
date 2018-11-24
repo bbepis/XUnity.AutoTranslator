@@ -1,4 +1,9 @@
-﻿### 2.15.4
+﻿### 3.0.0
+ * FEATURE - Support image dumping and loading (not automatic!). Disabled by default
+ * BUG FIX - Fixed toggle translation which was broken in 2.15.4
+ * MISC - Cleaned up configuration parameter names. Automatically migrated
+
+### 2.15.4
  * MISC - Added configuration option to apply 'UI resize behaviour' to all components regardless of them being translated: ForceUIResizing
  * MISC - Added configuration option to change line spacing for UGUI within the 'UI resize behaviour': ResizeUILineSpacingScale
 

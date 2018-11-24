@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
    public abstract class KnownWwwEndpoint : IKnownEndpoint
    {
-      protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
+      protected static readonly ConstructorInfo WwwConstructor = Constants.ClrTypes.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
 
       private bool _isBusy = false;
 
@@ -66,7 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   string error = null;
                   try
                   {
-                     error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
+                     error = (string)AccessTools.Property( Constants.ClrTypes.WWW, "error" ).GetValue( www, null );
                   }
                   catch( Exception e )
                   {
@@ -80,7 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                   }
                   else
                   {
-                     var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
+                     var text = (string)AccessTools.Property( Constants.ClrTypes.WWW, "text" ).GetValue( www, null );
 
                      if( text != null )
                      {

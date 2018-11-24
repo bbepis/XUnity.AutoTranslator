@@ -29,12 +29,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -48,12 +48,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -68,12 +68,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -87,12 +87,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -106,12 +106,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -125,12 +125,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -144,12 +144,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
       }
 
       static void Prefix( GUIContent title )
@@ -163,12 +163,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent[] contents )
@@ -185,12 +185,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoTextField", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( bool ), typeof( int ), typeof( GUIStyle ), typeof( string ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoTextField", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( bool ), typeof( int ), typeof( GUIStyle ), typeof( string ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -204,12 +204,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.GUI != null;
+         return Constants.ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessTools.Method( Constants.ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )

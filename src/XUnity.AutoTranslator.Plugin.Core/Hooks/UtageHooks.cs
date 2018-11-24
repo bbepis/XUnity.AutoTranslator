@@ -21,12 +21,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.AdvCommand != null;
+         return Constants.ClrTypes.AdvCommand != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.AdvCommand, "ParseCellLocalizedText", new Type[] { } );
+         return AccessTools.Method( Constants.ClrTypes.AdvCommand, "ParseCellLocalizedText", new Type[] { } );
       }
 
       static void Postfix( object __instance, ref string __result )
@@ -44,12 +44,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.AdvEngine != null;
+         return Constants.ClrTypes.AdvEngine != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.AdvEngine, "JumpScenario", new Type[] { typeof( string ) } );
+         return AccessTools.Method( Constants.ClrTypes.AdvEngine, "JumpScenario", new Type[] { typeof( string ) } );
       }
 
       static void Prefix( ref string label )

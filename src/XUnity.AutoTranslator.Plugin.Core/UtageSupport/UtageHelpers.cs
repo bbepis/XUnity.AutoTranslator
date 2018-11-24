@@ -19,13 +19,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UtageSupport
          {
             try
             {
-               AdvManager = GameObject.FindObjectOfType( Constants.Types.AdvDataManager );
-               var ScenarioDataTblProperty = Constants.Types.AdvDataManager.GetProperty( "ScenarioDataTbl" );
+               AdvManager = GameObject.FindObjectOfType( Constants.ClrTypes.AdvDataManager );
+               var ScenarioDataTblProperty = Constants.ClrTypes.AdvDataManager.GetProperty( "ScenarioDataTbl" );
                var ScenarioDataTbl = ScenarioDataTblProperty.GetValue( AdvManager, empty );
                foreach( object labelToAdvScenarioDataKeyValuePair in (IEnumerable)ScenarioDataTbl )
                {
                   var labelToAdvScenarioDataKeyValuePairType = typeof( KeyValuePair<,> )
-                     .MakeGenericType( new Type[] { typeof( string ), Constants.Types.AdvScenarioData } );
+                     .MakeGenericType( new Type[] { typeof( string ), Constants.ClrTypes.AdvScenarioData } );
 
                   var AdvScenarioDataKey = (string)labelToAdvScenarioDataKeyValuePairType.GetProperty( "Key" )
                      .GetValue( labelToAdvScenarioDataKeyValuePair, empty );
@@ -44,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UtageSupport
                      foreach( object labelToAdvScenarioLabelDataKeyValuePair in (IEnumerable)labelToAdvScenarioLabelData )
                      {
                         var labelToAdvScenarioLabelDataKeyValuePairType = typeof( KeyValuePair<,> )
-                           .MakeGenericType( new Type[] { typeof( string ), Constants.Types.AdvScenarioLabelData } );
+                           .MakeGenericType( new Type[] { typeof( string ), Constants.ClrTypes.AdvScenarioLabelData } );
 
                         var AdvScenarioLabelDataKey = (string)labelToAdvScenarioLabelDataKeyValuePairType.GetProperty( "Key" )
                            .GetValue( labelToAdvScenarioLabelDataKeyValuePair, empty );

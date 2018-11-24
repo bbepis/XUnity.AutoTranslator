@@ -25,12 +25,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.UILabel != null;
+         return Constants.ClrTypes.UILabel != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( Constants.Types.UILabel, "text" ).GetSetMethod();
+         return AccessTools.Property( Constants.ClrTypes.UILabel, "text" ).GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -48,12 +48,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Constants.Types.UILabel != null;
+         return Constants.ClrTypes.UILabel != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Method( Constants.Types.UILabel, "OnEnable" );
+         return AccessTools.Method( Constants.ClrTypes.UILabel, "OnEnable" );
       }
 
       public static void Postfix( object __instance )

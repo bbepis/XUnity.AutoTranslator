@@ -11,7 +11,8 @@ using XUnity.AutoTranslator.Plugin.Core.Fonts;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class TranslationInfo
+
+   public class TextTranslationInfo
    {
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
@@ -23,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private MonoBehaviour _typewriter;
       private object _alteredSpacing;
 
-      public TranslationInfo()
+      public TextTranslationInfo()
       {
       }
 
@@ -41,19 +42,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _hasCheckedTypeWriter = true;
 
-            if( Constants.Types.Typewriter != null )
+            if( Constants.ClrTypes.Typewriter != null )
             {
                var ui = graphic as Component;
                if( ui != null )
                {
-                  _typewriter = (MonoBehaviour)ui.GetComponent( Constants.Types.Typewriter );
+                  _typewriter = (MonoBehaviour)ui.GetComponent( Constants.ClrTypes.Typewriter );
                }
             }
          }
 
          if( _typewriter != null )
          {
-            AccessTools.Method( Constants.Types.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
+            AccessTools.Method( Constants.ClrTypes.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
          }
       }
 
@@ -139,7 +140,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var type = graphic.GetType();
 
             // special handling for NGUI to better handle textbox sizing
-            if( type == Constants.Types.UILabel )
+            if( type == Constants.ClrTypes.UILabel )
             {
                var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
                var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
@@ -179,7 +180,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _unresize = null;
       }
 
-      public TranslationInfo Reset( string newText )
+      public TextTranslationInfo Reset( string newText )
       {
          IsTranslated = false;
          TranslatedText = null;

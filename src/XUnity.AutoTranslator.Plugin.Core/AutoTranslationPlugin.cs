@@ -89,6 +89,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
+      private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
+
       private object _advEngine;
       private float? _nextAdvUpdate;
 
@@ -99,7 +101,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private float _translationsQueuedPerSecond;
 
       private bool _isInTranslatedMode = true;
-      private bool _hooksEnabled = true;
+      private bool _textHooksEnabled = true;
+      private bool _imageHooksEnabled = true;
       private bool _batchLogicHasFailed = false;
 
       private int _availableBatchOperations = Settings.MaxAvailableBatchOperations;
@@ -201,6 +204,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
+      private IEnumerable<string> GetTextureFiles()
+      {
+         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ), $"*.png", SearchOption.AllDirectories )
+            .Select( x => x.Replace( "/", "\\" ) );
+      }
+
       private void MaintenanceLoop( object state )
       {
          while( true )
@@ -274,10 +283,47 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   LoadTranslationsInFile( fullFileName );
                }
             }
+
+            if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+            {
+               _translatedImages.Clear();
+               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ) );
+               foreach( var fullFileName in GetTextureFiles() )
+               {
+                  RegisterImageDataAndHash( fullFileName, null, null );
+               }
+            }
          }
          catch( Exception e )
          {
             Logger.Current.Error( e, "An error occurred while loading translations." );
+         }
+      }
+
+      private void RegisterImageDataAndHash( string fullFileName, string key, byte[] data )
+      {
+         if( key == null )
+         {
+            var fileName = Path.GetFileNameWithoutExtension( fullFileName );
+            var startHash = fileName.LastIndexOf( "[" );
+            var endHash = fileName.LastIndexOf( "]" );
+
+            if( endHash > -1 && startHash > -1 && endHash > startHash )
+            {
+               var takeFrom = startHash + 1;
+               key = fileName.Substring( takeFrom, endHash - takeFrom );
+            }
+         }
+
+         if( data == null )
+         {
+            data = File.ReadAllBytes( fullFileName );
+         }
+
+
+         if( key != null )
+         {
+            _translatedImages[ key ] = data;
          }
       }
 
@@ -584,6 +630,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private bool IsImageTranslated( string hash )
+      {
+         return _translatedImages.ContainsKey( hash );
+      }
+
+      private bool TryGetTranslatedImage( string hash, out byte[] data )
+      {
+         return _translatedImages.TryGetValue( hash, out data );
+      }
+
       private void AddTranslation( string key, string value )
       {
          _translations[ key ] = value;
@@ -663,9 +719,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string Hook_TextChanged_WithResult( object ui, string text )
       {
-         if( !ui.IsKnownType() ) return null;
+         if( !ui.IsKnownTextType() ) return null;
 
-         if( _hooksEnabled && !_temporarilyDisabled )
+         if( _textHooksEnabled && !_temporarilyDisabled )
          {
             return TranslateOrQueueWebJob( ui, text, false );
          }
@@ -674,9 +730,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string ExternalHook_TextChanged_WithResult( object ui, string text )
       {
-         if( !ui.IsKnownType() ) return null;
+         if( !ui.IsKnownTextType() ) return null;
 
-         if( _hooksEnabled && !_temporarilyDisabled )
+         if( _textHooksEnabled && !_temporarilyDisabled )
          {
             return TranslateOrQueueWebJob( ui, text, true );
          }
@@ -685,13 +741,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Hook_TextChanged( object ui )
       {
-         if( _hooksEnabled && !_temporarilyDisabled )
+         if( _textHooksEnabled && !_temporarilyDisabled )
          {
             TranslateOrQueueWebJob( ui, null, false );
          }
       }
 
-      private void SetTranslatedText( object ui, string translatedText, TranslationInfo info )
+      public void Hook_ImageChangedOnComponent( object source )
+      {
+         if( !_imageHooksEnabled ) return;
+         if( !source.IsKnownImageType() ) return;
+
+         HandleImage( source, null );
+      }
+
+      public void Hook_ImageChanged( Texture2D texture )
+      {
+         if( !_imageHooksEnabled ) return;
+         if( texture == null ) return;
+
+         HandleImage( null, texture );
+      }
+
+      private void SetTranslatedText( object ui, string translatedText, TextTranslationInfo info )
       {
          info?.SetTranslatedText( translatedText );
 
@@ -705,7 +777,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _hasOverrideFont )
          {
-            var info = ui.GetTranslationInfo();
+            var info = ui.GetTextTranslationInfo();
             if( _overrideFont )
             {
                info?.ChangeFont( ui );
@@ -718,12 +790,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( Settings.ForceUIResizing )
          {
-            var info = ui.GetTranslationInfo();
+            var info = ui.GetTextTranslationInfo();
             if( info?.IsCurrentlySettingText == false )
             {
                // force UI resizing is highly problematic for NGUI because text should somehow
                // be set after changing "resize" properties... brilliant stuff
-               if( ui.GetType() != Constants.Types.UILabel )
+               if( ui.GetType() != ClrTypes.UILabel )
                {
                   info?.ResizeUI( ui );
                }
@@ -734,13 +806,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <summary>
       /// Sets the text of a UI  text, while ensuring this will not fire a text changed event.
       /// </summary>
-      private void SetText( object ui, string text, bool isTranslated, TranslationInfo info )
+      private void SetText( object ui, string text, bool isTranslated, TextTranslationInfo info )
       {
          if( !info?.IsCurrentlySettingText ?? true )
          {
             try
             {
-               _hooksEnabled = false;
+               _textHooksEnabled = false;
 
                if( info != null )
                {
@@ -778,7 +850,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             finally
             {
-               _hooksEnabled = true;
+               _textHooksEnabled = true;
 
                if( info != null )
                {
@@ -801,7 +873,30 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return str.Length <= ( Settings.MaxCharactersPerTranslation / 2 );
       }
 
-      public bool ShouldTranslate( object ui, bool ignoreComponentState )
+      public bool ShouldTranslateImageComponent( object ui )
+      {
+         var component = ui as Component;
+         if( component != null )
+         {
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return false;
+            }
+
+            var behaviour = component as Behaviour;
+            if( behaviour?.isActiveAndEnabled == false )
+            {
+               return false;
+            }
+         }
+
+         return true;
+      }
+
+      public bool ShouldTranslateTextComponent( object ui, bool ignoreComponentState )
       {
          var component = ui as Component;
          if( component != null )
@@ -823,8 +918,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            var inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.InputField )
-               ?? component.gameObject.GetFirstComponentInSelfOrAncestor( Constants.Types.TMP_InputField );
+            var inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField )
+               ?? component.gameObject.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField );
 
             return inputField == null;
          }
@@ -834,7 +929,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private string TranslateOrQueueWebJob( object ui, string text, bool ignoreComponentState )
       {
-         var info = ui.GetTranslationInfo();
+         var info = ui.GetTextTranslationInfo();
 
          if( _ongoingOperations.Contains( ui ) )
          {
@@ -858,19 +953,218 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      public static bool IsCurrentlySetting( TranslationInfo info )
+      public static bool IsCurrentlySetting( TextTranslationInfo info )
       {
          if( info == null ) return false;
 
          return info.IsCurrentlySettingText;
       }
 
-      private string TranslateImmediate( object ui, string text, TranslationInfo info, bool ignoreComponentState )
+      private void HandleImage( object source, Texture2D texture )
+      {
+         // Make work with raw textures somehow?????
+         // work with obscure games? Sprite?
+
+         // Test without texture replacement (old! in old games!)
+
+         if( Settings.EnableTextureDumping )
+         {
+            try
+            {
+               DumpTexture( source, texture );
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "An error occurred while dumping texture." );
+            }
+         }
+
+         if( Settings.EnableTextureTranslation )
+         {
+            try
+            {
+               TranslateTexture( source, texture, false );
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "An error occurred while translating texture." );
+            }
+         }
+      }
+
+      private void TranslateTexture( object source, Texture2D texture, bool forceReload )
+      {
+         try
+         {
+            _imageHooksEnabled = false;
+
+            texture = texture ?? source.GetTexture();
+            if( texture == null ) return;
+
+            var tti = texture.GetTextureTranslationInfo();
+            var iti = source.GetImageTranslationInfo();
+            var key = tti.GetKey( texture );
+            if( string.IsNullOrEmpty( key ) ) return;
+
+            if( TryGetTranslatedImage( key, out var newData ) )
+            {
+               if( _isInTranslatedMode )
+               {
+                  // handle texture
+                  if( !tti.IsTranslated || forceReload )
+                  {
+                     try
+                     {
+                        texture.LoadImageEx( newData, tti.IsNonReadable( texture ) );
+                     }
+                     finally
+                     {
+                        tti.IsTranslated = true;
+                     }
+                  }
+
+                  // handle containing component
+                  if( iti != null )
+                  {
+                     if( !iti.IsTranslated || forceReload )
+                     {
+                        try
+                        {
+                           source.SetAllDirtyEx();
+                        }
+                        finally
+                        {
+                           iti.IsTranslated = true;
+                        }
+                     }
+                  }
+               }
+            }
+            else
+            {
+               // if we cannot find the texture, and the texture is considered translated... hmmm someone has removed a file
+
+               // handle texture
+               var originalData = tti.GetOriginalData( texture );
+               if( originalData != null )
+               {
+                  if( tti.IsTranslated )
+                  {
+                     try
+                     {
+                        texture.LoadImageEx( originalData, tti.IsNonReadable( texture ) );
+                     }
+                     finally
+                     {
+                        tti.IsTranslated = true;
+                     }
+                  }
+
+                  // handle containing component
+                  if( iti != null )
+                  {
+                     if( iti.IsTranslated )
+                     {
+                        try
+                        {
+                           source.SetAllDirtyEx();
+                        }
+                        finally
+                        {
+                           iti.IsTranslated = true;
+                        }
+                     }
+                  }
+               }
+            }
+
+            if( !_isInTranslatedMode )
+            {
+               var originalData = tti.GetOriginalData( texture );
+               if( originalData != null )
+               {
+                  // handle texture
+                  if( tti.IsTranslated )
+                  {
+                     try
+                     {
+                        texture.LoadImageEx( originalData, tti.IsNonReadable( texture ) );
+                     }
+                     finally
+                     {
+                        tti.IsTranslated = false;
+                     }
+                  }
+
+                  // handle containing component
+                  if( iti != null )
+                  {
+                     if( iti.IsTranslated )
+                     {
+                        try
+                        {
+                           source.SetAllDirtyEx();
+                        }
+                        finally
+                        {
+                           iti.IsTranslated = false;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         finally
+         {
+            _imageHooksEnabled = true;
+         }
+      }
+
+      private void DumpTexture( object source, Texture2D texture )
+      {
+         try
+         {
+            _imageHooksEnabled = false;
+
+            texture = texture ?? source.GetTexture();
+            if( texture == null ) return;
+
+            var info = texture.GetTextureTranslationInfo();
+            if( info.HasDumpedAlternativeTexture ) return;
+
+            try
+            {
+               var key = info.GetKey( texture );
+               if( string.IsNullOrEmpty( key ) ) return;
+
+               if( !IsImageTranslated( key ) )
+               {
+                  var name = texture.GetTextureName().SanitizeForFileSystem();
+                  var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory );
+                  var fullName = Path.Combine( root, name + " [" + key + "].png" );
+
+                  var originalData = info.GetOrCreateOriginalData( texture );
+                  File.WriteAllBytes( fullName, originalData );
+                  RegisterImageDataAndHash( fullName, key, originalData );
+               }
+            }
+            finally
+            {
+               info.HasDumpedAlternativeTexture = true;
+            }
+         }
+         finally
+         {
+            _imageHooksEnabled = true;
+         }
+      }
+
+      private string TranslateImmediate( object ui, string text, TextTranslationInfo info, bool ignoreComponentState )
       {
          // Get the trimmed text
          text = ( text ?? ui.GetText() ).TrimIfConfigured();
 
-         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( text );
 
@@ -895,11 +1189,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Translates the string of a UI  text or queues it up to be translated
       /// by the HTTP translation service.
       /// </summary>
-      private string TranslateOrQueueWebJobImmediate( object ui, string text, TranslationInfo info, bool supportsStabilization, bool ignoreComponentState, TranslationContext context = null )
+      private string TranslateOrQueueWebJobImmediate( object ui, string text, TextTranslationInfo info, bool supportsStabilization, bool ignoreComponentState, TranslationContext context = null )
       {
+         text = text ?? ui.GetText();
+
          // make sure text exists
          var originalText = text;
-         text = text ?? ui.GetText();
          if( context == null )
          {
             // Get the trimmed text
@@ -909,7 +1204,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          //Logger.Current.Debug( ui.GetType().Name + ": " + text );
 
          // Ensure that we actually want to translate this text and its owning UI element. 
-         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslate( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
             info?.Reset( originalText );
             var isSpammer = ui.IsSpammingComponent();
@@ -986,11 +1281,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               _ongoingOperations.Remove( ui );
 
+                              originalText = stabilizedText;
+                              stabilizedText = stabilizedText.TrimIfConfigured();
+
                               if( !string.IsNullOrEmpty( stabilizedText ) && IsTranslatable( stabilizedText ) )
                               {
-                                 originalText = stabilizedText;
-                                 stabilizedText = stabilizedText.TrimIfConfigured();
-
                                  var stabilizedTextKey = new TranslationKey( ui, stabilizedText, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
@@ -1529,7 +1824,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var text = component.GetText().TrimIfConfigured();
                      if( text == job.Key.OriginalText )
                      {
-                        var info = component.GetTranslationInfo();
+                        var info = component.GetTextTranslationInfo();
                         SetTranslatedText( component, job.TranslatedText, info );
                      }
                   }
@@ -1565,7 +1860,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               if( translatedText != null )
                               {
-                                 var info = context.Component.GetTranslationInfo();
+                                 var info = context.Component.GetTextTranslationInfo();
                                  SetTranslatedText( context.Component, translatedText, info );
                               }
                            }
@@ -1580,8 +1875,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
 
                // Utage support
-               if( Constants.Types.AdvEngine != null
-                  && job.OriginalSources.Any( x => Constants.Types.AdvCommand.IsAssignableFrom( x.GetType() ) ) )
+               if( ClrTypes.AdvEngine != null
+                  && job.OriginalSources.Any( x => ClrTypes.AdvCommand.IsAssignableFrom( x.GetType() ) ) )
                {
                   _nextAdvUpdate = Time.time + 0.5f;
                }
@@ -1593,12 +1888,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _advEngine == null )
          {
-            _advEngine = GameObject.FindObjectOfType( Constants.Types.AdvEngine );
+            _advEngine = GameObject.FindObjectOfType( Constants.ClrTypes.AdvEngine );
          }
 
          if( _advEngine != null )
          {
-            AccessTools.Method( Constants.Types.AdvEngine, "ChangeLanguage" )?.Invoke( _advEngine, new object[ 0 ] );
+            AccessTools.Method( Constants.ClrTypes.AdvEngine, "ChangeLanguage" )?.Invoke( _advEngine, new object[ 0 ] );
          }
       }
 
@@ -1606,16 +1901,35 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          LoadTranslations();
 
+         // FIXME: Translate TEXTURES first??? Problem if texture is not related to a component!
+
          foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
          {
-            var info = kvp.Value as TranslationInfo;
-            if( info != null && !string.IsNullOrEmpty( info.OriginalText ) )
+            var ui = kvp.Key;
+            try
             {
-               var key = new TranslationKey( kvp.Key, info.OriginalText, false );
-               if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+               if( ( ui as Component )?.gameObject?.activeSelf ?? false )
                {
-                  SetTranslatedText( kvp.Key, translatedText, info ); // no need to untemplatize the translated text
+                  var tti = kvp.Value as TextTranslationInfo;
+                  if( tti != null && !string.IsNullOrEmpty( tti.OriginalText ) )
+                  {
+                     var key = new TranslationKey( kvp.Key, tti.OriginalText, false );
+                     if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+                     {
+                        SetTranslatedText( kvp.Key, translatedText, tti ); // no need to untemplatize the translated text
+                     }
+                  }
+
+                  if( Settings.EnableTextureTranslation )
+                  {
+                     TranslateTexture( ui, null, true );
+                  }
                }
+            }
+            catch( Exception )
+            {
+               // not super pretty, no...
+               ObjectExtensions.Remove( ui );
             }
          }
       }
@@ -1666,19 +1980,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // make sure we use the translated version of all texts
                foreach( var kvp in objects )
                {
-                  var ui = kvp.Key;
-                  try
+                  var tti = kvp.Value as TextTranslationInfo;
+                  if( tti != null )
                   {
-                     if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                     var ui = kvp.Key;
+                     try
                      {
-                        var info = (TranslationInfo)kvp.Value;
-                        info?.ChangeFont( ui );
+                        if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                        {
+                           tti?.ChangeFont( ui );
+                        }
                      }
-                  }
-                  catch( Exception )
-                  {
-                     // not super pretty, no...
-                     ObjectExtensions.Remove( ui );
+                     catch( Exception )
+                     {
+                        // not super pretty, no...
+                        ObjectExtensions.Remove( ui );
+                     }
                   }
                }
             }
@@ -1687,13 +2004,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // make sure we use the original version of all texts
                foreach( var kvp in objects )
                {
+                  var tti = kvp.Value as TextTranslationInfo;
                   var ui = kvp.Key;
                   try
                   {
                      if( ( ui as Component )?.gameObject?.activeSelf ?? false )
                      {
-                        var info = (TranslationInfo)kvp.Value;
-                        info?.UnchangeFont( ui );
+                        tti?.UnchangeFont( ui );
                      }
                   }
                   catch( Exception )
@@ -1713,6 +2030,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          Logger.Current.Info( $"Toggling translations of {objects.Count} objects." );
 
+         // FIXME: Translate TEXTURES first??? Problem if texture is not related to a component!
+
          if( _isInTranslatedMode )
          {
             // make sure we use the translated version of all texts
@@ -1723,11 +2042,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( ( ui as Component )?.gameObject?.activeSelf ?? false )
                   {
-                     var info = (TranslationInfo)kvp.Value;
-
-                     if( info != null && info.IsTranslated )
+                     var tti = kvp.Value as TextTranslationInfo;
+                     if( tti != null && tti.IsTranslated )
                      {
-                        SetText( ui, info.TranslatedText, true, info );
+                        SetText( ui, tti.TranslatedText, true, tti );
+                     }
+
+                     if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
+                     {
+                        TranslateTexture( ui, null, false );
                      }
                   }
                }
@@ -1748,11 +2071,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( ( ui as Component )?.gameObject?.activeSelf ?? false )
                   {
-                     var info = (TranslationInfo)kvp.Value;
-
-                     if( info != null && info.IsTranslated )
+                     var tti = kvp.Value as TextTranslationInfo;
+                     if( tti != null && tti.IsTranslated )
                      {
-                        SetText( ui, info.OriginalText, true, info );
+                        SetText( ui, tti.OriginalText, true, tti );
+                     }
+
+                     if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
+                     {
+                        TranslateTexture( ui, null, false );
                      }
                   }
                }
@@ -1864,9 +2191,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var components = obj.GetComponents<Component>();
             foreach( var component in components )
             {
-               if( component.IsKnownType() )
+               if( component.IsKnownTextType() )
                {
                   Hook_TextChanged( component );
+               }
+
+               if( Settings.EnableTextureTranslation )
+               {
+                  if( component.IsKnownImageType() )
+                  {
+                     Hook_ImageChangedOnComponent( component );
+                  }
                }
             }
 

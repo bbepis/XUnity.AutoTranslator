@@ -23,12 +23,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.Text != null;
+         return ClrTypes.Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         var text = AccessTools.Property( Types.Text, "text" );
+         var text = AccessTools.Property( ClrTypes.Text, "text" );
          return text.GetSetMethod();
       }
 
@@ -47,12 +47,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( HarmonyInstance instance )
       {
-         return Types.Text != null;
+         return ClrTypes.Text != null;
       }
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         var OnEnable = AccessTools.Method( Types.Text, "OnEnable" );
+         var OnEnable = AccessTools.Method( ClrTypes.Text, "OnEnable" );
          return OnEnable;
       }
 
