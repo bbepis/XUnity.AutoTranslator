@@ -2266,7 +2266,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void ManualHookForImages()
       {
-         if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+         if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
          {
             // scan all textures and update
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();

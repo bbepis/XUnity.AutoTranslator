@@ -137,9 +137,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Method( typeof( Cursor ), "SetCursor", new[] { typeof( Texture2D ), typeof( Vector2 ), typeof( CursorMode ) } );
       }
 
-      public static void Postfix( Texture2D texture )
+      public static void Prefix( Texture2D texture )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChanged( texture );
+         AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
       }
    }
 }
