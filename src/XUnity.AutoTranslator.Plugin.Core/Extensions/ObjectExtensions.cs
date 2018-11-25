@@ -37,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          // Simplify this??
 
-         return ( Settings.EnableUGUI && ( ui is Image || ui is RawImage ) )
+         return ( Settings.EnableUGUI && ( ui is Material || ui is Image || ui is RawImage ) )
             || ( Settings.EnableNGUI
                && ( ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
                || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )

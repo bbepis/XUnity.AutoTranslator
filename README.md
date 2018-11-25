@@ -1,5 +1,19 @@
 ﻿# XUnity Auto Translator
 
+## Index
+ * Notice
+ * Text Frameworks
+ * Plugin Frameworks
+ * Configuration
+ * Key Mapping
+ * Installation
+ * Translating Mods
+ * Texture Translation
+ * Integrating with Auto Translator
+
+## Notice
+The latest version (3.0.0) now also supports basic image loading/dumping. These are not automatically translated and the feature is disabled by default. Please see 'Texture Translation' for further instructions.
+
 ## Text Frameworks
 This is an auto translation mod that hooks into the unity game engine and attempts to provide translations for the following text frameworks for Unity:
  * UGUI
@@ -60,6 +74,15 @@ WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline remov
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 
+[Texture]
+TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from
+EnableTextureTranslation=False   ;Indicates whether the plugin will attempt to replace in-game images with those from the TextureDirectory directory
+EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capapble of replacing to the TextureDirectory. Has significant performance impact
+EnableTextureToggling=False      ;Indicates whether or not toggle the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
+EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and replace more texture
+LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name
+TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameThenData"]
+
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
 
@@ -92,7 +115,7 @@ Tag=2.9.0                        ;Tag representing the last version this plugin 
 The following key inputs are mapped:
  * ALT + T: Alternate between translated and untranslated versions of all texts provided by this plugin.
  * ALT + D: Dump untranslated texts (if no endpoint is configured)
- * ALT + R: Reload translation files. Useful if you change the text files on the fly.
+ * ALT + R: Reload translation files. Useful if you change the text and texture files on the fly. Not guaranteed to work for all textures.
  * ALT + U: Manual hooking. The default hooks wont always pick up texts. This will attempt to make lookups manually.
  * ALT + F: If OverrideFont is configured, will toggle between overridden and default font.
 
@@ -171,6 +194,46 @@ The file structure should like like this
 
 ## Translating Mods
 Often other mods UI are implemented through IMGUI. As you can see above, this is disabled by default. By changing the "EnableIMGUI" value to "True", it will start translating IMGUI as well, which likely means that other mods UI will be translated.
+
+## Texture Translation
+From version 3.0.0+ this mode provides basic capabilities to replace images. It is a feature that is disabled by default. There is no automatic translation of these images though. 
+
+It is controlled by the following configuration:
+
+```ini
+[Texture]
+TextureDirectory=Translation\Texture
+EnableTextureTranslation=False
+EnableTextureDumping=False
+EnableTextureToggling=False
+TextureHashGenerationStrategy=FromImageName
+```
+
+`TextureDirectory=Translation\Texture` specifies the directory where textures are dumped to and loaded from. Loading will happen from all subdirectories of the specified directory as well, so you can move dumped images to whatever folder structure you desire.
+
+`EnableTextureTranslation=True` enables texture translation. This basically means that textures will be loaded from the `TextureDirectory` and it's subsdirectories. These images will replace the in-game images used by the game.
+
+`EnableTextureDumping=True` enables texture dumping. This means that the mod will dump any images it has not already dumped to the `TextureDirectory`. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+
+`EnableTextureScanOnSceneLoad=True` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost.
+
+`LoadUnmodifiedTextures=False` enabldes whether or not the plugin should load textures that has not been modified. This is only useful for debugging. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+
+`EnableTextureToggling=False` enables toggle textures with the ALT+T hotkey. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+
+`TextureHashGenerationStrategy=FromImageName` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
+This is done through a hash-value that is stored in square brackets in each image file name. This configuration specifies how these hash-values are generated.
+`FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images.
+`FromImageData` means that the hash is generated from the data stored in the image, which is guaranteed to exist for all images.
+`FromImageNameThenData` means that it should use the name, if available, otherwise use the data.
+
+There's an important catch you need to be aware when dealing with these options and that is if ANY of these options exists: `EnableTextureDumping=True`, `EnableTextureToggling=True`, `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData`, then the game will need to read the raw data from all images it finds in game in order to replace the image and this is an expensive operation.
+
+It is therefore recommended to use `TextureHashGenerationStrategy=FromImageName`. Most likely, images without a resource name wont be interesting to translate anyway.
+
+If you redistribute this mod with translated images then you **must delete all images that you do not translate to avoid resource waste**, as they are all loaded into memory on mod startup.
+
+**NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True`, `LoadUnmodifiedTextures=False` OR `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData` ENABLED.**
 
 ## Integrating with Auto Translator
 

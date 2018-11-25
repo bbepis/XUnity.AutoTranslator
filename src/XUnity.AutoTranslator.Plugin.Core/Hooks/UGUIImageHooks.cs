@@ -16,9 +16,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( Image_sprite_Hook ),
          typeof( Image_overrideSprite_Hook ),
          typeof( RawImage_texture_Hook ),
-         typeof( Cursor_SetCursor_Hook )
+         typeof( Cursor_SetCursor_Hook ),
+
+         //// fallback hooks on material (Prefix hooks)
+         //typeof( Material_mainTexture_Hook ),
       };
    }
+
+   //[Harmony]
+   //public static class Material_mainTexture_Hook
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return true;
+   //   }
+
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Property( typeof( Material ), "mainTexture" ).GetSetMethod();
+   //   }
+
+   //   public static void Prefix( object __instance, Texture value )
+   //   {
+   //      if( value is Texture2D texture2D )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
+   //      }
+   //   }
+   //}
 
    [Harmony]
    public static class MaskableGraphic_OnEnable_Hook

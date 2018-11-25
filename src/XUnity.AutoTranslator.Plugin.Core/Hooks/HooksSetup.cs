@@ -29,7 +29,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             {
                UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                harmony.PatchAll( UGUIHooks.All );
-               harmony.PatchAll( UGUIImageHooks.All );
+               if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+               {
+                  harmony.PatchAll( UGUIImageHooks.All );
+               }
             }
          }
          catch( Exception e )
@@ -56,7 +59,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             {
                NGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
                harmony.PatchAll( NGUIHooks.All );
-               harmony.PatchAll( NGUIImageHooks.All );
+               if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+               {
+                  harmony.PatchAll( NGUIImageHooks.All );
+               }
             }
          }
          catch( Exception e )

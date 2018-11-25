@@ -90,6 +90,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
       private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
+      private HashSet<string> _untranslatedImages = new HashSet<string>();
 
       private object _advEngine;
       private float? _nextAdvUpdate;
@@ -184,6 +185,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _overrideFont = _hasOverrideFont;
          }
 
+         if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
+         {
+            try
+            {
+               EnableSceneLoadScan();
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "An error occurred while settings up texture scene-load scans." );
+            }
+         }
+
          LoadTranslations();
          LoadStaticTranslations();
 
@@ -264,6 +277,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      public void EnableSceneLoadScan()
+      {
+         // specified in own method, because of chance that this has changed through Unity lifetime
+         SceneManager.sceneLoaded += SceneManager_SceneLoaded;
+      }
+
+      private void SceneManager_SceneLoaded( Scene scene, LoadSceneMode arg1 )
+      {
+         Logger.Current.Info( "SceneLoading..." );
+         var startTime = Time.realtimeSinceStartup;
+
+         ManualHookForImages();
+
+         var endTime = Time.realtimeSinceStartup;
+         Logger.Current.Info( $"SceneLoaded (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+      }
+
       /// <summary>
       /// Loads the translations found in Translation.{lang}.txt
       /// </summary>
@@ -287,10 +317,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
                _translatedImages.Clear();
+               _untranslatedImages.Clear();
                Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ) );
                foreach( var fullFileName in GetTextureFiles() )
                {
-                  RegisterImageDataAndHash( fullFileName, null, null );
+                  RegisterImageFromFile( fullFileName );
                }
             }
          }
@@ -300,38 +331,103 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void RegisterImageDataAndHash( string fullFileName, string key, byte[] data )
+      private void RegisterImageFromFile( string fullFileName )
       {
-         if( key == null )
-         {
-            var fileName = Path.GetFileNameWithoutExtension( fullFileName );
-            var startHash = fileName.LastIndexOf( "[" );
-            var endHash = fileName.LastIndexOf( "]" );
+         var fileName = Path.GetFileNameWithoutExtension( fullFileName );
+         var startHash = fileName.LastIndexOf( "[" );
+         var endHash = fileName.LastIndexOf( "]" );
 
-            if( endHash > -1 && startHash > -1 && endHash > startHash )
+         if( endHash > -1 && startHash > -1 && endHash > startHash )
+         {
+            var takeFrom = startHash + 1;
+
+            // load based on whether or not the key is image hashed
+            var parts = fileName.Substring( takeFrom, endHash - takeFrom ).Split( '-' );
+            string key;
+            string originalHash;
+            if( parts.Length == 1 )
             {
-               var takeFrom = startHash + 1;
-               key = fileName.Substring( takeFrom, endHash - takeFrom );
+               key = parts[ 0 ];
+               originalHash = parts[ 0 ];
+            }
+            else if( parts.Length == 2 )
+            {
+               key = parts[ 0 ];
+               originalHash = parts[ 1 ];
+            }
+            else
+            {
+               Logger.Current.Warn( $"Image not loaded (unknown key): {fullFileName}." );
+               return;
+            }
+
+            var data = File.ReadAllBytes( fullFileName );
+            var currentHash = HashHelper.Compute( data ).Substring( 0, 8 );
+
+            // only load images that someone has modified!
+            if( Settings.LoadUnmodifiedTextures || StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0 )
+            {
+               RegisterTranslatedImage( key, data );
+               Logger.Current.Debug( $"Image loaded: {fullFileName}." );
+            }
+            else
+            {
+               RegisterUntranslatedImage( key );
+               Logger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
             }
          }
-
-         if( data == null )
+         else
          {
-            data = File.ReadAllBytes( fullFileName );
+            Logger.Current.Warn( $"Image not loaded (no key): {fullFileName}." );
+         }
+      }
+
+      private void RegisterImageFromData( string textureName, string key, byte[] data )
+      {
+         var name = textureName.SanitizeForFileSystem();
+         var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory );
+         var originalHash = HashHelper.Compute( data ).Substring( 0, 8 );
+
+         // allow hash and key to be the same; only store one of them then!
+         string fileName;
+         if( key == originalHash )
+         {
+            fileName = name + " [" + key + "].png";
+         }
+         else
+         {
+            fileName = name + " [" + key + "-" + originalHash + "].png";
          }
 
+         var fullName = Path.Combine( root, fileName );
+         File.WriteAllBytes( fullName, data );
+         Logger.Current.Info( "Dumped texture file: " + fileName );
 
-         if( key != null )
+         if( Settings.LoadUnmodifiedTextures )
          {
-            _translatedImages[ key ] = data;
+            RegisterTranslatedImage( key, data );
          }
+         else
+         {
+            RegisterUntranslatedImage( key );
+         }
+      }
+
+      private void RegisterTranslatedImage( string key, byte[] data )
+      {
+         _translatedImages[ key ] = data;
+      }
+
+      private void RegisterUntranslatedImage( string key )
+      {
+         _untranslatedImages.Add( key );
       }
 
       private void LoadTranslationsInFile( string fullFileName )
       {
          if( File.Exists( fullFileName ) )
          {
-            Logger.Current.Debug( $"Loading translations from {fullFileName}." );
+            Logger.Current.Debug( $"Loading texts: {fullFileName}." );
 
             string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
             foreach( string translation in translations )
@@ -630,14 +726,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private bool IsImageTranslated( string hash )
+      private bool IsImageRegistered( string key )
       {
-         return _translatedImages.ContainsKey( hash );
+         return _translatedImages.ContainsKey( key ) || _untranslatedImages.Contains( key );
       }
 
-      private bool TryGetTranslatedImage( string hash, out byte[] data )
+      private bool TryGetTranslatedImage( string key, out byte[] data )
       {
-         return _translatedImages.TryGetValue( hash, out data );
+         return _translatedImages.TryGetValue( key, out data );
       }
 
       private void AddTranslation( string key, string value )
@@ -747,20 +843,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Hook_ImageChangedOnComponent( object source )
+      public void Hook_ImageChangedOnComponent( object source, Texture2D texture = null, bool isPrefixHooked = false )
       {
          if( !_imageHooksEnabled ) return;
          if( !source.IsKnownImageType() ) return;
 
-         HandleImage( source, null );
+         HandleImage( source, texture, isPrefixHooked );
       }
 
-      public void Hook_ImageChanged( Texture2D texture )
+      public void Hook_ImageChanged( Texture2D texture, bool isPrefixHooked = false )
       {
          if( !_imageHooksEnabled ) return;
          if( texture == null ) return;
 
-         HandleImage( null, texture );
+         HandleImage( null, texture, isPrefixHooked );
       }
 
       private void SetTranslatedText( object ui, string translatedText, TextTranslationInfo info )
@@ -960,13 +1056,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return info.IsCurrentlySettingText;
       }
 
-      private void HandleImage( object source, Texture2D texture )
+      private void HandleImage( object source, Texture2D texture, bool isPrefixHooked )
       {
-         // Make work with raw textures somehow?????
-         // work with obscure games? Sprite?
-
-         // Test without texture replacement (old! in old games!)
-
          if( Settings.EnableTextureDumping )
          {
             try
@@ -983,7 +1074,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               TranslateTexture( source, texture, false );
+               TranslateTexture( source, texture, isPrefixHooked, false );
             }
             catch( Exception e )
             {
@@ -992,7 +1083,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void TranslateTexture( object source, Texture2D texture, bool forceReload )
+      private void TranslateTexture( object source, Texture2D texture, bool isPrefixHooked, bool forceReload )
       {
          try
          {
@@ -1030,7 +1121,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           source.SetAllDirtyEx();
+                           if( !isPrefixHooked )
+                           {
+                              source.SetAllDirtyEx();
+                           }
                         }
                         finally
                         {
@@ -1067,7 +1161,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           source.SetAllDirtyEx();
+                           if( !isPrefixHooked )
+                           {
+                              source.SetAllDirtyEx();
+                           }
                         }
                         finally
                         {
@@ -1103,7 +1200,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           source.SetAllDirtyEx();
+                           if( !isPrefixHooked )
+                           {
+                              source.SetAllDirtyEx();
+                           }
                         }
                         finally
                         {
@@ -1137,15 +1237,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var key = info.GetKey( texture );
                if( string.IsNullOrEmpty( key ) ) return;
 
-               if( !IsImageTranslated( key ) )
+               if( !IsImageRegistered( key ) )
                {
-                  var name = texture.GetTextureName().SanitizeForFileSystem();
-                  var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory );
-                  var fullName = Path.Combine( root, name + " [" + key + "].png" );
-
+                  var name = texture.GetTextureName();
                   var originalData = info.GetOrCreateOriginalData( texture );
-                  File.WriteAllBytes( fullName, originalData );
-                  RegisterImageDataAndHash( fullName, key, originalData );
+                  RegisterImageFromData( name, key, originalData );
                }
             }
             finally
@@ -1901,28 +1997,31 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          LoadTranslations();
 
-         // FIXME: Translate TEXTURES first??? Problem if texture is not related to a component!
-
          foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
          {
             var ui = kvp.Key;
             try
             {
-               if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+               if( ui is Component component )
                {
-                  var tti = kvp.Value as TextTranslationInfo;
-                  if( tti != null && !string.IsNullOrEmpty( tti.OriginalText ) )
+                  if( component.gameObject?.activeSelf ?? false )
                   {
-                     var key = new TranslationKey( kvp.Key, tti.OriginalText, false );
-                     if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+                     var tti = kvp.Value as TextTranslationInfo;
+                     if( tti != null && !string.IsNullOrEmpty( tti.OriginalText ) )
                      {
-                        SetTranslatedText( kvp.Key, translatedText, tti ); // no need to untemplatize the translated text
+                        var key = new TranslationKey( kvp.Key, tti.OriginalText, false );
+                        if( TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+                        {
+                           SetTranslatedText( kvp.Key, translatedText, tti ); // no need to untemplatize the translated text
+                        }
                      }
                   }
-
+               }
+               else
+               {
                   if( Settings.EnableTextureTranslation )
                   {
-                     TranslateTexture( ui, null, true );
+                     TranslateTexture( ui, null, false, true );
                   }
                }
             }
@@ -2040,17 +2139,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var ui = kvp.Key;
                try
                {
-                  if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                  if( ui is Component component )
                   {
-                     var tti = kvp.Value as TextTranslationInfo;
-                     if( tti != null && tti.IsTranslated )
+                     if( component.gameObject?.activeSelf ?? false )
                      {
-                        SetText( ui, tti.TranslatedText, true, tti );
+                        var tti = kvp.Value as TextTranslationInfo;
+                        if( tti != null && tti.IsTranslated )
+                        {
+                           SetText( ui, tti.TranslatedText, true, tti );
+                        }
                      }
-
+                  }
+                  else
+                  {
                      if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
                      {
-                        TranslateTexture( ui, null, false );
+                        TranslateTexture( ui, null, false, false );
                      }
                   }
                }
@@ -2069,17 +2173,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var ui = kvp.Key;
                try
                {
-                  if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                  if( ui is Component component )
                   {
-                     var tti = kvp.Value as TextTranslationInfo;
-                     if( tti != null && tti.IsTranslated )
+                     if( component.gameObject?.activeSelf ?? false )
                      {
-                        SetText( ui, tti.OriginalText, true, tti );
+                        var tti = kvp.Value as TextTranslationInfo;
+                        if( tti != null && tti.IsTranslated )
+                        {
+                           SetText( ui, tti.OriginalText, true, tti );
+                        }
                      }
-
+                  }
+                  else
+                  {
                      if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
                      {
-                        TranslateTexture( ui, null, false );
+                        TranslateTexture( ui, null, false, false );
                      }
                   }
                }
@@ -2143,9 +2252,35 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void ManualHook()
       {
+         ManualHookForText();
+         ManualHookForImages();
+      }
+
+      private void ManualHookForText()
+      {
          foreach( var root in GetAllRoots() )
          {
             TraverseChildrenManualHook( root );
+         }
+      }
+
+      private void ManualHookForImages()
+      {
+         if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+         {
+            // scan all textures and update
+            var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
+            foreach( var texture in textures )
+            {
+               Hook_ImageChanged( texture );
+            }
+
+            //// scan all components and set dirty
+            //var components = GameObject.FindObjectsOfType<Component>();
+            //foreach( var component in components )
+            //{
+            //   component.SetAllDirtyEx();
+            //}
          }
       }
 

@@ -83,6 +83,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextureTranslation;
       public static bool EnableTextureDumping;
       public static bool EnableTextureToggling;
+      public static bool EnableTextureScanOnSceneLoad;
+      public static bool LoadUnmodifiedTextures;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
       public static bool CopyToClipboard;
@@ -142,7 +144,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableTextureTranslation = Config.Current.Preferences[ "Texture" ][ "EnableTextureTranslation" ].GetOrDefault( false );
          EnableTextureDumping = Config.Current.Preferences[ "Texture" ][ "EnableTextureDumping" ].GetOrDefault( false );
          EnableTextureToggling = Config.Current.Preferences[ "Texture" ][ "EnableTextureToggling" ].GetOrDefault( false );
-         TextureHashGenerationStrategy = Config.Current.Preferences[ "Texture" ][ "TextureHashGenerationStrategy" ].GetOrDefault( TextureHashGenerationStrategy.FromImageNameThenData );
+         EnableTextureScanOnSceneLoad = Config.Current.Preferences[ "Texture" ][ "EnableTextureScanOnSceneLoad" ].GetOrDefault( true );
+         LoadUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "LoadUnmodifiedTextures" ].GetOrDefault( false );
+         TextureHashGenerationStrategy = Config.Current.Preferences[ "Texture" ][ "TextureHashGenerationStrategy" ].GetOrDefault( TextureHashGenerationStrategy.FromImageName );
 
          // special handling because of enum parsing
          try

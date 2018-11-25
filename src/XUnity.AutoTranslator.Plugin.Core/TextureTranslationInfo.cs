@@ -58,14 +58,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                _originalData = result.Data;
                _nonReadable = result.NonReadable;
-               _key = HashHelper.Compute( _originalData ).Substring( 0, 10 );
+               _key = HashHelper.Compute( _originalData ).Substring( 0, 8 );
             }
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageName )
             {
                var name = texture.name; // name may be duplicate, WILL be duplicate!
                if( string.IsNullOrEmpty( name ) || name.Contains( "(Clone)" ) ) return;
 
-               _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 10 );
+               _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 8 );
 
                if( Settings.EnableTextureToggling )
                {
@@ -84,11 +84,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   _originalData = result.Data;
                   _nonReadable = result.NonReadable;
-                  _key = HashHelper.Compute( _originalData ).Substring( 0, 10 );
+                  _key = HashHelper.Compute( _originalData ).Substring( 0, 8 );
                }
                else
                {
-                  _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 10 );
+                  _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 8 );
 
                   if( Settings.EnableTextureToggling )
                   {
