@@ -8,6 +8,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TextureTranslationInfo
    {
+      private static readonly Encoding UTF8 = new UTF8Encoding( false );
+
       private string _key;
       private byte[] _originalData;
       private bool? _nonReadable;
@@ -63,9 +65,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageName )
             {
                var name = texture.name; // name may be duplicate, WILL be duplicate!
-               if( string.IsNullOrEmpty( name ) || name.Contains( "(Clone)" ) ) return;
+               if( string.IsNullOrEmpty( name ) ) return;
 
-               _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 8 );
+               _key = HashHelper.Compute( UTF8.GetBytes( name ) ).Substring( 0, 8 );
 
                if( Settings.EnableTextureToggling )
                {
@@ -88,7 +90,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  _key = HashHelper.Compute( Encoding.UTF8.GetBytes( name ) ).Substring( 0, 8 );
+                  _key = HashHelper.Compute( UTF8.GetBytes( name ) ).Substring( 0, 8 );
 
                   if( Settings.EnableTextureToggling )
                   {

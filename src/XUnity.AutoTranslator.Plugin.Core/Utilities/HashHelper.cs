@@ -15,8 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       public static string Compute( byte[] data )
       {
          var hash = SHA1.ComputeHash( data );
-         var base64 = ByteArrayToHexViaLookup32( hash );
-         return base64;
+         var hex = ByteArrayToHexViaLookup32( hash );
+         return hex;
       }
 
       private static uint[] CreateLookup32()
