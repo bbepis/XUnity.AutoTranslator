@@ -1234,14 +1234,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             try
             {
-               var key = info.GetKey( texture );
-               if( string.IsNullOrEmpty( key ) ) return;
-
-               if( !IsImageRegistered( key ) )
+               if( ShouldTranslate( texture ) )
                {
-                  var name = texture.GetTextureName();
-                  var originalData = info.GetOrCreateOriginalData( texture );
-                  RegisterImageFromData( name, key, originalData );
+                  var key = info.GetKey( texture );
+                  if( string.IsNullOrEmpty( key ) ) return;
+
+                  if( !IsImageRegistered( key ) )
+                  {
+                     var name = texture.GetTextureName();
+                     //var format = "[" + texture.format.ToString() + "] ";
+
+                     var originalData = info.GetOrCreateOriginalData( texture );
+                     RegisterImageFromData( name, key, originalData );
+                  }
                }
             }
             finally
@@ -1253,6 +1258,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _imageHooksEnabled = true;
          }
+      }
+
+      private bool ShouldTranslate( Texture2D texture )
+      {
+         // convert to int so engine versions that does not have specific enums still work
+         var format = (int)texture.format;
+
+         // 1 = Alpha8
+         // 9 = R16
+         // 63 = R8
+         return format != 1
+            && format != 9
+            && format != 63;
       }
 
       private string TranslateImmediate( object ui, string text, TextTranslationInfo info, bool ignoreComponentState )
