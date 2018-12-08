@@ -47,7 +47,6 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
             AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
             AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
-            AddFile( Path.Combine( managedDir, "Jurassic.dll" ), Resources.Jurassic );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
 
             // create an .ini file for each launcher, if it does not already exist

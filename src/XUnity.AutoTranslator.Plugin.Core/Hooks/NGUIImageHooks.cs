@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    public static class NGUIImageHooks
    {
       public static readonly Type[] All = new Type[] {
-         typeof( UIAtlas_texture_Hook ),
+         typeof( UIAtlas_spriteMaterial_Hook ),
          typeof( UISprite_OnInit_Hook ),
          typeof( UISprite_material_Hook ),
          typeof( UISprite_atlas_Hook ),
@@ -28,9 +28,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       };
    }
 
-
    [Harmony]
-   public static class UIAtlas_texture_Hook
+   public static class UIAtlas_spriteMaterial_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -42,9 +41,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UIAtlas, "spriteMaterial" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
    
@@ -80,9 +79,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UISprite, "material" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
 
@@ -99,9 +98,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UISprite, "atlas" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
    
@@ -118,9 +117,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UITexture, "mainTexture" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
 
@@ -137,9 +136,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UITexture, "material" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
 
@@ -175,9 +174,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UI2DSprite, "sprite2D" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
 
@@ -194,9 +193,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UI2DSprite, "material" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
       }
    }
 

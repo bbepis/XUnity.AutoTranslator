@@ -19,20 +19,111 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
    public static class HooksSetup
    {
-      public static void InstallHooks()
+      private static HarmonyInstance _harmony;
+
+      static HooksSetup()
       {
-         var harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
+         _harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
+      }
+
+      public static void InstallOverrideTextHooks()
+      {
+         if( Settings.EnableUGUI || Settings.EnableUtage )
+         {
+            UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
+         if( Settings.EnableTextMeshPro )
+         {
+            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
+         if( Settings.EnableNGUI )
+         {
+            NGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
+         if( Settings.EnableIMGUI )
+         {
+            IMGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateIMGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
+      }
+
+      public static void InstallImageHooks()
+      {
+         try
+         {
+            if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+            {
+               _harmony.PatchAll( UGUIImageHooks.All );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up image hooks for UnityEngine." );
+         }
+
+         try
+         {
+            if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
+            {
+               _harmony.PatchAll( NGUIImageHooks.All );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up image hooks for NGUI." );
+         }
+
+         //var knownTypes = new HashSet<Type> { typeof( Texture ), typeof( Texture2D ), typeof( Sprite ), typeof( Material ) };
+         //foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+         //{
+         //   try
+         //   {
+         //      var types = assembly.GetTypes();
+         //      foreach( var type in types )
+         //      {
+         //         try
+         //         {
+         //            var properties = type.GetProperties( BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public );
+         //            foreach( var property in properties )
+         //            {
+         //               if( property.CanWrite && knownTypes.Contains( property.PropertyType ) )
+         //               {
+         //                  try
+         //                  {
+         //                     var original = property.GetSetMethod();
+         //                     var prefix = typeof( GenericPrefix_Hook ).GetMethod( "Prefix" );
+         //                     _harmony.Patch( original, new HarmonyMethod( prefix ), null, null );
+         //                     Logger.Current.Warn( "Patched: " + type.Name + "." + property.Name );
+         //                  }
+         //                  catch( Exception e )
+         //                  {
+         //                     Logger.Current.Error( "Failed patching: " + type.Name + "." + property.Name );
+         //                  }
+         //               }
+         //            }
+         //         }
+         //         catch( Exception e )
+         //         {
+         //            Logger.Current.Error( e, "Failed getting properties of type: " + type.Name );
+         //         }
+         //      }
+         //   }
+         //   catch( Exception )
+         //   {
+         //      Logger.Current.Error( "Failed getting types of assembly: " + assembly.FullName );
+         //   }
+         //}
+
+      }
+
+      public static void InstallTextHooks()
+      {
 
          try
          {
             if( Settings.EnableUGUI || Settings.EnableUtage )
             {
                UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               harmony.PatchAll( UGUIHooks.All );
-               if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
-               {
-                  harmony.PatchAll( UGUIImageHooks.All );
-               }
+               _harmony.PatchAll( UGUIHooks.All );
             }
          }
          catch( Exception e )
@@ -45,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             if( Settings.EnableTextMeshPro )
             {
                TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               harmony.PatchAll( TextMeshProHooks.All );
+               _harmony.PatchAll( TextMeshProHooks.All );
             }
          }
          catch( Exception e )
@@ -58,11 +149,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             if( Settings.EnableNGUI )
             {
                NGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               harmony.PatchAll( NGUIHooks.All );
-               if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
-               {
-                  harmony.PatchAll( NGUIImageHooks.All );
-               }
+               _harmony.PatchAll( NGUIHooks.All );
             }
          }
          catch( Exception e )
@@ -74,18 +161,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               var success = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-               if( !success )
-               {
-                  harmony.PatchAll( IMGUIHooks.All );
+               IMGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateIMGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
 
-                  // This wont work in "newer" unity versions!
-                  try
-                  {
-                     harmony.PatchType( typeof( DoButtonGridHook ) );
-                  }
-                  catch { }
+               _harmony.PatchAll( IMGUIHooks.All );
+
+               // This wont work in "newer" unity versions!
+               try
+               {
+                  _harmony.PatchType( typeof( DoButtonGridHook ) );
                }
+               catch { }
             }
          }
          catch( Exception e )
@@ -97,7 +182,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUtage )
             {
-               harmony.PatchAll( UtageHooks.All );
+               _harmony.PatchAll( UtageHooks.All );
             }
          }
          catch( Exception e )

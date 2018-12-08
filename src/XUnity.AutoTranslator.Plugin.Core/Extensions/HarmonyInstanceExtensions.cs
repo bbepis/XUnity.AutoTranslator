@@ -12,7 +12,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          foreach( var type in types )
          {
-            instance.PatchType( type );
+            try
+            {
+               instance.PatchType( type );
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Warn( e, "An error occurred while patching a property/method on a class." );
+            }
          }
       }
 

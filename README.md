@@ -12,7 +12,7 @@
  * [Integrating with Auto Translator](#integrating-with-auto-translator)
 
 ## Notice
-The latest version (3.0.0) now also supports basic image loading/dumping. These are not automatically translated and the feature is disabled by default.
+The latest version (2.16.0+) now also supports basic image loading/dumping. These are not automatically translated and the feature is disabled by default.
 
 If you are going to make use of this feature, please make sure you read and understand the [Texture Translation](#texture-translation) section!
 
@@ -81,8 +81,9 @@ TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of
 EnableTextureTranslation=False   ;Indicates whether the plugin will attempt to replace in-game images with those from the TextureDirectory directory
 EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capapble of replacing to the TextureDirectory. Has significant performance impact
 EnableTextureToggling=False      ;Indicates whether or not toggle the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
-EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and replace more texture
+EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
+DeleteUnmodifiedTextures=False   ;Indicates whether or not unmodified texture files should be deleted. Useful for cleaninig up the TextureDirectory
 TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameThenData"]
 
 [Http]
@@ -198,7 +199,7 @@ The file structure should like like this
 Often other mods UI are implemented through IMGUI. As you can see above, this is disabled by default. By changing the "EnableIMGUI" value to "True", it will start translating IMGUI as well, which likely means that other mods UI will be translated.
 
 ## Texture Translation
-From version 3.0.0+ this mod provides basic capabilities to replace images. It is a feature that is disabled by default. There is no automatic translation of these images though.
+From version 2.16.0+ this mod provides basic capabilities to replace images. It is a feature that is disabled by default. There is no automatic translation of these images though.
 
 It is controlled by the following configuration:
 
@@ -210,6 +211,7 @@ EnableTextureDumping=False
 EnableTextureToggling=False
 EnableTextureScanOnSceneLoad=True
 LoadUnmodifiedTextures=False
+DeleteUnmodifiedTextures=False
 TextureHashGenerationStrategy=FromImageName
 ```
 
@@ -217,18 +219,20 @@ TextureHashGenerationStrategy=FromImageName
 
 `EnableTextureTranslation` enables texture translation. This basically means that textures will be loaded from the `TextureDirectory` and it's subsdirectories. These images will replace the in-game images used by the game.
 
-`EnableTextureDumping` enables texture dumping. This means that the mod will dump any images it has not already dumped to the `TextureDirectory`. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+`EnableTextureDumping` enables texture dumping. This means that the mod will dump any images it has not already dumped to the `TextureDirectory`. When dumping textures, it may also be worth enabling `EnableTextureScanOnSceneLoad` to more quickly find all textures that require translating. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
 `EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost. However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
 
 `LoadUnmodifiedTextures` enables whether or not the plugin should load textures that has not been modified. This is only useful for debugging, and likely to cause various visual glitches, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
-`EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. Also this by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+`DeleteUnmodifiedTextures` enables whether or not the plugin should delete texture files that has not been modified. This is useful for cleaning up the `TextureDirectory` after image translation, such that no unmodified images are distributed. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
+
+`EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. This is by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639-6E698E92].png`. This configuration specifies how these hash-values are generated:
  * `FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images or even be unique. However, it is generally fairly reliable.
- * `FromImageData` means that the hash is generated from the data stored in the image, which is guaranteed to exist for all images. However, generating the hash comes at a performance cost.
+ * `FromImageData` means that the hash is generated from the data stored in the image, which is guaranteed to exist for all images. However, generating the hash comes at a performance cost, that will also be incurred by the end-users.
  * `FromImageNameThenData` means that it should use the name, if available, otherwise use the data.
 
 There's an important catch you need to be aware when dealing with these options and that is if ANY of these options exists: `EnableTextureDumping=True`, `EnableTextureToggling=True`, `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData`, then the game will need to read the raw data from all images it finds in game in order to replace the image and this is an expensive operation.
@@ -240,12 +244,12 @@ If you redistribute this mod with translated images, it is recommended you delet
 You can also change the file name to whatever you desire, as long as you keep the hash appended to the end of the file name.
 
 If you take anything away from this section, it should be these two points:
- * **NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True` OR `LoadUnmodifiedTextures=True`**
- * **ONLY DISTRIBUTE THIS MOD WITH `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData` ENABLED IF ABSOLUTELY REQUIRED BY THE GAME.**
+ * **NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True`, `LoadUnmodifiedTextures=True` OR `DeleteUnmodifiedTextures=True`**
+ * **ONLY REDISTRIBUTE THIS MOD WITH `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData` ENABLED IF ABSOLUTELY REQUIRED BY THE GAME.**
 
 ### Technical details about Hash Generation in file names
 There are actually two hashes in the generated file name, separated by a dash (-):
- * The first hash is a SHA1 (only first 4 bytes) based on the `TextureHashGenerationStrategy` used. If `FromImageName` is specified, then it is based on the UTF8 representation.
+ * The first hash is a SHA1 (only first 4 bytes) based on the `TextureHashGenerationStrategy` used. If `FromImageName` is specified, then it is based on the UTF8 (without BOM) representation.
  * The second hash is a SHA1 (only first 4 bytes) based on the data in the image. This is used to determine whether or not the image has been modified, so images that has not been edited are not loaded. Unless `LoadUnmodifiedTextures` is specified.
 
 If `TextureHashGenerationStrategy=FromImageData` is specified, only a single hash will appear in each file name, as that single hash can be used both to identify the image and to determine whether or not it has been edited.

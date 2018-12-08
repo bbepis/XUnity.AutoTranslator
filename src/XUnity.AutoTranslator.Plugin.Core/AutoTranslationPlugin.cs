@@ -148,7 +148,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( Settings.EnableConsole ) DebugConsole.Enable();
 
-         HooksSetup.InstallHooks();
+         HooksSetup.InstallTextHooks();
+         HooksSetup.InstallImageHooks();
 
          try
          {
@@ -288,7 +289,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Logger.Current.Info( "SceneLoading..." );
          var startTime = Time.realtimeSinceStartup;
 
-         ManualHookForImages();
+         ManualHookForTextures();
 
          var endTime = Time.realtimeSinceStartup;
          Logger.Current.Info( $"SceneLoaded (took {Math.Round( endTime - startTime, 2 )} seconds)" );
@@ -357,15 +358,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               Logger.Current.Warn( $"Image not loaded (unknown key): {fullFileName}." );
+               Logger.Current.Warn( $"Image not loaded (unknown hash): {fullFileName}." );
                return;
             }
 
             var data = File.ReadAllBytes( fullFileName );
             var currentHash = HashHelper.Compute( data ).Substring( 0, 8 );
-
+            var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
+            
             // only load images that someone has modified!
-            if( Settings.LoadUnmodifiedTextures || StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0 )
+            if( Settings.LoadUnmodifiedTextures || isModified )
             {
                RegisterTranslatedImage( key, data );
                Logger.Current.Debug( $"Image loaded: {fullFileName}." );
@@ -375,10 +377,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
                RegisterUntranslatedImage( key );
                Logger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
             }
+
+            if( Settings.DeleteUnmodifiedTextures && !isModified )
+            {
+               try
+               {
+                  File.Delete( fullFileName );
+                  Logger.Current.Warn( $"Image deleted (unmodified): {fullFileName}." );
+               }
+               catch( Exception e )
+               {
+                  Logger.Current.Warn( e, $"An error occurred while trying to delete unmodified image: {fullFileName}." );
+               }
+            }
          }
          else
          {
-            Logger.Current.Warn( $"Image not loaded (no key): {fullFileName}." );
+            Logger.Current.Warn( $"Image not loaded (no hash): {fullFileName}." );
          }
       }
 
@@ -1315,11 +1330,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             text = text.TrimIfConfigured();
          }
 
-         //Logger.Current.Debug( ui.GetType().Name + ": " + text );
-
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
+            //Logger.Current.Debug( "START: " + ui.GetType().Name + ": " + text );
+
             info?.Reset( originalText );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = new TranslationKey( ui, text, isSpammer, context != null );
@@ -1567,6 +1582,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             yield return new WaitForSeconds( delay );
             var afterText = ui.GetText();
 
+            //Logger.Current.Debug( "WAITING: " + ui.GetType().Name + ": " + afterText );
+
             if( beforeText == afterText )
             {
                onTextStabilized( afterText );
@@ -1637,7 +1654,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          onContinue();
       }
 
-      public void Start()
+      public void Awake()
       {
          if( !_initialized )
          {
@@ -1652,6 +1669,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                Logger.Current.Error( e, "An unexpected error occurred during plugin initialization." );
             }
+         }
+      }
+
+      public void Start()
+      {
+         try
+         {
+            HooksSetup.InstallOverrideTextHooks();
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An unexpected error occurred during plugin start." );
          }
       }
 
@@ -2270,11 +2299,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void ManualHook()
       {
-         ManualHookForText();
-         ManualHookForImages();
+         ManualHookForComponents();
+         ManualHookForTextures();
       }
 
-      private void ManualHookForText()
+      private void ManualHookForComponents()
       {
          foreach( var root in GetAllRoots() )
          {
@@ -2282,7 +2311,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void ManualHookForImages()
+      private void ManualHookForTextures()
       {
          if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
          {
@@ -2349,7 +2378,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   Hook_TextChanged( component );
                }
 
-               if( Settings.EnableTextureTranslation )
+               if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
                {
                   if( component.IsKnownImageType() )
                   {

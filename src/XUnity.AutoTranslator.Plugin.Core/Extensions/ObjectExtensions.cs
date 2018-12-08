@@ -35,16 +35,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          var type = ui.GetType();
 
-         // Simplify this??
-
-         return ( Settings.EnableUGUI && ( ui is Material || ui is Image || ui is RawImage ) )
-            || ( Settings.EnableNGUI
-               && ( ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
-               || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )
-               || ( ClrTypes.UITexture != null && ClrTypes.UITexture.IsAssignableFrom( type ) )
-               //|| ( ClrTypes.UIFont != null && ClrTypes.UIFont.IsAssignableFrom( type ) )
-               || ( ClrTypes.UIPanel != null && ClrTypes.UIPanel.IsAssignableFrom( type ) ) )
-            );
+         return ( ui is Material || ui is Image || ui is RawImage )
+            || ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
+            || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )
+            || ( ClrTypes.UITexture != null && ClrTypes.UITexture.IsAssignableFrom( type ) )
+            //|| ( ClrTypes.UIFont != null && ClrTypes.UIFont.IsAssignableFrom( type ) )
+            || ( ClrTypes.UIPanel != null && ClrTypes.UIPanel.IsAssignableFrom( type ) );
       }
 
       public static bool SupportsStabilization( this object ui )

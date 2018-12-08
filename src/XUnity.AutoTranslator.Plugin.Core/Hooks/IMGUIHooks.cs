@@ -11,6 +11,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 {
    public static class IMGUIHooks
    {
+      public static bool HooksOverriden = false;
+
       public static readonly Type[] All = new[] {
          typeof( BeginGroupHook ),
          typeof( BoxHook ),
@@ -39,7 +41,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -58,7 +63,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
 
    }
@@ -78,7 +86,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -97,7 +108,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -116,7 +130,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -135,7 +152,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -154,7 +174,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent title )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( title );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( title );
+         }
       }
    }
 
@@ -173,9 +196,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent[] contents )
       {
-         foreach( var content in contents )
+         if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            foreach( var content in contents )
+            {
+               AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            }
          }
       }
    }
@@ -195,7 +221,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 
@@ -214,7 +243,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
 
       static void Prefix( GUIContent content )
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         if( !IMGUIHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+         }
       }
    }
 }

@@ -18,32 +18,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( RawImage_texture_Hook ),
          typeof( Cursor_SetCursor_Hook ),
 
-         //// fallback hooks on material (Prefix hooks)
-         //typeof( Material_mainTexture_Hook ),
+         // fallback hooks on material (Prefix hooks)
+         typeof( Material_mainTexture_Hook ),
       };
    }
 
-   //[Harmony]
-   //public static class Material_mainTexture_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return true;
-   //   }
+   public static class GenericPrefix_Hook
+   {
+      public static void Prefix( object __instance, object value )
+      {
+         if( value is Texture2D texture2D )
+         {
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
+         }
+      }
+   }
 
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( typeof( Material ), "mainTexture" ).GetSetMethod();
-   //   }
+   [Harmony]
+   public static class Material_mainTexture_Hook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return true;
+      }
 
-   //   public static void Prefix( object __instance, Texture value )
-   //   {
-   //      if( value is Texture2D texture2D )
-   //      {
-   //         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
-   //      }
-   //   }
-   //}
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Property( typeof( Material ), "mainTexture" ).GetSetMethod();
+      }
+
+      public static void Prefix( object __instance, Texture value )
+      {
+         if( value is Texture2D texture2D )
+         {
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
+         }
+      }
+   }
 
    [Harmony]
    public static class MaskableGraphic_OnEnable_Hook
@@ -62,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          if( __instance is Image || __instance is RawImage )
          {
-            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
          }
       }
    }
@@ -82,7 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -101,7 +112,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -120,7 +131,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 

@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Harmony;
-using Jurassic;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -199,40 +198,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                {
                   var html = downloadResult.Result;
 
-                  const string lookup = "TKK=eval('";
-                  var index = html.IndexOf( lookup );
-                  if( index > -1 ) // jurassic approach
+                  bool found = false;
+                  string[] lookups = new[] { "tkk:'", "TKK='" };
+                  foreach( var lookup in lookups )
                   {
-                     var lookupIndex = index + lookup.Length;
-                     var openClamIndex = html.IndexOf( '{', lookupIndex );
-                     var closeClamIndex = html.IndexOf( '}', openClamIndex );
-                     var functionIndex = html.IndexOf( "function", lookupIndex );
-                     var script = html.Substring( functionIndex, closeClamIndex - functionIndex + 1 );
-                     var decodedScript = script.Replace( "\\x3d", "=" ).Replace( "\\x27", "'" ).Replace( "function", "function FuncName" );
-
-                     // https://github.com/paulbartrum/jurassic/wiki/Safely-executing-user-provided-scripts
-                     ScriptEngine engine = new ScriptEngine();
-                     engine.Evaluate( decodedScript );
-                     var result = engine.CallGlobalFunction<string>( "FuncName" );
-
-                     var parts = result.Split( '.' );
-                     if( parts.Length == 2 )
-                     {
-                        m = long.Parse( parts[ 0 ] );
-                        s = long.Parse( parts[ 1 ] );
-                     }
-                     else
-                     {
-                        Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
-                     }
-                  }
-                  else
-                  {
-                     const string lookup2 = "TKK='";
-                     index = html.IndexOf( lookup2 );
+                     var index = html.IndexOf( lookup );
                      if( index > -1 ) // simple string approach
                      {
-                        var startIndex = index + lookup2.Length;
+                        var startIndex = index + lookup.Length;
                         var endIndex = html.IndexOf( "'", startIndex );
                         var result = html.Substring( startIndex, endIndex - startIndex );
 
@@ -241,16 +214,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                         {
                            m = long.Parse( parts[ 0 ] );
                            s = long.Parse( parts[ 1 ] );
-                        }
-                        else
-                        {
-                           Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
+                           found = true;
+                           break;
                         }
                      }
-                     else
-                     {
-                        Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
-                     }
+                  }
+
+                  if( !found )
+                  {
+                     Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
                   }
                }
                catch( Exception e )

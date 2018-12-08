@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BepInEx;
 using ExIni;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -21,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
       {
          _dataFolder = "BepInEx";
          _configPath = Path.Combine( _dataFolder, "AutoTranslatorConfig.ini" );
-         Logger.Current = new BepInLogger();
+         Core.Logger.Current = new BepInLogger();
       }
 
       public IniFile Preferences

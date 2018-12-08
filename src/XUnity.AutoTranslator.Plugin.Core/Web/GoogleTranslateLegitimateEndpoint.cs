@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using Harmony;
-using Jurassic;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;

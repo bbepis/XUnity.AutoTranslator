@@ -121,9 +121,6 @@
   <data name="ExIni" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\libs\ExIni.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Jurassic" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\Jurassic.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="Mono_Cecil" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\..\libs\Mono.Cecil.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
