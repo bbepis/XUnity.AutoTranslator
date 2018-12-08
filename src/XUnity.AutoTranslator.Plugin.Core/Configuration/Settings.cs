@@ -85,7 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextureToggling;
       public static bool EnableTextureScanOnSceneLoad;
       public static bool LoadUnmodifiedTextures;
-      public static bool DeleteUnmodifiedTextures;
+      //public static bool DeleteUnmodifiedTextures;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
       public static bool CopyToClipboard;
@@ -147,7 +147,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableTextureToggling = Config.Current.Preferences[ "Texture" ][ "EnableTextureToggling" ].GetOrDefault( false );
          EnableTextureScanOnSceneLoad = Config.Current.Preferences[ "Texture" ][ "EnableTextureScanOnSceneLoad" ].GetOrDefault( false );
          LoadUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "LoadUnmodifiedTextures" ].GetOrDefault( false );
-         DeleteUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "DeleteUnmodifiedTextures" ].GetOrDefault( false );
+         //DeleteUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "DeleteUnmodifiedTextures" ].GetOrDefault( false );
          TextureHashGenerationStrategy = Config.Current.Preferences[ "Texture" ][ "TextureHashGenerationStrategy" ].GetOrDefault( TextureHashGenerationStrategy.FromImageName );
 
          // special handling because of enum parsing

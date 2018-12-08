@@ -378,18 +378,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                Logger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
             }
 
-            if( Settings.DeleteUnmodifiedTextures && !isModified )
-            {
-               try
-               {
-                  File.Delete( fullFileName );
-                  Logger.Current.Warn( $"Image deleted (unmodified): {fullFileName}." );
-               }
-               catch( Exception e )
-               {
-                  Logger.Current.Warn( e, $"An error occurred while trying to delete unmodified image: {fullFileName}." );
-               }
-            }
+            //if( Settings.DeleteUnmodifiedTextures && !isModified )
+            //{
+            //   try
+            //   {
+            //      File.Delete( fullFileName );
+            //      Logger.Current.Warn( $"Image deleted (unmodified): {fullFileName}." );
+            //   }
+            //   catch( Exception e )
+            //   {
+            //      Logger.Current.Warn( e, $"An error occurred while trying to delete unmodified image: {fullFileName}." );
+            //   }
+            //}
          }
          else
          {

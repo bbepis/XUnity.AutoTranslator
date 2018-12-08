@@ -83,7 +83,6 @@ EnableTextureDumping=False       ;Indicates whether the plugin will dump texture
 EnableTextureToggling=False      ;Indicates whether or not toggle the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
 EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
-DeleteUnmodifiedTextures=False   ;Indicates whether or not unmodified texture files should be deleted. Useful for cleaninig up the TextureDirectory
 TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameThenData"]
 
 [Http]
@@ -211,7 +210,6 @@ EnableTextureDumping=False
 EnableTextureToggling=False
 EnableTextureScanOnSceneLoad=True
 LoadUnmodifiedTextures=False
-DeleteUnmodifiedTextures=False
 TextureHashGenerationStrategy=FromImageName
 ```
 
@@ -224,8 +222,6 @@ TextureHashGenerationStrategy=FromImageName
 `EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost. However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
 
 `LoadUnmodifiedTextures` enables whether or not the plugin should load textures that has not been modified. This is only useful for debugging, and likely to cause various visual glitches, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
-
-`DeleteUnmodifiedTextures` enables whether or not the plugin should delete texture files that has not been modified. This is useful for cleaning up the `TextureDirectory` after image translation, such that no unmodified images are distributed. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
 `EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. This is by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
@@ -244,7 +240,7 @@ If you redistribute this mod with translated images, it is recommended you delet
 You can also change the file name to whatever you desire, as long as you keep the hash appended to the end of the file name.
 
 If you take anything away from this section, it should be these two points:
- * **NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True`, `LoadUnmodifiedTextures=True` OR `DeleteUnmodifiedTextures=True`**
+ * **NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True` OR `LoadUnmodifiedTextures=True`**
  * **ONLY REDISTRIBUTE THIS MOD WITH `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData` ENABLED IF ABSOLUTELY REQUIRED BY THE GAME.**
 
 ### Technical details about Hash Generation in file names
