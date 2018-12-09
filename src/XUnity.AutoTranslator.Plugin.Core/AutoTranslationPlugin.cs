@@ -363,7 +363,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             var data = File.ReadAllBytes( fullFileName );
-            var currentHash = HashHelper.Compute( data ).Substring( 0, 8 );
+            var currentHash = HashHelper.Compute( data );
             var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
             
             // only load images that someone has modified!
@@ -401,7 +401,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          var name = textureName.SanitizeForFileSystem();
          var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory );
-         var originalHash = HashHelper.Compute( data ).Substring( 0, 8 );
+         var originalHash = HashHelper.Compute( data );
 
          // allow hash and key to be the same; only store one of them then!
          string fileName;

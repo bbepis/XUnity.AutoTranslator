@@ -249,8 +249,8 @@ If you take anything away from this section, it should be these two points:
 
 ### Technical details about Hash Generation in file names
 There are actually two hashes in the generated file name, separated by a dash (-):
- * The first hash is a SHA1 (only first 4 bytes) based on the `TextureHashGenerationStrategy` used. If `FromImageName` is specified, then it is based on the UTF8 (without BOM) representation.
- * The second hash is a SHA1 (only first 4 bytes) based on the data in the image. This is used to determine whether or not the image has been modified, so images that has not been edited are not loaded. Unless `LoadUnmodifiedTextures` is specified.
+ * The first hash is a SHA1 (only first 5 bytes) based on the `TextureHashGenerationStrategy` used. If `FromImageName` is specified, then it is based on the UTF8 (without BOM) representation.
+ * The second hash is a SHA1 (only first 5 bytes) based on the data in the image. This is used to determine whether or not the image has been modified, so images that has not been edited are not loaded. Unless `LoadUnmodifiedTextures` is specified.
 
 If `TextureHashGenerationStrategy=FromImageData` is specified, only a single hash will appear in each file name, as that single hash can be used both to identify the image and to determine whether or not it has been edited.
 
