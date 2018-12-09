@@ -222,7 +222,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
                   if( !found )
                   {
-                     Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Could not locate TKK value. Using fallback TKK values instead." );
+                     Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
                   }
                }
                catch( Exception e )
@@ -234,7 +234,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          if( error != null )
          {
-            Logger.Current.Warn( "An error occurred while setting up GoogleTranslate Cookie/TKK. Using fallback TKK values instead." + Environment.NewLine + error );
+            Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." + Environment.NewLine + error );
          }
       }
 
