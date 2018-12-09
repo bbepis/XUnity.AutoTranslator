@@ -14,6 +14,8 @@
 ## Notice
 The latest version (2.16.0+) now also supports basic image loading/dumping. These are not automatically translated and the feature is disabled by default.
 
+This feature is primarily meant for games with little to no mod support to enable full translations without needing to modify resource files.
+
 If you are going to make use of this feature, please make sure you read and understand the [Texture Translation](#texture-translation) section!
 
 ## Text Frameworks
@@ -199,6 +201,8 @@ Often other mods UI are implemented through IMGUI. As you can see above, this is
 
 ## Texture Translation
 From version 2.16.0+ this mod provides basic capabilities to replace images. It is a feature that is disabled by default. There is no automatic translation of these images though.
+
+This feature is primarily meant for games with little to no mod support to enable full translations without needing to modify resource files.
 
 It is controlled by the following configuration:
 
