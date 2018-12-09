@@ -191,42 +191,49 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          if( !Settings.AllowPluginHookOverride ) return false;
 
-         var objects = GameObject.FindObjectsOfType<GameObject>();
-         foreach( var gameObject in objects )
+         try
          {
-            if( gameObject != null )
+            var objects = GameObject.FindObjectsOfType<GameObject>();
+            foreach( var gameObject in objects )
             {
-               var components = gameObject.GetComponents<Component>();
-               foreach( var component in components )
+               if( gameObject != null )
                {
-                  if( component != null )
+                  var components = gameObject.GetComponents<Component>();
+                  foreach( var component in components )
                   {
-                     var e = component.GetType().GetEvent( eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-                     if( e != null )
+                     if( component != null )
                      {
-                        var addMethod = e.GetAddMethod();
-                        if( addMethod != null )
+                        var e = component.GetType().GetEvent( eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+                        if( e != null )
                         {
-                           try
+                           var addMethod = e.GetAddMethod();
+                           if( addMethod != null )
                            {
-                              if( addMethod.IsStatic )
+                              try
                               {
-                                 addMethod.Invoke( null, new object[] { callback } );
-                              }
-                              else
-                              {
-                                 addMethod.Invoke( component, new object[] { callback } );
-                              }
+                                 if( addMethod.IsStatic )
+                                 {
+                                    addMethod.Invoke( null, new object[] { callback } );
+                                 }
+                                 else
+                                 {
+                                    addMethod.Invoke( component, new object[] { callback } );
+                                 }
 
-                              Logger.Current.Info( eventName + " was hooked by external plugin." );
-                              return true;
+                                 Logger.Current.Info( eventName + " was hooked by external plugin." );
+                                 return true;
+                              }
+                              catch { }
                            }
-                           catch { }
                         }
                      }
                   }
                }
             }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
          }
 
          return false;
