@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override void ApplyHeaders( WebHeaderCollection headers )
       {
-         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36" );
+         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" );
          headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
       }
 

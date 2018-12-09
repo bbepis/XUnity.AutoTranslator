@@ -12,25 +12,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          foreach( var type in types )
          {
-            try
-            {
-               instance.PatchType( type );
-            }
-            catch( Exception e )
-            {
-               Logger.Current.Warn( e, "An error occurred while patching a property/method on a class." );
-            }
+            instance.PatchType( type );
          }
       }
 
       public static void PatchType( this HarmonyInstance instance, Type type )
       {
-         var parentMethodInfos = type.GetHarmonyMethods();
-         if( parentMethodInfos != null && parentMethodInfos.Count() > 0 )
+         try
          {
-            var info = HarmonyMethod.Merge( parentMethodInfos );
-            var processor = new PatchProcessor( instance, type, info );
-            processor.Patch();
+            var parentMethodInfos = type.GetHarmonyMethods();
+            if( parentMethodInfos != null && parentMethodInfos.Count() > 0 )
+            {
+               var info = HarmonyMethod.Merge( parentMethodInfos );
+               var processor = new PatchProcessor( instance, type, info );
+               processor.Patch();
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Warn( e, "An error occurred while patching a property/method on a class." );
          }
       }
    }

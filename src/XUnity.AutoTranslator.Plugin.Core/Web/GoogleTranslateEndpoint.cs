@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       //protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
-      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
+      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
       //private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
       private static readonly System.Random RandomNumbers = new System.Random();
 
