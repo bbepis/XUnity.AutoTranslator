@@ -41,9 +41,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UIAtlas, "spriteMaterial" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
    
@@ -79,9 +79,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UISprite, "material" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -98,9 +98,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UISprite, "atlas" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
    
@@ -117,9 +117,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UITexture, "mainTexture" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -136,9 +136,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UITexture, "material" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -174,9 +174,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UI2DSprite, "sprite2D" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
       }
    }
 
@@ -193,9 +193,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.UI2DSprite, "material" ).GetSetMethod();
       }
 
-      public static void Prefix( object __instance )
+      public static void Postfix( object __instance )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true );
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
+      }
+   }
+
+   [Harmony]
+   public static class UIPanel_clipTexture_Hook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return ClrTypes.UIPanel != null;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Property( ClrTypes.UIPanel, "clipTexture" ).GetSetMethod();
+      }
+
+      public static void Postfix( object __instance )
+      {
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
       }
    }
 
@@ -230,25 +249,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
          return AccessTools.Property( ClrTypes.UIFont, "dynamicFont" ).GetSetMethod();
-      }
-
-      public static void Postfix( object __instance )
-      {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance );
-      }
-   }
-
-   [Harmony]
-   public static class UIPanel_clipTexture_Hook
-   {
-      static bool Prepare( HarmonyInstance instance )
-      {
-         return ClrTypes.UIPanel != null;
-      }
-
-      static MethodBase TargetMethod( HarmonyInstance instance )
-      {
-         return AccessTools.Property( ClrTypes.UIPanel, "clipTexture" ).GetSetMethod();
       }
 
       public static void Postfix( object __instance )

@@ -1098,6 +1098,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void TranslateTexture( object ui, bool forceReload )
+      {
+         if( ui is Texture2D texture2d )
+         {
+            TranslateTexture( null, texture2d, false, forceReload );
+         }
+         else
+         {
+            TranslateTexture( ui, null, false, forceReload );
+         }
+      }
+
       private void TranslateTexture( object source, Texture2D texture, bool isPrefixHooked, bool forceReload )
       {
          try
@@ -2064,12 +2076,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
                }
-               else
+
+               if( Settings.EnableTextureTranslation )
                {
-                  if( Settings.EnableTextureTranslation )
-                  {
-                     TranslateTexture( ui, null, false, true );
-                  }
+                  TranslateTexture( ui, true );
                }
             }
             catch( Exception )
@@ -2197,12 +2207,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                      }
                   }
-                  else
+
+                  if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
                   {
-                     if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
-                     {
-                        TranslateTexture( ui, null, false, false );
-                     }
+                     TranslateTexture( ui, false );
                   }
                }
                catch( Exception )
@@ -2231,12 +2239,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                      }
                   }
-                  else
+
+                  if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
                   {
-                     if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
-                     {
-                        TranslateTexture( ui, null, false, false );
-                     }
+                     TranslateTexture( ui, false );
                   }
                }
                catch( Exception )

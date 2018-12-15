@@ -68,6 +68,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static Texture2D GetTexture( this object ui )
       {
+         if( ui == null ) return null;
+
          if( ui is Image image )
          {
             return image.mainTexture as Texture2D;

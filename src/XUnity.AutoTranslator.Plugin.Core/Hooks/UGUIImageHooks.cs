@@ -15,6 +15,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( MaskableGraphic_OnEnable_Hook ),
          typeof( Image_sprite_Hook ),
          typeof( Image_overrideSprite_Hook ),
+         typeof( Image_material_Hook ),
          typeof( RawImage_texture_Hook ),
          typeof( Cursor_SetCursor_Hook ),
 
@@ -27,9 +28,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       public static void Prefix( object __instance, object value )
       {
-         if( value is Texture2D texture2D )
+         if( value is Texture2D texture2d )
          {
-            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true );
          }
       }
    }
@@ -49,9 +50,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void Prefix( object __instance, Texture value )
       {
-         if( value is Texture2D texture2D )
+         if( value is Texture2D texture2d )
          {
-            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2D, true );
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true );
          }
       }
    }
@@ -117,6 +118,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
+   public static class Image_material_Hook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Property( typeof( Image ), "material" ).GetSetMethod();
+      }
+
+      public static void Postfix( object __instance )
+      {
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
+      }
+   }
+
+   [Harmony]
    public static class RawImage_texture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -129,9 +149,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( typeof( RawImage ), "texture" ).GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance, Texture value )
       {
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false );
+         if( value is Texture2D texture2d )
+         {
+            AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true );
+         }
       }
    }
 
