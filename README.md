@@ -26,7 +26,7 @@ This is an auto translation mod that hooks into the unity game engine and attemp
  * TextMeshPro
  * Utage (VN Game Engine)
 
-It does go to the internet, in order to provide the translation, so if you are not comfortable with that, dont use it.
+It does go to the internet, in order to provide the translation, so if you are not comfortable with that, don't use it.
  
 ## Plugin Frameworks
 The mod can be installed into the following Plugin Managers:
@@ -223,7 +223,7 @@ TextureHashGenerationStrategy=FromImageName
 
 `EnableTextureDumping` enables texture dumping. This means that the mod will dump any images it has not already dumped to the `TextureDirectory`. When dumping textures, it may also be worth enabling `EnableTextureScanOnSceneLoad` to more quickly find all textures that require translating. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
-`EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost. However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
+`EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost during scene load (which is often during loading screens, etc.). However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
 
 `LoadUnmodifiedTextures` enables whether or not the plugin should load textures that has not been modified. This is only useful for debugging, and likely to cause various visual glitches, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
