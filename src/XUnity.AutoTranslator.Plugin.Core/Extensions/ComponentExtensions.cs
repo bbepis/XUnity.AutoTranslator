@@ -97,10 +97,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             graphic.SetAllDirty();
          }
-         else if( ui is Material material )
-         {
-            material.mainTexture = material.mainTexture;
-         }
          else
          {
             // lets attempt some reflection for several known types

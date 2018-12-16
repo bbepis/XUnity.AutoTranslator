@@ -81,8 +81,8 @@ ForceUIResizing=True             ;Indicates whether the UI resize behavior shoul
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from
 EnableTextureTranslation=False   ;Indicates whether the plugin will attempt to replace in-game images with those from the TextureDirectory directory
-EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capapble of replacing to the TextureDirectory. Has significant performance impact
-EnableTextureToggling=False      ;Indicates whether or not toggle the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
+EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capable of replacing to the TextureDirectory. Has significant performance impact
+EnableTextureToggling=False      ;Indicates whether or not toggling the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
 EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
 TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameThenData"]
@@ -212,7 +212,7 @@ TextureDirectory=Translation\Texture
 EnableTextureTranslation=False
 EnableTextureDumping=False
 EnableTextureToggling=False
-EnableTextureScanOnSceneLoad=True
+EnableTextureScanOnSceneLoad=False
 LoadUnmodifiedTextures=False
 TextureHashGenerationStrategy=FromImageName
 ```
@@ -230,8 +230,8 @@ TextureHashGenerationStrategy=FromImageName
 `EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. This is by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
-This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639-6E698E92].png`. This configuration specifies how these hash-values are generated:
- * `FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images or even be unique. However, it is generally fairly reliable.
+This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:
+ * `FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images or even be unique. However, it is generally fairly reliable. If an image has no resource name, it will not be dumped.
  * `FromImageData` means that the hash is generated from the data stored in the image, which is guaranteed to exist for all images. However, generating the hash comes at a performance cost, that will also be incurred by the end-users.
  * `FromImageNameThenData` means that it should use the name, if available, otherwise use the data.
 
