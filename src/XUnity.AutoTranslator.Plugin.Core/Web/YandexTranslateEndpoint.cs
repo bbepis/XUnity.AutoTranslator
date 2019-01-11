@@ -14,9 +14,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    public class YandexTranslateEndpoint : KnownHttpEndpoint
    {
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
-      public YandexTranslateEndpoint()
+
+      private string _key;
+
+      public YandexTranslateEndpoint( string key )
       {
+         if( string.IsNullOrEmpty( key ) ) throw new ArgumentException( "The YandexTranslate endpoint requires an API key which has not been provided.", nameof( key ) );
+
+         _key = key;
+
          ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translate.yandex.net" );
+
+         SetupServicePoints( "https://translate.yandex.net" );
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )
@@ -69,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         return string.Format( HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ), Settings.YandexAPIKey );
+         return string.Format( HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ), _key );
       }
    }
 }

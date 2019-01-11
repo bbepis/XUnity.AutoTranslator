@@ -15,12 +15,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    public class BaiduTranslateEndpoint : KnownHttpEndpoint
    {
       private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
-
       private static readonly MD5 HashMD5 = MD5.Create();
 
-      public BaiduTranslateEndpoint()
+      private string _appId;
+      private string _appSecret;
+
+      public BaiduTranslateEndpoint( string baiduAppId, string baiduAppSecret )
       {
+         if( string.IsNullOrEmpty( baiduAppId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided.", nameof( baiduAppId ) );
+         if( string.IsNullOrEmpty( baiduAppSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided.", nameof( baiduAppSecret ) );
+
+         _appId = baiduAppId;
+         _appSecret = baiduAppSecret;
+
          ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "api.fanyi.baidu.com" );
+
+         SetupServicePoints( "http://api.fanyi.baidu.com" );
       }
 
       private static string CreateMD5( string input )
@@ -81,9 +91,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
          string salt = DateTime.UtcNow.Millisecond.ToString();
-         var md5 = CreateMD5( Settings.BaiduAppId + untranslatedText + salt + Settings.BaiduAppSecret );
+         var md5 = CreateMD5( _appId + untranslatedText + salt + _appSecret );
 
-         return string.Format( HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, Settings.BaiduAppId, salt, md5 );
+         return string.Format( HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, _appId, salt, md5 );
       }
    }
 }

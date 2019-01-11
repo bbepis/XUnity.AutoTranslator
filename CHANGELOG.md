@@ -1,4 +1,15 @@
-﻿### 2.16.0
+﻿### 2.17.0
+ * FEATURE - Support legitimate Bing translate API (requires key)
+ * FEATURE - Documented custom endpoint
+ * BUG FIX - Fixed bug in older versions of the Unity engine where the plugin would crash on startup due to missing APIs in relation to the SceneManagement namespace
+ * BUG FIX - Fixed bug that could happen in Utage-based games, that would cause dialogue to sometimes be cut off mid-sentence
+ * BUG FIX - Incorrect handling of 'null' default values in configuration
+ * BUG FIX - Various other minor fixes
+ * MISC - Added configuration option to support ignoring texts starting with certain characters, IgnoreTextStartingWith
+ * MISC - Template reparation for IMGUI translations
+ * MISC - Big update to README file to fully describe the features of the plugin
+
+### 2.16.0
  * FEATURE - Support image dumping and loading (not automatic!). Disabled by default
  * BUG FIX - Fixed toggle translation which was broken in 2.15.4
  * BUG FIX - Updated TKK retrieval logic

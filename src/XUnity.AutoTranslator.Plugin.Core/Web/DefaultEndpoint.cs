@@ -14,7 +14,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public DefaultEndpoint( string endpoint )
       {
          _endpoint = endpoint;
-         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( new Uri( _endpoint ).Host );
+
+         var uri = new Uri( endpoint );
+         ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( uri.Host );
+
+         SetupServicePoints( uri.Scheme + "://" + uri.Host + ":" + uri.Port );
       }
 
       public override void ApplyHeaders( WebHeaderCollection headers )

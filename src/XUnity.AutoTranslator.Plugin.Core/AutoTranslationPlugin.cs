@@ -92,7 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
 
-      private object _advEngine;
+      private Component _advEngine;
       private float? _nextAdvUpdate;
 
       private IKnownEndpoint _endpoint;
@@ -186,7 +186,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _overrideFont = _hasOverrideFont;
          }
 
-         if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
+         if( Features.SupportsScenes && Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
          {
             try
             {
@@ -280,11 +280,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void EnableSceneLoadScan()
       {
-         // specified in own method, because of chance that this has changed through Unity lifetime
-         SceneManager.sceneLoaded += SceneManager_SceneLoaded;
+         EnableSceneLoadScanInternal();
       }
 
-      private void SceneManager_SceneLoaded( Scene scene, LoadSceneMode arg1 )
+      public void EnableSceneLoadScanInternal()
+      {
+         // specified in own method, because of chance that this has changed through Unity lifetime
+         SceneManager.sceneLoaded += ( arg1, arg2 ) => SceneManager_SceneLoaded();
+      }
+
+      private void SceneManager_SceneLoaded()
       {
          Logger.Current.Info( "SceneLoading..." );
          var startTime = Time.realtimeSinceStartup;
@@ -365,7 +370,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var data = File.ReadAllBytes( fullFileName );
             var currentHash = HashHelper.Compute( data );
             var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
-            
+
             // only load images that someone has modified!
             if( Settings.LoadUnmodifiedTextures || isModified )
             {
@@ -697,8 +702,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _unstartedJobs.Clear();
                _completedJobs.Clear();
                _ongoingJobs.Clear();
-               Settings.IsShutdown = true;
 
+               Settings.IsShutdown = true;
                Logger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
             }
          }
@@ -976,7 +981,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private bool IsTranslatable( string str )
       {
-         return _symbolCheck( str ) && str.Length <= Settings.MaxCharactersPerTranslation && !_reverseTranslations.ContainsKey( str );
+         return _symbolCheck( str )
+            && str.Length <= Settings.MaxCharactersPerTranslation
+            && !_reverseTranslations.ContainsKey( str )
+            && !Settings.IgnoreTextStartingWith.Any( x => str.StartsWithStrict( x ) );
       }
 
       private bool IsShortText( string str )
@@ -1718,7 +1726,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                KickoffTranslations();
                FinishTranslations();
 
-               if( _nextAdvUpdate.HasValue && Time.time > _nextAdvUpdate )
+               if( ClrTypes.AdvEngine != null && _nextAdvUpdate.HasValue && Time.time > _nextAdvUpdate )
                {
                   _nextAdvUpdate = null;
                   UpdateUtageText();
@@ -1826,15 +1834,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
       {
-         if( !Settings.IsShutdown )
-         {
-            if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
-            {
-               Settings.IsShutdown = true;
-               Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
-            }
-         }
-
          _consecutiveErrors = 0;
 
          var succeeded = batch.MatchWithTranslations( translatedTextBatch );
@@ -1881,11 +1880,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             Logger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
          }
-      }
-
-      private void OnSingleTranslationCompleted( TranslationJob job, string translatedText )
-      {
-         Settings.TranslationCount++;
 
          if( !Settings.IsShutdown )
          {
@@ -1893,8 +1887,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                Settings.IsShutdown = true;
                Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
             }
          }
+      }
+
+      private void OnSingleTranslationCompleted( TranslationJob job, string translatedText )
+      {
+         Settings.TranslationCount++;
 
          _consecutiveErrors = 0;
 
@@ -1913,6 +1916,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          AddTranslation( job.Key, job.TranslatedText );
          job.State = TranslationJobState.Succeeded;
          _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
+
+         if( !Settings.IsShutdown )
+         {
+            if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
+            {
+               Settings.IsShutdown = true;
+               Logger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+
+               _unstartedJobs.Clear();
+               _completedJobs.Clear();
+               _ongoingJobs.Clear();
+            }
+         }
       }
 
       private void OnTranslationFailed( TranslationJob job )
@@ -2041,9 +2057,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void UpdateUtageText()
       {
-         if( _advEngine == null )
+         // After an object is destroyed, an equality check with null will return true. The variable does not go to null, you can still call GetInstanceID() on it, but the "==" operator is overloaded and behaves as expected.
+         if( _advEngine == null || _advEngine?.gameObject == null )
          {
-            _advEngine = GameObject.FindObjectOfType( Constants.ClrTypes.AdvEngine );
+            _advEngine = (Component)GameObject.FindObjectOfType( Constants.ClrTypes.AdvEngine );
          }
 
          if( _advEngine != null )

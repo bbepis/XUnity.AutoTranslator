@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
@@ -65,6 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string WatsonAPIUrl;
       public static string WatsonAPIUsername;
       public static string WatsonAPIPassword;
+      public static string BingOcpApimSubscriptionKey;
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
       public static string MigrationsTag;
@@ -78,6 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
+      public static string[] IgnoreTextStartingWith;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -139,7 +142,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          OverrideFont = Config.Current.Preferences[ "Behaviour" ][ "OverrideFont" ].GetOrDefault( string.Empty );
          ResizeUILineSpacingScale = Config.Current.Preferences[ "Behaviour" ][ "ResizeUILineSpacingScale" ].GetOrDefault<float?>( null, true );
          ForceUIResizing = Config.Current.Preferences[ "Behaviour" ][ "ForceUIResizing" ].GetOrDefault( false );
-
+         IgnoreTextStartingWith = Config.Current.Preferences[ "Behaviour" ][ "IgnoreTextStartingWith" ].GetOrDefault( "\\u180e;", true )
+            ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).Select( x => x.UnescapeJson() ).ToArray() ?? new string[ 0 ];
 
          TextureDirectory = Config.Current.Preferences[ "Texture" ][ "TextureDirectory" ].GetOrDefault( @"Translation\Texture" );
          EnableTextureTranslation = Config.Current.Preferences[ "Texture" ][ "EnableTextureTranslation" ].GetOrDefault( false );
@@ -165,6 +169,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );
 
          GoogleAPIKey = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
+
+         BingOcpApimSubscriptionKey = Config.Current.Preferences[ "BingLegitimate" ][ "OcpApimSubscriptionKey" ].GetOrDefault( "" );
 
          BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
          BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );

@@ -269,6 +269,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return false;
       }
 
+      public static bool StartsWithStrict( this string str, string prefix )
+      {
+         var len = Math.Min( str.Length, prefix.Length );
+         if( len < prefix.Length ) return false;
+
+         for( int i = 0 ; i < len ; i++ )
+         {
+            if( str[ i ] != prefix[ i ] ) return false;
+         }
+
+         return true;
+      }
+
       public static string UnescapeJson( this string str )
       {
          if( str == null ) return null;

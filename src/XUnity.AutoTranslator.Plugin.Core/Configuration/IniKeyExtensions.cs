@@ -13,10 +13,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static T GetOrDefault<T>( this IniKey that, T defaultValue, bool allowEmpty = false )
       {
          var typeOfT = typeof( T ).UnwrapNullable();
-         if( !allowEmpty )
+         if( allowEmpty )
          {
             var value = that.Value;
-            if( string.IsNullOrEmpty( value ) )
+            if( value == null ) // we want to use the default value, because it is null, the config has just been created
             {
                if( defaultValue != null )
                {
@@ -37,14 +37,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             }
             else
             {
-               if( typeOfT.IsEnum )
+               // there exists a value in the config, so we do not want to set anything
+               // we just want to return what we can find, default not included
+               if( !string.IsNullOrEmpty( value ) )
                {
-                  return (T)Enum.Parse( typeOfT, that.Value, true );
+                  if( typeOfT.IsEnum )
+                  {
+                     return (T)Enum.Parse( typeOfT, that.Value, true );
+                  }
+                  else
+                  {
+                     return (T)Convert.ChangeType( that.Value, typeOfT, CultureInfo.InvariantCulture );
+                  }
                }
-               else
-               {
-                  return (T)Convert.ChangeType( that.Value, typeOfT, CultureInfo.InvariantCulture );
-               }
+               return default( T );
             }
          }
          else

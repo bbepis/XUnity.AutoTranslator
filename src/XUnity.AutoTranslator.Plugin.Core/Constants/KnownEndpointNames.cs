@@ -20,5 +20,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public const string WatsonTranslate = "WatsonTranslate";
 
       public const string ExciteTranslate = "ExciteTranslate";
+
+      public const string BingTranslate = "BingTranslate";
+
+      public const string BingTranslateLegitimate = "BingTranslateLegitimate";
    }
 }

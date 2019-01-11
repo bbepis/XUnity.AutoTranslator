@@ -34,6 +34,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type Typewriter = FindType( "Typewriter" );
       public static readonly Type TextEditor = FindType( "UnityEngine.TextEditor" );
       public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
+      public static readonly Type SceneManager = FindType( "UnityEngine.SceneManager" );
+      public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
 
       // Utage
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );

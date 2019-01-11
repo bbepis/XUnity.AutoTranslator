@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.BepIn
 {
@@ -15,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
 
       protected override void Log( LogLevel level, string message )
       {
-         BepInEx.Logger.CurrentLogger.Log( Convert( level ), "[XUnity.AutoTranslator] " + message );
+         BepInEx.Logger.CurrentLogger.Log( Convert( level ), "[XUnity.AutoTranslator " + PluginData.Version + "] " + message );
       }
 
       public BepInEx.Logging.LogLevel Convert( LogLevel level )

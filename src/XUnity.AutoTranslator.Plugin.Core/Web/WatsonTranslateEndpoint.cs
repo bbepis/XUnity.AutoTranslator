@@ -15,9 +15,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    {
       private static readonly string HttpsServicePointTemplateUrl = Settings.WatsonAPIUrl.TrimEnd( '/' ) + "/v2/translate?model_id={0}-{1}&text={2}";
 
-      public WatsonTranslateEndpoint()
+      private string _url;
+      private string _username;
+      private string _password;
+
+      public WatsonTranslateEndpoint( string url, string username, string password )
       {
-         //ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( new Uri( Settings.WatsonAPIUrl ).Host );
+         if( string.IsNullOrEmpty( url ) ) throw new ArgumentException( "The WatsonTranslate endpoint requires a url which has not been provided.", nameof( url ) );
+         if( string.IsNullOrEmpty( username ) ) throw new ArgumentException( "The WatsonTranslate endpoint requires a username which has not been provided.", nameof( username ) );
+         if( string.IsNullOrEmpty( password ) ) throw new ArgumentException( "The WatsonTranslate endpoint requires a password which has not been provided.", nameof( password ) );
+
+         _url = url;
+         _username = username;
+         _password = password;
+
+         //ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( new Uri( _url ).Host );
       }
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
@@ -25,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          headers[ "User-Agent" ] = Settings.GetUserAgent( "curl/7.55.1" );
          headers[ "Accept" ] = "application/json";
          headers[ "Accept-Charset" ] = "UTF-8";
-         headers[ "Authorization" ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( Settings.WatsonAPIUsername + ":" + Settings.WatsonAPIPassword ) );
+         headers[ "Authorization" ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( _username + ":" + _password ) );
       }
 
       //public override void ApplyHeaders( WebHeaderCollection headers )
@@ -33,7 +45,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       //   headers[ HttpRequestHeader.UserAgent ] = "curl/7.55.1";
       //   headers[ HttpRequestHeader.Accept ] = "application/json";
       //   headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
-      //   headers[ HttpRequestHeader.Authorization ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( Settings.WatsonAPIUsername + ":" + Settings.WatsonAPIPassword ) );
+      //   headers[ HttpRequestHeader.Authorization ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( _username + ":" + _password ) );
       //}
 
       public override bool TryExtractTranslated( string result, out string translated )

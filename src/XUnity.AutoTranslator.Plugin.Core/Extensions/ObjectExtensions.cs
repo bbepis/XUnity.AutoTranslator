@@ -39,13 +39,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
             || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )
             || ( ClrTypes.UITexture != null && ClrTypes.UITexture.IsAssignableFrom( type ) )
-            //|| ( ClrTypes.UIFont != null && ClrTypes.UIFont.IsAssignableFrom( type ) )
             || ( ClrTypes.UIPanel != null && ClrTypes.UIPanel.IsAssignableFrom( type ) );
       }
 
       public static bool SupportsStabilization( this object ui )
       {
          if( ui == null ) return false;
+
+         // shortcircuit for spammy component, to avoid reflective calls
+         if( ui is GUIContent ) return false;
 
          var type = ui.GetType();
 

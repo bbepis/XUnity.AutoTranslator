@@ -19,8 +19,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    {
       private static readonly string HttpsServicePointTemplateUrl = "https://translation.googleapis.com/language/translate/v2?key={0}";
 
-      public GoogleTranslateLegitimateEndpoint()
+      private string _key;
+
+      public GoogleTranslateLegitimateEndpoint( string key )
       {
+         if( string.IsNullOrEmpty( key ) ) throw new ArgumentException( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided.", nameof( key ) );
+
+         _key = key;
+
          // Configure service points / service point manager
          ServicePointManager.ServerCertificateValidationCallback += Security.AlwaysAllowByHosts( "translation.googleapis.com" );
          SetupServicePoints( "https://translation.googleapis.com" );
@@ -63,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
       public override string GetServiceUrl( string untranslatedText, string from, string to )
       {
-         return string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( Settings.GoogleAPIKey ) );
+         return string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( _key ) );
       }
 
       public override string GetRequestObject( string untranslatedText, string from, string to )
@@ -83,30 +89,4 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return false;
       }
    }
-   
-   //public class GRequest
-   //{
-   //   public string q { get; set; }
-
-   //   public string target { get; set; }
-
-   //   public string source { get; set; }
-
-   //   public string format { get; set; }
-   //}
-
-   //public class GResponse
-   //{
-   //   public GData data { get; set; }
-   //}
-
-   //public class GData
-   //{
-   //   public List<GTranslation> translations { get; set; }
-   //}
-
-   //public class GTranslation
-   //{
-   //   public string translatedText { get; set; }
-   //}
 }

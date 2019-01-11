@@ -12,6 +12,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public static readonly bool SupportsCustomYieldInstruction = false;
 
+      public static readonly bool SupportsScenes = false;
+
       static Features()
       {
          try
@@ -30,6 +32,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception )
          {
             
+         }
+
+         try
+         {
+            SupportsScenes = ClrTypes.Scene != null && ClrTypes.SceneManager != null;
+         }
+         catch( Exception )
+         {
+
          }
       }
    }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -70,15 +71,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          switch( level )
          {
             case LogLevel.Debug:
-               return "[DEBUG][XUnity.AutoTranslator]: ";
+               return "[DEBUG][XUnity.AutoTranslator " + PluginData.Version + "]: ";
             case LogLevel.Info:
-               return "[INFO][XUnity.AutoTranslator]: ";
+               return "[INFO][XUnity.AutoTranslator " + PluginData.Version + "]: ";
             case LogLevel.Warn:
-               return "[WARN][XUnity.AutoTranslator]: ";
+               return "[WARN][XUnity.AutoTranslator " + PluginData.Version + "]: ";
             case LogLevel.Error:
-               return "[ERROR][XUnity.AutoTranslator]: ";
+               return "[ERROR][XUnity.AutoTranslator " + PluginData.Version + "]: ";
             default:
-               return "[UNKNOW][XUnity.AutoTranslator]: ";
+               return "[UNKNOW][XUnity.AutoTranslator " + PluginData.Version + "]: ";
          }
       }
    }
