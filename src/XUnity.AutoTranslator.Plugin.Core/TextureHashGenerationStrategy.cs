@@ -4,6 +4,6 @@
    {
       FromImageName,
       FromImageData,
-      FromImageNameThenData
+      FromImageNameAndScene,
    }
 }

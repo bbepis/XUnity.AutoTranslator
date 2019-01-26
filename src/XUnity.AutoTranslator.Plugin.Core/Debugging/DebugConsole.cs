@@ -24,6 +24,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 
          Console.SetOut( writer );
          Console.SetError( writer );
+
+         uint shiftjisCodePage = 932;
+
+         Kernel32.SetConsoleOutputCP( shiftjisCodePage );
+         Console.OutputEncoding = ConsoleEncoding.GetEncoding( shiftjisCodePage );
       }
    }
 }

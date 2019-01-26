@@ -126,9 +126,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       public static string Decode( string text )
       {
+         var commentIndex = text.IndexOf( "//" );
+         if( commentIndex > -1 )
+         {
+            text = text.Substring( 0, commentIndex );
+         }
+
          return text.Replace( "\\r", "\r" )
             .Replace( "\\n", "\n" )
-            .Replace( "%3D", "=" );
+            .Replace( "%3D", "=" )
+            .Replace( "%2F%2F", "//" );
       }
 
       /// <summary>
@@ -140,7 +147,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          return text.Replace( "\r", "\\r" )
             .Replace( "\n", "\\n" )
-            .Replace( "=", "%3D" );
+            .Replace( "=", "%3D" )
+            .Replace( "//", "%2F%2F" );
       }
    }
 }

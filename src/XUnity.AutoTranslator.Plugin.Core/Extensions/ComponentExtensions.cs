@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Harmony;
@@ -13,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly string TextPropertyName = "text";
       private static readonly string TexturePropertyName = "texture";
       private static readonly string MainTexturePropertyName = "mainTexture";
+      private static readonly string CapitalMainTexturePropertyName = "MainTexture";
       private static readonly string MarkAsChangedMethodName = "MarkAsChanged";
 
       public static string GetText( this object ui )
@@ -78,12 +80,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             return rawImage.mainTexture as Texture2D;
          }
+         else if( ui is SpriteRenderer spriteRenderer )
+         {
+            return spriteRenderer.sprite?.texture;
+         }
          else
          {
             // lets attempt some reflection for several known types
             var type = ui.GetType();
             var texture = type.GetProperty( MainTexturePropertyName )?.GetValue( ui, null )
-               ?? type.GetProperty( TexturePropertyName )?.GetValue( ui, null );
+               ?? type.GetProperty( TexturePropertyName )?.GetValue( ui, null )
+               ?? type.GetProperty( CapitalMainTexturePropertyName )?.GetValue( ui, null );
 
             return texture as Texture2D;
          }

@@ -32,5 +32,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 
       [DllImport( "kernel32.dll", ExactSpelling = true, SetLastError = true )]
       public static extern bool CloseHandle( IntPtr handle );
+
+      [DllImport( "kernel32.dll" )]
+      public static extern IntPtr SetConsoleOutputCP( uint codepage );
+
+      [DllImport( "kernel32.dll", SetLastError = true )]
+      public static extern int WideCharToMultiByte(
+          uint codePage,
+          uint dwFlags,
+          [In, MarshalAs( UnmanagedType.LPArray )] char[] lpWideCharStr,
+          int cchWideChar,
+          [Out, MarshalAs( UnmanagedType.LPArray )] byte[] lpMultiByteStr,
+          int cbMultiByte,
+          IntPtr lpDefaultChar,
+          IntPtr lpUsedDefaultChar );
+
+      [DllImport( "kernel32.dll", SetLastError = true )]
+      public static extern int MultiByteToWideChar(
+          uint codePage,
+          uint dwFlags,
+          [In, MarshalAs( UnmanagedType.LPArray )] byte[] lpMultiByteStr,
+          int cbMultiByte,
+          [Out, MarshalAs( UnmanagedType.LPArray )] char[] lpWideCharStr,
+          int cchWideChar );
    }
 }

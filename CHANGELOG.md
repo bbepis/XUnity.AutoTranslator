@@ -1,4 +1,19 @@
-﻿### 2.17.0
+﻿### 2.18.0
+ * FEATURE - Text Getter Compatibility Mode. Fools the game into thinking that it is not actually translated
+ * FEATURE - Textures - Live2D component support
+ * FEATURE - Textures - SpriteRenderer component support
+ * FEATURE - Hotkey to reboot plugin in certain situations
+ * BUG FIX - No longer trim translated text (if configured) when loading translation files
+ * MISC - Support legacy OnLevelWasLoaded
+ * MISC - Avoid harmless 'log errors' in relation to texture translation
+ * MISC - Set max value of MaxCharactersPerTranslation to 500
+ * MISC - Documentation update to describe 'Behaviour' configuration section
+ * MISC - Removed "FromImageNameThenData" as hash source on textures
+ * MISC - Added "FromImageNameAndScene" as hash source on textures
+ * MISC - Inline comment handling when using '//' to indicate a comment
+ * MISC - Improved default configuration for Utage-related games to improve translation when newlines are involved
+
+### 2.17.0
  * FEATURE - Support legitimate Bing translate API (requires key)
  * FEATURE - Documented custom endpoint
  * BUG FIX - Fixed bug in older versions of the Unity engine where the plugin would crash on startup due to missing APIs in relation to the SceneManagement namespace

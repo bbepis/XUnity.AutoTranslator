@@ -14,20 +14,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       
       public static TextureDataResult GetData( Texture2D texture, RenderTextureFormat rtf = RenderTextureFormat.Default, RenderTextureReadWrite cs = RenderTextureReadWrite.Default )
       {
-         byte[] data = null;
-         bool nonReadable = texture.IsNonReadable();
+         var start = Time.realtimeSinceStartup;
 
-         if( !nonReadable )
-         {
-            data = texture.EncodeToPNGEx();
-         }
+         byte[] data = null;
+         //bool nonReadable = texture.IsNonReadable();
+
+         //if( !nonReadable )
+         //{
+         //   data = texture.EncodeToPNGEx();
+         //}
 
          if( data == null )
          {
-            // https://support.unity3d.com/hc/en-us/articles/206486626-How-can-I-get-pixels-from-unreadable-textures-
-            nonReadable = true;
-
             var tmp = RenderTexture.GetTemporary( texture.width, texture.height, 0, rtf, cs );
+            GL.Clear( false, true, Transparent );
             Graphics.Blit( texture, tmp );
             var previousRenderTexture = RenderTexture.active;
             RenderTexture.active = tmp;
@@ -37,30 +37,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             data = texture2d.EncodeToPNGEx();
             UnityEngine.Object.DestroyImmediate( texture2d );
 
-            //GL.Clear( false, true, Transparent );
             //Graphics.Blit( tex, tmp );
             //var texture2d = GetTextureFromRenderTexture( tmp );
             //var data = texture2d.EncodeToPNG();
             //UnityEngine.Object.DestroyImmediate( texture2d );
 
-            RenderTexture.active = previousRenderTexture;
+            RenderTexture.active = previousRenderTexture == tmp ? null : previousRenderTexture;
             RenderTexture.ReleaseTemporary( tmp );
          }
 
-         return new TextureDataResult( data, nonReadable );
+         var end = Time.realtimeSinceStartup;
+
+         return new TextureDataResult( data, false, end - start );
       }
    }
 
    public struct TextureDataResult
    {
-      public TextureDataResult( byte[] data, bool nonReadable )
+      public TextureDataResult( byte[] data, bool nonReadable, float calculationTime )
       {
          Data = data;
          NonReadable = nonReadable;
+         CalculationTime = calculationTime;
       }
 
       public byte[] Data { get; }
 
       public bool NonReadable { get; }
+
+      public float CalculationTime { get; set; }
    }
 }

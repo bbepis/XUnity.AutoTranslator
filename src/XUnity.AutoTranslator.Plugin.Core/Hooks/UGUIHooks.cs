@@ -8,6 +8,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
+
    public static class UGUIHooks
    {
       public static bool HooksOverriden = false;
@@ -36,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          if( !UGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -60,7 +61,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          if( !UGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }

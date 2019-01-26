@@ -46,32 +46,35 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
+      public static void InstallTextGetterCompatHooks()
+      {
+         try
+         {
+            if( Settings.TextGetterCompatibilityMode )
+            {
+               _harmony.PatchAll( TextGetterCompatHooks.All );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while setting up text getter compat hooks." );
+         }
+      }
+
       public static void InstallImageHooks()
       {
          try
          {
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
-               _harmony.PatchAll( UGUIImageHooks.All );
+               _harmony.PatchAll( ImageHooks.All );
             }
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up image hooks for UnityEngine." );
+            Logger.Current.Error( e, "An error occurred while setting up image hooks." );
          }
-
-         try
-         {
-            if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
-            {
-               _harmony.PatchAll( NGUIImageHooks.All );
-            }
-         }
-         catch( Exception e )
-         {
-            Logger.Current.Error( e, "An error occurred while setting up image hooks for NGUI." );
-         }
-
+         
          //var knownTypes = new HashSet<Type> { typeof( Texture ), typeof( Texture2D ), typeof( Sprite ), typeof( Material ) };
          //foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
          //{
@@ -112,7 +115,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          //      Logger.Current.Error( "Failed getting types of assembly: " + assembly.FullName );
          //   }
          //}
-
       }
 
       public static void InstallTextHooks()

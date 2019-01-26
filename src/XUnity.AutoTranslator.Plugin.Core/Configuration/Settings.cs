@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    public static class Settings
    {
       // cannot be changed
+      public static readonly int MaxMaxCharactersPerTranslation = 500;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
       public static readonly string EnglishLanguage = "en";
@@ -30,6 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
 
       public static bool IsShutdown = false;
+      public static bool IsShutdownFatal = false;
       public static int TranslationCount = 0;
       public static int MaxAvailableBatchOperations = 40;
 
@@ -81,12 +84,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
       public static string[] IgnoreTextStartingWith;
+      public static bool TextGetterCompatibilityMode;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
       public static bool EnableTextureDumping;
       public static bool EnableTextureToggling;
       public static bool EnableTextureScanOnSceneLoad;
+      public static bool EnableSpriteRendererHooking;
       public static bool LoadUnmodifiedTextures;
       //public static bool DeleteUnmodifiedTextures;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
@@ -129,7 +134,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          Delay = Config.Current.Preferences[ "Behaviour" ][ "Delay" ].GetOrDefault( 0f );
          MaxCharactersPerTranslation = Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].GetOrDefault( 200 );
-         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( ClrTypes.AdvEngine == null );
+         IgnoreWhitespaceInDialogue = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInDialogue" ].GetOrDefault( true );
          IgnoreWhitespaceInNGUI = Config.Current.Preferences[ "Behaviour" ][ "IgnoreWhitespaceInNGUI" ].GetOrDefault( true );
          MinDialogueChars = Config.Current.Preferences[ "Behaviour" ][ "MinDialogueChars" ].GetOrDefault( 20 );
          ForceSplitTextAfterCharacters = Config.Current.Preferences[ "Behaviour" ][ "ForceSplitTextAfterCharacters" ].GetOrDefault( 0 );
@@ -144,15 +149,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          ForceUIResizing = Config.Current.Preferences[ "Behaviour" ][ "ForceUIResizing" ].GetOrDefault( false );
          IgnoreTextStartingWith = Config.Current.Preferences[ "Behaviour" ][ "IgnoreTextStartingWith" ].GetOrDefault( "\\u180e;", true )
             ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).Select( x => x.UnescapeJson() ).ToArray() ?? new string[ 0 ];
+         TextGetterCompatibilityMode = Config.Current.Preferences[ "Behaviour" ][ "TextGetterCompatibilityMode" ].GetOrDefault( false );
 
          TextureDirectory = Config.Current.Preferences[ "Texture" ][ "TextureDirectory" ].GetOrDefault( @"Translation\Texture" );
          EnableTextureTranslation = Config.Current.Preferences[ "Texture" ][ "EnableTextureTranslation" ].GetOrDefault( false );
          EnableTextureDumping = Config.Current.Preferences[ "Texture" ][ "EnableTextureDumping" ].GetOrDefault( false );
          EnableTextureToggling = Config.Current.Preferences[ "Texture" ][ "EnableTextureToggling" ].GetOrDefault( false );
          EnableTextureScanOnSceneLoad = Config.Current.Preferences[ "Texture" ][ "EnableTextureScanOnSceneLoad" ].GetOrDefault( false );
+         EnableSpriteRendererHooking = Config.Current.Preferences[ "Texture" ][ "EnableSpriteRendererHooking" ].GetOrDefault( false );
          LoadUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "LoadUnmodifiedTextures" ].GetOrDefault( false );
          //DeleteUnmodifiedTextures = Config.Current.Preferences[ "Texture" ][ "DeleteUnmodifiedTextures" ].GetOrDefault( false );
          TextureHashGenerationStrategy = Config.Current.Preferences[ "Texture" ][ "TextureHashGenerationStrategy" ].GetOrDefault( TextureHashGenerationStrategy.FromImageName );
+
+         if( MaxCharactersPerTranslation > MaxMaxCharactersPerTranslation )
+         {
+            Config.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].Value = MaxMaxCharactersPerTranslation.ToString( CultureInfo.InvariantCulture );
+            MaxCharactersPerTranslation = MaxMaxCharactersPerTranslation;
+         }
 
          // special handling because of enum parsing
          try

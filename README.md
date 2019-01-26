@@ -68,6 +68,8 @@ The plugin employs the following spam prevention mechanisms:
  12. It employs an internal dictionary of manual translations (~10000 in total) for commonly used phrases (Japanese-to-English only) to prevent sending out translation requests for these.
  13. Some endpoints support batching of translations so far fewer requests are sent. This does not increase the total number of translations per session (2).
  14. All translation results are cached in memory and stored on disk to prevent making the same translation request twice.
+ 15. Due to its spammy nature, any text that comes from an IMGUI component has any numbers found in it templated away (and substituted back in upon translation) to prevent issues in relation to (6).
+ 16. The plugin will keep a single TCP connection alive towards the translation endpoint. This connection will be gracefully closed if it is not used for 50 seconds.
 
 ## Text Frameworks
 The following text frameworks are supported.
@@ -112,7 +114,7 @@ AllowPluginHookOverride=True     ;Allow other text translation plugins to overri
 
 [Behaviour]
 Delay=0                          ;Delay to wait before attempting to translate a text in seconds
-MaxCharactersPerTranslation=200  ;Max characters per text to translate
+MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 500.
 IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
 IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
 MinDialogueChars=20              ;The length of the text for it to be considered a dialogue
@@ -128,15 +130,17 @@ WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline remov
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
+TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from
 EnableTextureTranslation=False   ;Indicates whether the plugin will attempt to replace in-game images with those from the TextureDirectory directory
 EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capable of replacing to the TextureDirectory. Has significant performance impact
 EnableTextureToggling=False      ;Indicates whether or not toggling the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
-EnableTextureScanOnSceneLoad=True ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
+EnableTextureScanOnSceneLoad=False ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
+EnableSpriteRendererHooking=False ;Indicates whether or not the plugin should attempt to hook SpriteRenderer. This is a seperate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
-TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameThenData"]
+TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameAndScene"]
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
@@ -169,6 +173,52 @@ Enable=True                      ;Used to enable automatic migrations of this co
 Tag=2.9.0                        ;Tag representing the last version this plugin was executed under. Do not edit
 ```
 
+### Behaviour Configuration Explanation
+
+#### Whitespace Handling
+When it comes to automated translations, proper whitespace handling can really make or break the translation. The parameters that control whitespace handling are:
+ * `IgnoreWhitespaceInDialogue`
+ * `IgnoreWhitespaceInNGUI`
+ * `MinDialogueChars`
+ * `ForceSplitTextAfterCharacters`
+ * `TrimAllText`
+ * `WhitespaceRemovalStrategy`
+
+The first thing the plugin does when it discovers a new text is trim any whitespace, if `TrimAllText` is configured. This does not include newlines or "special" whitespace such as japanese whitespace.
+
+After this initial trimming, the plugin determines whether or not it should perform a special whitespace removal operation. How it removes the whitespace is based on the parameter `WhitespaceRemomvalStrategy`. The default value of this parameter is recommended. The other value (AllOccurrences) is only kept for legacy reasons.
+
+It determine whether or not to perform this operation based on the parameters `IgnoreWhitespaceInDialogue`, `IgnoreWhitespaceInNGUI` and `MinDialogueChars`:
+ * `IgnoreWhitespaceInDialogue`: If the text is longer than `MinDialogueChars`, whitespace is removed.
+ * `IgnoreWhitespaceInNGUI`: If the text comes from an NGUI component, whitespace is removed.
+
+After the text has been translated by the configured service, `ForceSplitTextAfterCharacters` is used to determine if the plugin should force the result into multiple lines after a certain number of characters.
+
+The main reason that this type of handling can make or break a translation really comes down to whether or not whitespace is removed from the source text before sending it to the endpoint. Most endpoints (such as GoogleTranslate) consider text on multiple lines seperately, which can often result in terrible translation if an unnecessary newline is included.
+
+#### UI Resizing
+Often when performing a translation on a text component, the resulting text is larger than the original. This often means that there is not enough room in the text component for the result. This section describes ways to remedy that by changing important parameters of the text components.
+
+The important parameters in relation to this are `EnableUIResizing`, `ResizeUILineSpacingScale`, `ForceUIResizing` and `OverrideFont`.
+ * `EnableUIResizing`: Resizes the components when a translation is performed.
+ * `ForceUIResizing`: Resizes all components at all times, period.
+ * `ResizeUILineSpacingScale`: Changes the line spacing of resized components. UGUI only.
+ * `OverrideFont`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. UGUI only.
+
+Resizing of a UI component does not refer to changing of it's dimensions, but rather how the component handles overflow. The plugin changes the overflow parameters such that text is more likely to be displayed.
+
+#### Reducing Translation Requests
+The following aims at reducing the number of requests send to the translation endpoint:
+ * `EnableBatching`: Batches several translation requests into a single with supported endpoints (Only GoogleTranslate and GoogleTranslateLegitimate at the moment)
+ * `UseStaticTranslations`: Enables usage of internal lookup dictionary of various english-to-japanese terms.
+ * `MaxCharactersPerTranslation`: Specifies the maximum length of a text to translate. Any texts longer than this is ignored by the plugin. Cannot be greater than 500.
+
+#### Other Options
+ * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
+ * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
+ * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
+ * `Delay`: Required delay from a text appears until a translation request is queued in seconds. IMGUI not supported.
+
 ## Key Mapping
 The following key inputs are mapped:
  * ALT + T: Alternate between translated and untranslated versions of all texts provided by this plugin.
@@ -176,12 +226,13 @@ The following key inputs are mapped:
  * ALT + R: Reload translation files. Useful if you change the text and texture files on the fly. Not guaranteed to work for all textures.
  * ALT + U: Manual hooking. The default hooks wont always pick up texts. This will attempt to make lookups manually.
  * ALT + F: If OverrideFont is configured, will toggle between overridden and default font.
+ * ALT + Q: Reboot the plugin if it was shutdown. This will only work if the plugin was shut down due to consecutive errors towards the translation endpoint. Should only be used if you have reason to believe you have remedied the problem (such as changed VPN endpoint etc.) otherwise it will just shut down again.
 
 ## Installation
 The plugin can be installed in following ways:
 
 ### BepInEx Plugin
-REQUIRES: [BepInEx plugin manager](https://github.com/bbepis/BepInEx) (follow its installation instructions first!). 
+REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow its installation instructions first!). 
 
  1. Download XUnity.AutoTranslator-BepIn-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in BepInEx folder.
@@ -254,7 +305,7 @@ The file structure should like like this
 Often other mods UI are implemented through IMGUI. As you can see above, this is disabled by default. By changing the "EnableIMGUI" value to "True", it will start translating IMGUI as well, which likely means that other mods UI will be translated.
 
 ## Manual Translations
-When you use this plugin, you can always go to the file `Translation\_AutoGeneratedTranslations.{lang}.txt` (OutputFile) to edit any auto generated translations and they will show up the next time you run the game.
+When you use this plugin, you can always go to the file `Translation\_AutoGeneratedTranslations.{lang}.txt` (OutputFile) to edit any auto generated translations and they will show up the next time you run the game. Or you can press (ALT+R) to reload the translation immediately.
 
 It is also worth noting that this plugin will read all text files (*.txt) in the `Translation` (Directory), so if you want to provide a manual translation, you can simply cut out texts from the `Translation\_AutoGeneratedTranslations.{lang}.txt` (OutputFile) and place them in new text files in order to replace them with a manual translation.
 
@@ -280,6 +331,7 @@ EnableTextureTranslation=False
 EnableTextureDumping=False
 EnableTextureToggling=False
 EnableTextureScanOnSceneLoad=False
+EnableSpriteRendererHooking=False
 LoadUnmodifiedTextures=False
 TextureHashGenerationStrategy=FromImageName
 ```
@@ -292,6 +344,8 @@ TextureHashGenerationStrategy=FromImageName
 
 `EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost during scene load (which is often during loading screens, etc.). However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
 
+`EnableSpriteRendererHooking` allows the plugin to attempt to hook SpriteRenderer. This is a seperate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations.
+
 `LoadUnmodifiedTextures` enables whether or not the plugin should load textures that has not been modified. This is only useful for debugging, and likely to cause various visual glitches, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
 
 `EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. This is by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **NEVER REDISTRIBUTE THIS MOD WITH THIS ENABLED.**
@@ -300,9 +354,9 @@ TextureHashGenerationStrategy=FromImageName
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:
  * `FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images or even be unique. However, it is generally fairly reliable. If an image has no resource name, it will not be dumped.
  * `FromImageData` means that the hash is generated from the data stored in the image, which is guaranteed to exist for all images. However, generating the hash comes at a performance cost, that will also be incurred by the end-users.
- * `FromImageNameThenData` means that it should use the name, if available, otherwise use the data.
+ * `FromImageNameAndScene` means that it should use the name and scene to generate a hash. The name is still required for this to work. When using this option, there is a chance the same texture could be dumped with different hashes, which is undesirable, but it could be required for some games, if the name itself is not unique and the `FromImageData` option causes performance issues.
 
-There's an important catch you need to be aware when dealing with these options and that is if ANY of these options exists: `EnableTextureDumping=True`, `EnableTextureToggling=True`, `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData`, then the game will need to read the raw data from all images it finds in game in order to replace the image and this is an expensive operation.
+There's an important catch you need to be aware when dealing with these options and that is if ANY of these options exists: `EnableTextureDumping=True`, `EnableTextureToggling=True`, `TextureHashGenerationStrategy=FromImageData`, then the game will need to read the raw data from all images it finds in game in order to replace the image and this is an expensive operation.
 
 It is therefore recommended to use `TextureHashGenerationStrategy=FromImageName`. Most likely, images without a resource name won't be interesting to translate anyway.
 
@@ -312,7 +366,7 @@ You can also change the file name to whatever you desire, as long as you keep th
 
 If you take anything away from this section, it should be these two points:
  * **NEVER REDISTRIBUTE THIS MOD WITH `EnableTextureDumping=True`, `EnableTextureToggling=True` OR `LoadUnmodifiedTextures=True`**
- * **ONLY REDISTRIBUTE THIS MOD WITH `TextureHashGenerationStrategy=FromImageData|FromImageNameThenData` ENABLED IF ABSOLUTELY REQUIRED BY THE GAME.**
+ * **ONLY REDISTRIBUTE THIS MOD WITH `TextureHashGenerationStrategy=FromImageData` ENABLED IF ABSOLUTELY REQUIRED BY THE GAME.**
 
 ### Technical details about Hash Generation in file names
 There are actually two hashes in the generated file name, separated by a dash (-):

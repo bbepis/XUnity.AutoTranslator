@@ -35,7 +35,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          var type = ui.GetType();
 
-         return ( ui is Material || ui is Image || ui is RawImage )
+         return ( ui is Material || ui is Image || ui is RawImage || ui is SpriteRenderer )
+            || ( ClrTypes.CubismRenderer != null && ClrTypes.CubismRenderer.IsAssignableFrom( type ) )
             || ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
             || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )
             || ( ClrTypes.UITexture != null && ClrTypes.UITexture.IsAssignableFrom( type ) )
@@ -93,6 +94,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type );
       }
 
+      public static TextTranslationInfo GetOrCreateTextTranslationInfo( this object obj )
+      {
+         if( !Settings.EnableObjectTracking ) return null;
+
+         if( !obj.SupportsStabilization() ) return null;
+
+         var info = obj.GetOrCreate<TextTranslationInfo>();
+
+         return info;
+      }
+
       public static TextTranslationInfo GetTextTranslationInfo( this object obj )
       {
          if( !Settings.EnableObjectTracking ) return null;
@@ -104,17 +116,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return info;
       }
 
-      public static ImageTranslationInfo GetImageTranslationInfo( this object obj )
+      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj )
       {
-         return obj.Get<ImageTranslationInfo>();
+         return obj.GetOrCreate<ImageTranslationInfo>();
       }
 
-      public static TextureTranslationInfo GetTextureTranslationInfo( this Texture texture )
+      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture texture )
       {
-         return texture.Get<TextureTranslationInfo>();
+         return texture.GetOrCreate<TextureTranslationInfo>();
       }
 
-      public static T Get<T>( this object obj )
+      public static T GetOrCreate<T>( this object obj )
          where T : new()
       {
          if( obj == null ) return default( T );
@@ -157,6 +169,44 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                return t;
             }
          }
+      }
+
+      public static T Get<T>( this object obj )
+         where T : new()
+      {
+         if( obj == null ) return default( T );
+
+         lock( Sync )
+         {
+            if( DynamicFields.TryGetValue( obj, out object value ) )
+            {
+               if( value is Dictionary<Type, object> existingDictionary )
+               {
+                  if( existingDictionary.TryGetValue( typeof( T ), out value ) )
+                  {
+                     if( value is T )
+                     {
+                        return (T)value;
+                     }
+                     else
+                     {
+                        return default( T );
+                     }
+                  }
+               }
+
+               if( value is T )
+               {
+                  return (T)value;
+               }
+               else
+               {
+                  return default( T );
+               }
+            }
+         }
+
+         return default( T );
       }
 
       public static void Cull()

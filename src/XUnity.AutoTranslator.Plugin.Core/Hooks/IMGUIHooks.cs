@@ -43,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -65,7 +65,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
 
@@ -88,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -110,7 +110,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -132,7 +132,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -154,7 +154,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -176,7 +176,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( title );
+            AutoTranslationPlugin.Current.Hook_TextChanged( title, false );
          }
       }
    }
@@ -200,7 +200,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
          {
             foreach( var content in contents )
             {
-               AutoTranslationPlugin.Current.Hook_TextChanged( content );
+               AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
             }
          }
       }
@@ -223,7 +223,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }
@@ -245,7 +245,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
       {
          if( !IMGUIHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content );
+            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
    }

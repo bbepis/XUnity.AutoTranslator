@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -65,7 +65,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -88,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -111,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -134,7 +134,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -157,7 +157,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -180,7 +180,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -203,7 +203,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
@@ -226,7 +226,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          if( !TextMeshProHooks.HooksOverriden )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance );
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }

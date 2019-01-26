@@ -14,10 +14,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly MethodInfo LoadImage = AccessTools.Method( ClrTypes.ImageConversion, "LoadImage", new[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) } );
       private static readonly MethodInfo EncodeToPNG = AccessTools.Method( ClrTypes.ImageConversion, "EncodeToPNG", new[] { typeof( Texture2D ) } );
 
-      public static bool IsNonReadable( this Texture2D texture )
-      {
-         return texture.GetRawTextureData().Length == 0;
-      }
+      //public static bool IsNonReadable( this Texture2D texture )
+      //{
+      //   return texture.GetRawTextureData().Length == 0;
+      //}
 
       public static void LoadImageEx( this Texture2D texture, byte[] data, bool markNonReadable )
       {

@@ -29,13 +29,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );
       public static readonly Type GUI = FindType( "UnityEngine.GUI" );
       public static readonly Type ImageConversion = FindType( "UnityEngine.ImageConversion" );
+      public static readonly Type Texture = FindType( "UnityEngine.Texture" );
+      public static readonly Type SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
+      public static readonly Type Object = FindType( "UnityEngine.Object" );
+      public static readonly Type TextEditor = FindType( "UnityEngine.TextEditor" );
+      public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
+      public static readonly Type SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
+      public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );
-      public static readonly Type TextEditor = FindType( "UnityEngine.TextEditor" );
-      public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
-      public static readonly Type SceneManager = FindType( "UnityEngine.SceneManager" );
-      public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
 
       // Utage
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
@@ -44,6 +47,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
       public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
+
+      // Live2D
+      public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );
 
       private static Type FindType( string name )
       {

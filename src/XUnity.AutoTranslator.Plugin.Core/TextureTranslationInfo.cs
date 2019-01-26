@@ -1,6 +1,8 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
@@ -8,6 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public class TextureTranslationInfo
    {
+      //private static readonly Dictionary<int, string> KnownHashes = new Dictionary<int, string>();
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
 
       private string _key;
@@ -22,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( !_nonReadable.HasValue )
          {
-            _nonReadable = texture.IsNonReadable();
+            _nonReadable = false;
          }
 
          return _nonReadable.Value;
@@ -54,6 +57,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _key == null )
          {
+            var instanceId = texture.GetInstanceID();
+
             if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageData )
             {
                var result = TextureHelper.GetData( texture );
@@ -61,6 +66,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _originalData = result.Data;
                _nonReadable = result.NonReadable;
                _key = HashHelper.Compute( _originalData );
+
+               //if( KnownHashes.TryGetValue( instanceId, out string hashValue ) )
+               //{
+               //   _key = hashValue;
+
+               //   if( Settings.EnableTextureToggling )
+               //   {
+               //      var result = TextureHelper.GetData( texture );
+
+               //      _originalData = result.Data;
+               //      _nonReadable = result.NonReadable;
+               //   }
+               //}
+               //else
+               //{
+               //   var result = TextureHelper.GetData( texture );
+
+               //   _originalData = result.Data;
+               //   _nonReadable = result.NonReadable;
+               //   _key = HashHelper.Compute( _originalData );
+
+               //   if( !string.IsNullOrEmpty( texture.name ) && result.CalculationTime > 0.6f )
+               //   {
+               //      KnownHashes[ instanceId ] = _key;
+               //   }
+               //}
             }
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageName )
             {
@@ -77,28 +108,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   _nonReadable = result.NonReadable;
                }
             }
-            else // if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageNameThenData )
+            else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageNameAndScene )
             {
-               var name = texture.name;
-               if( string.IsNullOrEmpty( name ) )
+               var name = texture.name; // name may be duplicate, WILL be duplicate!
+               if( string.IsNullOrEmpty( name ) ) return;
+
+               name += "|" + SceneManagerEx.GetActiveSceneId();
+
+               _key = HashHelper.Compute( UTF8.GetBytes( name ) );
+
+               if( Settings.EnableTextureToggling )
                {
                   var result = TextureHelper.GetData( texture );
 
                   _originalData = result.Data;
                   _nonReadable = result.NonReadable;
-                  _key = HashHelper.Compute( _originalData );
-               }
-               else
-               {
-                  _key = HashHelper.Compute( UTF8.GetBytes( name ) );
-
-                  if( Settings.EnableTextureToggling )
-                  {
-                     var result = TextureHelper.GetData( texture );
-
-                     _originalData = result.Data;
-                     _nonReadable = result.NonReadable;
-                  }
                }
             }
          }
