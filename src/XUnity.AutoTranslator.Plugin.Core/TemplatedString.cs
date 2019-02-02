@@ -2,7 +2,7 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class TemplatedString
+   internal class TemplatedString
    {
       public TemplatedString( string template, Dictionary<string, string> arguments )
       {

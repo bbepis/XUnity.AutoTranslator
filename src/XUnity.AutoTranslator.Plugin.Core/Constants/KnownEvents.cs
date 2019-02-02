@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Constants
 {
-   public static class KnownEvents
+   internal static class KnownEvents
    {
       public static string OnUnableToTranslateUGUI = "OnUnableToTranslateUGUI";
       public static string OnUnableToTranslateTextMeshPro = "OnUnableToTranslateTextMeshPro";

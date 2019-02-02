@@ -1,4 +1,13 @@
-﻿### 2.18.0
+﻿### 2.19.0
+ * FEATURE - UI to control plugin more conveniently (press ALT + X)
+ * FEATURE - Dynamic selection of translator during game session
+ * FEATURE - Support BingTranslate API
+ * FEATURE - Support LEC Offline Power Translator 15
+ * MISC - {GameExeName} variable can now be used in configuration of directories and files
+ * MISC - Changed the way the 'Custom' endpoint works. See README for more info
+ * MISC - Added new configuration 'GameLogTextPaths' to enable special handling of text components that text is being appended to continuously (requires export knowledge to setup)
+
+### 2.18.0
  * FEATURE - Text Getter Compatibility Mode. Fools the game into thinking that it is not actually translated
  * FEATURE - Textures - Live2D component support
  * FEATURE - Textures - SpriteRenderer component support

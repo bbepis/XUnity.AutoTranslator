@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class TextureReloadContext
+   internal class TextureReloadContext
    {
       private readonly HashSet<Texture2D> _textures;
 

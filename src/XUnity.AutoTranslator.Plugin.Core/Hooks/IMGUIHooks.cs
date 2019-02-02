@@ -7,27 +7,28 @@ using Harmony;
 using UnityEngine;
 using static UnityEngine.GUI;
 
-namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
+namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 {
-   public static class IMGUIHooks
+   internal static class IMGUIHooks
    {
       public static bool HooksOverriden = false;
 
       public static readonly Type[] All = new[] {
-         typeof( BeginGroupHook ),
-         typeof( BoxHook ),
-         typeof( DoRepeatButtonHook ),
-         typeof( DoLabelHook ),
-         typeof( DoButtonHook ),
-         typeof( DoModalWindowHook ),
-         typeof( DoWindowHook ),
-         typeof( DoTextFieldHook ),
-         typeof( DoToggleHook ),
+         typeof( GUI_BeginGroup_Hook ),
+         typeof( GUI_Box_Hook ),
+         typeof( GUI_DoRepeatButton_Hook ),
+         typeof( GUI_DoLabel_Hook ),
+         typeof( GUI_DoButton_Hook ),
+         typeof( GUI_DoModalWindow_Hook ),
+         typeof( GUI_DoWindow_Hook ),
+         typeof( GUI_DoTextField_Hook ),
+         typeof( GUI_DoButtonGrid_Hook ),
+         typeof( GUI_DoToggle_Hook ),
       };
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class BeginGroupHook
+   internal static class GUI_BeginGroup_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -49,7 +50,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class BoxHook
+   internal static class GUI_Box_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -72,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoRepeatButtonHook
+   internal static class GUI_DoRepeatButton_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -94,7 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoLabelHook
+   internal static class GUI_DoLabel_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -116,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoButtonHook
+   internal static class GUI_DoButton_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -138,7 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoModalWindowHook
+   internal static class GUI_DoModalWindow_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -160,7 +161,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoWindowHook
+   internal static class GUI_DoWindow_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -182,7 +183,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoButtonGridHook
+   internal static class GUI_DoButtonGrid_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -207,7 +208,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoTextFieldHook
+   internal static class GUI_DoTextField_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -229,7 +230,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IMGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class DoToggleHook
+   internal static class GUI_DoToggle_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {

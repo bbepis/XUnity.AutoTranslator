@@ -8,7 +8,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
-   public static class TextureHelper
+   internal static class TextureHelper
    {
       private static readonly Color Transparent = new Color( 0, 0, 0, 0 );
       
@@ -52,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       }
    }
 
-   public struct TextureDataResult
+   internal struct TextureDataResult
    {
       public TextureDataResult( byte[] data, bool nonReadable, float calculationTime )
       {

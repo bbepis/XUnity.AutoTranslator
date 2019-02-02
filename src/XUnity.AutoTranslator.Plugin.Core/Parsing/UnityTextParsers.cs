@@ -6,13 +6,15 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-   public static class UnityTextParsers
+   internal static class UnityTextParsers
    {
-      private static readonly RichTextParser RichTextParser = new RichTextParser();
+      public static RichTextParser RichTextParser;
+      public static GameLogTextParser GameLogTextParser;
 
-      public static RichTextParser GetTextParserByGameEngine()
+      public static void Initialize( Func<string, bool> isTranslatable )
       {
-         return RichTextParser;
+         RichTextParser = new RichTextParser();
+         GameLogTextParser = new GameLogTextParser( isTranslatable );
       }
    }
 }

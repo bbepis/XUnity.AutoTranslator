@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-   public class RichTextParser
+
+   internal class RichTextParser : ITextParser
    {
       private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
       private static readonly Regex TagRegex = new Regex( "<.*?>" );
@@ -14,6 +16,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       public RichTextParser()
       {
 
+      }
+
+      public bool CanApply( object ui )
+      {
+         return ui.SupportsRichText();
       }
 
       public ParserResult Parse( string input )
@@ -123,7 +130,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             templateString = templateString.Replace( fullKey, newKey );
          }
 
-         return new ParserResult( input, templateString, arg != 'A', args );
+         return new ParserResult( input, templateString, arg != 'A', true, args );
       }
    }
 }

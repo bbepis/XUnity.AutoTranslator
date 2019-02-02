@@ -14,11 +14,6 @@ namespace XUnity.AutoTranslator.Plugin.UnityInjector
    [PluginName( PluginData.Name ), PluginVersion( PluginData.Version )]
    public class AutoTranslatorPlugin : PluginBase, IConfiguration
    {
-      IniFile IConfiguration.ReloadConfig()
-      {
-         return ReloadConfig();
-      }
-
       void IConfiguration.SaveConfig()
       {
          SaveConfig();

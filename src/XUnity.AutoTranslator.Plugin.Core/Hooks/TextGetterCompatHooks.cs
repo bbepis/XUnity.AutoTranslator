@@ -2,19 +2,20 @@
 using System.Reflection;
 using Harmony;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
+namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 {
-   public static class TextGetterCompatHooks
+   internal static class TextGetterCompatHooks
    {
       public static readonly Type[] All = new[] {
-         typeof( TextPropertyGetterHook1 ),
-         typeof( TextPropertyGetterHook2 ),
+         typeof( Text_text_Hook ),
+         typeof( TMP_Text_text_Hook ),
       };
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TextPropertyGetterHook1
+   internal static class Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -29,12 +30,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance, ref string __result )
       {
-         TextGetterCompatMode.ReplaceTextWithOriginal( __instance, ref __result );
+         TextGetterCompatModeHelper.ReplaceTextWithOriginal( __instance, ref __result );
       }
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TextPropertyGetterHook2
+   internal static class TMP_Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -48,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance, ref string __result )
       {
-         TextGetterCompatMode.ReplaceTextWithOriginal( __instance, ref __result );
+         TextGetterCompatModeHelper.ReplaceTextWithOriginal( __instance, ref __result );
       }
    }
 }

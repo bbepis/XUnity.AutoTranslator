@@ -33,6 +33,4 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shim
 
       public abstract bool keepWaiting { get; }
    }
-
-
 }

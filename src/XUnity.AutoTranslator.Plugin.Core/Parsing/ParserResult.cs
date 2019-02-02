@@ -2,13 +2,14 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-   public class ParserResult
+   internal class ParserResult
    {
-      public ParserResult( string originalText, string template, bool hasRichText, Dictionary<string, string> args )
+      public ParserResult( string originalText, string template, bool succeeded, bool persistCombinedResult, Dictionary<string, string> args )
       {
          OriginalText = originalText;
          Template = template;
-         HasRichSyntax = hasRichText;
+         Succeeded = succeeded;
+         PersistCombinedResult = persistCombinedResult;
          Arguments = args;
       }
 
@@ -18,7 +19,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public Dictionary<string, string> Arguments { get; private set; }
 
-      public bool HasRichSyntax { get; private set; }
+      public bool Succeeded { get; private set; }
+
+      public bool PersistCombinedResult { get; private set; }
 
       public string Untemplate( Dictionary<string, string> arguments )
       {

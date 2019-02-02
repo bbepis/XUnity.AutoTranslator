@@ -7,7 +7,7 @@ using ExIni;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
-   public class DefaultConfiguration : IConfiguration
+   internal class DefaultConfiguration : IConfiguration
    {
       private IniFile _file;
       private string _configPath;

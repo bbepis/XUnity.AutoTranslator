@@ -6,7 +6,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
-   public static class HashHelper
+   internal static class HashHelper
    {
       private static readonly SHA1Managed SHA1 = new SHA1Managed();
       private static readonly uint[] Lookup32 = CreateLookup32();

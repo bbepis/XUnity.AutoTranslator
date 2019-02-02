@@ -1,6 +1,6 @@
 ﻿namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public enum TextureHashGenerationStrategy
+   internal enum TextureHashGenerationStrategy
    {
       FromImageName,
       FromImageData,

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
-   public static class Config
+   internal static class Config
    {
       public static IConfiguration Current;
    }

@@ -5,10 +5,11 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class TextureTranslationInfo
+   internal class TextureTranslationInfo
    {
       //private static readonly Dictionary<int, string> KnownHashes = new Dictionary<int, string>();
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
@@ -113,7 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var name = texture.name; // name may be duplicate, WILL be duplicate!
                if( string.IsNullOrEmpty( name ) ) return;
 
-               name += "|" + SceneManagerEx.GetActiveSceneId();
+               name += "|" + SceneManagerHelper.GetActiveSceneId();
 
                _key = HashHelper.Compute( UTF8.GetBytes( name ) );
 

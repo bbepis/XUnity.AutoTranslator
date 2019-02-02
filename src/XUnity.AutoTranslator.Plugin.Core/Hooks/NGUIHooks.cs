@@ -10,18 +10,18 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
-   public static class NGUIHooks
+   internal static class NGUIHooks
    {
       public static bool HooksOverriden = false;
 
       public static readonly Type[] All = new[] {
-         typeof( TextPropertyHook ),
-         typeof( OnEnableHook )
+         typeof( UILabel_text_Hook ),
+         typeof( UILabel_OnEnable_Hook )
       };
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TextPropertyHook
+   internal static class UILabel_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -44,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class OnEnableHook
+   internal static class UILabel_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {

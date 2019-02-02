@@ -6,7 +6,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 {
-   public static class Kernel32
+   internal static class Kernel32
    {
       [DllImport( "kernel32.dll", SetLastError = true )]
       public static extern bool AllocConsole();

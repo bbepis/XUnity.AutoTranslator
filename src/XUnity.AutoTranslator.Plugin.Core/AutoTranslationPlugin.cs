@@ -20,7 +20,6 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
-using XUnity.AutoTranslator.Plugin.Core.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -29,6 +28,8 @@ using XUnity.AutoTranslator.Plugin.Core.Batching;
 using Harmony;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using System.Diagnostics;
+using XUnity.AutoTranslator.Plugin.Core.UI;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -40,6 +41,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Allow the instance to be accessed statically, as only one will exist.
       /// </summary>
       public static AutoTranslationPlugin Current;
+
+
+      private XuaWindow _window;
 
       /// <summary>
       /// These are the currently running translation jobs (being translated by an http request).
@@ -98,7 +102,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Component _advEngine;
       private float? _nextAdvUpdate;
 
-      private IKnownEndpoint _endpoint;
+      private ServiceEndpointConfiguration _servicePoints;
+      private List<ConfiguredEndpoint> _configuredEndpoints;
+      private ConfiguredEndpoint _endpoint;
 
       private int[] _currentTranslationsQueuedPerSecondRollingWindow = new int[ Settings.TranslationQueueWatchWindow ];
       private float? _timeExceededThreshold;
@@ -146,7 +152,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             Logger.Current.Error( e, "An error occurred during configuration. Shutting plugin down." );
 
-            _endpoint = null;
             Settings.IsShutdown = true;
             Settings.IsShutdownFatal = true;
 
@@ -159,16 +164,55 @@ namespace XUnity.AutoTranslator.Plugin.Core
          HooksSetup.InstallImageHooks();
          HooksSetup.InstallTextGetterCompatHooks();
 
+         _servicePoints = new ServiceEndpointConfiguration();
          try
          {
-            _endpoint = KnownEndpoints.FindEndpoint( Settings.ServiceEndpoint );
+            _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, _servicePoints )
+               .OrderBy( x => x.Endpoint.FriendlyName )
+               .ToList();
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while constructing endpoints. Shutting plugin down." );
+
+            Settings.IsShutdown = true;
+            Settings.IsShutdownFatal = true;
+
+            return;
+         }
+
+         try
+         {
+            var primaryEndpoint = _configuredEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.ServiceEndpoint );
+
+            if( primaryEndpoint == null ) throw new Exception( "The primary endpoint was not properly configured." );
+            if( primaryEndpoint.Error != null ) throw new Exception( "The primary endpoint was not properly configured.", primaryEndpoint.Error );
+
+            _endpoint = primaryEndpoint;
          }
          catch( Exception e )
          {
             Logger.Current.Error( e, "An unexpected error occurred during initialization of endpoint." );
          }
 
-         if( !TextHelper.IsFromLanguageSupported( Settings.FromLanguage ) )
+         // TODO: Perhaps some bleeding edge check to see if this is required?
+         var callback = _servicePoints.GetCertificateValidationCheck();
+         if( callback != null )
+         {
+            ServicePointManager.ServerCertificateValidationCallback += callback;
+         }
+
+         // Save again because configuration may be modified by endpoints
+         try
+         {
+            Config.Current.SaveConfig();
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred during while saving configuration." );
+         }
+
+         if( !LanguageHelper.IsFromLanguageSupported( Settings.FromLanguage ) )
          {
             Logger.Current.Error( $"The plugin has been configured to use the 'FromLanguage={Settings.FromLanguage}'. This language is not supported. Shutting plugin down." );
 
@@ -177,7 +221,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             Settings.IsShutdownFatal = true;
          }
 
-         _symbolCheck = TextHelper.GetSymbolCheck( Settings.FromLanguage );
+         _symbolCheck = LanguageHelper.GetSymbolCheck( Settings.FromLanguage );
 
          if( !string.IsNullOrEmpty( Settings.OverrideFont ) )
          {
@@ -207,6 +251,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
          LoadStaticTranslations();
 
+         _window = new XuaWindow(
+            new List<ToggleViewModel>
+            {
+               new ToggleViewModel(
+                  " Translated",
+                  "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
+                  "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
+                  ToggleTranslation, () => _isInTranslatedMode )
+            },
+            _configuredEndpoints.Select( x =>
+               new TranslatorDropdownOptionViewModel( () => x == _endpoint, x, OnEndpointSelected ) ).ToList(),
+            new List<ButtonViewModel>
+            {
+               new ButtonViewModel( "Reboot", "<b>REBOOT PLUGIN</b>\nReboots the plugin if it has been shutdown. This only works if the plugin was shut down due to consequtive errors towards the translation endpoint.", RebootPlugin, () => Settings.IsShutdown && !Settings.IsShutdownFatal ),
+               new ButtonViewModel( "Reload", "<b>RELOAD TRANSLATION</b>\nReloads all translation text files and texture files from disk.", ReloadTranslations, null ),
+               new ButtonViewModel( "Hook", "<b>MANUAL HOOK</b>\nTraverses the unity object tree for looking for anything that can be translated. Performs a translation if something is found.", ManualHook, null )
+            },
+            new List<LabelViewModel>
+            {
+               new LabelViewModel( "Version: ", () => PluginData.Version ),
+               new LabelViewModel( "Status: ", () => Settings.IsShutdown ? "Shutdown" : "Running" ),
+               new LabelViewModel( "Served translations: ", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
+               new LabelViewModel( "Queued translations: ", () => $"{(_unstartedJobs.Count + _ongoingJobs.Count)} / {Settings.MaxUnstartedJobs}"  ),
+               new LabelViewModel( "Error'ed translations: ", () => $"{_consecutiveErrors} / {Settings.MaxErrors}"  ),
+            } );
+
+         UnityTextParsers.Initialize( text => IsTranslatable( text ) && IsBelowMaxLength( text ) );
+
          // start a thread that will periodically removed unused references
          var t1 = new Thread( MaintenanceLoop );
          t1.IsBackground = true;
@@ -218,15 +290,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
          t2.Start();
       }
 
+      private void OnEndpointSelected( ConfiguredEndpoint endpoint )
+      {
+         _endpoint = endpoint;
+         if( Settings.IsShutdown && !Settings.IsShutdownFatal )
+         {
+            RebootPlugin();
+            ManualHook();
+         }
+      }
+
       private IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ), $"*.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
       private IEnumerable<string> GetTextureFiles()
       {
-         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ), $"*.png", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize(), $"*.png", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -236,7 +318,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               ObjectExtensions.Cull();
+               ObjectReferenceMapper.Cull();
             }
             catch( Exception e )
             {
@@ -284,7 +366,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void EnableSceneLoadScan()
+      private void EnableSceneLoadScan()
       {
          Logger.Current.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
          if( Features.SupportsScenes )
@@ -298,13 +380,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void EnableSceneLoadScanInternal()
+      private void EnableSceneLoadScanInternal()
       {
          // do this in a different class to avoid having an anonymous method with references to the "Scene" class
          SceneManagerLoader.EnableSceneLoadScanInternal( this );
       }
 
-      public void OnLevelWasLoadedFromSceneManager( int id )
+      internal void OnLevelWasLoadedFromSceneManager( int id )
       {
          try
          {
@@ -343,10 +425,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             lock( _writeToFileSync )
             {
-               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ) );
-               Directory.CreateDirectory( Path.GetDirectoryName( Path.Combine( Config.Current.DataPath, Settings.OutputFile ) ) );
+               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ).Parameterize() );
+               Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
-               var mainTranslationFile = Settings.AutoTranslationsFilePath.Replace( "/", "\\" );
+               var mainTranslationFile = Settings.AutoTranslationsFilePath;
                LoadTranslationsInFile( mainTranslationFile );
                foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile } ) )
                {
@@ -358,7 +440,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                _translatedImages.Clear();
                _untranslatedImages.Clear();
-               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ) );
+               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize() );
                foreach( var fullFileName in GetTextureFiles() )
                {
                   RegisterImageFromFile( fullFileName );
@@ -439,7 +521,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void RegisterImageFromData( string textureName, string key, byte[] data )
       {
          var name = textureName.SanitizeForFileSystem();
-         var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory );
+         var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize();
          var originalHash = HashHelper.Compute( data );
 
          // allow hash and key to be the same; only store one of them then!
@@ -654,7 +736,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _frameForLastQueuedTranslation = currentFrame;
       }
 
-      public void PeriodicResetFrameCheck()
+      private void PeriodicResetFrameCheck()
       {
          var currentSecond = (int)Time.time;
          if( currentSecond % 100 == 0 )
@@ -897,12 +979,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return result;
       }
 
-      public bool TryGetReverseTranslation( string value, out string key )
+      internal bool TryGetReverseTranslation( string value, out string key )
       {
          return _reverseTranslations.TryGetValue( value, out key );
       }
 
-      public string Hook_TextChanged_WithResult( object ui, string text )
+      internal string Hook_TextChanged_WithResult( object ui, string text )
       {
          if( !ui.IsKnownTextType() ) return null;
 
@@ -913,7 +995,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      public string ExternalHook_TextChanged_WithResult( object ui, string text )
+      internal string ExternalHook_TextChanged_WithResult( object ui, string text )
       {
          if( !ui.IsKnownTextType() ) return null;
 
@@ -924,7 +1006,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      public void Hook_TextChanged( object ui, bool onEnable )
+      internal void Hook_TextChanged( object ui, bool onEnable )
       {
          if( _textHooksEnabled && !_temporarilyDisabled )
          {
@@ -937,7 +1019,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Hook_ImageChangedOnComponent( object source, Texture2D texture, bool isPrefixHooked, bool onEnable )
+      internal void Hook_ImageChangedOnComponent( object source, Texture2D texture, bool isPrefixHooked, bool onEnable )
       {
          if( !_imageHooksEnabled ) return;
          if( !source.IsKnownImageType() ) return;
@@ -950,7 +1032,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Hook_ImageChanged( Texture2D texture, bool isPrefixHooked )
+      internal void Hook_ImageChanged( Texture2D texture, bool isPrefixHooked )
       {
          if( !_imageHooksEnabled ) return;
          if( texture == null ) return;
@@ -968,7 +1050,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Hook_HandleComponent( object ui )
+      internal void Hook_HandleComponent( object ui )
       {
          if( _hasOverrideFont )
          {
@@ -1076,17 +1158,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool IsTranslatable( string str )
       {
          return _symbolCheck( str )
-            && str.Length <= Settings.MaxCharactersPerTranslation
+            //&& str.Length <= Settings.MaxCharactersPerTranslation
             && !_reverseTranslations.ContainsKey( str )
             && !Settings.IgnoreTextStartingWith.Any( x => str.StartsWithStrict( x ) );
       }
 
-      private bool IsShortText( string str )
+      private bool IsBelowMaxLength( string str )
+      {
+         return str.Length <= Settings.MaxCharactersPerTranslation;
+      }
+
+      private bool IsBelowMaxLengthStrict( string str )
       {
          return str.Length <= ( Settings.MaxCharactersPerTranslation / 2 );
       }
 
-      public bool ShouldTranslateImageComponent( object ui )
+      private bool ShouldTranslateImageComponent( object ui )
       {
          var component = ui as Component;
          if( component != null )
@@ -1109,7 +1196,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return true;
       }
 
-      public bool ShouldTranslateTextComponent( object ui, bool ignoreComponentState )
+      private bool ShouldTranslateTextComponent( object ui, bool ignoreComponentState )
       {
          var component = ui as Component;
          if( component != null )
@@ -1166,7 +1253,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      public static bool IsCurrentlySetting( TextTranslationInfo info )
+      private static bool IsCurrentlySetting( TextTranslationInfo info )
       {
          if( info == null ) return false;
 
@@ -1435,6 +1522,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   return translation;
                }
             }
+            else
+            {
+               if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
+               {
+                  var result = UnityTextParsers.GameLogTextParser.Parse( text );
+                  if( result.Succeeded )
+                  {
+                     translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                     if( translation != null )
+                     {
+                        SetTranslatedText( ui, translation, info );
+                        return translation;
+                     }
+                  }
+               }
+            }
          }
 
          return null;
@@ -1482,13 +1585,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               if( context == null && ui.SupportsRichText() )
+               if( context == null )
                {
-                  var parser = UnityTextParsers.GetTextParserByGameEngine();
-                  if( parser != null )
+                  if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                   {
-                     var result = parser.Parse( text );
-                     if( result.HasRichSyntax )
+                     var result = UnityTextParsers.GameLogTextParser.Parse( text );
+                     if( result.Succeeded )
+                     {
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                        if( translation != null )
+                        {
+                           SetTranslatedText( ui, translation, info );
+                           return translation;
+                        }
+                     }
+                  }
+                  else if( UnityTextParsers.RichTextParser.CanApply( ui ) && IsBelowMaxLength( text ) )
+                  {
+                     var result = UnityTextParsers.RichTextParser.Parse( text );
+                     if( result.Succeeded )
                      {
                         var isWhitelisted = ui.IsWhitelistedForImmediateRichTextTranslation();
 
@@ -1558,13 +1673,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  }
                                  else
                                  {
-                                    if( context == null && ui.SupportsRichText() )
+                                    if( context == null )
                                     {
-                                       var parser = UnityTextParsers.GetTextParserByGameEngine();
-                                       if( parser != null )
+                                       if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                                        {
-                                          var result = parser.Parse( stabilizedText );
-                                          if( result.HasRichSyntax )
+                                          var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText );
+                                          if( result.Succeeded )
+                                          {
+                                             var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, true );
+                                             if( translatedText != null )
+                                             {
+                                                // stabilized, no need to untemplate
+                                                SetTranslatedText( ui, translatedText, info );
+                                             }
+                                             return;
+                                          }
+                                       }
+                                       else if( UnityTextParsers.RichTextParser.CanApply( ui ) && IsBelowMaxLength( stabilizedText ) )
+                                       {
+                                          var result = UnityTextParsers.RichTextParser.Parse( stabilizedText );
+                                          if( result.Succeeded )
                                           {
                                              var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, true );
                                              if( translatedText != null )
@@ -1580,10 +1708,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     // Lets try not to spam a service that might not be there...
                                     if( _endpoint != null )
                                     {
-                                       if( !Settings.IsShutdown )
+                                       if( IsBelowMaxLength( stabilizedText ) )
                                        {
-                                          var job = GetOrCreateTranslationJobFor( ui, stabilizedTextKey, context );
-                                          job.Components.Add( ui );
+                                          if( !Settings.IsShutdown )
+                                          {
+                                             var job = GetOrCreateTranslationJobFor( ui, stabilizedTextKey, context );
+                                             job.Components.Add( ui );
+                                          }
                                        }
                                     }
                                     else
@@ -1600,7 +1731,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      _ongoingOperations.Remove( ui );
                   }
                }
-               else if( !isSpammer || ( isSpammer && IsShortText( text ) ) )
+               else if( !isSpammer || ( isSpammer && IsBelowMaxLengthStrict( text ) ) )
                {
                   if( context != null )
                   {
@@ -1661,7 +1792,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var key = kvp.Key;
             var value = kvp.Value.TrimIfConfigured();
-            if( !string.IsNullOrEmpty( value ) && IsTranslatable( value ) )
+            if( !string.IsNullOrEmpty( value ) && IsTranslatable( value ) && IsBelowMaxLength( value ) )
             {
                string partTranslation;
                if( TryGetTranslation( value, out partTranslation ) )
@@ -1697,7 +1828,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// the text has stopped changing. This is important for 'story'
       /// mode text, which 'scrolls' into place slowly.
       /// </summary>
-      public IEnumerator WaitForTextStablization( object ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
+      private IEnumerator WaitForTextStablization( object ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
       {
          yield return 0; // wait a single frame to allow any external plugins to complete their hooking logic
 
@@ -1733,7 +1864,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// for global text, where the component cannot tell us if the text
       /// has changed itself.
       /// </summary>
-      public IEnumerator WaitForTextStablization( TranslationKey textKey, float delay, Action onTextStabilized, Action onFailed = null )
+      private IEnumerator WaitForTextStablization( TranslationKey textKey, float delay, Action onTextStabilized, Action onFailed = null )
       {
          var text = textKey.GetDictionaryLookupKey();
 
@@ -1773,13 +1904,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public IEnumerator DelayForSeconds( float delay, Action onContinue )
+      private IEnumerator DelayForSeconds( float delay, Action onContinue )
       {
          yield return new WaitForSeconds( delay );
          onContinue();
       }
 
-      public void Awake()
+      void Awake()
       {
          if( !_initialized )
          {
@@ -1797,7 +1928,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Start()
+      void Start()
       {
          try
          {
@@ -1809,13 +1940,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Update()
+      void Update()
       {
          try
          {
-            if( _endpoint != null )
+            // perform this check every 100 frames!
+            if( Time.frameCount % 100 == 0 )
             {
-               _endpoint.OnUpdate();
+               ConnectionTrackingWebClient.CheckServicePoints();
             }
 
             if( Features.SupportsClipboard )
@@ -1871,11 +2003,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   RebootPlugin();
                }
+               else if( isAltPressed && Input.GetKeyDown( KeyCode.X ) )
+               {
+                  _window.IsShown = !_window.IsShown;
+               }
             }
          }
          catch( Exception e )
          {
             Logger.Current.Error( e, "An error occurred in Update callback. " );
+         }
+      }
+
+      void OnGUI()
+      {
+         try
+         {
+            DisableAutoTranslator();
+
+            if( _window.IsShown ) _window.OnGUI();
+         }
+         finally
+         {
+            EnableAutoTranslator();
          }
       }
 
@@ -1904,7 +2054,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         if( Settings.EnableBatching && _endpoint.SupportsLineSplitting && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _availableBatchOperations > 0 )
+         if( Settings.EnableBatching && _endpoint.Endpoint.SupportsLineSplitting() && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _availableBatchOperations > 0 )
          {
             while( _unstartedJobs.Count > 0 && _availableBatchOperations > 0 )
             {
@@ -1929,8 +2079,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   _availableBatchOperations--;
 
-                  StartCoroutine( _endpoint.Translate( batch.GetFullTranslationKey(), Settings.FromLanguage, Settings.Language, translatedText => OnBatchTranslationCompleted( batch, translatedText ),
-                  () => OnTranslationFailed( batch ) ) );
+                  var untranslatedText = batch.GetFullTranslationKey();
+                  Logger.Current.Debug( "Starting translation for: " + untranslatedText );
+                  StartCoroutine( _endpoint.Translate( untranslatedText, Settings.FromLanguage, Settings.Language, translatedText => OnBatchTranslationCompleted( batch, translatedText ),
+                  ( msg, e ) => OnTranslationFailed( batch, msg, e ) ) );
                }
             }
          }
@@ -1949,8 +2101,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                _ongoingJobs[ key ] = job;
 
-               StartCoroutine( _endpoint.Translate( job.Key.GetDictionaryLookupKey(), Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
-               () => OnTranslationFailed( job ) ) );
+               var untranslatedText = job.Key.GetDictionaryLookupKey();
+               Logger.Current.Debug( "Starting translation for: " + untranslatedText );
+               StartCoroutine( _endpoint.Translate( untranslatedText, Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
+               ( msg, e ) => OnTranslationFailed( job, msg, e ) ) );
             }
          }
 
@@ -1962,9 +2116,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _kickedOff.Clear();
       }
 
-      public void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
+      private void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
       {
          _consecutiveErrors = 0;
+         Logger.Current.Debug( $"Translation for '{batch.GetFullTranslationKey()}' succeded. Result: {translatedTextBatch}" );
 
          var succeeded = batch.MatchWithTranslations( translatedTextBatch );
          if( succeeded )
@@ -2029,6 +2184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void OnSingleTranslationCompleted( TranslationJob job, string translatedText )
       {
          Settings.TranslationCount++;
+         Logger.Current.Debug( $"Translation for '{job.Key.GetDictionaryLookupKey()}' succeded. Result: {translatedText}" );
 
          _consecutiveErrors = 0;
 
@@ -2063,8 +2219,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnTranslationFailed( TranslationJob job )
+      private void OnTranslationFailed( TranslationJob job, string error, Exception e )
       {
+         if( e == null )
+         {
+            Logger.Current.Error( error );
+         }
+         else
+         {
+            Logger.Current.Error( e, error );
+         }
+
          Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
 
@@ -2085,8 +2250,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnTranslationFailed( TranslationBatch batch )
+      private void OnTranslationFailed( TranslationBatch batch, string error, Exception e )
       {
+         if( e == null )
+         {
+            Logger.Current.Error( error );
+         }
+         else
+         {
+            Logger.Current.Error( e, error );
+         }
+
          Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
 
@@ -2153,7 +2327,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                         if( !string.IsNullOrEmpty( translatedText ) )
                         {
-                           if( !_translations.ContainsKey( context.Result.OriginalText ) )
+                           if( result.PersistCombinedResult && !_translations.ContainsKey( context.Result.OriginalText ) )
                            {
                               AddTranslation( context.Result.OriginalText, translatedText );
                               QueueNewTranslationForDisk( context.Result.OriginalText, translatedText );
@@ -2206,7 +2380,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
 
          var context = new TextureReloadContext();
-         foreach( var kvp in ObjectExtensions.GetAllRegisteredObjects() )
+         foreach( var kvp in ObjectReferenceMapper.GetAllRegisteredObjects() )
          {
             var ui = kvp.Key;
             try
@@ -2235,7 +2409,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             catch( Exception )
             {
                // not super pretty, no...
-               ObjectExtensions.Remove( ui );
+               ObjectReferenceMapper.Remove( ui );
             }
          }
       }
@@ -2278,7 +2452,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _overrideFont = !_overrideFont;
 
-            var objects = ObjectExtensions.GetAllRegisteredObjects();
+            var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
             Logger.Current.Info( $"Toggling fonts of {objects.Count} objects." );
 
             if( _overrideFont )
@@ -2300,7 +2474,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      catch( Exception )
                      {
                         // not super pretty, no...
-                        ObjectExtensions.Remove( ui );
+                        ObjectReferenceMapper.Remove( ui );
                      }
                   }
                }
@@ -2322,7 +2496,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   catch( Exception )
                   {
                      // not super pretty, no...
-                     ObjectExtensions.Remove( ui );
+                     ObjectReferenceMapper.Remove( ui );
                   }
                }
             }
@@ -2332,7 +2506,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void ToggleTranslation()
       {
          _isInTranslatedMode = !_isInTranslatedMode;
-         var objects = ObjectExtensions.GetAllRegisteredObjects();
+         var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
 
          Logger.Current.Info( $"Toggling translations of {objects.Count} objects." );
 
@@ -2364,7 +2538,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                catch( Exception )
                {
                   // not super pretty, no...
-                  ObjectExtensions.Remove( ui );
+                  ObjectReferenceMapper.Remove( ui );
                }
             }
          }
@@ -2396,7 +2570,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                catch( Exception )
                {
                   // not super pretty, no...
-                  ObjectExtensions.Remove( ui );
+                  ObjectReferenceMapper.Remove( ui );
                }
             }
          }
@@ -2560,6 +2734,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void EnableAutoTranslator()
       {
          _temporarilyDisabled = false;
+      }
+
+      void OnApplicationQuit()
+      {
+         if( _configuredEndpoints == null ) return;
+
+         foreach( var ce in _configuredEndpoints )
+         {
+            try
+            {
+               if( ce.Endpoint is IDisposable disposable ) disposable.Dispose();
+            }
+            catch( Exception e )
+            {
+               Logger.Current.Error( e, "An error occurred while disposing endpoint." );
+            }
+         }
       }
    }
 

@@ -12,7 +12,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
-   public static class ImageHooks
+   internal static class ImageHooks
    {
       public static readonly Type[] All = new[] {
          typeof( MaskableGraphic_OnEnable_Hook ),
@@ -41,26 +41,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( UITexture_material_Hook ),
          typeof( UIPanel_clipTexture_Hook ),
          typeof( UIRect_OnInit_Hook ),
-         //typeof( UIFont_dynamicFont_Hook ),
-         //typeof( UIFont_material_Hook ),
-         //typeof( UILabel_bitmapFont_Hook ),
-         //typeof( UILabel_trueTypeFont_Hook ),
       };
    }
 
-   //public static class GenericPrefix_Hook
-   //{
-   //   public static void Prefix( object __instance, object value )
-   //   {
-   //      if( value is Texture2D texture2d )
-   //      {
-   //         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true );
-   //      }
-   //   }
-   //}
-
    [Harmony]
-   public static class SpriteRenderer_sprite_Hook
+   internal static class SpriteRenderer_sprite_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -78,142 +63,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       }
    }
 
-   //[Harmony]
-   //public static class SpriteRenderer_get_sprite_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( ClrTypes.SpriteRenderer, "sprite" ).GetGetMethod();
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( new StackTrace().ToString() );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-   //[Harmony]
-   //public static class SpriteRenderer_get_size_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( ClrTypes.SpriteRenderer, "size" ).GetGetMethod();
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( "SpriteRenderer_get_size_Hook" );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-   //[Harmony]
-   //public static class SpriteRenderer_set_size_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( ClrTypes.SpriteRenderer, "size" ).GetSetMethod();
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( "SpriteRenderer_set_size_Hook" );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-   //[Harmony]
-   //public static class SpriteRenderer_get_color_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( ClrTypes.SpriteRenderer, "color" ).GetGetMethod();
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( "SpriteRenderer_get_color_Hook" );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-   //[Harmony]
-   //public static class SpriteRenderer_set_color_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Property( ClrTypes.SpriteRenderer, "color" ).GetSetMethod();
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( "SpriteRenderer_set_color_Hook" );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-   //[Harmony]
-   //public static class SpriteRenderer_GetSpriteBounds_Hook
-   //{
-   //   static bool Prepare( HarmonyInstance instance )
-   //   {
-   //      return ClrTypes.SpriteRenderer != null;
-   //   }
-
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
-   //   {
-   //      return AccessTools.Method( ClrTypes.SpriteRenderer, "GetSpriteBounds" );
-   //   }
-
-   //   public static void Postfix( object __instance )
-   //   {
-   //      Logger.Current.Error( "SpriteRenderer_GetSpriteBounds_Hook" );
-   //      AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
-   //   }
-   //}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    [Harmony]
-   public static class CubismRenderer_MainTexture_Hook
+   internal static class CubismRenderer_MainTexture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -232,7 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class CubismRenderer_TryInitialize_Hook
+   internal static class CubismRenderer_TryInitialize_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -251,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class Material_mainTexture_Hook
+   internal static class Material_mainTexture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -273,7 +124,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class MaskableGraphic_OnEnable_Hook
+   internal static class MaskableGraphic_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -295,7 +146,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class Image_sprite_Hook
+   internal static class Image_sprite_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -314,7 +165,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class Image_overrideSprite_Hook
+   internal static class Image_overrideSprite_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -333,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class Image_material_Hook
+   internal static class Image_material_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -352,7 +203,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class RawImage_texture_Hook
+   internal static class RawImage_texture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -374,7 +225,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class Cursor_SetCursor_Hook
+   internal static class Cursor_SetCursor_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -393,7 +244,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UIAtlas_spriteMaterial_Hook
+   internal static class UIAtlas_spriteMaterial_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -412,7 +263,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UISprite_OnInit_Hook
+   internal static class UISprite_OnInit_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -431,7 +282,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UISprite_material_Hook
+   internal static class UISprite_material_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -450,7 +301,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UISprite_atlas_Hook
+   internal static class UISprite_atlas_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -469,7 +320,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UITexture_mainTexture_Hook
+   internal static class UITexture_mainTexture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -488,7 +339,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UITexture_material_Hook
+   internal static class UITexture_material_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -507,7 +358,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UIRect_OnInit_Hook
+   internal static class UIRect_OnInit_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -526,7 +377,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UI2DSprite_sprite2D_Hook
+   internal static class UI2DSprite_sprite2D_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -545,7 +396,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UI2DSprite_material_Hook
+   internal static class UI2DSprite_material_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -564,7 +415,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UIPanel_clipTexture_Hook
+   internal static class UIPanel_clipTexture_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -584,7 +435,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
 
    [Harmony]
-   public static class UIFont_material_Hook
+   internal static class UIFont_material_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -603,7 +454,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UIFont_dynamicFont_Hook
+   internal static class UIFont_dynamicFont_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -622,7 +473,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UILabel_bitmapFont_Hook
+   internal static class UILabel_bitmapFont_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -641,7 +492,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class UILabel_trueTypeFont_Hook
+   internal static class UILabel_trueTypeFont_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {

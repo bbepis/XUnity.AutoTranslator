@@ -6,8 +6,9 @@ using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
-   public static class GameObjectExtensions
+   internal static class GameObjectExtensions
    {
+      private static GameObject[] _objects = new GameObject[ 128 ];
       private static readonly string DummyName = "Dummy";
       private static readonly string XuaIgnore = "XUAIGNORE";
 
@@ -29,6 +30,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
 
          return null;
+      }
+
+      public static string GetPath( this GameObject obj )
+      {
+         int i = 0;
+         _objects[ i++ ] = obj;
+         while( obj.transform.parent != null )
+         {
+            obj = obj.transform.parent.gameObject;
+            _objects[ i++ ] = obj;
+         }
+
+         StringBuilder path = new StringBuilder();
+         while( --i >= 0 )
+         {
+            path.Append( "/" ).Append( _objects[ i ].name );
+         }
+
+
+         var result = path.ToString();
+
+         return result;
       }
 
       public static bool HasIgnoredName( this GameObject go )

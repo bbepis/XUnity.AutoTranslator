@@ -8,19 +8,18 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
-
-   public static class UGUIHooks
+   internal static class UGUIHooks
    {
       public static bool HooksOverriden = false;
 
       public static readonly Type[] All = new[] {
-         typeof( TextPropertyHook ),
-         typeof( OnEnableHook ),
+         typeof( Text_text_Hook ),
+         typeof( Text_OnEnable_Hook ),
       };
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class TextPropertyHook
+   internal static class Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -44,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    }
 
    [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
-   public static class OnEnableHook
+   internal static class Text_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {

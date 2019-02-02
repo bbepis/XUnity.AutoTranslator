@@ -3,7 +3,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Batching
 {
-   public class TranslationBatch
+   internal class TranslationBatch
    {
       public TranslationBatch()
       {

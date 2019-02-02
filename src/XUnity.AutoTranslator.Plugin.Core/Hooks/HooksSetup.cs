@@ -9,15 +9,16 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
-using XUnity.AutoTranslator.Plugin.Core.IMGUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
 
-   public static class HooksSetup
+   internal static class HooksSetup
    {
       private static HarmonyInstance _harmony;
 
@@ -74,47 +75,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             Logger.Current.Error( e, "An error occurred while setting up image hooks." );
          }
-         
-         //var knownTypes = new HashSet<Type> { typeof( Texture ), typeof( Texture2D ), typeof( Sprite ), typeof( Material ) };
-         //foreach( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
-         //{
-         //   try
-         //   {
-         //      var types = assembly.GetTypes();
-         //      foreach( var type in types )
-         //      {
-         //         try
-         //         {
-         //            var properties = type.GetProperties( BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public );
-         //            foreach( var property in properties )
-         //            {
-         //               if( property.CanWrite && knownTypes.Contains( property.PropertyType ) )
-         //               {
-         //                  try
-         //                  {
-         //                     var original = property.GetSetMethod();
-         //                     var prefix = typeof( GenericPrefix_Hook ).GetMethod( "Prefix" );
-         //                     _harmony.Patch( original, new HarmonyMethod( prefix ), null, null );
-         //                     Logger.Current.Warn( "Patched: " + type.Name + "." + property.Name );
-         //                  }
-         //                  catch( Exception e )
-         //                  {
-         //                     Logger.Current.Error( "Failed patching: " + type.Name + "." + property.Name );
-         //                  }
-         //               }
-         //            }
-         //         }
-         //         catch( Exception e )
-         //         {
-         //            Logger.Current.Error( e, "Failed getting properties of type: " + type.Name );
-         //         }
-         //      }
-         //   }
-         //   catch( Exception )
-         //   {
-         //      Logger.Current.Error( "Failed getting types of assembly: " + assembly.FullName );
-         //   }
-         //}
       }
 
       public static void InstallTextHooks()
@@ -161,13 +121,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             if( Settings.EnableIMGUI )
             {
                _harmony.PatchAll( IMGUIHooks.All );
-
-               // This wont work in "newer" unity versions!
-               try
-               {
-                  _harmony.PatchType( typeof( DoButtonGridHook ) );
-               }
-               catch { }
             }
          }
          catch( Exception e )

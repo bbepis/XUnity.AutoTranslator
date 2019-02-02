@@ -2,7 +2,7 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core.Batching
 {
-   public class TranslationLineTracker
+   internal class TranslationLineTracker
    {
       public TranslationLineTracker( TranslationJob job )
       {

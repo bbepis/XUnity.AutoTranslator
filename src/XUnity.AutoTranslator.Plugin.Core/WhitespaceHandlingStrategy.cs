@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public enum WhitespaceHandlingStrategy
+   internal enum WhitespaceHandlingStrategy
    {
       AllOccurrences,
       TrimPerNewline

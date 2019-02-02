@@ -13,7 +13,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       IniFile Preferences { get; }
 
       void SaveConfig();
-
-      IniFile ReloadConfig();
    }
 }

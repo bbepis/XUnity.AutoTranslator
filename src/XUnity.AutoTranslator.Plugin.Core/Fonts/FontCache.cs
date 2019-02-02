@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {
-   public static class FontCache
+   internal static class FontCache
    {
       private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
 

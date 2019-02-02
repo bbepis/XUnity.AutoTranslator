@@ -6,7 +6,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Debugging
 {
-   public static class DebugConsole
+   internal static class DebugConsole
    {
       private static IntPtr _consoleOut;
 

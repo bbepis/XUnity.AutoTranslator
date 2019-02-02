@@ -5,11 +5,10 @@ using System.Net;
 using System.Text;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.Parsing;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class TranslationJob
+   internal class TranslationJob
    {
       public TranslationJob( TranslationKey key )
       {
@@ -65,28 +64,5 @@ namespace XUnity.AutoTranslator.Plugin.Core
             context.Jobs.Add( this );
          }
       }
-   }
-
-   public enum TranslationJobState
-   {
-      RunningOrQueued,
-      Succeeded,
-      Failed
-   }
-
-   public class TranslationContext
-   {
-      public TranslationContext( object component, ParserResult result )
-      {
-         Jobs = new HashSet<TranslationJob>();
-         Component = component;
-         Result = result;
-      }
-
-      public ParserResult Result { get; private set; }
-
-      public HashSet<TranslationJob> Jobs { get; private set; }
-
-      public object Component { get; private set; }
    }
 }

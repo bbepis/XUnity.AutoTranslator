@@ -11,7 +11,7 @@ using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
-   public static class Settings
+   internal static class Settings
    {
       // cannot be changed
       public static readonly int MaxMaxCharactersPerTranslation = 500;
@@ -23,12 +23,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
       public static readonly int MaxUnstartedJobs = 3500;
       public static readonly float IncreaseBatchOperationsEvery = 30;
-      public static readonly bool EnableObjectTracking = true;
       public static readonly int MaximumStaggers = 6;
       public static readonly int PreviousTextStaggerCount = 3;
       public static readonly int MaximumConsecutiveFramesTranslated = 90;
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
       public static bool UsesWhitespaceBetweenWords = false;
+      public static string ApplicationName;
 
 
       public static bool IsShutdown = false;
@@ -63,20 +63,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool IgnoreWhitespaceInDialogue;
       public static bool IgnoreWhitespaceInNGUI;
       public static int MinDialogueChars;
-      public static string BaiduAppId;
-      public static string BaiduAppSecret;
-      public static string YandexAPIKey;
-      public static string WatsonAPIUrl;
-      public static string WatsonAPIUsername;
-      public static string WatsonAPIPassword;
-      public static string BingOcpApimSubscriptionKey;
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
       public static string MigrationsTag;
       public static bool EnableBatching;
       public static bool TrimAllText;
       public static bool EnableUIResizing;
-      public static string GoogleAPIKey;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
       public static string UserAgent;
@@ -84,6 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
       public static string[] IgnoreTextStartingWith;
+      public static HashSet<string> GameLogTextPaths;
       public static bool TextGetterCompatibilityMode;
 
       public static string TextureDirectory;
@@ -103,18 +96,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       {
          try
          {
-            // clear configuration from old versions...
-            var section = Config.Current.Preferences[ "AutoTranslator" ];
-            foreach( var key in section.Keys.ToList() )
-            {
-               section.DeleteKey( key.Key );
-            }
-
-            Config.Current.Preferences.DeleteSection( "AutoTranslator" );
-            Config.Current.Preferences[ "Service" ].DeleteKey( "EnableSSL" );
+            ApplicationName = Path.GetFileNameWithoutExtension( ApplicationInformation.StartupPath );
          }
-         catch { }
-
+         catch( Exception e )
+         {
+            Logger.Current.Error( e, "An error occurred while getting application name." );
+         }
 
 
          ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].GetOrDefault( KnownEndpointNames.GoogleTranslate, true );
@@ -150,6 +137,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          IgnoreTextStartingWith = Config.Current.Preferences[ "Behaviour" ][ "IgnoreTextStartingWith" ].GetOrDefault( "\\u180e;", true )
             ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).Select( x => x.UnescapeJson() ).ToArray() ?? new string[ 0 ];
          TextGetterCompatibilityMode = Config.Current.Preferences[ "Behaviour" ][ "TextGetterCompatibilityMode" ].GetOrDefault( false );
+         GameLogTextPaths = Config.Current.Preferences[ "Behaviour" ][ "GameLogTextPaths" ].GetOrDefault( "", true )
+            ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
+         GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
 
          TextureDirectory = Config.Current.Preferences[ "Texture" ][ "TextureDirectory" ].GetOrDefault( @"Translation\Texture" );
          EnableTextureTranslation = Config.Current.Preferences[ "Texture" ][ "EnableTextureTranslation" ].GetOrDefault( false );
@@ -181,19 +171,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );
 
-         GoogleAPIKey = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
-
-         BingOcpApimSubscriptionKey = Config.Current.Preferences[ "BingLegitimate" ][ "OcpApimSubscriptionKey" ].GetOrDefault( "" );
-
-         BaiduAppId = Config.Current.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
-         BaiduAppSecret = Config.Current.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
-
-         YandexAPIKey = Config.Current.Preferences[ "Yandex" ][ "YandexAPIKey" ].GetOrDefault( "" );
-
-         WatsonAPIUrl = Config.Current.Preferences[ "Watson" ][ "WatsonAPIUrl" ].GetOrDefault( "" );
-         WatsonAPIUsername = Config.Current.Preferences[ "Watson" ][ "WatsonAPIUsername" ].GetOrDefault( "" );
-         WatsonAPIPassword = Config.Current.Preferences[ "Watson" ][ "WatsonAPIPassword" ].GetOrDefault( "" );
-
          EnablePrintHierarchy = Config.Current.Preferences[ "Debug" ][ "EnablePrintHierarchy" ].GetOrDefault( false );
          EnableConsole = Config.Current.Preferences[ "Debug" ][ "EnableConsole" ].GetOrDefault( false );
          EnableDebugLogs = Config.Current.Preferences[ "Debug" ][ "EnableLog" ].GetOrDefault( false );
@@ -201,8 +178,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableMigrations = Config.Current.Preferences[ "Migrations" ][ "Enable" ].GetOrDefault( true );
          MigrationsTag = Config.Current.Preferences[ "Migrations" ][ "Tag" ].GetOrDefault( string.Empty );
 
-         AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) );
-         UsesWhitespaceBetweenWords = TextHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
+         AutoTranslationsFilePath = Path.Combine( Config.Current.DataPath, OutputFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
+         UsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
 
          if( EnableMigrations )
          {
@@ -214,20 +191,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          Config.Current.SaveConfig();
       }
-
+      
       private static void Migrate()
       {
-         var currentTag = MigrationsTag;
-         var newTag = PluginData.Version;
-
-         // migrate from unknown version to known version. Reset to google translate
-         if( string.IsNullOrEmpty( currentTag ) )
-         {
-            if( ServiceEndpoint == KnownEndpointNames.GoogleTranslateHack )
-            {
-               ServiceEndpoint = Config.Current.Preferences[ "Service" ][ "Endpoint" ].Value = KnownEndpointNames.GoogleTranslate;
-            }
-         }
       }
 
       public static string GetUserAgent( string defaultUserAgent )

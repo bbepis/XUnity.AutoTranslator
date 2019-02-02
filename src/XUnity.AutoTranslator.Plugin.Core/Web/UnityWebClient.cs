@@ -9,25 +9,26 @@ using System.Reflection;
 using System.Text;
 using Harmony;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Shim;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class UnityWebClient : MyWebClient
+   public class UnityWebClient : ConnectionTrackingWebClient
    {
-      private KnownHttpEndpoint _httpEndpoint;
+      private HttpEndpoint _httpEndpoint;
 
-      public UnityWebClient( KnownHttpEndpoint endpoint )
+      public UnityWebClient( HttpEndpoint endpoint )
       {
          _httpEndpoint = endpoint;
          Encoding = Encoding.UTF8;
-         DownloadStringCompleted += UnityWebClient_DownloadStringCompleted;
-         UploadStringCompleted += UnityWebClient_UploadStringCompleted;
       }
 
-      private void UnityWebClient_UploadStringCompleted( object sender, MyUploadStringCompletedEventArgs ev )
+      private void UnityWebClient_UploadStringCompleted( object sender, UnityUploadStringCompletedEventArgs ev )
       {
-         var handle = ev.UserState as DownloadResult;
+         UploadStringCompleted -= UnityWebClient_UploadStringCompleted;
+
+         var handle = ev.UserState as UnityWebResponse;
 
          // obtain result, error, etc.
          string text = null;
@@ -52,9 +53,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          handle.SetCompleted( text, error );
       }
 
-      private void UnityWebClient_DownloadStringCompleted( object sender, MyDownloadStringCompletedEventArgs ev )
+      private void UnityWebClient_DownloadStringCompleted( object sender, UnityDownloadStringCompletedEventArgs ev )
       {
-         var handle = ev.UserState as DownloadResult;
+         DownloadStringCompleted -= UnityWebClient_DownloadStringCompleted;
+
+         var handle = ev.UserState as UnityWebResponse;
 
          // obtain result, error, etc.
          string text = null;
@@ -85,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var httpRequest = request as HttpWebRequest;
          if( httpRequest != null )
          {
-            var cookies = _httpEndpoint.ReadCookies();
+            var cookies = _httpEndpoint.GetCookiesForNewRequest();
             httpRequest.CookieContainer = cookies;
          }
          return request;
@@ -110,43 +113,64 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          var response = r as HttpWebResponse;
          if( response != null )
          {
-            _httpEndpoint.WriteCookies( response );
+            _httpEndpoint.StoreCookiesFromResponse( response );
          }
       }
 
-      public DownloadResult GetDownloadResult( Uri address )
+      public UnityWebResponse DownloadStringByUnityInstruction( Uri address )
       {
-         var handle = new DownloadResult();
-         DownloadStringAsync( address, handle );
+         var handle = new UnityWebResponse();
+
+         try
+         {
+            DownloadStringCompleted += UnityWebClient_DownloadStringCompleted;
+            DownloadStringAsync( address, handle );
+         }
+         catch
+         {
+            DownloadStringCompleted -= UnityWebClient_DownloadStringCompleted;
+            throw;
+         }
+
          return handle;
       }
 
-      public DownloadResult GetDownloadResult( Uri address, string request )
+      public UnityWebResponse UploadStringByUnityInstruction( Uri address, string request )
       {
-         var handle = new DownloadResult();
-         UploadStringAsync( address, "POST", request, handle );
+         var handle = new UnityWebResponse();
+
+         try
+         {
+            UploadStringCompleted += UnityWebClient_UploadStringCompleted;
+            UploadStringAsync( address, "POST", request, handle );
+         }
+         catch
+         {
+            UploadStringCompleted -= UnityWebClient_UploadStringCompleted;
+            throw;
+         }
+
          return handle;
       }
    }
 
-   public class DownloadResult : CustomYieldInstructionShim
+   public class UnityWebResponse : CustomYieldInstructionShim
    {
-      private bool _isCompleted = false;
-
       public void SetCompleted( string result, string error )
       {
-         _isCompleted = true;
+         IsCompleted = true;
+
          Result = result;
          Error = error;
       }
 
-      public override bool keepWaiting => !_isCompleted;
+      public override bool keepWaiting => !IsCompleted;
 
       public string Result { get; set; }
 
       public string Error { get; set; }
 
-      public bool IsCompleted => _isCompleted;
+      public bool IsCompleted { get; private set; } = false;
 
       public bool Succeeded => Error == null;
    }

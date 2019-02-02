@@ -1,6 +1,6 @@
 ﻿namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public class ImageTranslationInfo
+   internal class ImageTranslationInfo
    {
       public bool IsTranslated { get; set; }
    }

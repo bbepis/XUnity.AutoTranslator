@@ -6,7 +6,7 @@ using Harmony;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
-   public static class HarmonyInstanceExtensions
+   internal static class HarmonyInstanceExtensions
    {
       public static void PatchAll( this HarmonyInstance instance, IEnumerable<Type> types )
       {
@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while patching a property/method on a class." );
+            Logger.Current.Warn( e, "An error occurred while patching a property/method on a class. Failing class: " + type.Name );
          }
       }
    }

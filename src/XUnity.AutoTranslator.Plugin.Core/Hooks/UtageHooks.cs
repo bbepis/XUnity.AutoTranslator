@@ -4,20 +4,20 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Harmony;
-using XUnity.AutoTranslator.Plugin.Core.UtageSupport;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
-   public static class UtageHooks
+   internal static class UtageHooks
    {
       public static readonly Type[] All = new[] {
-         typeof( AdvCommand_ParseCellLocalizedTextHook ),
-         typeof( AdvEngine_JumpScenario ),
+         typeof( AdvCommand_ParseCellLocalizedText_Hook ),
+         typeof( AdvEngine_JumpScenario_Hook ),
       };
    }
 
    [Harmony]
-   public static class AdvCommand_ParseCellLocalizedTextHook
+   internal static class AdvCommand_ParseCellLocalizedText_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    }
 
    [Harmony]
-   public static class AdvEngine_JumpScenario
+   internal static class AdvEngine_JumpScenario_Hook
    {
       static bool Prepare( HarmonyInstance instance )
       {
@@ -54,7 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static void Prefix( ref string label )
       {
-         UtageHelpers.FixLabel( ref label );
+         UtageHelper.FixLabel( ref label );
       }
    }
 }

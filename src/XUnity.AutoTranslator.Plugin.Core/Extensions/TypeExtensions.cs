@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
-   public static class TypeExtensions
+   internal static class TypeExtensions
    {
       public static Type UnwrapNullable( this Type type )
       {

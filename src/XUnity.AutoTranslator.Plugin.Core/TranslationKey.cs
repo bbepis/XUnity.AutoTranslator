@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public struct TranslationKey
+   internal struct TranslationKey
    {
       public TranslationKey( object ui, string key, bool templatizeByNumbers, bool neverRemoveWhitespace = false )
       {

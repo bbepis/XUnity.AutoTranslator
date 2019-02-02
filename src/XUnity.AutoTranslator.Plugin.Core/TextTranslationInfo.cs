@@ -12,7 +12,7 @@ using XUnity.AutoTranslator.Plugin.Core.Fonts;
 namespace XUnity.AutoTranslator.Plugin.Core
 {
 
-   public class TextTranslationInfo
+   internal class TextTranslationInfo
    {
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
