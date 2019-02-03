@@ -171,7 +171,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var context = new InitializationContext( Config.Current, _httpSecurity );
 
             _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, context )
-               .OrderBy( x => x.Endpoint.FriendlyName )
+               .OrderBy( x => x.Error != null )
+               .ThenBy( x => x.Endpoint.FriendlyName )
                .ToList();
          }
          catch( Exception e )

@@ -2,10 +2,11 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
+      <AssemblyName>GoogleTranslateLegitimate</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\GoogleTranslateLegitimateEndpoint.cs" Link="GoogleTranslateLegitimateEndpoint.cs" />
+      <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\GoogleTranslateLegitimateEndpoint.cs" Link="GoogleTranslateLegitimateEndpoint.cs" />
    </ItemGroup>
 
    <ItemGroup>
@@ -14,7 +15,7 @@
 
    <ItemGroup>
       <Reference Include="ExIni">
-        <HintPath>..\..\..\libs\ExIni.dll</HintPath>
+         <HintPath>..\..\..\libs\ExIni.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine">
          <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>

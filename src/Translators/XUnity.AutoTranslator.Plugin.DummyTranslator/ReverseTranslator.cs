@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.DummyTranslator
 {
-   public class DummyTranslator : ITranslateEndpoint
+   public class ReverseTranslator : ITranslateEndpoint
    {
-      public string Id => "Dummy";
+      public string Id => "Reverser";
 
-      public string FriendlyName => "Dummy";
+      public string FriendlyName => "Reverser";
 
       public int MaxConcurrency => 50;
 
@@ -21,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.DummyTranslator
 
       public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
       {
-         success( "Incorrect translation" );
+         success( new string( untranslatedText.Reverse().ToArray() ) );
 
          return null;
       }

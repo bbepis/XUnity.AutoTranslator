@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public TranslatorDropdownOptionViewModel( Func<bool> isSelected, ConfiguredEndpoint selection, Action<ConfiguredEndpoint> onSelected ) : base( selection.Endpoint.FriendlyName, isSelected, () => selection.Error == null, selection, onSelected )
       {
          _selected = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CURRENT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} is the currently selected translator that will be used to perform translations." );
-         _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because misses vital configuration. {selection.Error?.Message}" );
+         _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because it must be configured first. {selection.Error?.Message}" );
          _normal = new GUIContent( selection.Endpoint.FriendlyName, $"<b>SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} will be selected as translator." );
       }
 

@@ -442,39 +442,64 @@ This approach requires version 2.15.0 or later!
 ## Implementing a Translator
 Since version 3.0.0, you can now also implement your own translators.
 
+### Important Notes on Implementing a Translator based on an Online Service
+Whenever you implement a translator based on an online service, it is important to not use it in an abusive way. For example by:
+ * Establishing a large number of connections to it
+ * Performing web scraping instead of using an available API
+
+With that in mind, consider the following:
+ * The `WWW` class in Unity establishes a new TCP connection on each request you make, making it extremely poor at this kind of job. Especially if SSL (https) is involved because it has to do the entire handshake procedure each time.
+ * The `UnityWebRequest` class in Unity does not exist in most games, because they use an old engine, so it is not a good choice either.
+ * The `WebClient` class from .NET is capable of using persistent connections (it does so by default), but has its own problems with SSL. The version of Mono used in most Unity games rejects all certificates by default making all HTTPS connections fail. This, however, can be remedied during the initialization phase of the translator (see examples below). Another shortcoming of this API is the fact that the runtime will never release the TCP connections it has used until the process ends. The API also integrates terribly with Unity because callbacks return on a background thread.
+
+None of these are therefore an ideal solution.
+
+To remedy this, I have made a class `XUnityWebClient`, which is based on Mono's version of WebClient. However, it adds the following features:
+ * Enables integration with Unity by returning result classes that can be 'yielded'.
+ * Properly closes connections that has not been used for 50 seconds.
+
+I recommend using this class, or in case that cannot be used, falling back to the .NET 'WebClient'.
+
+### How-To
 Follow these steps:
  * Start a new project in Visual Studio 2017 or later. (Be a good boy and choose the "Class Library (.NET Standard)" template. After choosing that, edit the generated .csproj file and change the TargetFramework element to 'net35')
- * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll file.
+ * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll
+ * Add a reference to UnityEngine.dll
+ * Add a reference to ExIni.dll
  * Create a new class that either:
    * Implements the `ITranslateEndpoint` interface
    * Inherits from the `HttpEndpoint` class
 
-Here's two examples that does either:
+Here's an example that simply reverses the text:
 
 ```C#
-public class DummyTranslator : ITranslateEndpoint
+public class ReverseTranslator : ITranslateEndpoint
 {
-   public string Id => "Dummy";
+   public string Id => "Reverser";
 
-   public string FriendlyName => "Dummy";
+   public string FriendlyName => "Reverser";
 
    public int MaxConcurrency => 50;
 
-   public void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+   public void Initialize( InitializationContext context )
    {
 
    }
 
    public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
    {
-      success( "Incorrect translation" );
+      success( new string( untranslatedText.Reverse().ToArray() ) );
 
       return null;
    }
 }
 ```
 
-TODO: Example...
+Here's a more real example of one of the existing endpoints based on the HttpEndpoint:
+
+...
+
+As you can see, the `XUnityWebClient` class is not even used. We simply return a request object that the `HttpEndpoint` will use internally to perform the request.
 
 After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory (you may have to create it) of the plugin folder. That's it.
 

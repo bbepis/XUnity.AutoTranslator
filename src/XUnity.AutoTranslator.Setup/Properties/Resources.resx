@@ -143,37 +143,37 @@
       <value>..\..\XUnity.AutoTranslator.Patcher\bin\Release\net35\XUnity.AutoTranslator.Patcher.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_BaiduTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BaiduTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.BaiduTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BaiduTranslate\bin\Release\net35\BaiduTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_BingTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BingTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.BingTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BingTranslate\bin\Release\net35\BingTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_BingTranslateLegitimate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BingTranslateLegitimate\bin\Release\net35\XUnity.AutoTranslator.Plugin.BingTranslateLegitimate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.BingTranslateLegitimate\bin\Release\net35\BingTranslateLegitimate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_CustomTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.CustomTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.CustomTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.CustomTranslate\bin\Release\net35\CustomTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_GoogleTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.GoogleTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslate\bin\Release\net35\GoogleTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_GoogleTranslateLegitimate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate\bin\Release\net35\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate\bin\Release\net35\GoogleTranslateLegitimate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_LecPowerTranslator15" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.LecPowerTranslator15\bin\Release\net35\XUnity.AutoTranslator.Plugin.LecPowerTranslator15.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.LecPowerTranslator15\bin\Release\net35\LecPowerTranslator15.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_WatsonTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.WatsonTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.WatsonTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.WatsonTranslate\bin\Release\net35\WatsonTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_YandexTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.YandexTranslate\bin\Release\net35\XUnity.AutoTranslator.Plugin.YandexTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.YandexTranslate\bin\Release\net35\YandexTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_Core" type="System.Resources.ResXFileRef, System.Windows.Forms">
       <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="XUnity_AutoTranslator_Plugin_Lec" type="System.Resources.ResXFileRef, System.Windows.Forms">
-      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.Lec\bin\x86\Release\net35\XUnity.AutoTranslator.Plugin.Lec.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+      <value>..\..\Translators\XUnity.AutoTranslator.Plugin.Lec\bin\x86\Release\net35\Lec.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
    <data name="_0Harmony" type="System.Resources.ResXFileRef, System.Windows.Forms">
       <value>..\..\..\libs\0Harmony.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

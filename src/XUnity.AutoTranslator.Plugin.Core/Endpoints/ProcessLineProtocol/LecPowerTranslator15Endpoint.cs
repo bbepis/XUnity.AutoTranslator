@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
          if( !to.Equals( "en", StringComparison.OrdinalIgnoreCase ) ) throw new Exception( "Only japanese to english is supported." );
 
          var path1 = context.Config.DataPath;
-         var exePath1 = Path.Combine( path1, @"Translators\XUnity.AutoTranslator.Plugin.Lec.exe" );
+         var exePath1 = Path.Combine( path1, @"Translators\Lec.exe" );
          var file1Exists = File.Exists( exePath1 );
          if( !file1Exists )
          {

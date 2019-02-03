@@ -41,16 +41,16 @@ namespace XUnity.AutoTranslator.Setup
          AddFile( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
          AddFile( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
          AddFile( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.BaiduTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BaiduTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.BingTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.BingLegitimateTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslateLegitimate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.CustomTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_CustomTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.GoogleTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_GoogleTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate.dll" ), Resources.XUnity_AutoTranslator_Plugin_GoogleTranslateLegitimate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.LecPowerTranslator15.dll" ), Resources.XUnity_AutoTranslator_Plugin_LecPowerTranslator15, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.Lec.exe" ), Resources.XUnity_AutoTranslator_Plugin_Lec, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.WatsonTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_WatsonTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.YandexTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_YandexTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "BaiduTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BaiduTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "BingTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "BingLegitimateTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslateLegitimate, true );
+         AddFile( Path.Combine( translatorsPath, "CustomTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_CustomTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "GoogleTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_GoogleTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "GoogleTranslateLegitimate.dll" ), Resources.XUnity_AutoTranslator_Plugin_GoogleTranslateLegitimate, true );
+         AddFile( Path.Combine( translatorsPath, "LecPowerTranslator15.dll" ), Resources.XUnity_AutoTranslator_Plugin_LecPowerTranslator15, true );
+         AddFile( Path.Combine( translatorsPath, "Lec.exe" ), Resources.XUnity_AutoTranslator_Plugin_Lec, true );
+         AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_WatsonTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "YandexTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_YandexTranslate, true );
 
          foreach( var launcher in launchers )
          {

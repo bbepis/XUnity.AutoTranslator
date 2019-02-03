@@ -2,6 +2,7 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
+      <AssemblyName>CustomTranslate</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>

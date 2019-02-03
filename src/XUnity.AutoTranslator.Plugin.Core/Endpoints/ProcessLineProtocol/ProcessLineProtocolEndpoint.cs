@@ -48,6 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
                      _process.StartInfo.Arguments = _arguments;
                      _process.EnableRaisingEvents = false;
                      _process.StartInfo.UseShellExecute = false;
+                     _process.StartInfo.CreateNoWindow = true;
                      _process.StartInfo.RedirectStandardInput = true;
                      _process.StartInfo.RedirectStandardOutput = true;
                      _process.StartInfo.RedirectStandardError = true;

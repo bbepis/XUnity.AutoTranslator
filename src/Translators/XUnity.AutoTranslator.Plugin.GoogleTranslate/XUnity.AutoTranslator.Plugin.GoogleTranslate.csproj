@@ -2,10 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath></OutputPath>
+    <AssemblyName>GoogleTranslate</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="ExIni">
+      <HintPath>..\..\..\libs\ExIni.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
