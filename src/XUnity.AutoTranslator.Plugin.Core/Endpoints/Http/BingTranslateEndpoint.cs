@@ -6,7 +6,6 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -237,8 +236,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       {
          try
          {
-            Logger.Current.Warn( result );
-
             var obj = JSON.Parse( result );
 
             var code = obj[ "statusCode" ].AsInt;

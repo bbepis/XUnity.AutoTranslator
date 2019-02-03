@@ -11,34 +11,16 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Web
+namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
 {
-   public delegate void UnityDownloadStringCompletedEventHandler( object sender, UnityDownloadStringCompletedEventArgs e );
-   public delegate void UnityUploadStringCompletedEventHandler( object sender, UnityUploadStringCompletedEventArgs e );
+   #region EventArgs
 
-   public class UnityDownloadStringCompletedEventArgs : AsyncCompletedEventArgs
+   public delegate void XUnityDownloadStringCompletedEventHandler( object sender, XUnityDownloadStringCompletedEventArgs e );
+   public class XUnityDownloadStringCompletedEventArgs : AsyncCompletedEventArgs
    {
       private string result;
 
-      internal UnityDownloadStringCompletedEventArgs( string result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
-      {
-         this.result = result;
-      }
-
-      public string Result
-      {
-         get
-         {
-            base.RaiseExceptionIfNecessary();
-            return this.result;
-         }
-      }
-   }
-   public class UnityUploadStringCompletedEventArgs : AsyncCompletedEventArgs
-   {
-      private string result;
-
-      internal UnityUploadStringCompletedEventArgs( string result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      internal XUnityDownloadStringCompletedEventArgs( string result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
       {
          this.result = result;
       }
@@ -53,13 +35,228 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       }
    }
 
-   public class UnityAsyncCompletedEventArgs : EventArgs
+   public delegate void XUnityUploadStringCompletedEventHandler( object sender, XUnityUploadStringCompletedEventArgs e );
+   public class XUnityUploadStringCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private string result;
+
+      internal XUnityUploadStringCompletedEventArgs( string result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public string Result
+      {
+         get
+         {
+            base.RaiseExceptionIfNecessary();
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityDownloadDataCompletedEventHandler( object sender, XUnityDownloadDataCompletedEventArgs e );
+   public class XUnityDownloadDataCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private byte[] result;
+
+      internal XUnityDownloadDataCompletedEventArgs( byte[] result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public byte[] Result
+      {
+         get
+         {
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityDownloadProgressChangedEventHandler( object sender, XUnityDownloadProgressChangedEventArgs e );
+   public class XUnityDownloadProgressChangedEventArgs : ProgressChangedEventArgs
+   {
+      private long received;
+      private long total;
+
+      internal XUnityDownloadProgressChangedEventArgs( long bytesReceived, long totalBytesToReceive, object userState ) : base( ( totalBytesToReceive == -1L ) ? 0 : ( (int)( ( bytesReceived * 100L ) / totalBytesToReceive ) ), userState )
+      {
+         this.received = bytesReceived;
+         this.total = totalBytesToReceive;
+      }
+
+      public long BytesReceived
+      {
+         get
+         {
+            return this.received;
+         }
+      }
+
+      public long TotalBytesToReceive
+      {
+         get
+         {
+            return this.total;
+         }
+      }
+   }
+
+   public delegate void XUnityOpenReadCompletedEventHandler( object sender, XUnityOpenReadCompletedEventArgs e );
+   public class XUnityOpenReadCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private Stream result;
+
+      internal XUnityOpenReadCompletedEventArgs( Stream result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public Stream Result
+      {
+         get
+         {
+            base.RaiseExceptionIfNecessary();
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityOpenWriteCompletedEventHandler( object sender, XUnityOpenWriteCompletedEventArgs e );
+   public class XUnityOpenWriteCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private Stream result;
+
+      internal XUnityOpenWriteCompletedEventArgs( Stream result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public Stream Result
+      {
+         get
+         {
+            base.RaiseExceptionIfNecessary();
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityUploadDataCompletedEventHandler( object sender, XUnityUploadDataCompletedEventArgs e );
+   public class XUnityUploadDataCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private byte[] result;
+
+      internal XUnityUploadDataCompletedEventArgs( byte[] result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public byte[] Result
+      {
+         get
+         {
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityUploadFileCompletedEventHandler( object sender, XUnityUploadFileCompletedEventArgs e );
+   public class XUnityUploadFileCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private byte[] result;
+
+      internal XUnityUploadFileCompletedEventArgs( byte[] result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public byte[] Result
+      {
+         get
+         {
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityUploadProgressChangedEventHandler( object sender, XUnityUploadProgressChangedEventArgs e );
+   public class XUnityUploadProgressChangedEventArgs : ProgressChangedEventArgs
+   {
+      private long received;
+      private long sent;
+      private long total_recv;
+      private long total_send;
+
+      internal XUnityUploadProgressChangedEventArgs( long bytesReceived, long totalBytesToReceive, long bytesSent, long totalBytesToSend, int progressPercentage, object userState ) : base( progressPercentage, userState )
+      {
+         this.received = bytesReceived;
+         this.total_recv = totalBytesToReceive;
+         this.sent = bytesSent;
+         this.total_send = totalBytesToSend;
+      }
+
+      public long BytesReceived
+      {
+         get
+         {
+            return this.received;
+         }
+      }
+
+      public long BytesSent
+      {
+         get
+         {
+            return this.sent;
+         }
+      }
+
+      public long TotalBytesToReceive
+      {
+         get
+         {
+            return this.total_recv;
+         }
+      }
+
+      public long TotalBytesToSend
+      {
+         get
+         {
+            return this.total_send;
+         }
+      }
+   }
+
+   public delegate void XUnityUploadValuesCompletedEventHandler( object sender, XUnityUploadValuesCompletedEventArgs e );
+   public class XUnityUploadValuesCompletedEventArgs : AsyncCompletedEventArgs
+   {
+      private byte[] result;
+
+      internal XUnityUploadValuesCompletedEventArgs( byte[] result, Exception error, bool cancelled, object userState ) : base( error, cancelled, userState )
+      {
+         this.result = result;
+      }
+
+      public byte[] Result
+      {
+         get
+         {
+            return this.result;
+         }
+      }
+   }
+
+   public delegate void XUnityAsyncCompletedEventHandler( object sender, XUnityAsyncCompletedEventArgs e );
+   public class XUnityAsyncCompletedEventArgs : EventArgs
    {
       private bool _cancelled;
       private Exception _error;
       private object _userState;
 
-      public UnityAsyncCompletedEventArgs( Exception error, bool cancelled, object userState )
+      public XUnityAsyncCompletedEventArgs( Exception error, bool cancelled, object userState )
       {
          this._error = error;
          this._cancelled = cancelled;
@@ -102,6 +299,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
    }
+
+   #endregion
 
    public class ConnectionTrackingWebClient
    {
@@ -150,7 +349,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      public static void CheckServicePoints()
+      internal static void CheckServicePoints()
       {
          List<KeyValuePair<string, ServicePointState>> idleEntries = null;
 
@@ -218,22 +417,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       protected WebHeaderCollection responseHeaders;
       private static readonly string urlEncodedCType = "application/x-www-form-urlencoded";
 
-      public event UnityDownloadStringCompletedEventHandler DownloadStringCompleted;
-      public event UnityUploadStringCompletedEventHandler UploadStringCompleted;
+      public event XUnityDownloadStringCompletedEventHandler DownloadStringCompleted;
+      public event XUnityUploadStringCompletedEventHandler UploadStringCompleted;
 
-      //public void CancelAsync()
-      //{
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      if( this.async_thread != null )
-      //      {
-      //         Thread thread = this.async_thread;
-      //         this.CompleteAsync();
-      //         thread.Interrupt();
-      //      }
-      //   }
-      //}
+      public event XUnityDownloadDataCompletedEventHandler DownloadDataCompleted;
+      public event XUnityAsyncCompletedEventHandler DownloadFileCompleted;
+      public event XUnityDownloadProgressChangedEventHandler DownloadProgressChanged;
+      public event XUnityOpenReadCompletedEventHandler OpenReadCompleted;
+      public event XUnityOpenWriteCompletedEventHandler OpenWriteCompleted;
+      public event XUnityUploadDataCompletedEventHandler UploadDataCompleted;
+      public event XUnityUploadFileCompletedEventHandler UploadFileCompleted;
+      public event XUnityUploadProgressChangedEventHandler UploadProgressChanged;
+      public event XUnityUploadValuesCompletedEventHandler UploadValuesCompleted;
 
       private void CheckBusy()
       {
@@ -321,43 +516,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return buffer;
       }
 
-      //public void DownloadDataAsync( Uri address )
-      //{
-      //   this.DownloadDataAsync( address, null );
-      //}
+      public void DownloadDataAsync( Uri address )
+      {
+         this.DownloadDataAsync( address, null );
+      }
 
-      //public void DownloadDataAsync( Uri address, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         try
-      //         {
-      //            byte[] result = this.DownloadDataCore( (Uri)objArray[ 0 ], objArray[ 1 ] );
-      //            this.OnDownloadDataCompleted( new DownloadDataCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            this.OnDownloadDataCompleted( new DownloadDataCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
-      //            throw;
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnDownloadDataCompleted( new DownloadDataCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void DownloadDataAsync( Uri address, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               try
+               {
+                  byte[] result = this.DownloadDataCore( (Uri)objArray[ 0 ], objArray[ 1 ] );
+                  this.OnDownloadDataCompleted( new XUnityDownloadDataCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  this.OnDownloadDataCompleted( new XUnityDownloadDataCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
+                  throw;
+               }
+               catch( Exception exception )
+               {
+                  this.OnDownloadDataCompleted( new XUnityDownloadDataCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       private byte[] DownloadDataCore( Uri address, object userToken )
       {
@@ -391,126 +586,126 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return buffer;
       }
 
-      //public void DownloadFile( string address, string fileName )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   this.DownloadFile( this.CreateUri( address ), fileName );
-      //}
+      public void DownloadFile( string address, string fileName )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         this.DownloadFile( this.CreateUri( address ), fileName );
+      }
 
-      //public void DownloadFile( Uri address, string fileName )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   if( fileName == null )
-      //   {
-      //      throw new ArgumentNullException( "fileName" );
-      //   }
-      //   try
-      //   {
-      //      this.SetBusy();
-      //      this.async = false;
-      //      this.DownloadFileCore( address, fileName, null );
-      //   }
-      //   catch( WebException )
-      //   {
-      //      throw;
-      //   }
-      //   catch( Exception exception2 )
-      //   {
-      //      throw new WebException( "An error occurred performing a WebClient request.", exception2 );
-      //   }
-      //   finally
-      //   {
-      //      this.is_busy = false;
-      //   }
-      //}
+      public void DownloadFile( Uri address, string fileName )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         if( fileName == null )
+         {
+            throw new ArgumentNullException( "fileName" );
+         }
+         try
+         {
+            this.SetBusy();
+            this.async = false;
+            this.DownloadFileCore( address, fileName, null );
+         }
+         catch( WebException )
+         {
+            throw;
+         }
+         catch( Exception exception2 )
+         {
+            throw new WebException( "An error occurred performing a WebClient request.", exception2 );
+         }
+         finally
+         {
+            this.is_busy = false;
+         }
+      }
 
-      //public void DownloadFileAsync( Uri address, string fileName )
-      //{
-      //   this.DownloadFileAsync( address, fileName, null );
-      //}
+      public void DownloadFileAsync( Uri address, string fileName )
+      {
+         this.DownloadFileAsync( address, fileName, null );
+      }
 
-      //public void DownloadFileAsync( Uri address, string fileName, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   if( fileName == null )
-      //   {
-      //      throw new ArgumentNullException( "fileName" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, fileName, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         try
-      //         {
-      //            this.DownloadFileCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], objArray[ 2 ] );
-      //            this.OnDownloadFileCompleted( new AsyncCompletedEventArgs( null, false, objArray[ 2 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            this.OnDownloadFileCompleted( new AsyncCompletedEventArgs( null, true, objArray[ 2 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnDownloadFileCompleted( new AsyncCompletedEventArgs( exception, false, objArray[ 2 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void DownloadFileAsync( Uri address, string fileName, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         if( fileName == null )
+         {
+            throw new ArgumentNullException( "fileName" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, fileName, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               try
+               {
+                  this.DownloadFileCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], objArray[ 2 ] );
+                  this.OnDownloadFileCompleted( new XUnityAsyncCompletedEventArgs( null, false, objArray[ 2 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  this.OnDownloadFileCompleted( new XUnityAsyncCompletedEventArgs( null, true, objArray[ 2 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnDownloadFileCompleted( new XUnityAsyncCompletedEventArgs( exception, false, objArray[ 2 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
-      //private void DownloadFileCore( Uri address, string fileName, object userToken )
-      //{
-      //   WebRequest request = null;
-      //   FileStream stream = new FileStream( fileName, FileMode.Create );
-      //   try
-      //   {
-      //      request = this.SetupRequest( address );
-      //      WebResponse webResponse = this.GetWebResponse( request );
-      //      Stream responseStream = webResponse.GetResponseStream();
-      //      int contentLength = (int)webResponse.ContentLength;
-      //      int count = ( ( contentLength > -1 ) && ( contentLength <= 0x8000 ) ) ? contentLength : 0x8000;
-      //      byte[] buffer = new byte[ count ];
-      //      int num3 = 0;
-      //      long bytesReceived = 0L;
-      //      while( ( num3 = responseStream.Read( buffer, 0, count ) ) != 0 )
-      //      {
-      //         if( this.async )
-      //         {
-      //            bytesReceived += num3;
-      //            this.OnDownloadProgressChanged( new DownloadProgressChangedEventArgs( bytesReceived, webResponse.ContentLength, userToken ) );
-      //         }
-      //         stream.Write( buffer, 0, num3 );
-      //      }
-      //   }
-      //   catch( ThreadInterruptedException )
-      //   {
-      //      if( request != null )
-      //      {
-      //         request.Abort();
-      //      }
-      //      throw;
-      //   }
-      //   finally
-      //   {
-      //      if( stream != null )
-      //      {
-      //         stream.Dispose();
-      //      }
-      //   }
-      //}
+      private void DownloadFileCore( Uri address, string fileName, object userToken )
+      {
+         WebRequest request = null;
+         FileStream stream = new FileStream( fileName, FileMode.Create );
+         try
+         {
+            request = this.SetupRequest( address );
+            WebResponse webResponse = this.GetWebResponse( request );
+            Stream responseStream = webResponse.GetResponseStream();
+            int contentLength = (int)webResponse.ContentLength;
+            int count = ( ( contentLength > -1 ) && ( contentLength <= 0x8000 ) ) ? contentLength : 0x8000;
+            byte[] buffer = new byte[ count ];
+            int num3 = 0;
+            long bytesReceived = 0L;
+            while( ( num3 = responseStream.Read( buffer, 0, count ) ) != 0 )
+            {
+               if( this.async )
+               {
+                  bytesReceived += num3;
+                  this.OnDownloadProgressChanged( new XUnityDownloadProgressChangedEventArgs( bytesReceived, webResponse.ContentLength, userToken ) );
+               }
+               stream.Write( buffer, 0, num3 );
+            }
+         }
+         catch( ThreadInterruptedException )
+         {
+            if( request != null )
+            {
+               request.Abort();
+            }
+            throw;
+         }
+         finally
+         {
+            if( stream != null )
+            {
+               stream.Dispose();
+            }
+         }
+      }
 
       public string DownloadString( string address )
       {
@@ -553,15 +748,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                try
                {
                   string result = this.encoding.GetString( this.DownloadDataCore( (Uri)objArray[ 0 ], objArray[ 1 ] ) );
-                  this.OnDownloadStringCompleted( new UnityDownloadStringCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
+                  this.OnDownloadStringCompleted( new XUnityDownloadStringCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
                }
                catch( ThreadInterruptedException )
                {
-                  this.OnDownloadStringCompleted( new UnityDownloadStringCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
+                  this.OnDownloadStringCompleted( new XUnityDownloadStringCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
                }
                catch( Exception exception )
                {
-                  this.OnDownloadStringCompleted( new UnityDownloadStringCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
+                  this.OnDownloadStringCompleted( new XUnityDownloadStringCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
                }
             }, parameter );
          }
@@ -671,33 +866,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return new Uri( this.baseAddress, path + queryString, queryString != null );
       }
 
-      //protected virtual void OnDownloadDataCompleted( DownloadDataCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.DownloadDataCompleted != null )
-      //   {
-      //      this.DownloadDataCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnDownloadDataCompleted( XUnityDownloadDataCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.DownloadDataCompleted != null )
+         {
+            this.DownloadDataCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnDownloadFileCompleted( AsyncCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.DownloadFileCompleted != null )
-      //   {
-      //      this.DownloadFileCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnDownloadFileCompleted( XUnityAsyncCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.DownloadFileCompleted != null )
+         {
+            this.DownloadFileCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnDownloadProgressChanged( DownloadProgressChangedEventArgs e )
-      //{
-      //   if( this.DownloadProgressChanged != null )
-      //   {
-      //      this.DownloadProgressChanged( this, e );
-      //   }
-      //}
+      protected virtual void OnDownloadProgressChanged( XUnityDownloadProgressChangedEventArgs e )
+      {
+         if( this.DownloadProgressChanged != null )
+         {
+            this.DownloadProgressChanged( this, e );
+         }
+      }
 
-      protected virtual void OnDownloadStringCompleted( UnityDownloadStringCompletedEventArgs args )
+      protected virtual void OnDownloadStringCompleted( XUnityDownloadStringCompletedEventArgs args )
       {
          this.CompleteAsync();
          if( this.DownloadStringCompleted != null )
@@ -706,51 +901,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      //protected virtual void OnOpenReadCompleted( OpenReadCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.OpenReadCompleted != null )
-      //   {
-      //      this.OpenReadCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnOpenReadCompleted( XUnityOpenReadCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.OpenReadCompleted != null )
+         {
+            this.OpenReadCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnOpenWriteCompleted( OpenWriteCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.OpenWriteCompleted != null )
-      //   {
-      //      this.OpenWriteCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnOpenWriteCompleted( XUnityOpenWriteCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.OpenWriteCompleted != null )
+         {
+            this.OpenWriteCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnUploadDataCompleted( UploadDataCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.UploadDataCompleted != null )
-      //   {
-      //      this.UploadDataCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnUploadDataCompleted( XUnityUploadDataCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.UploadDataCompleted != null )
+         {
+            this.UploadDataCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnUploadFileCompleted( UploadFileCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.UploadFileCompleted != null )
-      //   {
-      //      this.UploadFileCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnUploadFileCompleted( XUnityUploadFileCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.UploadFileCompleted != null )
+         {
+            this.UploadFileCompleted( this, args );
+         }
+      }
 
-      //protected virtual void OnUploadProgressChanged( UploadProgressChangedEventArgs e )
-      //{
-      //   if( this.UploadProgressChanged != null )
-      //   {
-      //      this.UploadProgressChanged( this, e );
-      //   }
-      //}
+      protected virtual void OnUploadProgressChanged( XUnityUploadProgressChangedEventArgs e )
+      {
+         if( this.UploadProgressChanged != null )
+         {
+            this.UploadProgressChanged( this, e );
+         }
+      }
 
-      protected virtual void OnUploadStringCompleted( UnityUploadStringCompletedEventArgs args )
+      protected virtual void OnUploadStringCompleted( XUnityUploadStringCompletedEventArgs args )
       {
          this.CompleteAsync();
          if( this.UploadStringCompleted != null )
@@ -759,14 +954,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
-      //protected virtual void OnUploadValuesCompleted( UploadValuesCompletedEventArgs args )
-      //{
-      //   this.CompleteAsync();
-      //   if( this.UploadValuesCompleted != null )
-      //   {
-      //      this.UploadValuesCompleted( this, args );
-      //   }
-      //}
+      protected virtual void OnUploadValuesCompleted( XUnityUploadValuesCompletedEventArgs args )
+      {
+         this.CompleteAsync();
+         if( this.UploadValuesCompleted != null )
+         {
+            this.UploadValuesCompleted( this, args );
+         }
+      }
 
       public Stream OpenRead( string address )
       {
@@ -807,48 +1002,48 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return responseStream;
       }
 
-      //public void OpenReadAsync( Uri address )
-      //{
-      //   this.OpenReadAsync( address, null );
-      //}
+      public void OpenReadAsync( Uri address )
+      {
+         this.OpenReadAsync( address, null );
+      }
 
-      //public void OpenReadAsync( Uri address, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         WebRequest request = null;
-      //         try
-      //         {
-      //            request = this.SetupRequest( (Uri)objArray[ 0 ] );
-      //            Stream result = this.GetWebResponse( request ).GetResponseStream();
-      //            this.OnOpenReadCompleted( new OpenReadCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            if( request != null )
-      //            {
-      //               request.Abort();
-      //            }
-      //            this.OnOpenReadCompleted( new OpenReadCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnOpenReadCompleted( new OpenReadCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void OpenReadAsync( Uri address, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               WebRequest request = null;
+               try
+               {
+                  request = this.SetupRequest( (Uri)objArray[ 0 ] );
+                  Stream result = this.GetWebResponse( request ).GetResponseStream();
+                  this.OnOpenReadCompleted( new XUnityOpenReadCompletedEventArgs( result, null, false, objArray[ 1 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  if( request != null )
+                  {
+                     request.Abort();
+                  }
+                  this.OnOpenReadCompleted( new XUnityOpenReadCompletedEventArgs( null, null, true, objArray[ 1 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnOpenReadCompleted( new XUnityOpenReadCompletedEventArgs( null, exception, false, objArray[ 1 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       public Stream OpenWrite( string address )
       {
@@ -901,53 +1096,53 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return requestStream;
       }
 
-      //public void OpenWriteAsync( Uri address )
-      //{
-      //   this.OpenWriteAsync( address, null );
-      //}
+      public void OpenWriteAsync( Uri address )
+      {
+         this.OpenWriteAsync( address, null );
+      }
 
-      //public void OpenWriteAsync( Uri address, string method )
-      //{
-      //   this.OpenWriteAsync( address, method, null );
-      //}
+      public void OpenWriteAsync( Uri address, string method )
+      {
+         this.OpenWriteAsync( address, method, null );
+      }
 
-      //public void OpenWriteAsync( Uri address, string method, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, method, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         WebRequest request = null;
-      //         try
-      //         {
-      //            request = this.SetupRequest( (Uri)objArray[ 0 ], (string)objArray[ 1 ], true );
-      //            Stream result = request.GetRequestStream();
-      //            this.OnOpenWriteCompleted( new OpenWriteCompletedEventArgs( result, null, false, objArray[ 2 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            if( request != null )
-      //            {
-      //               request.Abort();
-      //            }
-      //            this.OnOpenWriteCompleted( new OpenWriteCompletedEventArgs( null, null, true, objArray[ 2 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnOpenWriteCompleted( new OpenWriteCompletedEventArgs( null, exception, false, objArray[ 2 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void OpenWriteAsync( Uri address, string method, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, method, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               WebRequest request = null;
+               try
+               {
+                  request = this.SetupRequest( (Uri)objArray[ 0 ], (string)objArray[ 1 ], true );
+                  Stream result = request.GetRequestStream();
+                  this.OnOpenWriteCompleted( new XUnityOpenWriteCompletedEventArgs( result, null, false, objArray[ 2 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  if( request != null )
+                  {
+                     request.Abort();
+                  }
+                  this.OnOpenWriteCompleted( new XUnityOpenWriteCompletedEventArgs( null, null, true, objArray[ 2 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnOpenWriteCompleted( new XUnityOpenWriteCompletedEventArgs( null, exception, false, objArray[ 2 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       private byte[] ReadAll( Stream stream, int length, object userToken )
       {
@@ -1106,51 +1301,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return buffer;
       }
 
-      //public void UploadDataAsync( Uri address, byte[] data )
-      //{
-      //   this.UploadDataAsync( address, null, data );
-      //}
+      public void UploadDataAsync( Uri address, byte[] data )
+      {
+         this.UploadDataAsync( address, null, data );
+      }
 
-      //public void UploadDataAsync( Uri address, string method, byte[] data )
-      //{
-      //   this.UploadDataAsync( address, method, data, null );
-      //}
+      public void UploadDataAsync( Uri address, string method, byte[] data )
+      {
+         this.UploadDataAsync( address, method, data, null );
+      }
 
-      //public void UploadDataAsync( Uri address, string method, byte[] data, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   if( data == null )
-      //   {
-      //      throw new ArgumentNullException( "data" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, method, data, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         try
-      //         {
-      //            byte[] result = this.UploadDataCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (byte[])objArray[ 2 ], objArray[ 3 ] );
-      //            this.OnUploadDataCompleted( new UploadDataCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            this.OnUploadDataCompleted( new UploadDataCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnUploadDataCompleted( new UploadDataCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void UploadDataAsync( Uri address, string method, byte[] data, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         if( data == null )
+         {
+            throw new ArgumentNullException( "data" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, method, data, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               try
+               {
+                  byte[] result = this.UploadDataCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (byte[])objArray[ 2 ], objArray[ 3 ] );
+                  this.OnUploadDataCompleted( new XUnityUploadDataCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  this.OnUploadDataCompleted( new XUnityUploadDataCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnUploadDataCompleted( new XUnityUploadDataCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       private byte[] UploadDataCore( Uri address, string method, byte[] data, object userToken )
       {
@@ -1230,51 +1425,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return buffer;
       }
 
-      //public void UploadFileAsync( Uri address, string fileName )
-      //{
-      //   this.UploadFileAsync( address, null, fileName );
-      //}
+      public void UploadFileAsync( Uri address, string fileName )
+      {
+         this.UploadFileAsync( address, null, fileName );
+      }
 
-      //public void UploadFileAsync( Uri address, string method, string fileName )
-      //{
-      //   this.UploadFileAsync( address, method, fileName, null );
-      //}
+      public void UploadFileAsync( Uri address, string method, string fileName )
+      {
+         this.UploadFileAsync( address, method, fileName, null );
+      }
 
-      //public void UploadFileAsync( Uri address, string method, string fileName, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   if( fileName == null )
-      //   {
-      //      throw new ArgumentNullException( "fileName" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.SetBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, method, fileName, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         try
-      //         {
-      //            byte[] result = this.UploadFileCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (string)objArray[ 2 ], objArray[ 3 ] );
-      //            this.OnUploadFileCompleted( new UploadFileCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            this.OnUploadFileCompleted( new UploadFileCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnUploadFileCompleted( new UploadFileCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void UploadFileAsync( Uri address, string method, string fileName, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         if( fileName == null )
+         {
+            throw new ArgumentNullException( "fileName" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.SetBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, method, fileName, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               try
+               {
+                  byte[] result = this.UploadFileCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (string)objArray[ 2 ], objArray[ 3 ] );
+                  this.OnUploadFileCompleted( new XUnityUploadFileCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  this.OnUploadFileCompleted( new XUnityUploadFileCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnUploadFileCompleted( new XUnityUploadFileCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       private byte[] UploadFileCore( Uri address, string method, string fileName, object userToken )
       {
@@ -1432,15 +1627,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
                try
                {
                   string result = this.UploadString( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (string)objArray[ 2 ] );
-                  this.OnUploadStringCompleted( new UnityUploadStringCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
+                  this.OnUploadStringCompleted( new XUnityUploadStringCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
                }
                catch( ThreadInterruptedException )
                {
-                  this.OnUploadStringCompleted( new UnityUploadStringCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
+                  this.OnUploadStringCompleted( new XUnityUploadStringCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
                }
                catch( Exception exception )
                {
-                  this.OnUploadStringCompleted( new UnityUploadStringCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
+                  this.OnUploadStringCompleted( new XUnityUploadStringCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
                }
             }, parameter );
          }
@@ -1501,51 +1696,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return buffer;
       }
 
-      //public void UploadValuesAsync( Uri address, NameValueCollection values )
-      //{
-      //   this.UploadValuesAsync( address, null, values );
-      //}
+      public void UploadValuesAsync( Uri address, NameValueCollection values )
+      {
+         this.UploadValuesAsync( address, null, values );
+      }
 
-      //public void UploadValuesAsync( Uri address, string method, NameValueCollection values )
-      //{
-      //   this.UploadValuesAsync( address, method, values, null );
-      //}
+      public void UploadValuesAsync( Uri address, string method, NameValueCollection values )
+      {
+         this.UploadValuesAsync( address, method, values, null );
+      }
 
-      //public void UploadValuesAsync( Uri address, string method, NameValueCollection values, object userToken )
-      //{
-      //   if( address == null )
-      //   {
-      //      throw new ArgumentNullException( "address" );
-      //   }
-      //   if( values == null )
-      //   {
-      //      throw new ArgumentNullException( "values" );
-      //   }
-      //   MyWebClient client = this;
-      //   lock( client )
-      //   {
-      //      this.CheckBusy();
-      //      this.async = true;
-      //      object[] parameter = new object[] { address, method, values, userToken };
-      //      ThreadPool.QueueUserWorkItem( delegate ( object state )
-      //      {
-      //         object[] objArray = (object[])state;
-      //         try
-      //         {
-      //            byte[] result = this.UploadValuesCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (NameValueCollection)objArray[ 2 ], objArray[ 3 ] );
-      //            this.OnUploadValuesCompleted( new UploadValuesCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
-      //         }
-      //         catch( ThreadInterruptedException )
-      //         {
-      //            this.OnUploadValuesCompleted( new UploadValuesCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
-      //         }
-      //         catch( Exception exception )
-      //         {
-      //            this.OnUploadValuesCompleted( new UploadValuesCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
-      //         }
-      //      }, parameter );
-      //   }
-      //}
+      public void UploadValuesAsync( Uri address, string method, NameValueCollection values, object userToken )
+      {
+         if( address == null )
+         {
+            throw new ArgumentNullException( "address" );
+         }
+         if( values == null )
+         {
+            throw new ArgumentNullException( "values" );
+         }
+         ConnectionTrackingWebClient client = this;
+         lock( client )
+         {
+            this.CheckBusy();
+            this.async = true;
+            object[] parameter = new object[] { address, method, values, userToken };
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               object[] objArray = (object[])state;
+               try
+               {
+                  byte[] result = this.UploadValuesCore( (Uri)objArray[ 0 ], (string)objArray[ 1 ], (NameValueCollection)objArray[ 2 ], objArray[ 3 ] );
+                  this.OnUploadValuesCompleted( new XUnityUploadValuesCompletedEventArgs( result, null, false, objArray[ 3 ] ) );
+               }
+               catch( ThreadInterruptedException )
+               {
+                  this.OnUploadValuesCompleted( new XUnityUploadValuesCompletedEventArgs( null, null, true, objArray[ 3 ] ) );
+               }
+               catch( Exception exception )
+               {
+                  this.OnUploadValuesCompleted( new XUnityUploadValuesCompletedEventArgs( null, exception, false, objArray[ 3 ] ) );
+               }
+            }, parameter );
+         }
+      }
 
       private byte[] UploadValuesCore( Uri uri, string method, NameValueCollection data, object userToken )
       {

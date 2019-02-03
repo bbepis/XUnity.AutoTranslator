@@ -4,6 +4,8 @@
  * FEATURE - Support BingTranslate API
  * FEATURE - Support LEC Offline Power Translator 15
  * FEATURE - Enable custom implementations of translators that can be loaded dynamically
+ * FEATURE - Removed support for Excite translate because it only support the 'WWW' API in Unity due to missing TLS1.2 implementation
+ * FEATURE - Updated Watson translate to v3
  * MISC - {GameExeName} variable can now be used in configuration of directories and files
  * MISC - Changed the way the 'Custom' endpoint works. See README for more info
  * MISC - Added new configuration 'GameLogTextPaths' to enable special handling of text components that text is being appended to continuously (requires export knowledge to setup)

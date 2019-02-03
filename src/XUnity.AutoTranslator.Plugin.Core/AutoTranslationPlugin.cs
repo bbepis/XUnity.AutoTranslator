@@ -30,6 +30,7 @@ using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using System.Diagnostics;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

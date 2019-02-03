@@ -7,6 +7,7 @@ using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
@@ -15,10 +16,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 {
    internal class WatsonTranslateEndpoint : WwwEndpoint
    {
+      private static readonly string RequestTemplate = "{{\"text\":[\"{2}\"],\"model_id\":\"{0}-{1}\"}}";
+
       private string _template;
       private string _url;
-      private string _username;
-      private string _password;
+      private string _key;
 
       public WatsonTranslateEndpoint()
       {
@@ -30,22 +32,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public override void Initialize( InitializationContext context )
       {
-         _url = context.Config.Preferences[ "Watson" ][ "WatsonAPIUrl" ].GetOrDefault( "" );
-         _username = context.Config.Preferences[ "Watson" ][ "WatsonAPIUsername" ].GetOrDefault( "" );
-         _password = context.Config.Preferences[ "Watson" ][ "WatsonAPIPassword" ].GetOrDefault( "" );
+         _url = context.Config.Preferences[ "Watson" ][ "Url" ].GetOrDefault( "" );
+         _key = context.Config.Preferences[ "Watson" ][ "Key" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _url ) ) throw new Exception( "The WatsonTranslate endpoint requires a url which has not been provided." );
-         if( string.IsNullOrEmpty( _username ) ) throw new Exception( "The WatsonTranslate endpoint requires a username which has not been provided." );
-         if( string.IsNullOrEmpty( _password ) ) throw new Exception( "The WatsonTranslate endpoint requires a password which has not been provided." );
+         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The WatsonTranslate endpoint requires a key which has not been provided." );
 
-         _template = _url.TrimEnd( '/' ) + "/v2/translate?model_id={0}-{1}&text={2}";
+         _template = _url.TrimEnd( '/' ) + "/v3/translate?version=2018-05-01";
+      }
+
+      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      {
+         return _template;
+      }
+
+      public override string GetRequestObject( string untranslatedText, string from, string to )
+      {
+         return string.Format( RequestTemplate, from, to, TextHelper.EscapeJson( untranslatedText ) );
       }
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
          headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "curl/7.55.1" : AutoTranslationState.UserAgent;
          headers[ "Accept" ] = "application/json";
-         headers[ "Accept-Charset" ] = "UTF-8";
-         headers[ "Authorization" ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( _username + ":" + _password ) );
+         headers[ "Content-Type" ] = "application/json";
+         headers[ "Authorization" ] = "Basic " + Convert.ToBase64String( Encoding.ASCII.GetBytes( "apikey:" + _key ) );
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -74,11 +84,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
             translated = null;
             return false;
          }
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( _template, from, to, WWW.EscapeURL( untranslatedText ) );
       }
    }
 }

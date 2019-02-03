@@ -4,6 +4,10 @@
     <TargetFramework>net35</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath></OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\GoogleTranslateEndpoint.cs" Link="GoogleTranslateEndpoint.cs" />
   </ItemGroup>
@@ -17,5 +21,9 @@
       <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\&quot;&#xD;&#xA;)" />
+  </Target>
 
 </Project>

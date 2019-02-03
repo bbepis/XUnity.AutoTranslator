@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -21,6 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       public abstract void Initialize( InitializationContext context );
 
       public abstract string GetServiceUrl( string untranslatedText, string from, string to );
+
+      public virtual string GetRequestObject( string untranslatedText, string from, string to ) => null;
 
       public abstract void ApplyHeaders( Dictionary<string, string> headers );
 
@@ -49,9 +52,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
             var headers = new Dictionary<string, string>();
             ApplyHeaders( headers );
             var url = GetServiceUrl( untranslatedText, from, to );
+            var data = GetRequestObject( untranslatedText, from, to );
 
             // execute request
-            www = WwwConstructor.Invoke( new object[] { url, null, headers } );
+            www = WwwConstructor.Invoke( new object[] { url, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
          }
          catch( Exception e )
          {

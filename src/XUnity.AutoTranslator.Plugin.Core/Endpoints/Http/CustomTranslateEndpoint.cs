@@ -9,13 +9,13 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
-   internal class CustomHttpEndpoint : HttpEndpoint
+   internal class CustomTranslateEndpoint : HttpEndpoint
    {
       private static readonly string ServicePointTemplateUrl = "{0}?from={1}&to={2}&text={3}";
       private string _endpoint;
       private string _friendlyName;
 
-      public CustomHttpEndpoint()
+      public CustomTranslateEndpoint()
       {
          _friendlyName = "Custom";
       }

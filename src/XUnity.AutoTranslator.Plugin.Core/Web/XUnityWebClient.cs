@@ -10,6 +10,7 @@ using System.Text;
 using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
+using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
@@ -26,7 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          Encoding = Encoding.UTF8;
       }
 
-      private void UnityWebClient_UploadStringCompleted( object sender, UnityUploadStringCompletedEventArgs ev )
+      private void UnityWebClient_UploadStringCompleted( object sender, XUnityUploadStringCompletedEventArgs ev )
       {
          UploadStringCompleted -= UnityWebClient_UploadStringCompleted;
 
@@ -35,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          handle.SetCompleted( _responseCode.Value, ev.Result, responseHeaders, _responseCookies, ev.Error );
       }
 
-      private void UnityWebClient_DownloadStringCompleted( object sender, UnityDownloadStringCompletedEventArgs ev )
+      private void UnityWebClient_DownloadStringCompleted( object sender, XUnityDownloadStringCompletedEventArgs ev )
       {
          DownloadStringCompleted -= UnityWebClient_DownloadStringCompleted;
 
@@ -94,6 +95,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       public XUnityWebResponse Send( XUnityWebRequest request )
       {
          var handle = new XUnityWebResponse();
+
+         _requestCookies = request.Cookies;
+         _requestHeaders = request.Headers;
 
          if( request.Data == null )
          {

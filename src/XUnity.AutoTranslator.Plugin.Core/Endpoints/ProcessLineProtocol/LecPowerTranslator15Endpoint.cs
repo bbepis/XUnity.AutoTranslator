@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 {
-   internal class LecPowerTranslateEndpoint : ProcessLineProtocolEndpoint
+   internal class LecPowerTranslator15Endpoint : ProcessLineProtocolEndpoint
    {
       public override string Id => "LecPowerTranslator15";
 
@@ -25,19 +25,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
          var path1 = context.Config.DataPath;
          var exePath1 = Path.Combine( path1, "XUnity.AutoTranslator.Plugin.Lec.exe" );
          var file1Exists = File.Exists( exePath1 );
-         var path2 = new FileInfo( typeof( LecPowerTranslateEndpoint ).Assembly.Location ).Directory.FullName;
-         var exePath2 = Path.Combine( path2, "XUnity.AutoTranslator.Plugin.Lec.exe" );
-         var file2Exists = File.Exists( exePath2 );
-         if( !file1Exists && !file2Exists )
+         if( !file1Exists )
          {
-            if( path1 != path2 )
-            {
-               throw new Exception( $"Could not find any executable at '{exePath1}' or at '{exePath2}'" );
-            }
-            else
-            {
-               throw new Exception( $"Could not find any executable at '{exePath1}'" );
-            }
+            throw new Exception( $"Could not find any executable at '{exePath1}'" );
          }
 
          _arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( pathToLec ) );
@@ -45,10 +35,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
          if( file1Exists )
          {
             _exePath = exePath1;
-         }
-         else if( file2Exists )
-         {
-            _exePath = exePath2;
          }
          else
          {
