@@ -17,13 +17,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
       {
          var to = context.Config.Preferences[ "General" ][ "Language" ].Value;
          var from = context.Config.Preferences[ "General" ][ "FromLanguage" ].Value;
-         var pathToLec = context.Config.Preferences[ "LecPowerTranslator15" ][ "Path" ].GetOrDefault( "" );
+         var pathToLec = context.Config.Preferences[ "LecPowerTranslator15" ][ "InstallationPath" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
          if( !from.Equals( "ja", StringComparison.OrdinalIgnoreCase ) ) throw new Exception( "Only japanese to english is supported." );
          if( !to.Equals( "en", StringComparison.OrdinalIgnoreCase ) ) throw new Exception( "Only japanese to english is supported." );
 
          var path1 = context.Config.DataPath;
-         var exePath1 = Path.Combine( path1, "XUnity.AutoTranslator.Plugin.Lec.exe" );
+         var exePath1 = Path.Combine( path1, @"Translators\XUnity.AutoTranslator.Plugin.Lec.exe" );
          var file1Exists = File.Exists( exePath1 );
          if( !file1Exists )
          {

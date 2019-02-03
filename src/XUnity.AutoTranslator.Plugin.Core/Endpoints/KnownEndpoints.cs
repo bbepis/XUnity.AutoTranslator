@@ -17,11 +17,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          var endpoints = new List<ConfiguredEndpoint>();
 
          // could dynamically load types from other assemblies...
-         var integratedTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( typeof( KnownEndpoints ).Assembly );
+         //var integratedTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( typeof( KnownEndpoints ).Assembly );
          var pluginFolder = Path.Combine( Config.Current.DataPath, Settings.PluginFolder );
          var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
 
-         foreach( var type in integratedTypes.Union( dynamicTypes ).Distinct() )
+         foreach( var type in dynamicTypes )
          {
             AddEndpoint( go, context, endpoints, type );
          }
