@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public abstract string FriendlyName { get; }
 
-      public abstract void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints );
+      public abstract void Initialize( InitializationContext context );
 
       public abstract string GetServiceUrl( string untranslatedText, string from, string to );
 

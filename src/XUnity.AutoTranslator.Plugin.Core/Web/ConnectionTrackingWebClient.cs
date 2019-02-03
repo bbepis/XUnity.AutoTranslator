@@ -215,7 +215,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private bool is_busy;
       private IWebProxy proxy;
       private NameValueCollection queryString;
-      private WebHeaderCollection responseHeaders;
+      protected WebHeaderCollection responseHeaders;
       private static readonly string urlEncodedCType = "application/x-www-form-urlencoded";
 
       public event UnityDownloadStringCompletedEventHandler DownloadStringCompleted;

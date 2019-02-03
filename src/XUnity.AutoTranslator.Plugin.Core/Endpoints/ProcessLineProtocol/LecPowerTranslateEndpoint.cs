@@ -13,16 +13,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 
       public override string FriendlyName => "LEC Power Translator 15";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         var to = configuration.Preferences[ "General" ][ "Language" ].Value;
-         var from = configuration.Preferences[ "General" ][ "FromLanguage" ].Value;
-         var pathToLec = configuration.Preferences[ "LecPowerTranslator15" ][ "Path" ].GetOrDefault( "" );
+         var to = context.Config.Preferences[ "General" ][ "Language" ].Value;
+         var from = context.Config.Preferences[ "General" ][ "FromLanguage" ].Value;
+         var pathToLec = context.Config.Preferences[ "LecPowerTranslator15" ][ "Path" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
          if( !from.Equals( "ja", StringComparison.OrdinalIgnoreCase ) ) throw new Exception( "Only japanese to english is supported." );
          if( !to.Equals( "en", StringComparison.OrdinalIgnoreCase ) ) throw new Exception( "Only japanese to english is supported." );
 
-         var path1 = configuration.DataPath;
+         var path1 = context.Config.DataPath;
          var exePath1 = Path.Combine( path1, "XUnity.AutoTranslator.Plugin.Lec.exe" );
          var file1Exists = File.Exists( exePath1 );
          var path2 = new FileInfo( typeof( LecPowerTranslateEndpoint ).Assembly.Location ).Directory.FullName;

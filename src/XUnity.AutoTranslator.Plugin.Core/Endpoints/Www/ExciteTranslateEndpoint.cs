@@ -24,14 +24,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public override string FriendlyName => "Excite Translator";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         servicePoints.EnableHttps( "www.excite.co.jp", "excite.co.jp" );
+         context.HttpSecurity.EnableSslFor( "www.excite.co.jp", "excite.co.jp" );
       }
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
-         headers[ "User-Agent" ] = Settings.GetUserAgent( "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53" );
+         headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "Mozilla/5.0 (iPhone; CPU iPhone OS 7_1_2 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Version/7.0 Mobile/11D257 Safari/9537.53" : AutoTranslationState.UserAgent;
          headers[ "Accept" ] = "text/html";
          //headers[ "Accept-Charset" ] = "UTF-8";
          //headers[ "DNT" ] = "1";

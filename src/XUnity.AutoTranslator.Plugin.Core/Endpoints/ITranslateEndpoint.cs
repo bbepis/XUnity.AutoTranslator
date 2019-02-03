@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// <summary>
       /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
       /// </summary>
-      void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints );
+      void Initialize( InitializationContext context );
 
       /// <summary>
       /// Attempt to translated the provided untranslated text. Will be used in a "coroutine", so it can be implemented

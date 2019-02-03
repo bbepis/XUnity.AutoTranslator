@@ -28,11 +28,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public override string FriendlyName => "Watson Language Translator";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _url = Config.Current.Preferences[ "Watson" ][ "WatsonAPIUrl" ].GetOrDefault( "" );
-         _username = Config.Current.Preferences[ "Watson" ][ "WatsonAPIUsername" ].GetOrDefault( "" );
-         _password = Config.Current.Preferences[ "Watson" ][ "WatsonAPIPassword" ].GetOrDefault( "" );
+         _url = context.Config.Preferences[ "Watson" ][ "WatsonAPIUrl" ].GetOrDefault( "" );
+         _username = context.Config.Preferences[ "Watson" ][ "WatsonAPIUsername" ].GetOrDefault( "" );
+         _password = context.Config.Preferences[ "Watson" ][ "WatsonAPIPassword" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _url ) ) throw new Exception( "The WatsonTranslate endpoint requires a url which has not been provided." );
          if( string.IsNullOrEmpty( _username ) ) throw new Exception( "The WatsonTranslate endpoint requires a username which has not been provided." );
          if( string.IsNullOrEmpty( _password ) ) throw new Exception( "The WatsonTranslate endpoint requires a password which has not been provided." );
@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public override void ApplyHeaders( Dictionary<string, string> headers )
       {
-         headers[ "User-Agent" ] = Settings.GetUserAgent( "curl/7.55.1" );
+         headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "curl/7.55.1" : AutoTranslationState.UserAgent;
          headers[ "Accept" ] = "application/json";
          headers[ "Accept-Charset" ] = "UTF-8";
          headers[ "Authorization" ] = "Basic " + System.Convert.ToBase64String( System.Text.Encoding.ASCII.GetBytes( _username + ":" + _password ) );

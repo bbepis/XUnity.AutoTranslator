@@ -56,40 +56,82 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public override string FriendlyName => "Bing Translator";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
          // Configure service points / service point manager
-         servicePoints.EnableHttps( "www.bing.com" );
+         context.HttpSecurity.EnableSslFor( "www.bing.com" );
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
-         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( DefaultUserAgent );
+         _translationCount++;
+         string address = null;
+
+         if( _ig == null || _iid == null )
+         {
+            address = HttpsServicePointTemplateUrlWithoutIG;
+         }
+         else
+         {
+            address = string.Format( HttpsServicePointTemplateUrl, _ig, _iid, _translationCount );
+         }
+
+         var data = string.Format( RequestTemplate, WWW.EscapeURL( untranslatedText ), from, to );
+
+         var request = new XUnityWebRequest( "POST", address, data );
+
+         request.Cookies = _cookieContainer;
+         AddHeaders( request, true );
+
+         return request;
+      }
+
+      private XUnityWebRequest CreateWebSiteRequest()
+      {
+         var request = new XUnityWebRequest( HttpsTranslateUserSite );
+
+         request.Cookies = _cookieContainer;
+         AddHeaders( request, false );
+
+         return request;
+      }
+
+      private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
+      {
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? DefaultUserAgent : AutoTranslationState.UserAgent;
 
          if( AcceptLanguage != null )
          {
-            headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
+            request.Headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
          }
          if( Accept != null )
          {
-            headers[ HttpRequestHeader.Accept ] = Accept;
+            request.Headers[ HttpRequestHeader.Accept ] = Accept;
          }
-         if( Referer != null )
+         if( Referer != null && isTranslationRequest )
          {
-            headers[ HttpRequestHeader.Referer ] = Referer;
+            request.Headers[ HttpRequestHeader.Referer ] = Referer;
          }
-         if( Origin != null )
+         if( Origin != null && isTranslationRequest )
          {
-            headers[ "Origin" ] = Origin;
+            request.Headers[ "Origin" ] = Origin;
          }
          if( AcceptCharset != null )
          {
-            headers[ HttpRequestHeader.AcceptCharset ] = AcceptCharset;
+            request.Headers[ HttpRequestHeader.AcceptCharset ] = AcceptCharset;
          }
-         if( ContentType != null )
+         if( ContentType != null && isTranslationRequest )
          {
-            headers[ HttpRequestHeader.ContentType ] = ContentType;
+            request.Headers[ HttpRequestHeader.ContentType ] = ContentType;
          }
+      }
+
+      public override void InspectTranslationResponse( XUnityWebResponse response )
+      {
+         CookieCollection cookies = response.NewCookies;
+
+         // FIXME: Is this needed? Should already be added
+         _cookieContainer.Add( cookies );
       }
 
       public override IEnumerator OnBeforeTranslate()
@@ -110,65 +152,66 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public IEnumerator SetupIGAndIID()
       {
-         string error = null;
-         UnityWebResponse downloadResult = null;
+         XUnityWebResponse response = null;
 
          _cookieContainer = new CookieContainer();
          _translationCount = 0;
 
-         var client = Client;
          try
          {
-            ApplyHeaders( client.Headers );
-            client.Headers.Remove( HttpRequestHeader.Referer );
-            client.Headers.Remove( "Origin" );
-            client.Headers.Remove( HttpRequestHeader.ContentType );
-            downloadResult = client.DownloadStringByUnityInstruction( new Uri( HttpsTranslateUserSite ) );
+            var client = new XUnityWebClient();
+            var request = CreateWebSiteRequest();
+            response = client.Send( request );
          }
          catch( Exception e )
          {
-            error = e.ToString();
+            Logger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            yield break;
          }
 
-         if( downloadResult != null )
+         if( Features.SupportsCustomYieldInstruction )
          {
-            if( Features.SupportsCustomYieldInstruction )
+            yield return response;
+         }
+         else
+         {
+            while( response.keepWaiting )
             {
-               yield return downloadResult;
-            }
-            else
-            {
-               while( !downloadResult.IsCompleted )
-               {
-                  yield return new WaitForSeconds( 0.2f );
-               }
-            }
-
-            error = downloadResult.Error;
-            if( downloadResult.Succeeded && downloadResult.Result != null )
-            {
-               try
-               {
-                  var html = downloadResult.Result;
-
-                  _ig = Lookup( "ig\":\"", html );
-                  _iid = Lookup( ".init(\"/feedback/submission?\",\"", html );
-
-                  if( _ig == null || _iid == null )
-                  {
-                     Logger.Current.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
-                  }
-               }
-               catch( Exception e )
-               {
-                  error = e.ToString();
-               }
+               yield return new WaitForSeconds( 0.2f );
             }
          }
 
-         if( error != null )
+         InspectTranslationResponse( response );
+
+         // failure
+         if( response.Error != null )
          {
-            Logger.Current.Warn( "An error occurred while setting up BingTranslate IG. Proceeding without..." + Environment.NewLine + error );
+            Logger.Current.Warn( response.Error, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            yield break;
+         }
+
+         // failure
+         if( response.Result == null )
+         {
+            Logger.Current.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            yield break;
+         }
+
+         try
+         {
+            var html = response.Result;
+
+            _ig = Lookup( "ig\":\"", html );
+            _iid = Lookup( ".init(\"/feedback/submission?\",\"", html );
+
+            if( _ig == null || _iid == null )
+            {
+               Logger.Current.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
          }
       }
 
@@ -194,6 +237,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       {
          try
          {
+            Logger.Current.Warn( result );
+
             var obj = JSON.Parse( result );
 
             var code = obj[ "statusCode" ].AsInt;
@@ -216,36 +261,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             translated = null;
             return false;
          }
-      }
-
-      public override string GetRequestObject( string untranslatedText, string from, string to )
-      {
-         return string.Format( RequestTemplate, WWW.EscapeURL( untranslatedText ), from, to );
-
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         _translationCount++;
-
-         if( _ig == null || _iid == null )
-         {
-            return HttpsServicePointTemplateUrlWithoutIG;
-         }
-         else
-         {
-            return string.Format( HttpsServicePointTemplateUrl, _ig, _iid, _translationCount );
-         }
-      }
-
-      public override void StoreCookiesFromResponse( HttpWebResponse response )
-      {
-         _cookieContainer.Add( response.Cookies );
-      }
-
-      public override CookieContainer GetCookiesForNewRequest()
-      {
-         return _cookieContainer;
       }
    }
 }

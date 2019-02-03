@@ -13,6 +13,7 @@
  * [Regarding Redistribution](#regarding-redistribution)
  * [Texture Translation](#texture-translation)
  * [Integrating with Auto Translator](#integrating-with-auto-translator)
+ * [Implementing a Translator](#implementing-a-translator)
  
 ## Introduction
 This is a plugin that is capable of using various online translators to provide on-the-fly translations for various Unity-based games.
@@ -40,12 +41,17 @@ The supported online translators are:
  * [ExciteTranslate](https://anonym.to/?https://www.excite.co.jp/world/english_japanese/), based on the Excite online translation service. Does not require authentication.
    * No limitations, but unstable. Also very slow.
  * Custom. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
-   * Example Endpoint=http://my-custom-translation-service.net/translate
+   * Example Configuration:
+     * Endpoint=Custom
+     * [Custom]
+     * Url=http://my-custom-translation-service.net/translate
    * Example Request: GET http://my-custom-translation-service.net/translate?from=ja&to=en&text=こんにちは
    * Example Response (only body): Hello
    * If someone is willing to implement it, this could provide support for offline translators such as ATLAS or LEC as well, since it enables the scenario where you simply run a local web server that can serve translation requests.
  
 **Do note that if you use any of the online translators that does not require some form of authentication, that this plugin may break at any time.**
+
+Since 3.0.0, you can also implement your own translators. To do so, follow the instruction [here](#implementing-a-translator).
 
 ### About Authenticated Translators
 If you decide to use an authenticated service *do not ever share your key or secret*. If you do so by accident, you should revoke it immediately. Most, if not all services provides an option for this.
@@ -221,6 +227,7 @@ The following aims at reducing the number of requests send to the translation en
 
 ## Key Mapping
 The following key inputs are mapped:
+ * ALT + 0: Enable XUnity AutoTranslator UI. (That's a zero, not an O)
  * ALT + T: Alternate between translated and untranslated versions of all texts provided by this plugin.
  * ALT + D: Dump untranslated texts (if no endpoint is configured)
  * ALT + R: Reload translation files. Useful if you change the text and texture files on the fly. Not guaranteed to work for all textures.
@@ -431,3 +438,44 @@ public class MyPlugin : XPluginBase
 ```
 
 This approach requires version 2.15.0 or later!
+
+## Implementing a Translator
+Since version 3.0.0, you can now also implement your own translators.
+
+Follow these steps:
+ * Start a new project in Visual Studio 2017 or later. (Be a good boy and choose the "Class Library (.NET Standard)" template. After choosing that, edit the generated .csproj file and change the TargetFramework element to 'net35')
+ * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll file.
+ * Create a new class that either:
+   * Implements the `ITranslateEndpoint` interface
+   * Inherits from the `HttpEndpoint` class
+
+Here's two examples that does either:
+
+```C#
+public class DummyTranslator : ITranslateEndpoint
+{
+   public string Id => "Dummy";
+
+   public string FriendlyName => "Dummy";
+
+   public int MaxConcurrency => 50;
+
+   public void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+   {
+
+   }
+
+   public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+   {
+      success( "Incorrect translation" );
+
+      return null;
+   }
+}
+```
+
+TODO: Example...
+
+After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory (you may have to create it) of the plugin folder. That's it.
+
+

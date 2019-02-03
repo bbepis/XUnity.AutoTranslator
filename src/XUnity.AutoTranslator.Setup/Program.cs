@@ -29,6 +29,7 @@ namespace XUnity.AutoTranslator.Setup
 
          var reiPath = Path.Combine( gamePath, "ReiPatcher" );
          var patchesPath = Path.Combine( reiPath, "Patches" );
+         var autoTranslatorPath = Path.Combine( gamePath, "AutoTranslator" );
 
          // lets add any missing files
          AddFile( Path.Combine( reiPath, "ExIni.dll" ), Resources.ExIni );
@@ -39,14 +40,14 @@ namespace XUnity.AutoTranslator.Setup
          AddFile( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
          AddFile( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
          AddFile( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher, true );
-
+         AddFile( Path.Combine( autoTranslatorPath, "XUnity.AutoTranslator.Plugin.Lec.exe" ), Resources.XUnity_AutoTranslator_Plugin_Lec, true );
 
          foreach( var launcher in launchers )
          {
             var managedDir = Path.Combine( gamePath, launcher.Data.Name, "Managed" );
             AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
             AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
-            AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher ); // needed because file is modified by attribute in ReiPatcher... QQ
+            AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
 
             // create an .ini file for each launcher, if it does not already exist

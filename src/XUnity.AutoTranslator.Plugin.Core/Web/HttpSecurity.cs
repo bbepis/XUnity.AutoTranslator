@@ -8,11 +8,11 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class ServiceEndpointConfiguration
+   public class HttpSecurity
    {
       public readonly HashSet<string> _hosts = new HashSet<string>();
 
-      public void EnableHttps( params string[] hosts )
+      public void EnableSslFor( params string[] hosts )
       {
          foreach( var host in hosts )
          {

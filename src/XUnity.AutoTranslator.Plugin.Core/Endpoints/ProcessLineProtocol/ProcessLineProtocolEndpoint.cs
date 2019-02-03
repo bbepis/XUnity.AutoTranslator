@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 
       public abstract string FriendlyName { get; }
 
-      public abstract void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints );
+      public abstract void Initialize( InitializationContext context );
 
       public int MaxConcurrency => 1;
 
@@ -112,10 +112,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
          {
             _result = null;
          }
-      }
-
-      public void OnUpdate()
-      {
       }
 
       public class StreamReaderResult : CustomYieldInstructionShim

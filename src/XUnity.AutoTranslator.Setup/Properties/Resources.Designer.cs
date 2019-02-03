@@ -83,16 +83,6 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Jurassic {
-            get {
-                object obj = ResourceManager.GetObject("Jurassic", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] Mono_Cecil {
             get {
                 object obj = ResourceManager.GetObject("Mono_Cecil", resourceCulture);
@@ -166,6 +156,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         internal static byte[] XUnity_AutoTranslator_Plugin_Core {
             get {
                 object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_Core", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] XUnity_AutoTranslator_Plugin_Lec {
+            get {
+                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_Lec", resourceCulture);
                 return ((byte[])(obj));
             }
         }

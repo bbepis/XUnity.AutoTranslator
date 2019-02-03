@@ -8,12 +8,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    public static class AutoTranslationState
    {
-      public static int TranslationCount
-      {
-         get
-         {
-            return Settings.TranslationCount;
-         }
-      }
+      public static int TranslationCount => Settings.TranslationCount;
+
+      public static string UserAgent => Settings.UserAgent;
    }
 }

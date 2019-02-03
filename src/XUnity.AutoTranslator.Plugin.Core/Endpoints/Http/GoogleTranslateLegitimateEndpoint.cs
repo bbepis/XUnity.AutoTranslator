@@ -23,26 +23,36 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       private string _key;
 
-      public GoogleTranslateLegitimateEndpoint()
-      {
-
-      }
-
       public override string Id => "GoogleTranslateLegitimate";
 
       public override string FriendlyName => "Google! Translate (Authenticated)";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _key = Config.Current.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
+         _key = context.Config.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         servicePoints.EnableHttps( "translation.googleapis.com" );
+         context.HttpSecurity.EnableSslFor( "translation.googleapis.com" );
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
+         var b = new StringBuilder();
+         b.Append( "{" );
+         b.Append( "\"q\":\"" ).Append( untranslatedText.EscapeJson() ).Append( "\"," );
+         b.Append( "\"target\":\"" ).Append( to ).Append( "\"," );
+         b.Append( "\"source\":\"" ).Append( from ).Append( "\"," );
+         b.Append( "\"format\":\"text\"" );
+         b.Append( "}" );
+         var data = b.ToString();
+
+         var request = new XUnityWebRequest(
+            "POST",
+            string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( _key ) ),
+            data );
+
+         return request;
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -72,23 +82,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             translated = null;
             return false;
          }
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( _key ) );
-      }
-
-      public override string GetRequestObject( string untranslatedText, string from, string to )
-      {
-         var b = new StringBuilder();
-         b.Append( "{" );
-         b.Append( "\"q\":\"" ).Append( untranslatedText.EscapeJson() ).Append( "\"," );
-         b.Append( "\"target\":\"" ).Append( to ).Append( "\"," );
-         b.Append( "\"source\":\"" ).Append( from ).Append( "\"," );
-         b.Append( "\"format\":\"text\"" );
-         b.Append( "}" );
-         return b.ToString();
       }
    }
 }

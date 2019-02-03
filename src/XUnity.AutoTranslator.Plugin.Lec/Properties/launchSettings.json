@@ -1,8 +1,7 @@
 {
   "profiles": {
     "XUnity.AutoTranslator.Plugin.Lec": {
-      "commandName": "Project",
-      "commandLineArgs": "QzpcUHJvZ3JhbSBGaWxlcyAoeDg2KVxQb3dlciBUcmFuc2xhdG9yIDE1"
+      "commandName": "Project"
     }
   }
 }

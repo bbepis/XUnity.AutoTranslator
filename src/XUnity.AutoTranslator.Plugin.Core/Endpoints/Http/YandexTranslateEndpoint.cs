@@ -27,19 +27,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       {
       }
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _key = Config.Current.Preferences[ "Yandex" ][ "YandexAPIKey" ].GetOrDefault( "" );
+         _key = context.Config.Preferences[ "Yandex" ][ "YandexAPIKey" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
 
-         servicePoints.EnableHttps( "translate.yandex.net" );
+         context.HttpSecurity.EnableSslFor( "translate.yandex.net" );
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
-         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" );
-         headers[ HttpRequestHeader.Accept ] = "*/*";
-         headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
+         var request = new XUnityWebRequest(
+            string.Format(
+               HttpsServicePointTemplateUrl,
+               from,
+               to,
+               WWW.EscapeURL( untranslatedText ),
+               _key ) );
+
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" : AutoTranslationState.UserAgent;
+         request.Headers[ HttpRequestHeader.Accept ] = "*/*";
+         request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
+
+         return request;
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -80,11 +90,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             translated = null;
             return false;
          }
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( HttpsServicePointTemplateUrl, from, to, WWW.EscapeURL( untranslatedText ), _key );
       }
    }
 }

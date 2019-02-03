@@ -22,42 +22,39 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       private string _appId;
       private string _appSecret;
 
-      public BaiduTranslateEndpoint()
-      {
-
-      }
-
       public override string Id => "BaiduTranslate";
 
       public override string FriendlyName => "Baidu Translator";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _appId = configuration.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
-         _appSecret = configuration.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
+         _appId = context.Config.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
+         _appSecret = context.Config.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _appId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
          if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
-         servicePoints.EnableHttps( "api.fanyi.baidu.com" );
+         context.HttpSecurity.EnableSslFor( "api.fanyi.baidu.com" );
       }
 
-      private static string CreateMD5( string input )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
-         byte[] inputBytes = Encoding.UTF8.GetBytes( input );
-         byte[] hashBytes = HashMD5.ComputeHash( inputBytes );
+         string salt = DateTime.UtcNow.Millisecond.ToString();
+         var md5 = CreateMD5( _appId + untranslatedText + salt + _appSecret );
 
-         StringBuilder sb = new StringBuilder();
-         for( int i = 0 ; i < hashBytes.Length ; i++ )
-         {
-            sb.Append( hashBytes[ i ].ToString( "X2" ) );
-         }
-         return sb.ToString().ToLower();
-      }
+         var request = new XUnityWebRequest(
+            string.Format(
+               HttpServicePointTemplateUrl,
+               WWW.EscapeURL( untranslatedText ),
+               from,
+               to,
+               _appId,
+               salt,
+               md5 ) );
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
-      {
-         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" );
-         headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" : AutoTranslationState.UserAgent;
+         request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
+
+         return request;
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -96,12 +93,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      private static string CreateMD5( string input )
       {
-         string salt = DateTime.UtcNow.Millisecond.ToString();
-         var md5 = CreateMD5( _appId + untranslatedText + salt + _appSecret );
+         byte[] inputBytes = Encoding.UTF8.GetBytes( input );
+         byte[] hashBytes = HashMD5.ComputeHash( inputBytes );
 
-         return string.Format( HttpServicePointTemplateUrl, WWW.EscapeURL( untranslatedText ), from, to, _appId, salt, md5 );
+         StringBuilder sb = new StringBuilder();
+         for( int i = 0 ; i < hashBytes.Length ; i++ )
+         {
+            sb.Append( hashBytes[ i ].ToString( "X2" ) );
+         }
+         return sb.ToString().ToLower();
       }
    }
 }

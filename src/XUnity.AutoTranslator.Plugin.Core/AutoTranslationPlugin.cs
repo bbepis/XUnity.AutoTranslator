@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
       /// </summary>
-      public static AutoTranslationPlugin Current;
+      internal static AutoTranslationPlugin Current;
 
 
       private XuaWindow _window;
@@ -102,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Component _advEngine;
       private float? _nextAdvUpdate;
 
-      private ServiceEndpointConfiguration _servicePoints;
+      private HttpSecurity _httpSecurity;
       private List<ConfiguredEndpoint> _configuredEndpoints;
       private ConfiguredEndpoint _endpoint;
 
@@ -164,10 +164,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          HooksSetup.InstallImageHooks();
          HooksSetup.InstallTextGetterCompatHooks();
 
-         _servicePoints = new ServiceEndpointConfiguration();
+         _httpSecurity = new HttpSecurity();
          try
          {
-            _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, _servicePoints )
+            var context = new InitializationContext( Config.Current, _httpSecurity );
+
+            _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, context )
                .OrderBy( x => x.Endpoint.FriendlyName )
                .ToList();
          }
@@ -196,7 +198,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          // TODO: Perhaps some bleeding edge check to see if this is required?
-         var callback = _servicePoints.GetCertificateValidationCheck();
+         var callback = _httpSecurity.GetCertificateValidationCheck();
          if( callback != null )
          {
             ServicePointManager.ServerCertificateValidationCallback += callback;
@@ -2003,7 +2005,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   RebootPlugin();
                }
-               else if( isAltPressed && Input.GetKeyDown( KeyCode.X ) )
+               else if( isAltPressed && ( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) ) )
                {
                   _window.IsShown = !_window.IsShown;
                }
@@ -2263,7 +2265,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
-
+         _batchLogicHasFailed = true;
+         
          foreach( var tracker in batch.Trackers )
          {
             tracker.Job.State = TranslationJobState.Failed;

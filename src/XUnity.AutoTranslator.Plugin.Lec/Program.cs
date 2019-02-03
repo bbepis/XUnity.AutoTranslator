@@ -11,6 +11,14 @@ namespace XUnity.AutoTranslator.Plugin.Lec
       {
          try
          {
+            if( args.Length == 0 )
+            {
+               Console.WriteLine( "This program is automatically run during a game session if LEC is selected, and will be automatically stopped afterwards. This program cannot be run independently." );
+               Console.WriteLine( "Press any key to exit." );
+               Console.ReadKey();
+               return;
+            }
+
             var powerTranslatorPathPayload = args[ 0 ];
             var powerTranslatorPath = Encoding.UTF8.GetString( Convert.FromBase64String( powerTranslatorPathPayload ) );
             var dllPath = Path.Combine( powerTranslatorPath, @"Nova\JaEn\EngineDll_je.dll" );

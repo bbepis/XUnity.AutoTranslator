@@ -22,28 +22,36 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public override string Id => "Custom";
 
-      public override string FriendlyName => "Custom";
+      public override string FriendlyName => _friendlyName;
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _endpoint = configuration.Preferences[ "Custom" ][ "Url" ].GetOrDefault( "" );
+         _endpoint = context.Config.Preferences[ "Custom" ][ "Url" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _endpoint ) ) throw new ArgumentException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
-         servicePoints.EnableHttps( uri.Host );
+         context.HttpSecurity.EnableSslFor( uri.Host );
 
          _friendlyName += " (" + uri.Host + ")";
+      }
+
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      {
+         var request = new XUnityWebRequest(
+            string.Format(
+               ServicePointTemplateUrl,
+               _endpoint,
+               from,
+               to,
+               WWW.EscapeURL( untranslatedText ) ) );
+
+         return request;
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
       {
          translated = result;
          return true;
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( ServicePointTemplateUrl, _endpoint, from, to, WWW.EscapeURL( untranslatedText ) );
       }
    }
 }

@@ -31,36 +31,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       private string _key;
 
-      public BingTranslateLegitimateEndpoint()
-      {
-
-      }
-
       public override string Id => "BingTranslateLegitimate";
 
       public override string FriendlyName => "Bing Translator (Authenticated)";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         _key = Config.Current.Preferences[ "BingLegitimate" ][ "OcpApimSubscriptionKey" ].GetOrDefault( "" );
+         _key = context.Config.Preferences[ "BingLegitimate" ][ "OcpApimSubscriptionKey" ].GetOrDefault( "" );
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         servicePoints.EnableHttps( "api.cognitive.microsofttranslator.com" );
+         context.HttpSecurity.EnableSslFor( "api.cognitive.microsofttranslator.com" );
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
+         var request = new XUnityWebRequest(
+            "POST",
+            string.Format( HttpsServicePointTemplateUrl, from, to ),
+            string.Format( RequestTemplate, untranslatedText.EscapeJson() ) );
+
          if( Accept != null )
          {
-            headers[ HttpRequestHeader.Accept ] = Accept;
+            request.Headers[ HttpRequestHeader.Accept ] = Accept;
          }
          if( ContentType != null )
          {
-            headers[ HttpRequestHeader.ContentType ] = ContentType;
+            request.Headers[ HttpRequestHeader.ContentType ] = ContentType;
          }
+         request.Headers[ "Ocp-Apim-Subscription-Key" ] = _key;
 
-         headers[ "Ocp-Apim-Subscription-Key" ] = _key;
+         return request;
       }
 
       public override bool TryExtractTranslated( string result, out string translated )
@@ -82,17 +83,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             translated = null;
             return false;
          }
-      }
-
-      public override string GetRequestObject( string untranslatedText, string from, string to )
-      {
-         return string.Format( RequestTemplate, untranslatedText.EscapeJson() );
-
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( HttpsServicePointTemplateUrl, from, to );
       }
    }
 }

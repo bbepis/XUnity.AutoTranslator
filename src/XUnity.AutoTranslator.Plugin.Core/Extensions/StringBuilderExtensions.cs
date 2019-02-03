@@ -3,7 +3,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
-   internal static class StringBuilderExtensions
+   public static class StringBuilderExtensions
    {
       public static bool EndsWithWhitespaceOrNewline( this StringBuilder builder )
       {

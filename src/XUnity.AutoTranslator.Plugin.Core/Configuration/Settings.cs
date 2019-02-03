@@ -14,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    internal static class Settings
    {
       // cannot be changed
+      public static readonly string PluginFolder = "Translators";
       public static readonly int MaxMaxCharactersPerTranslation = 500;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
@@ -194,15 +195,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       
       private static void Migrate()
       {
-      }
-
-      public static string GetUserAgent( string defaultUserAgent )
-      {
-         if( !string.IsNullOrEmpty( UserAgent ) )
-         {
-            return UserAgent;
-         }
-         return defaultUserAgent;
       }
    }
 }

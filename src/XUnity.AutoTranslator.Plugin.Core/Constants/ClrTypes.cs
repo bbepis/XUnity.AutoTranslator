@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Constants
 {
-   public static class ClrTypes
+   internal static class ClrTypes
    {
       // TextMeshPro
       public static readonly Type TMP_InputField = FindType( "TMPro.TMP_InputField" );

@@ -6,7 +6,6 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using SimpleJSON;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -19,11 +18,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
    internal class GoogleTranslateEndpoint : HttpEndpoint
    {
-      //protected static readonly ConstructorInfo WwwConstructor = Constants.Types.WWW?.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
       private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
       private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
-      //private static readonly string UserAgentRepository = "https://techblog.willshouse.com/2012/01/03/most-common-user-agents/";
       private static readonly System.Random RandomNumbers = new System.Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
@@ -38,8 +35,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       private CookieContainer _cookieContainer;
       private bool _hasSetup = false;
-      //private bool _hasSetupCustomUserAgent = false;
-      //private string _popularUserAgent;
       private long m = 427761;
       private long s = 1179739010;
 
@@ -52,47 +47,73 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public override string FriendlyName => "Google! Translate";
 
-      public override void Initialize( IConfiguration configuration, ServiceEndpointConfiguration servicePoints )
+      public override void Initialize( InitializationContext context )
       {
-         servicePoints.EnableHttps( "translate.google.com", "translate.googleapis.com" );
+         context.HttpSecurity.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
       }
 
-      public override void ApplyHeaders( WebHeaderCollection headers )
+      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
       {
-         headers[ HttpRequestHeader.UserAgent ] = Settings.GetUserAgent( DefaultUserAgent );
+         var request = new XUnityWebRequest(
+            string.Format(
+               HttpsServicePointTemplateUrl,
+               from,
+               to,
+               Tk( untranslatedText ),
+               WWW.EscapeURL( untranslatedText ) ) );
 
+         request.Cookies = _cookieContainer;
+         AddHeaders( request, true );
+
+         return request;
+      }
+
+      private XUnityWebRequest CreateWebSiteRequest()
+      {
+         var request = new XUnityWebRequest( HttpsTranslateUserSite );
+
+         request.Cookies = _cookieContainer;
+         AddHeaders( request, false );
+
+         return request;
+      }
+
+      private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
+      {
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? DefaultUserAgent : AutoTranslationState.UserAgent;
          if( AcceptLanguage != null )
          {
-            headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
+            request.Headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
          }
          if( Accept != null )
          {
-            headers[ HttpRequestHeader.Accept ] = Accept;
+            request.Headers[ HttpRequestHeader.Accept ] = Accept;
          }
-         if( Referer != null )
+         if( Referer != null && isTranslationRequest )
          {
-            headers[ HttpRequestHeader.Referer ] = Referer;
+            request.Headers[ HttpRequestHeader.Referer ] = Referer;
          }
          if( AcceptCharset != null )
          {
-            headers[ HttpRequestHeader.AcceptCharset ] = AcceptCharset;
+            request.Headers[ HttpRequestHeader.AcceptCharset ] = AcceptCharset;
          }
+      }
+
+      public override void InspectTranslationResponse( XUnityWebResponse response )
+      {
+         CookieCollection cookies = response.NewCookies;
+         foreach( Cookie cookie in cookies )
+         {
+            // redirect cookie to correct domain
+            cookie.Domain = ".googleapis.com";
+         }
+
+         // FIXME: Is this needed? Should already be added
+         _cookieContainer.Add( cookies );
       }
 
       public override IEnumerator OnBeforeTranslate()
       {
-         //if( !_hasSetupCustomUserAgent )
-         //{
-         //   _hasSetupCustomUserAgent = true;
-
-         //   // setup dynamic user agent
-         //   var enumerator = SetupDynamicUserAgent();
-         //   while( enumerator.MoveNext() )
-         //   {
-         //      yield return enumerator.Current;
-         //   }
-         //}
-
          if( !_hasSetup || AutoTranslationState.TranslationCount % 100 == 0 )
          {
             _hasSetup = true;
@@ -106,139 +127,86 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      //public IEnumerator SetupDynamicUserAgent()
-      //{
-      //   // have to use WWW for this because unity mono is broken
-
-      //   if( WwwConstructor != null )
-      //   {
-      //      object www;
-      //      try
-      //      {
-      //         var headers = new Dictionary<string, string>();
-      //         www = WwwConstructor.Invoke( new object[] { UserAgentRepository, null, headers } );
-      //      }
-      //      catch( Exception e )
-      //      {
-      //         Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
-      //         yield break;
-      //      }
-
-      //      yield return www;
-
-      //      try
-      //      {
-      //         var error = (string)AccessTools.Property( Constants.Types.WWW, "error" ).GetValue( www, null );
-      //         if( error == null )
-      //         {
-      //            var text = (string)AccessTools.Property( Constants.Types.WWW, "text" ).GetValue( www, null );
-      //            var userAgents = text.GetBetween( "<textarea rows=\"10\" class=\"get-the-list\" onclick=\"this.select()\" readonly=\"readonly\">", "</textarea>" );
-      //            if( userAgents.Length > 42 )
-      //            {
-      //               var reader = new StringReader( userAgents );
-      //               var popularUserAgent = reader.ReadLine();
-      //               if( popularUserAgent.Length > 30 && popularUserAgent.Length < 300 && popularUserAgent.StartsWith( "Mozilla/" ) )
-      //               {
-      //                  _popularUserAgent = popularUserAgent;
-      //               }
-      //               else
-      //               {
-      //                  Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
-      //               }
-      //            }
-      //            else
-      //            {
-      //               Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Could not find a user agent in returned html." );
-      //            }
-      //         }
-      //         else
-      //         {
-      //            Logger.Current.Warn( "An error occurred while retrieving dynamic user agent. Request failed: " + Environment.NewLine + error );
-      //         }
-      //      }
-      //      catch( Exception e )
-      //      {
-      //         Logger.Current.Warn( e, "An error occurred while retrieving dynamic user agent." );
-      //      }
-      //   }
-      //}
-
       public IEnumerator SetupTKK()
       {
-         string error = null;
-         UnityWebResponse response = null;
+         XUnityWebResponse response = null;
 
          _cookieContainer = new CookieContainer();
 
          try
          {
-            ApplyHeaders( Client.Headers );
-            Client.Headers.Remove( HttpRequestHeader.Referer );
-            response = Client.DownloadStringByUnityInstruction( new Uri( HttpsTranslateUserSite ) );
+            var client = new XUnityWebClient();
+            var request = CreateWebSiteRequest();
+            response = client.Send( request );
          }
          catch( Exception e )
          {
-            error = e.ToString();
+            Logger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            yield break;
          }
 
-         if( response != null )
+         if( Features.SupportsCustomYieldInstruction )
          {
-            if( Features.SupportsCustomYieldInstruction )
+            yield return response;
+         }
+         else
+         {
+            while( response.keepWaiting )
             {
-               yield return response;
-            }
-            else
-            {
-               while( !response.IsCompleted )
-               {
-                  yield return new WaitForSeconds( 0.2f );
-               }
-            }
-
-            error = response.Error;
-            if( response.Succeeded && response.Result != null )
-            {
-               try
-               {
-                  var html = response.Result;
-
-                  bool found = false;
-                  string[] lookups = new[] { "tkk:'", "TKK='" };
-                  foreach( var lookup in lookups )
-                  {
-                     var index = html.IndexOf( lookup );
-                     if( index > -1 ) // simple string approach
-                     {
-                        var startIndex = index + lookup.Length;
-                        var endIndex = html.IndexOf( "'", startIndex );
-                        var result = html.Substring( startIndex, endIndex - startIndex );
-
-                        var parts = result.Split( '.' );
-                        if( parts.Length == 2 )
-                        {
-                           m = long.Parse( parts[ 0 ] );
-                           s = long.Parse( parts[ 1 ] );
-                           found = true;
-                           break;
-                        }
-                     }
-                  }
-
-                  if( !found )
-                  {
-                     Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
-                  }
-               }
-               catch( Exception e )
-               {
-                  error = e.ToString();
-               }
+               yield return new WaitForSeconds( 0.2f );
             }
          }
 
-         if( error != null )
+         InspectTranslationResponse( response );
+
+         // failure
+         if( response.Error != null )
          {
-            Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." + Environment.NewLine + error );
+            Logger.Current.Warn( response.Error, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            yield break;
+         }
+
+         // failure
+         if( response.Result == null )
+         {
+            Logger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            yield break;
+         }
+
+         try
+         {
+            var html = response.Result;
+
+            bool found = false;
+            string[] lookups = new[] { "tkk:'", "TKK='" };
+            foreach( var lookup in lookups )
+            {
+               var index = html.IndexOf( lookup );
+               if( index > -1 ) // simple string approach
+               {
+                  var startIndex = index + lookup.Length;
+                  var endIndex = html.IndexOf( "'", startIndex );
+                  var result = html.Substring( startIndex, endIndex - startIndex );
+
+                  var parts = result.Split( '.' );
+                  if( parts.Length == 2 )
+                  {
+                     m = long.Parse( parts[ 0 ] );
+                     s = long.Parse( parts[ 1 ] );
+                     found = true;
+                     break;
+                  }
+               }
+            }
+
+            if( !found )
+            {
+               Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
+            }
+         }
+         catch( Exception e )
+         {
+            Logger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
          }
       }
 
@@ -333,28 +301,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             translated = null;
             return false;
          }
-      }
-
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
-      {
-         return string.Format( HttpsServicePointTemplateUrl, from, to, Tk( untranslatedText ), WWW.EscapeURL( untranslatedText ) );
-      }
-
-      public override void StoreCookiesFromResponse( HttpWebResponse response )
-      {
-         CookieCollection cookies = response.Cookies;
-         foreach( Cookie cookie in cookies )
-         {
-            // redirect cookie to correct domain
-            cookie.Domain = ".googleapis.com";
-         }
-
-         _cookieContainer.Add( cookies );
-      }
-
-      public override CookieContainer GetCookiesForNewRequest()
-      {
-         return _cookieContainer;
       }
    }
 }

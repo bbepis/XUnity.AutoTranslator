@@ -16,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          RespectSettings = true;
       }
 
-      public bool RespectSettings { get; protected set; }
+      protected internal bool RespectSettings { get; protected set; }
 
       public void Error( Exception e, string message )
       {

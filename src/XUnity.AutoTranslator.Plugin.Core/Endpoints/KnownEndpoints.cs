@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -11,25 +12,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    internal static class KnownEndpoints
    {
-      public static List<ConfiguredEndpoint> CreateEndpoints( GameObject go, ServiceEndpointConfiguration servicePoints )
+      public static List<ConfiguredEndpoint> CreateEndpoints( GameObject go, InitializationContext context )
       {
          var endpoints = new List<ConfiguredEndpoint>();
 
          // could dynamically load types from other assemblies...
-         var types = typeof( KnownEndpoints ).Assembly
-            .GetTypes()
-            .Where( x => typeof( ITranslateEndpoint ).IsAssignableFrom( x ) && !x.IsAbstract && !x.IsInterface )
-            .ToList();
+         var integratedTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( typeof( KnownEndpoints ).Assembly );
+         var pluginFolder = Path.Combine( Config.Current.DataPath, Settings.PluginFolder );
+         var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
 
-         foreach( var type in types )
+         foreach( var type in integratedTypes.Union( dynamicTypes ).Distinct() )
          {
-            AddEndpoint( go, servicePoints, endpoints, type );
+            AddEndpoint( go, context, endpoints, type );
          }
 
          return endpoints;
       }
 
-      private static void AddEndpoint( GameObject go, ServiceEndpointConfiguration servicePoints, List<ConfiguredEndpoint> endpoints, Type type )
+      private static void AddEndpoint( GameObject go, InitializationContext context, List<ConfiguredEndpoint> endpoints, Type type )
       {
          ITranslateEndpoint endpoint;
          try
@@ -53,7 +53,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          try
          {
-            endpoint.Initialize( Config.Current, servicePoints );
+            endpoint.Initialize( context );
             endpoints.Add( new ConfiguredEndpoint( endpoint, null ) );
          }
          catch( Exception e )
