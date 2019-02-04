@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.DummyTranslator
 {
-   public class ReverseTranslator : ITranslateEndpoint
+   public class ReverseTranslatorEndpoint : ITranslateEndpoint
    {
       public string Id => "Reverser";
 

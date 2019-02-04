@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _friendlyName = "Custom";
       }
 
-      public override string Id => "Custom";
+      public override string Id => "CustomTranslate";
 
       public override string FriendlyName => _friendlyName;
 

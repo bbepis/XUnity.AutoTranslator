@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net35</TargetFramework>
-    <AssemblyName>BingTranslate</AssemblyName>
-  </PropertyGroup>
+   <PropertyGroup>
+      <TargetFramework>net35</TargetFramework>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BingTranslateEndpoint.cs" Link="BingTranslateEndpoint.cs" />
-  </ItemGroup>
+   <ItemGroup>
+     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Www\WatsonTranslateEndpoint.cs" Link="WatsonTranslateEndpoint.cs" />
+   </ItemGroup>
 
    <ItemGroup>
       <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
    </ItemGroup>
 
    <ItemGroup>
+      <Reference Include="ExIni">
+         <HintPath>..\..\..\libs\ExIni.dll</HintPath>
+      </Reference>
       <Reference Include="UnityEngine">
          <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>
       </Reference>

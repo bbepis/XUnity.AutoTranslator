@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace XUnity.AutoTranslator.Plugin.Lec
+namespace Lec.ExtProtocol
 {
    public sealed class UnmanagedLibraryLoader : IDisposable
    {

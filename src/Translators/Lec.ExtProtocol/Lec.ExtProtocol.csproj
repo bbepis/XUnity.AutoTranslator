@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net35</TargetFramework>
     <Platforms>AnyCPU;x86</Platforms>
-    <AssemblyName>Lec</AssemblyName>
   </PropertyGroup>
 
    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -12,7 +11,7 @@
    </Target>
 
    <ItemGroup>
-     <ProjectReference Include="..\..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+     <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
    </ItemGroup>
 
 </Project>

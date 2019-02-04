@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Lec
+namespace Lec.ExtProtocol
 {
    internal abstract class UnmanagedTranslationLibrary : IDisposable
    {

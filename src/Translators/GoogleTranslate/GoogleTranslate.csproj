@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <AssemblyName>GoogleTranslate</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

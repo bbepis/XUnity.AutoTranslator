@@ -74,29 +74,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Translators", "Translators", "{7A01BA34-3B96-4910-AC70-462BA59417CB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.DummyTranslator", "src\Translators\XUnity.AutoTranslator.Plugin.DummyTranslator\XUnity.AutoTranslator.Plugin.DummyTranslator.csproj", "{7493BA4A-C688-4103-B161-7E578FBB6C0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseTranslator", "src\Translators\ReverseTranslator\ReverseTranslator.csproj", "{7493BA4A-C688-4103-B161-7E578FBB6C0E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.GoogleTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslate\XUnity.AutoTranslator.Plugin.GoogleTranslate.csproj", "{5D9A4F4D-D2D2-4D2B-A58A-F7529DDAF1D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslate", "src\Translators\GoogleTranslate\GoogleTranslate.csproj", "{5D9A4F4D-D2D2-4D2B-A58A-F7529DDAF1D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BingTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.BingTranslate\XUnity.AutoTranslator.Plugin.BingTranslate.csproj", "{95C83913-8D7F-4FA1-877E-288251A2A461}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BingTranslate", "src\Translators\BingTranslate\BingTranslate.csproj", "{95C83913-8D7F-4FA1-877E-288251A2A461}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BaiduTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.BaiduTranslate\XUnity.AutoTranslator.Plugin.BaiduTranslate.csproj", "{DDE97F5D-E021-45C0-87B6-FAD35BC8BCFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaiduTranslate", "src\Translators\BaiduTranslate\BaiduTranslate.csproj", "{DDE97F5D-E021-45C0-87B6-FAD35BC8BCFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BingTranslateLegitimate", "src\Translators\XUnity.AutoTranslator.Plugin.BingTranslateLegitimate\XUnity.AutoTranslator.Plugin.BingTranslateLegitimate.csproj", "{F49BA6D1-FAFB-414C-97B1-28B77FC21286}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BingTranslateLegitimate", "src\Translators\BingTranslateLegitimate\BingTranslateLegitimate.csproj", "{F49BA6D1-FAFB-414C-97B1-28B77FC21286}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.CustomTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.CustomTranslate\XUnity.AutoTranslator.Plugin.CustomTranslate.csproj", "{CEA7D2D8-C2CF-4FA3-8184-DD485160CDAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomTranslate", "src\Translators\CustomTranslate\CustomTranslate.csproj", "{CEA7D2D8-C2CF-4FA3-8184-DD485160CDAC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.YandexTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.YandexTranslate\XUnity.AutoTranslator.Plugin.YandexTranslate.csproj", "{42DEC139-7E8E-4E2E-9BC9-0B5661F444C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YandexTranslate", "src\Translators\YandexTranslate\YandexTranslate.csproj", "{42DEC139-7E8E-4E2E-9BC9-0B5661F444C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.WatsonTranslate", "src\Translators\XUnity.AutoTranslator.Plugin.WatsonTranslate\XUnity.AutoTranslator.Plugin.WatsonTranslate.csproj", "{A74F9486-2BA0-42FF-8BBC-9F07ECFBDCE5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatsonTranslate", "src\Translators\WatsonTranslate\WatsonTranslate.csproj", "{A74F9486-2BA0-42FF-8BBC-9F07ECFBDCE5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.LecPowerTranslator15", "src\Translators\XUnity.AutoTranslator.Plugin.LecPowerTranslator15\XUnity.AutoTranslator.Plugin.LecPowerTranslator15.csproj", "{AE28F88E-E877-456B-98AB-BD03A59A3E44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LecPowerTranslator15", "src\Translators\LecPowerTranslator15\LecPowerTranslator15.csproj", "{AE28F88E-E877-456B-98AB-BD03A59A3E44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Lec", "src\Translators\XUnity.AutoTranslator.Plugin.Lec\XUnity.AutoTranslator.Plugin.Lec.csproj", "{AD0C7EF2-D394-43B5-9CCE-FA8A0A820076}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lec.ExtProtocol", "src\Translators\Lec.ExtProtocol\Lec.ExtProtocol.csproj", "{AD0C7EF2-D394-43B5-9CCE-FA8A0A820076}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate", "src\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate.csproj", "{41B612A5-2974-4988-A82E-84EEF2212A61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateLegitimate", "src\Translators\GoogleTranslateLegitimate\GoogleTranslateLegitimate.csproj", "{41B612A5-2974-4988-A82E-84EEF2212A61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.ExtProtocol", "XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj", "{65500234-7AD4-48B8-B51B-945ADBFF1133}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.ExtProtocol", "src\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj", "{65500234-7AD4-48B8-B51B-945ADBFF1133}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

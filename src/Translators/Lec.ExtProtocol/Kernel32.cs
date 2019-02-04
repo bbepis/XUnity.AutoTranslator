@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace XUnity.AutoTranslator.Plugin.Lec
+namespace Lec.ExtProtocol
 {
    internal static class Kernel32
    {

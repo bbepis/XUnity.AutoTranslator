@@ -2,11 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyName>BingTranslateLegitimate</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BingTranslateLegitimateEndpoint.cs" Link="BingTranslateLegitimateEndpoint.cs" />
+     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\YandexTranslateEndpoint.cs" Link="YandexTranslateEndpoint.cs" />
    </ItemGroup>
 
    <ItemGroup>

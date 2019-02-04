@@ -3,9 +3,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Lec
+namespace Lec.ExtProtocol
 {
-
    class LecTranslationLibrary : UnmanagedTranslationLibrary
    {
       public const int JapaneseCodepage = 932;

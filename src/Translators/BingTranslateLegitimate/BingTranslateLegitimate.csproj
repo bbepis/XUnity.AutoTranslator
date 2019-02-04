@@ -2,11 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyName>WatsonTranslate</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Www\WatsonTranslateEndpoint.cs" Link="WatsonTranslateEndpoint.cs" />
+     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BingTranslateLegitimateEndpoint.cs" Link="BingTranslateLegitimateEndpoint.cs" />
    </ItemGroup>
 
    <ItemGroup>

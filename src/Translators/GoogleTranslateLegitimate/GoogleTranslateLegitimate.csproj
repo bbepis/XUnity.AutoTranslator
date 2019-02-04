@@ -2,11 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyName>LecPowerTranslator15</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\ExtProtocol\LecPowerTranslator15Endpoint.cs" Link="LecPowerTranslator15Endpoint.cs" />
+      <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\GoogleTranslateLegitimateEndpoint.cs" Link="GoogleTranslateLegitimateEndpoint.cs" />
    </ItemGroup>
 
    <ItemGroup>

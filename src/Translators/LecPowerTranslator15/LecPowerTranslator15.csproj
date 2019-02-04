@@ -2,11 +2,10 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <AssemblyName>BaiduTranslate</AssemblyName>
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BaiduTranslateEndpoint.cs" Link="BaiduTranslateEndpoint.cs" />
+     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\ExtProtocol\LecPowerTranslator15Endpoint.cs" Link="LecPowerTranslator15Endpoint.cs" />
    </ItemGroup>
 
    <ItemGroup>
@@ -15,7 +14,7 @@
 
    <ItemGroup>
       <Reference Include="ExIni">
-        <HintPath>..\..\..\libs\ExIni.dll</HintPath>
+         <HintPath>..\..\..\libs\ExIni.dll</HintPath>
       </Reference>
       <Reference Include="UnityEngine">
          <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>

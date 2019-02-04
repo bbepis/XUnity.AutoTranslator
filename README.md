@@ -40,7 +40,7 @@ The supported online translators are:
    * Free up to 1 million characters per month.
  * [ExciteTranslate](https://anonym.to/?https://www.excite.co.jp/world/english_japanese/), based on the Excite online translation service. Does not require authentication.
    * No limitations, but unstable. Also very slow.
- * Custom. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
+ * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * Example Configuration:
      * Endpoint=Custom
      * [Custom]

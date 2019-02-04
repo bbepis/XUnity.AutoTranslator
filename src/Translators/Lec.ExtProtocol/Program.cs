@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
-namespace XUnity.AutoTranslator.Plugin.Lec
+namespace Lec.ExtProtocol
 {
    class Program
    {

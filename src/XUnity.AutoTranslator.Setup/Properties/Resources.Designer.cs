@@ -73,9 +73,89 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] BaiduTranslate {
+            get {
+                object obj = ResourceManager.GetObject("BaiduTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] BingTranslate {
+            get {
+                object obj = ResourceManager.GetObject("BingTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] BingTranslateLegitimate {
+            get {
+                object obj = ResourceManager.GetObject("BingTranslateLegitimate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] CustomTranslate {
+            get {
+                object obj = ResourceManager.GetObject("CustomTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] ExIni {
             get {
                 object obj = ResourceManager.GetObject("ExIni", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] GoogleTranslate {
+            get {
+                object obj = ResourceManager.GetObject("GoogleTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] GoogleTranslateLegitimate {
+            get {
+                object obj = ResourceManager.GetObject("GoogleTranslateLegitimate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Lec_ExtProtocol {
+            get {
+                object obj = ResourceManager.GetObject("Lec_ExtProtocol", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] LecPowerTranslator15 {
+            get {
+                object obj = ResourceManager.GetObject("LecPowerTranslator15", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -143,39 +223,19 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] WatsonTranslate {
+            get {
+                object obj = ResourceManager.GetObject("WatsonTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] XUnity_AutoTranslator_Patcher {
             get {
                 object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Patcher", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_BaiduTranslate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_BaiduTranslate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_BingTranslate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_BingTranslate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_BingTranslateLegitimate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_BingTranslateLegitimate", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -193,16 +253,6 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_CustomTranslate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_CustomTranslate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] XUnity_AutoTranslator_Plugin_ExtProtocol {
             get {
                 object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_ExtProtocol", resourceCulture);
@@ -213,59 +263,9 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_GoogleTranslate {
+        internal static byte[] YandexTranslate {
             get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_GoogleTranslate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_GoogleTranslateLegitimate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_GoogleTranslateLegitimate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_Lec {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_Lec", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_LecPowerTranslator15 {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_LecPowerTranslator15", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_WatsonTranslate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_WatsonTranslate", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_AutoTranslator_Plugin_YandexTranslate {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_YandexTranslate", resourceCulture);
+                object obj = ResourceManager.GetObject("YandexTranslate", resourceCulture);
                 return ((byte[])(obj));
             }
         }

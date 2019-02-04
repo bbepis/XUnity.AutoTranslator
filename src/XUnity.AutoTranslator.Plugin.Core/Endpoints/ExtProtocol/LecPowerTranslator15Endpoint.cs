@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
 
          var path1 = context.Config.DataPath;
-         var exePath1 = Path.Combine( path1, @"Translators\Lec.exe" );
+         var exePath1 = Path.Combine( path1, @"Translators\Lec.ExtProtocol.exe" );
          var file1Exists = File.Exists( exePath1 );
          if( !file1Exists )
          {

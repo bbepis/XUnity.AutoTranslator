@@ -25,7 +25,7 @@
    </ItemGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
    </ItemGroup>
 
    <ItemGroup>
