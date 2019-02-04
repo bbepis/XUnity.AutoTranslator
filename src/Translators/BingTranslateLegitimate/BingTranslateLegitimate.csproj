@@ -5,10 +5,6 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BingTranslateLegitimateEndpoint.cs" Link="BingTranslateLegitimateEndpoint.cs" />
-   </ItemGroup>
-
-   <ItemGroup>
       <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
    </ItemGroup>
 

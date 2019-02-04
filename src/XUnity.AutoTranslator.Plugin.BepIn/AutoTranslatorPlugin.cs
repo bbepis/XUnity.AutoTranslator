@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
       {
          _dataFolder = "BepInEx";
          _configPath = Path.Combine( _dataFolder, "AutoTranslatorConfig.ini" );
-         Core.Logger.Current = new BepInLogger();
+         Core.XuaLogger.Current = new BepInLogger();
       }
 
       public IniFile Preferences

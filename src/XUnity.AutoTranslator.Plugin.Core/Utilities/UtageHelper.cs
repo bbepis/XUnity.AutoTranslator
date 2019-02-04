@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             }
             catch( Exception e )
             {
-               Logger.Current.Warn( e, "An error occurred while setting up scenario set." );
+               XuaLogger.Current.Warn( e, "An error occurred while setting up scenario set." );
             }
          }
 

@@ -5,14 +5,17 @@ using System.Net;
 using System.Text;
 using SimpleJSON;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.Www;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
+namespace WatsonTranslate
 {
    internal class WatsonTranslateEndpoint : WwwEndpoint
    {

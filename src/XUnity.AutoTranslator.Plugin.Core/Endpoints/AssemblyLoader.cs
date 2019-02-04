@@ -31,7 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
             catch( Exception e )
             {
-               Logger.Current.Error( e, "An error occurred while loading types in assembly: " + file );
+               XuaLogger.Current.Error( e, "An error occurred while loading types in assembly: " + file );
             }
          }
 

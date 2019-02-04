@@ -2,7 +2,7 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   internal class ConsoleLogger : Logger
+   internal class ConsoleLogger : XuaLogger
    {
       protected override void Log( LogLevel level, string message )
       {

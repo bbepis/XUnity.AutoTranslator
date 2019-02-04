@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while patching a property/method on a class. Failing class: " + type.Name );
+            XuaLogger.Current.Warn( e, "An error occurred while patching a property/method on a class. Failing class: " + type.Name );
          }
       }
    }

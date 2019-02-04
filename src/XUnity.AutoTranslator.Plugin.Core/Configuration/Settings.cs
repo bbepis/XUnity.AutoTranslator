@@ -101,7 +101,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while getting application name." );
+            XuaLogger.Current.Error( e, "An error occurred while getting application name." );
          }
 
 
@@ -167,7 +167,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          {
             WhitespaceRemovalStrategy = WhitespaceHandlingStrategy.TrimPerNewline;
 
-            Logger.Current.Warn( e, "An error occurred while configuring 'WhitespaceRemovalStrategy'. Using default." );
+            XuaLogger.Current.Warn( e, "An error occurred while configuring 'WhitespaceRemovalStrategy'. Using default." );
          }
 
          UserAgent = Config.Current.Preferences[ "Http" ][ "UserAgent" ].GetOrDefault( string.Empty );

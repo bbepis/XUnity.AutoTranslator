@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.BepIn
 {
-   public class BepInLogger : Logger
+   public class BepInLogger : XuaLogger
    {
       public BepInLogger()
       {

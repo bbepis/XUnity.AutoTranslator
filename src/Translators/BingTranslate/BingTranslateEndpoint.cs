@@ -8,13 +8,16 @@ using System.Reflection;
 using System.Text;
 using SimpleJSON;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
+namespace BingTranslate
 {
    internal class BingTranslateEndpoint : HttpEndpoint
    {
@@ -175,7 +178,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
@@ -196,14 +199,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          // failure
          if( response.Error != null )
          {
-            Logger.Current.Warn( response.Error, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.Current.Warn( response.Error, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
          // failure
          if( response.Result == null )
          {
-            Logger.Current.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.Current.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
@@ -216,12 +219,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
             if( _ig == null || _iid == null )
             {
-               Logger.Current.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
+               XuaLogger.Current.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
             }
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.Current.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
          }
       }
 

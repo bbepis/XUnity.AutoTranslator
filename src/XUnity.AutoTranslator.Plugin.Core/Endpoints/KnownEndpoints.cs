@@ -48,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "Could not instantiate class: " + type.Name );
+            XuaLogger.Current.Error( e, "Could not instantiate class: " + type.Name );
             return;
          }
 

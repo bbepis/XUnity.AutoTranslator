@@ -5,7 +5,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.DummyTranslator
+namespace ReverseTranslator
 {
    public class ReverseTranslatorEndpoint : ITranslateEndpoint
    {

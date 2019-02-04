@@ -58,7 +58,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up text getter compat hooks." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up text getter compat hooks." );
          }
       }
 
@@ -73,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up image hooks." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up image hooks." );
          }
       }
 
@@ -89,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for UGUI." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for UGUI." );
          }
 
          try
@@ -101,7 +101,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
          }
 
          try
@@ -113,7 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for NGUI." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for NGUI." );
          }
 
          try
@@ -125,7 +125,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for IMGUI." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for IMGUI." );
          }
 
          try
@@ -137,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
          }
 
       }
@@ -175,7 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                                     addMethod.Invoke( component, new object[] { callback } );
                                  }
 
-                                 Logger.Current.Info( eventName + " was hooked by external plugin." );
+                                 XuaLogger.Current.Info( eventName + " was hooked by external plugin." );
                                  return true;
                               }
                               catch { }
@@ -188,7 +188,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            Logger.Current.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
+            XuaLogger.Current.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
          }
 
          return false;

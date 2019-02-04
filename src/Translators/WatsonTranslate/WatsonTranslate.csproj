@@ -5,10 +5,6 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Www\WatsonTranslateEndpoint.cs" Link="WatsonTranslateEndpoint.cs" />
-   </ItemGroup>
-
-   <ItemGroup>
       <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
    </ItemGroup>
 

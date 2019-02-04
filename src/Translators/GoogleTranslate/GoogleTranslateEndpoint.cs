@@ -8,13 +8,16 @@ using System.Reflection;
 using System.Text;
 using SimpleJSON;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
+namespace GoogleTranslate
 {
    internal class GoogleTranslateEndpoint : HttpEndpoint
    {
@@ -162,7 +165,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
@@ -183,14 +186,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          // failure
          if( response.Error != null )
          {
-            Logger.Current.Warn( response.Error, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Current.Warn( response.Error, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
          // failure
          if( response.Result == null )
          {
-            Logger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
@@ -222,12 +225,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
             if( !found )
             {
-               Logger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
+               XuaLogger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
             }
          }
          catch( Exception e )
          {
-            Logger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
          }
       }
 

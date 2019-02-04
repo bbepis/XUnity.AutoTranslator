@@ -374,7 +374,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
                foreach( var idleEntry in idleEntries )
                {
                   ActiveConnections.Remove( idleEntry.Key );
-                  Logger.Current.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to inactivity." );
+                  XuaLogger.Current.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to inactivity." );
                }
             }
          }

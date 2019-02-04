@@ -7,11 +7,11 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   public abstract class Logger
+   public abstract class XuaLogger
    {
-      public static Logger Current;
+      public static XuaLogger Current;
 
-      public Logger()
+      public XuaLogger()
       {
          RespectSettings = true;
       }

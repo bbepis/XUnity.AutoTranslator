@@ -2,10 +2,12 @@
 using System.IO;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
+namespace LecPowerTranslator15
 {
    internal class LecPowerTranslator15Endpoint : ExtProtocolEndpoint
    {

@@ -5,10 +5,6 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\ExtProtocol\LecPowerTranslator15Endpoint.cs" Link="LecPowerTranslator15Endpoint.cs" />
-   </ItemGroup>
-
-   <ItemGroup>
       <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
    </ItemGroup>
 

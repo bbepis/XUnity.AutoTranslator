@@ -4,10 +4,6 @@
     <TargetFramework>net35</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\..\XUnity.AutoTranslator.Plugin.Core\Endpoints\Http\BingTranslateEndpoint.cs" Link="BingTranslateEndpoint.cs" />
-  </ItemGroup>
-
    <ItemGroup>
       <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
    </ItemGroup>
