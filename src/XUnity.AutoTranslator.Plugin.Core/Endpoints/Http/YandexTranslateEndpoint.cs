@@ -33,16 +33,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
 
          context.HttpSecurity.EnableSslFor( "translate.yandex.net" );
+         
+         if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+         if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          var request = new XUnityWebRequest(
             string.Format(
                HttpsServicePointTemplateUrl,
-               from,
-               to,
-               WWW.EscapeURL( untranslatedText ),
+               context.SourceLanguage,
+               context.DestinationLanguage,
+               WWW.EscapeURL( context.UntranslatedText ),
                _key ) );
 
          request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" : AutoTranslationState.UserAgent;
@@ -52,43 +55,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return request;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
+         var data = context.ResultData;
+         var obj = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
+
+         var code = obj.AsObject[ "code" ].ToString();
+
+         if( code == "200" )
          {
-            var obj = JSON.Parse( result );
-            var lineBuilder = new StringBuilder( result.Length );
-
-            var code = obj.AsObject[ "code" ].ToString();
-
-            if( code == "200" )
+            var token = obj.AsObject[ "text" ].ToString();
+            token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
+            if( string.IsNullOrEmpty( token ) )
             {
-               var token = obj.AsObject[ "text" ].ToString();
-               token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
-               if( String.IsNullOrEmpty( token ) )
-               {
-                  translated = null;
-                  return false;
-               }
-
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-               lineBuilder.Append( token );
-
-               translated = lineBuilder.ToString();
-
-               var success = !string.IsNullOrEmpty( translated );
-               return success;
+               return;
             }
-            else
-            {
-               translated = null;
-               return false;
-            }
-         }
-         catch( Exception )
-         {
-            translated = null;
-            return false;
+
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+            lineBuilder.Append( token );
+
+            var translated = lineBuilder.ToString();
+
+            context.Complete( translated );
          }
       }
    }

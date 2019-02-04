@@ -451,6 +451,8 @@ With that in mind, consider the following:
  * The `WWW` class in Unity establishes a new TCP connection on each request you make, making it extremely poor at this kind of job. Especially if SSL (https) is involved because it has to do the entire handshake procedure each time.
  * The `UnityWebRequest` class in Unity does not exist in most games, because they use an old engine, so it is not a good choice either.
  * The `WebClient` class from .NET is capable of using persistent connections (it does so by default), but has its own problems with SSL. The version of Mono used in most Unity games rejects all certificates by default making all HTTPS connections fail. This, however, can be remedied during the initialization phase of the translator (see examples below). Another shortcoming of this API is the fact that the runtime will never release the TCP connections it has used until the process ends. The API also integrates terribly with Unity because callbacks return on a background thread.
+ * The `WebRequest` class from .NET is essentially the same as WebClient.
+ * The `HttpClient` class from .NET is also unlikely to exist in most Unity games.
 
 None of these are therefore an ideal solution.
 
@@ -486,9 +488,10 @@ public class ReverseTranslator : ITranslateEndpoint
 
    }
 
-   public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+   public IEnumerator Translate( TranslationContext context )
    {
-      success( new string( untranslatedText.Reverse().ToArray() ) );
+      var reversedText = new string( context.UntranslatedText.Reverse().ToArray() );
+      context.Complete( reversedText );
 
       return null;
    }

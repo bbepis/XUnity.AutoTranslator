@@ -25,6 +25,10 @@
    </ItemGroup>
 
    <ItemGroup>
+     <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+   </ItemGroup>
+
+   <ItemGroup>
       <Compile Update="Properties\Resources.Designer.cs">
          <DesignTime>True</DesignTime>
          <AutoGen>True</AutoGen>

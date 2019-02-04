@@ -41,6 +41,7 @@ namespace XUnity.AutoTranslator.Setup
          AddFile( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
          AddFile( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
          AddFile( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher, true );
+         AddFile( Path.Combine( translatorsPath, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
          AddFile( Path.Combine( translatorsPath, "BaiduTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BaiduTranslate, true );
          AddFile( Path.Combine( translatorsPath, "BingTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslate, true );
          AddFile( Path.Combine( translatorsPath, "BingLegitimateTranslate.dll" ), Resources.XUnity_AutoTranslator_Plugin_BingTranslateLegitimate, true );
@@ -59,6 +60,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
             AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
+            AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );

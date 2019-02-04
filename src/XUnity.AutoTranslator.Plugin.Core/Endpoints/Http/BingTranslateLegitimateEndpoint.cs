@@ -18,6 +18,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
    internal class BingTranslateLegitimateEndpoint : HttpEndpoint
    {
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
+      {
+         "af","ar","bn","bs","bg","yue","ca","zh-Hans","zh-Hant","hr","cs","da","nl","en","et","fj","fil","fi","fr","de","el","ht","he","hi","mww","hu","is","id","it","ja","sw","tlh","tlh-Qaak","ko","lv","lt","mg","ms","mt","nb","fa","pl","pt","otq","ro","ru","sm","sr-Cyrl","sr-Latn","sk","sl","es","sv","ty","ta","te","th","to","tr","uk","ur","vi","cy","yua"
+      };
+
       private static readonly string HttpsServicePointTemplateUrl = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from={0}&to={1}";
       private static readonly string RequestTemplate = "[{{\"Text\":\"{0}\"}}]";
       private static readonly System.Random RandomNumbers = new System.Random();
@@ -41,14 +46,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
          // Configure service points / service point manager
          context.HttpSecurity.EnableSslFor( "api.cognitive.microsofttranslator.com" );
+
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          var request = new XUnityWebRequest(
             "POST",
-            string.Format( HttpsServicePointTemplateUrl, from, to ),
-            string.Format( RequestTemplate, untranslatedText.EscapeJson() ) );
+            string.Format( HttpsServicePointTemplateUrl, context.SourceLanguage, context.DestinationLanguage ),
+            string.Format( RequestTemplate, context.UntranslatedText.EscapeJson() ) );
 
          if( Accept != null )
          {
@@ -63,25 +70,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return request;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
-         {
-            var arr = JSON.Parse( result );
+         var arr = JSON.Parse( context.ResultData );
 
-            var token = arr.AsArray[ 0 ]?.AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+         var token = arr.AsArray[ 0 ]?.AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
+         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
-            translated = token;
+         var translated = token;
 
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
-         }
-         catch
-         {
-            translated = null;
-            return false;
-         }
+         context.Complete( translated );
       }
    }
 }

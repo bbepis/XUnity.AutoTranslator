@@ -36,17 +36,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          context.HttpSecurity.EnableSslFor( "api.fanyi.baidu.com" );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          string salt = DateTime.UtcNow.Millisecond.ToString();
-         var md5 = CreateMD5( _appId + untranslatedText + salt + _appSecret );
+         var md5 = CreateMD5( _appId + context.UntranslatedText + salt + _appSecret );
 
          var request = new XUnityWebRequest(
             string.Format(
                HttpServicePointTemplateUrl,
-               WWW.EscapeURL( untranslatedText ),
-               from,
-               to,
+               WWW.EscapeURL( context.UntranslatedText ),
+               context.SourceLanguage,
+               context.DestinationLanguage,
                _appId,
                salt,
                md5 ) );
@@ -57,40 +57,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return request;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
+         if( context.ResultData.StartsWith( "{\"error" ) )
          {
-            if( result.StartsWith( "{\"error" ) )
-            {
-               translated = null;
-               return false;
-            }
-
-
-            var obj = JSON.Parse( result );
-            var lineBuilder = new StringBuilder( result.Length );
-
-            foreach( JSONNode entry in obj.AsObject[ "trans_result" ].AsArray )
-            {
-               var token = entry.AsObject[ "dst" ].ToString();
-               token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
-
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-               lineBuilder.Append( token );
-            }
-
-            translated = lineBuilder.ToString();
-
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
+            return;
          }
-         catch( Exception )
+
+         var data = context.ResultData;
+         var obj = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
+
+         foreach( JSONNode entry in obj.AsObject[ "trans_result" ].AsArray )
          {
-            translated = null;
-            return false;
+            var token = entry.AsObject[ "dst" ].ToString();
+            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+
+            lineBuilder.Append( token );
          }
+
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
       }
 
       private static string CreateMD5( string input )

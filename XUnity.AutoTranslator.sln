@@ -94,7 +94,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Lec", "src\Translators\XUnity.AutoTranslator.Plugin.Lec\XUnity.AutoTranslator.Plugin.Lec.csproj", "{AD0C7EF2-D394-43B5-9CCE-FA8A0A820076}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate", "src\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate.csproj", "{41B612A5-2974-4988-A82E-84EEF2212A61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate", "src\Translators\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate\XUnity.AutoTranslator.Plugin.GoogleTranslateLegitimate.csproj", "{41B612A5-2974-4988-A82E-84EEF2212A61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.ExtProtocol", "XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj", "{65500234-7AD4-48B8-B51B-945ADBFF1133}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -170,6 +172,10 @@ Global
 		{41B612A5-2974-4988-A82E-84EEF2212A61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41B612A5-2974-4988-A82E-84EEF2212A61}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41B612A5-2974-4988-A82E-84EEF2212A61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65500234-7AD4-48B8-B51B-945ADBFF1133}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65500234-7AD4-48B8-B51B-945ADBFF1133}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65500234-7AD4-48B8-B51B-945ADBFF1133}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65500234-7AD4-48B8-B51B-945ADBFF1133}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -193,6 +199,7 @@ Global
 		{AE28F88E-E877-456B-98AB-BD03A59A3E44} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{AD0C7EF2-D394-43B5-9CCE-FA8A0A820076} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{41B612A5-2974-4988-A82E-84EEF2212A61} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
+		{65500234-7AD4-48B8-B51B-945ADBFF1133} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}

@@ -21,22 +21,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public abstract void Initialize( InitializationContext context );
 
-      public abstract string GetServiceUrl( string untranslatedText, string from, string to );
+      public abstract void CreateTranslationRequest( WwwTranslationContext context );
 
-      public virtual string GetRequestObject( string untranslatedText, string from, string to ) => null;
+      public abstract void ExtractTranslatedText( WwwTranslationContext context );
 
-      public abstract void ApplyHeaders( Dictionary<string, string> headers );
-
-      public abstract bool TryExtractTranslated( string result, out string translated );
-
-      public virtual IEnumerator OnBeforeTranslate() => null;
+      public virtual IEnumerator OnBeforeTranslate( WwwTranslationContext context ) => null;
 
       public int MaxConcurrency => 1;
 
-      public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+      public IEnumerator Translate( TranslationContext context )
       {
+         var wwwContext = new WwwTranslationContext( context );
+
          // allow implementer of HttpEndpoint to do anything before starting translation
-         var setup = OnBeforeTranslate();
+         var setup = OnBeforeTranslate( wwwContext );
          if( setup != null )
          {
             while( setup.MoveNext() )
@@ -49,23 +47,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          try
          {
             // prepare request
-            var headers = new Dictionary<string, string>();
-            ApplyHeaders( headers );
-            var url = GetServiceUrl( untranslatedText, from, to );
-            var data = GetRequestObject( untranslatedText, from, to );
+            CreateTranslationRequest( wwwContext );
+            var url = wwwContext.ServiceUrl;
+            var data = wwwContext.Data;
+            var headers = wwwContext.Headers ?? new Dictionary<string, string>();
 
             // execute request
             www = WwwConstructor.Invoke( new object[] { url, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
          }
          catch( Exception e )
          {
-            failure( "Error occurred while setting up translation request.", e );
+            wwwContext.Fail( "Error occurred while setting up translation request.", e );
             yield break;
          }
 
          if( www == null )
          {
-            failure( "Unexpected error occurred while retrieving translation.", null );
+            wwwContext.Fail( "Unexpected error occurred while retrieving translation.", null );
             yield break;
          }
 
@@ -87,7 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
             if( error != null )
             {
-               failure( "Error occurred while retrieving translation." + Environment.NewLine + error, null );
+               wwwContext.Fail( "Error occurred while retrieving translation." + Environment.NewLine + error, null );
                yield break;
             }
 
@@ -95,24 +93,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
             var text = (string)AccessTools.Property( Constants.ClrTypes.WWW, "text" ).GetValue( www, null );
             if( text == null )
             {
-               failure( "Error occurred while extracting text from response.", null );
+               wwwContext.Fail( "Error occurred while extracting text from response.", null );
                yield break;
             }
 
-            // attempt to extract translation from data
-            if( TryExtractTranslated( text, out var translatedText ) )
-            {
-               translatedText = translatedText ?? string.Empty;
-               success( translatedText );
-            }
-            else
-            {
-               failure( "Error occurred while extracting translation.", null );
-            }
+            ExtractTranslatedText( wwwContext );
          }
          catch( Exception e )
          {
-            failure( "Error occurred while retrieving translation.", e );
+            wwwContext.Fail( "Error occurred while retrieving translation.", e );
          }
       }
    }

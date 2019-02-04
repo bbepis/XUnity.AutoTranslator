@@ -35,23 +35,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _friendlyName += " (" + uri.Host + ")";
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          var request = new XUnityWebRequest(
             string.Format(
                ServicePointTemplateUrl,
                _endpoint,
-               from,
-               to,
-               WWW.EscapeURL( untranslatedText ) ) );
+               context.SourceLanguage,
+               context.DestinationLanguage,
+               WWW.EscapeURL( context.UntranslatedText ) ) );
 
          return request;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         translated = result;
-         return true;
+         context.Complete( context.ResultData );
       }
    }
 }

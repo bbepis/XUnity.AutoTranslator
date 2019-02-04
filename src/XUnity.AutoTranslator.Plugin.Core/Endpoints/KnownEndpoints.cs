@@ -38,6 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                // allow implementing plugins to hook into Unity lifecycle
                endpoint = (ITranslateEndpoint)go.AddComponent( type );
+               UnityEngine.Object.DontDestroyOnLoad( (UnityEngine.Object)endpoint );
             }
             else
             {

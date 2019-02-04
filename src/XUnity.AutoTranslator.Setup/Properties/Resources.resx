@@ -172,6 +172,9 @@
    <data name="XUnity_AutoTranslator_Plugin_Core" type="System.Resources.ResXFileRef, System.Windows.Forms">
       <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>
+   <data name="XUnity_AutoTranslator_Plugin_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+      <value>..\..\XUnity.AutoTranslator.Plugin.Core\bin\Release\net35\XUnity.AutoTranslator.Plugin.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+   </data>
    <data name="XUnity_AutoTranslator_Plugin_Lec" type="System.Resources.ResXFileRef, System.Windows.Forms">
       <value>..\..\Translators\XUnity.AutoTranslator.Plugin.Lec\bin\x86\Release\net35\Lec.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
    </data>

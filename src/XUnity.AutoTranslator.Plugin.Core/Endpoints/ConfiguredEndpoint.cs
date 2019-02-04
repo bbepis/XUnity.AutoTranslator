@@ -22,10 +22,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
       {
+         var context = new TranslationContext( untranslatedText, from, to, success, failure );
          _ongoingTranslations++;
          try
          {
-            var iterator = Endpoint.Translate( untranslatedText, from, to, success, failure );
+            var iterator = Endpoint.Translate( context );
             if( iterator != null )
             {
                while( iterator.MoveNext() )
@@ -37,6 +38,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          finally
          {
             _ongoingTranslations--;
+
+            context.FailIfNotCompleted();
          }
       }
    }

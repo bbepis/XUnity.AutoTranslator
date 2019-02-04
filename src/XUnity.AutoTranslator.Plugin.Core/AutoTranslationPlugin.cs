@@ -168,7 +168,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _httpSecurity = new HttpSecurity();
          try
          {
-            var context = new InitializationContext( Config.Current, _httpSecurity );
+            var context = new InitializationContext( Config.Current, _httpSecurity, Settings.FromLanguage, Settings.Language );
 
             _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, context )
                .OrderBy( x => x.Error != null )

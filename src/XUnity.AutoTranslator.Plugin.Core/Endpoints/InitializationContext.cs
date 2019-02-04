@@ -9,10 +9,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    public class InitializationContext
    {
-      public InitializationContext( IConfiguration config, HttpSecurity httpSecurity )
+      internal InitializationContext(
+         IConfiguration config,
+         HttpSecurity httpSecurity,
+         string sourceLanguage,
+         string destinationLanguage )
       {
          Config = config;
          HttpSecurity = httpSecurity;
+         SourceLanguage = sourceLanguage;
+         DestinationLanguage = destinationLanguage;
       }
 
       /// <summary>
@@ -25,5 +31,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// Gets the HttpSecurity class which enables setting up SSL for endpoints.
       /// </summary>
       public HttpSecurity HttpSecurity { get; }
+
+      /// <summary>
+      /// Gets the source language.
+      /// </summary>
+      public string SourceLanguage { get; }
+
+      /// <summary>
+      /// Gets the destination language.
+      /// </summary>
+      public string DestinationLanguage { get; }
    }
 }

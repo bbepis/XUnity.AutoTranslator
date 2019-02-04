@@ -203,6 +203,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] XUnity_AutoTranslator_Plugin_ExtProtocol {
+            get {
+                object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_ExtProtocol", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] XUnity_AutoTranslator_Plugin_GoogleTranslate {
             get {
                 object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_GoogleTranslate", resourceCulture);

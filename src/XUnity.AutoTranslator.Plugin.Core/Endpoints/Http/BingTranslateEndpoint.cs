@@ -18,6 +18,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
    internal class BingTranslateEndpoint : HttpEndpoint
    {
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
+      {
+         "af","ar","bn","bs","bg","yue","ca","zh-Hans","zh-Hant","hr","cs","da","nl","en","et","fj","fil","fi","fr","de","el","ht","he","hi","mww","hu","is","id","it","ja","sw","tlh","tlh-Qaak","ko","lv","lt","mg","ms","mt","nb","fa","pl","pt","otq","ro","ru","sm","sr-Cyrl","sr-Latn","sk","sl","es","sv","ty","ta","te","th","to","tr","uk","ur","vi","cy","yua"
+      };
+
       private static readonly string HttpsServicePointTemplateUrl = "https://www.bing.com/ttranslate?&category=&IG={0}&IID={1}.{2}";
       private static readonly string HttpsServicePointTemplateUrlWithoutIG = "https://www.bing.com/ttranslate?&category=";
       private static readonly string HttpsTranslateUserSite = "https://www.bing.com/translator";
@@ -59,9 +64,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       {
          // Configure service points / service point manager
          context.HttpSecurity.EnableSslFor( "www.bing.com" );
+
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          _translationCount++;
          string address = null;
@@ -75,7 +82,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             address = string.Format( HttpsServicePointTemplateUrl, _ig, _iid, _translationCount );
          }
 
-         var data = string.Format( RequestTemplate, WWW.EscapeURL( untranslatedText ), from, to );
+         var data = string.Format(
+            RequestTemplate,
+            WWW.EscapeURL( context.UntranslatedText ),
+            context.SourceLanguage,
+            context.DestinationLanguage );
 
          var request = new XUnityWebRequest( "POST", address, data );
 
@@ -125,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      public override void InspectTranslationResponse( XUnityWebResponse response )
+      public override void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
       {
          CookieCollection cookies = response.NewCookies;
 
@@ -133,7 +144,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _cookieContainer.Add( cookies );
       }
 
-      public override IEnumerator OnBeforeTranslate()
+      public override IEnumerator OnBeforeTranslate( HttpTranslationContext context )
       {
          if( !_hasSetup || AutoTranslationState.TranslationCount % _resetAfter == 0 )
          {
@@ -141,7 +152,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             _hasSetup = true;
 
             // Setup TKK and cookies
-            var enumerator = SetupIGAndIID();
+            var enumerator = SetupIGAndIID( context );
             while( enumerator.MoveNext() )
             {
                yield return enumerator.Current;
@@ -149,7 +160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      public IEnumerator SetupIGAndIID()
+      public IEnumerator SetupIGAndIID( HttpTranslationContext context )
       {
          XUnityWebResponse response = null;
 
@@ -180,7 +191,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             }
          }
 
-         InspectTranslationResponse( response );
+         InspectTranslationResponse( context, response );
 
          // failure
          if( response.Error != null )
@@ -232,32 +243,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return null;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
+         var obj = JSON.Parse( context.ResultData );
+
+         var code = obj[ "statusCode" ].AsInt;
+         if( code != 200 )
          {
-            var obj = JSON.Parse( result );
-
-            var code = obj[ "statusCode" ].AsInt;
-            if( code != 200 )
-            {
-               translated = null;
-               return false;
-            }
-
-            var token = obj[ "translationResponse" ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
-
-            translated = token;
-
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
+            return;
          }
-         catch
-         {
-            translated = null;
-            return false;
-         }
+
+         var token = obj[ "translationResponse" ].ToString();
+         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+
+         var translated = token;
+
+         context.Complete( translated );
       }
    }
 }

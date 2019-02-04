@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Threading;
+using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace XUnity.AutoTranslator.Plugin.Lec
 {
@@ -33,15 +34,20 @@ namespace XUnity.AutoTranslator.Plugin.Lec
                   using( var reader = new StreamReader( stdin ) )
                   {
                      var receivedPayload = reader.ReadLine();
-                     if( string.IsNullOrEmpty( receivedPayload ) )
+                     if( string.IsNullOrEmpty( receivedPayload ) ) return;
+
+                     var message = ExtProtocolConvert.Decode( receivedPayload ) as TranslationRequest;
+                     if( message == null ) return;
+
+                     var translatedLine = translator.Translate( message.UntranslatedText );
+
+                     var response = new TranslationResponse
                      {
-                        return;
-                     }
+                        Id = message.Id,
+                        TranslatedText = translatedLine
+                     };
 
-                     var receivedLine = Encoding.UTF8.GetString( Convert.FromBase64String( receivedPayload ) );
-                     var translatedLine = translator.Translate( receivedLine );
-
-                     var translatedPayload = Convert.ToBase64String( Encoding.UTF8.GetBytes( translatedLine ) );
+                     var translatedPayload = ExtProtocolConvert.Encode( response );
                      writer.WriteLine( translatedPayload );
                   }
                }

@@ -9,11 +9,12 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Shim;
 using XUnity.AutoTranslator.Plugin.Core.Web;
+using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
+namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {
 
-   public abstract class ProcessLineProtocolEndpoint : ITranslateEndpoint, IDisposable
+   public abstract class ExtProtocolEndpoint : ITranslateEndpoint, IDisposable
    {
       private bool _disposed = false;
       private Process _process;
@@ -28,18 +29,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 
       public int MaxConcurrency => 1;
 
-      protected void Process_OutputDataReceived( object sender, DataReceivedEventArgs e )
+      public IEnumerator Translate( TranslationContext context )
       {
-      }
-
-      public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
-      {
-         var _result = new StreamReaderResult();
+         var result = new StreamReaderResult();
          try
          {
-            try
+            ThreadPool.QueueUserWorkItem( state =>
             {
-               ThreadPool.QueueUserWorkItem( state =>
+               try
                {
                   if( _process == null )
                   {
@@ -52,7 +49,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
                      _process.StartInfo.RedirectStandardInput = true;
                      _process.StartInfo.RedirectStandardOutput = true;
                      _process.StartInfo.RedirectStandardError = true;
-                     _process.OutputDataReceived += Process_OutputDataReceived;
                      _process.Start();
 
                      // wait a second...
@@ -61,33 +57,39 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 
                   if( _process.HasExited )
                   {
-                     _result.SetCompleted( null, "The translation process exited. Likely due to invalid path to installation." );
+                     result.SetCompleted( null, "The translation process exited. Likely due to invalid path to installation." );
                      return;
                   }
 
-                  var payload = Convert.ToBase64String( Encoding.UTF8.GetBytes( untranslatedText ) );
+                  var request = new TranslationRequest
+                  {
+                     Id = Guid.NewGuid(),
+                     SourceLanguage = context.SourceLanguage,
+                     DestinationLanguage = context.DestinationLanguage,
+                     UntranslatedText = context.UntranslatedText
+                  };
+                  var payload = ExtProtocolConvert.Encode( request );
                   _process.StandardInput.WriteLine( payload );
 
                   var returnedPayload = _process.StandardOutput.ReadLine();
-                  var returnedLine = Encoding.UTF8.GetString( Convert.FromBase64String( returnedPayload ) );
+                  var response = ExtProtocolConvert.Decode( returnedPayload );
 
-                  _result.SetCompleted( returnedLine, string.IsNullOrEmpty( returnedLine ) ? "Nothing was returned." : null );
-               } );
-            }
-            catch( Exception e )
-            {
-               failure( "Error occurred while retrieving translation.", e );
-               yield break;
-            }
+                  HandleProtocolMessage( result, response );
+               }
+               catch( Exception e )
+               {
+                  result.SetCompleted( null, e.Message );
+               }
+            } );
 
             // yield-wait for completion
             if( Features.SupportsCustomYieldInstruction )
             {
-               yield return _result;
+               yield return result;
             }
             else
             {
-               while( !_result.IsCompleted )
+               while( !result.IsCompleted )
                {
                   yield return new WaitForSeconds( 0.2f );
                }
@@ -95,27 +97,55 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ProcessLineProtocol
 
             try
             {
-               if( _result.Succeeded && _result.Result != null )
+               if( result.Succeeded )
                {
-                  success( _result.Result );
+                  context.Complete( result.Result );
                }
                else
                {
-                  failure( "Error occurred while retrieving translation." + Environment.NewLine + _result.Error, null );
+                  context.Fail( "Error occurred while retrieving translation." + Environment.NewLine + result.Error, null );
                }
             }
             catch( Exception e )
             {
-               failure( "Error occurred while retrieving translation.", e );
+               context.Fail( "Error occurred while retrieving translation.", e );
             }
          }
          finally
          {
-            _result = null;
+            result = null;
+
+            context.FailIfNotCompleted();
          }
       }
 
-      public class StreamReaderResult : CustomYieldInstructionShim
+      private static void HandleProtocolMessage( StreamReaderResult result, ProtocolMessage message )
+      {
+         switch( message )
+         {
+            case TranslationResponse translationResponse:
+               HandleTranslationResponse( result, translationResponse );
+               break;
+            case TranslationError translationResponse:
+               HandleTranslationError( result, translationResponse );
+               break;
+            default:
+               result.SetCompleted( null, "Received invalid response." );
+               break;
+         }
+      }
+
+      private static void HandleTranslationResponse( StreamReaderResult result, TranslationResponse message )
+      {
+         result.SetCompleted( message.TranslatedText, null );
+      }
+
+      private static void HandleTranslationError( StreamReaderResult result, TranslationError message )
+      {
+         result.SetCompleted( null, message.Reason );
+      }
+
+      private class StreamReaderResult : CustomYieldInstructionShim
       {
          public void SetCompleted( string result, string error )
          {

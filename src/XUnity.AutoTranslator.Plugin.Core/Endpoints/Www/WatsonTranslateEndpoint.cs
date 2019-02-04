@@ -38,52 +38,47 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The WatsonTranslate endpoint requires a key which has not been provided." );
 
          _template = _url.TrimEnd( '/' ) + "/v3/translate?version=2018-05-01";
+
+         if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+         if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
       }
 
-      public override string GetServiceUrl( string untranslatedText, string from, string to )
+      public override void CreateTranslationRequest( WwwTranslationContext context )
       {
-         return _template;
-      }
+         context.SetServiceUrl( _template );
+         context.SetRequestObject(
+            string.Format(
+               RequestTemplate,
+               context.SourceLanguage,
+               context.DestinationLanguage,
+               TextHelper.EscapeJson( context.UntranslatedText ) ) );
 
-      public override string GetRequestObject( string untranslatedText, string from, string to )
-      {
-         return string.Format( RequestTemplate, from, to, TextHelper.EscapeJson( untranslatedText ) );
-      }
-
-      public override void ApplyHeaders( Dictionary<string, string> headers )
-      {
+         var headers = new Dictionary<string, string>();
          headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "curl/7.55.1" : AutoTranslationState.UserAgent;
          headers[ "Accept" ] = "application/json";
          headers[ "Content-Type" ] = "application/json";
          headers[ "Authorization" ] = "Basic " + Convert.ToBase64String( Encoding.ASCII.GetBytes( "apikey:" + _key ) );
+         context.SetHeaders( headers );
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( WwwTranslationContext context )
       {
-         try
+         var data = context.ResultData;
+         var obj = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
+
+         foreach( JSONNode entry in obj.AsObject[ "translations" ].AsArray )
          {
-            var obj = JSON.Parse( result );
-            var lineBuilder = new StringBuilder( result.Length );
+            var token = entry.AsObject[ "translation" ].ToString();
+            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
-            foreach( JSONNode entry in obj.AsObject[ "translations" ].AsArray )
-            {
-               var token = entry.AsObject[ "translation" ].ToString();
-               token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-               lineBuilder.Append( token );
-            }
-            translated = lineBuilder.ToString();
-
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
+            lineBuilder.Append( token );
          }
-         catch( Exception )
-         {
-            translated = null;
-            return false;
-         }
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
       }
    }
 }

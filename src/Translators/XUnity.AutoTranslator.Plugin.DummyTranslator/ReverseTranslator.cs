@@ -20,9 +20,10 @@ namespace XUnity.AutoTranslator.Plugin.DummyTranslator
 
       }
 
-      public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+      public IEnumerator Translate( TranslationContext context )
       {
-         success( new string( untranslatedText.Reverse().ToArray() ) );
+         var reversedText = new string( context.UntranslatedText.Reverse().ToArray() );
+         context.Complete( reversedText );
 
          return null;
       }

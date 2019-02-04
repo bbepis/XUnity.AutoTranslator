@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections;
-using System.Net;
-using System.Threading;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Shim;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
@@ -15,26 +11,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public abstract string FriendlyName { get; }
 
-      public XUnityWebClient Client { get; }
-
       public int MaxConcurrency => 1;
 
       public abstract void Initialize( InitializationContext context );
 
-      public abstract bool TryExtractTranslated( string result, out string translated );
+      public abstract void ExtractTranslatedText( HttpTranslationContext context );
 
-      public abstract XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to );
+      public abstract XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context );
 
-      public virtual void InspectTranslationResponse( XUnityWebResponse response )
+      public virtual void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
       {
       }
 
-      public virtual IEnumerator OnBeforeTranslate() => null;
+      public virtual IEnumerator OnBeforeTranslate( HttpTranslationContext context ) => null;
 
-      public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+      public IEnumerator Translate( TranslationContext context )
       {
+         var httpContext = new HttpTranslationContext( context );
+
          // allow implementer of HttpEndpoint to do anything before starting translation
-         var setup = OnBeforeTranslate();
+         var setup = OnBeforeTranslate( httpContext );
          if( setup != null )
          {
             while( setup.MoveNext() )
@@ -48,12 +44,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          {
             // prepare request
             var client = new XUnityWebClient();
-            var request = CreateTranslationRequest( untranslatedText, from, to );
+            var request = CreateTranslationRequest( httpContext );
             response = client.Send( request );
          }
          catch( Exception e )
          {
-            failure( "Error occurred while setting up translation request.", e );
+            httpContext.Fail( "Error occurred while setting up translation request.", e );
             yield break;
          }
 
@@ -70,39 +66,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             }
          }
 
-         InspectTranslationResponse( response );
+         InspectTranslationResponse( httpContext, response );
 
          // failure
          if( response.Error != null )
          {
-            failure( "Error occurred while retrieving translation.", response.Error );
+            httpContext.Fail( "Error occurred while retrieving translation.", response.Error );
             yield break;
          }
 
          // failure
          if( response.Result == null )
          {
-            failure( "Error occurred while retrieving translation. Nothing was returned.", null );
+            httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned.", null );
             yield break;
          }
 
+         httpContext.ResultData = response.Result;
 
          try
          {
             // attempt to extract translation from data
-            if( TryExtractTranslated( response.Result, out var translatedText ) )
-            {
-               translatedText = translatedText ?? string.Empty;
-               success( translatedText );
-            }
-            else
-            {
-               failure( "Error occurred while extracting translation.", null );
-            }
+            ExtractTranslatedText( httpContext );
          }
          catch( Exception e )
          {
-            failure( "Error occurred while retrieving translation.", e );
+            httpContext.Fail( "Error occurred while retrieving translation.", e );
          }
       }
    }

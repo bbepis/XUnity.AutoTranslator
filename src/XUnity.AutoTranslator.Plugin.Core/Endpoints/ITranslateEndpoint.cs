@@ -34,6 +34,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// Attempt to translated the provided untranslated text. Will be used in a "coroutine", so it can be implemented
       /// in an async fashion.
       /// </summary>
-      IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure );
+      IEnumerator Translate( TranslationContext context );
    }
 }

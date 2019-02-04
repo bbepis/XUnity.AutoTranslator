@@ -18,7 +18,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
    internal class GoogleTranslateEndpoint : HttpEndpoint
    {
-      private static readonly string HttpsServicePointTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=t&dt=t&sl={0}&tl={1}&ie=UTF-8&oe=UTF-8&tk={2}&q={3}";
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
+      {
+         "romaji","af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","zh-CN","zh-TW","co","hr","cs","da","nl","en","eo","et","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu","is","ig","id","ga","it","ja","jw","kn","kk","km","ko","ku","ky","lo","la","lv","lt","lb","mk","mg","ms","ml","mt","mi","mr","mn","my","ne","no","ny","ps","fa","pl","pt","pa","ro","ru","sm","gd","sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tl","tg","ta","te","th","tr","uk","ur","uz","vi","cy","xh","yi","yo","zu"
+      };
+
+      private static readonly string HttpsServicePointTranslateTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl={1}&dt=t&tk={2}&q={3}";
+      private static readonly string HttpsServicePointRomanizeTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl=en&dt=rm&tk={1}&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
       private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
       private static readonly System.Random RandomNumbers = new System.Random();
@@ -50,17 +56,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       public override void Initialize( InitializationContext context )
       {
          context.HttpSecurity.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
+
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
-         var request = new XUnityWebRequest(
-            string.Format(
-               HttpsServicePointTemplateUrl,
-               from,
-               to,
-               Tk( untranslatedText ),
-               WWW.EscapeURL( untranslatedText ) ) );
+         XUnityWebRequest request;
+         if( context.DestinationLanguage == "romaji" )
+         {
+            request = new XUnityWebRequest(
+               string.Format(
+                  HttpsServicePointRomanizeTemplateUrl,
+                  context.SourceLanguage,
+                  Tk( context.UntranslatedText ),
+                  WWW.EscapeURL( context.UntranslatedText ) ) );
+         }
+         else
+         {
+            request = new XUnityWebRequest(
+               string.Format(
+                  HttpsServicePointTranslateTemplateUrl,
+                  context.SourceLanguage,
+                  context.DestinationLanguage,
+                  Tk( context.UntranslatedText ),
+                  WWW.EscapeURL( context.UntranslatedText ) ) );
+         }
 
          request.Cookies = _cookieContainer;
          AddHeaders( request, true );
@@ -99,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      public override void InspectTranslationResponse( XUnityWebResponse response )
+      public override void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
       {
          CookieCollection cookies = response.NewCookies;
          foreach( Cookie cookie in cookies )
@@ -112,14 +133,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _cookieContainer.Add( cookies );
       }
 
-      public override IEnumerator OnBeforeTranslate()
+      public override IEnumerator OnBeforeTranslate( HttpTranslationContext context )
       {
          if( !_hasSetup || AutoTranslationState.TranslationCount % 100 == 0 )
          {
             _hasSetup = true;
 
             // Setup TKK and cookies
-            var enumerator = SetupTKK();
+            var enumerator = SetupTKK( context );
             while( enumerator.MoveNext() )
             {
                yield return enumerator.Current;
@@ -127,7 +148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
       }
 
-      public IEnumerator SetupTKK()
+      public IEnumerator SetupTKK( HttpTranslationContext context )
       {
          XUnityWebResponse response = null;
 
@@ -157,7 +178,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             }
          }
 
-         InspectTranslationResponse( response );
+         InspectTranslationResponse( context, response );
 
          // failure
          if( response.Error != null )
@@ -274,33 +295,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return p.ToString( CultureInfo.InvariantCulture ) + "." + ( p ^ m ).ToString( CultureInfo.InvariantCulture );
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
+         var dataIndex = context.DestinationLanguage == "romaji" ? 3 : 0;
+
+         var data = context.ResultData;
+         var arr = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
+
+         foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
          {
-            var arr = JSON.Parse( result );
-            var lineBuilder = new StringBuilder( result.Length );
+            var token = entry.AsArray[ dataIndex ].ToString();
+            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
-            foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
-            {
-               var token = entry.AsArray[ 0 ].ToString();
-               token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-               lineBuilder.Append( token );
-            }
-
-            translated = lineBuilder.ToString();
-
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
+            lineBuilder.Append( token );
          }
-         catch
-         {
-            translated = null;
-            return false;
-         }
+
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
       }
    }
 }

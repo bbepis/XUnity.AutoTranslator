@@ -18,6 +18,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
    internal class GoogleTranslateLegitimateEndpoint : HttpEndpoint
    {
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
+      {
+         "af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","zh-CN","zh-TW","co","hr","cs","da","nl","en","eo","et","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu","is","ig","id","ga","it","ja","jw","kn","kk","km","ko","ku","ky","lo","la","lv","lt","lb","mk","mg","ms","ml","mt","mi","mr","mn","my","ne","no","ny","ps","fa","pl","pt","pa","ro","ru","sm","gd","sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tl","tg","ta","te","th","tr","uk","ur","uz","vi","cy","xh","yi","yo","zu"
+      };
+
       private static readonly string HttpsServicePointTemplateUrl = "https://translation.googleapis.com/language/translate/v2?key={0}";
 
       private string _key;
@@ -33,15 +38,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
          // Configure service points / service point manager
          context.HttpSecurity.EnableSslFor( "translation.googleapis.com" );
+
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( string untranslatedText, string from, string to )
+      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
       {
          var b = new StringBuilder();
          b.Append( "{" );
-         b.Append( "\"q\":\"" ).Append( untranslatedText.EscapeJson() ).Append( "\"," );
-         b.Append( "\"target\":\"" ).Append( to ).Append( "\"," );
-         b.Append( "\"source\":\"" ).Append( from ).Append( "\"," );
+         b.Append( "\"q\":\"" ).Append( context.UntranslatedText.EscapeJson() ).Append( "\"," );
+         b.Append( "\"target\":\"" ).Append( context.DestinationLanguage ).Append( "\"," );
+         b.Append( "\"source\":\"" ).Append( context.SourceLanguage ).Append( "\"," );
          b.Append( "\"format\":\"text\"" );
          b.Append( "}" );
          var data = b.ToString();
@@ -54,33 +61,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          return request;
       }
 
-      public override bool TryExtractTranslated( string result, out string translated )
+      public override void ExtractTranslatedText( HttpTranslationContext context )
       {
-         try
+         var obj = JSON.Parse( context.ResultData );
+         var lineBuilder = new StringBuilder( context.ResultData.Length );
+
+         foreach( JSONNode entry in obj.AsObject[ "data" ].AsObject[ "translations" ].AsArray )
          {
-            var obj = JSON.Parse( result );
-            var lineBuilder = new StringBuilder( result.Length );
+            var token = entry.AsObject[ "translatedText" ].ToString();
+            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
 
-            foreach( JSONNode entry in obj.AsObject[ "data" ].AsObject[ "translations" ].AsArray )
-            {
-               var token = entry.AsObject[ "translatedText" ].ToString();
-               token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 
-               if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-               lineBuilder.Append( token );
-            }
-
-            translated = lineBuilder.ToString();
-
-            var success = !string.IsNullOrEmpty( translated );
-            return success;
+            lineBuilder.Append( token );
          }
-         catch
-         {
-            translated = null;
-            return false;
-         }
+
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
       }
    }
 }
