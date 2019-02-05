@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 {
-   public class WwwTranslationContext
+   internal class WwwTranslationContext : IWwwTranslationContext, IWwwRequestCreationContext, IWwwTranslationExtractionContext
    {
-      private readonly TranslationContext _context;
+      private readonly ITranslationContext _context;
 
-      internal WwwTranslationContext( TranslationContext context )
+      internal WwwTranslationContext( ITranslationContext context )
       {
          _context = context;
       }
@@ -17,30 +16,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       public string UntranslatedText => _context.UntranslatedText;
       public string SourceLanguage => _context.SourceLanguage;
       public string DestinationLanguage => _context.DestinationLanguage;
-      public string ResultData { get; internal set; }
 
-      internal string ServiceUrl { get; private set; }
-      internal string Data { get; private set; }
-      internal Dictionary<string, string> Headers { get; private set; }
+      public string ResponseData { get; internal set; }
+      internal WwwRequestInfo RequestInfo { get; private set; }
 
-      public void SetServiceUrl( string serviceUrl )
+      void IWwwRequestCreationContext.Complete( WwwRequestInfo requestInfo )
       {
-         if( string.IsNullOrEmpty( serviceUrl ) ) throw new ArgumentNullException( nameof( serviceUrl ), "Received empty service url from translator." );
-
-         ServiceUrl = serviceUrl;
+         RequestInfo = requestInfo;
       }
 
-      public void SetRequestObject( string data )
-      {
-         Data = data;
-      }
-
-      public void SetHeaders( Dictionary<string, string> headers )
-      {
-         Headers = headers;
-      }
-
-      public void Complete( string translatedText )
+      void IWwwTranslationExtractionContext.Complete( string translatedText )
       {
          _context.Complete( translatedText );
       }

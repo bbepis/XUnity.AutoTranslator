@@ -19,17 +19,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public abstract string FriendlyName { get; }
 
-      public abstract void Initialize( InitializationContext context );
-
-      public abstract void CreateTranslationRequest( WwwTranslationContext context );
-
-      public abstract void ExtractTranslatedText( WwwTranslationContext context );
-
-      public virtual IEnumerator OnBeforeTranslate( WwwTranslationContext context ) => null;
-
       public int MaxConcurrency => 1;
 
-      public IEnumerator Translate( TranslationContext context )
+      public abstract void Initialize( IInitializationContext context );
+
+      public abstract void OnCreateRequest( IWwwRequestCreationContext context );
+
+      public abstract void OnExtractTranslation( IWwwTranslationExtractionContext context );
+
+      public virtual IEnumerator OnBeforeTranslate( IWwwTranslationContext context ) => null;
+
+      public IEnumerator Translate( ITranslationContext context )
       {
          var wwwContext = new WwwTranslationContext( context );
 
@@ -47,13 +47,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          try
          {
             // prepare request
-            CreateTranslationRequest( wwwContext );
-            var url = wwwContext.ServiceUrl;
-            var data = wwwContext.Data;
-            var headers = wwwContext.Headers ?? new Dictionary<string, string>();
+            OnCreateRequest( wwwContext );
+            if( wwwContext.RequestInfo == null )
+            {
+               wwwContext.Fail( "No request object was provided by the translator.", null );
+               yield break;
+            }
+
+            var request = wwwContext.RequestInfo;
+            var url = request.Address;
+            var data = request.Data;
+            var headers = request.Headers;
 
             // execute request
-            www = WwwConstructor.Invoke( new object[] { url, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
+            www = WwwConstructor.Invoke( new object[] { request.Address, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
          }
          catch( Exception e )
          {
@@ -97,7 +104,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
                yield break;
             }
 
-            ExtractTranslatedText( wwwContext );
+            wwwContext.ResponseData = text;
+
+            OnExtractTranslation( wwwContext );
          }
          catch( Exception e )
          {

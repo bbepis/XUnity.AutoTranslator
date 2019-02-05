@@ -25,11 +25,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
       public abstract string FriendlyName { get; }
 
-      public abstract void Initialize( InitializationContext context );
+      public abstract void Initialize( IInitializationContext context );
 
       public int MaxConcurrency => 1;
 
-      public IEnumerator Translate( TranslationContext context )
+      public IEnumerator Translate( ITranslationContext context )
       {
          var result = new StreamReaderResult();
          try
@@ -114,8 +114,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          finally
          {
             result = null;
-
-            context.FailIfNotCompleted();
          }
       }
 

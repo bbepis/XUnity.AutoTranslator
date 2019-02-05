@@ -41,18 +41,18 @@ namespace BingTranslateLegitimate
 
       public override string FriendlyName => "Bing Translator (Authenticated)";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         _key = context.Config.Preferences[ "BingLegitimate" ][ "OcpApimSubscriptionKey" ].GetOrDefault( "" );
+         _key = context.GetOrCreateSetting( "BingLegitimate", "OcpApimSubscriptionKey", "" );
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         context.HttpSecurity.EnableSslFor( "api.cognitive.microsofttranslator.com" );
+         context.EnableSslFor( "api.cognitive.microsofttranslator.com" );
 
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          var request = new XUnityWebRequest(
             "POST",
@@ -69,12 +69,12 @@ namespace BingTranslateLegitimate
          }
          request.Headers[ "Ocp-Apim-Subscription-Key" ] = _key;
 
-         return request;
+         context.Complete( request );
       }
 
-      public override void ExtractTranslatedText( HttpTranslationContext context )
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         var arr = JSON.Parse( context.ResultData );
+         var arr = JSON.Parse( context.Response.Data );
 
          var token = arr.AsArray[ 0 ]?.AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
          token = token.Substring( 1, token.Length - 2 ).UnescapeJson();

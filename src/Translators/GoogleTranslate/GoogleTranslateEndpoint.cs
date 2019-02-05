@@ -56,14 +56,29 @@ namespace GoogleTranslate
 
       public override string FriendlyName => "Google! Translate";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         context.HttpSecurity.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
+         context.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
 
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
+      {
+         if( !_hasSetup || AutoTranslatorState.TranslationCount % 100 == 0 )
+         {
+            _hasSetup = true;
+
+            // Setup TKK and cookies
+            var enumerator = SetupTKK();
+            while( enumerator.MoveNext() )
+            {
+               yield return enumerator.Current;
+            }
+         }
+      }
+
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          XUnityWebRequest request;
          if( context.DestinationLanguage == "romaji" )
@@ -89,7 +104,35 @@ namespace GoogleTranslate
          request.Cookies = _cookieContainer;
          AddHeaders( request, true );
 
-         return request;
+         context.Complete( request );
+      }
+
+      public override void OnInspectResponse( IHttpResponseInspectionContext context )
+      {
+         InspectResponse( context.Response );
+      }
+
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
+      {
+         var dataIndex = context.DestinationLanguage == "romaji" ? 3 : 0;
+
+         var data = context.Response.Data;
+         var arr = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
+
+         foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
+         {
+            var token = entry.AsArray[ dataIndex ].ToString();
+            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+
+            lineBuilder.Append( token );
+         }
+
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
       }
 
       private XUnityWebRequest CreateWebSiteRequest()
@@ -104,7 +147,7 @@ namespace GoogleTranslate
 
       private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
       {
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? DefaultUserAgent : AutoTranslationState.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? DefaultUserAgent : AutoTranslatorSettings.UserAgent;
          if( AcceptLanguage != null )
          {
             request.Headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;
@@ -123,7 +166,7 @@ namespace GoogleTranslate
          }
       }
 
-      public override void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
+      private void InspectResponse( XUnityWebResponse response )
       {
          CookieCollection cookies = response.NewCookies;
          foreach( Cookie cookie in cookies )
@@ -136,22 +179,7 @@ namespace GoogleTranslate
          _cookieContainer.Add( cookies );
       }
 
-      public override IEnumerator OnBeforeTranslate( HttpTranslationContext context )
-      {
-         if( !_hasSetup || AutoTranslationState.TranslationCount % 100 == 0 )
-         {
-            _hasSetup = true;
-
-            // Setup TKK and cookies
-            var enumerator = SetupTKK( context );
-            while( enumerator.MoveNext() )
-            {
-               yield return enumerator.Current;
-            }
-         }
-      }
-
-      public IEnumerator SetupTKK( HttpTranslationContext context )
+      public IEnumerator SetupTKK()
       {
          XUnityWebResponse response = null;
 
@@ -181,7 +209,7 @@ namespace GoogleTranslate
             }
          }
 
-         InspectTranslationResponse( context, response );
+         InspectResponse( response );
 
          // failure
          if( response.Error != null )
@@ -191,7 +219,7 @@ namespace GoogleTranslate
          }
 
          // failure
-         if( response.Result == null )
+         if( response.Data == null )
          {
             XuaLogger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
@@ -199,7 +227,7 @@ namespace GoogleTranslate
 
          try
          {
-            var html = response.Result;
+            var html = response.Data;
 
             bool found = false;
             string[] lookups = new[] { "tkk:'", "TKK='" };
@@ -296,29 +324,6 @@ namespace GoogleTranslate
          p %= (long)1e6;
 
          return p.ToString( CultureInfo.InvariantCulture ) + "." + ( p ^ m ).ToString( CultureInfo.InvariantCulture );
-      }
-
-      public override void ExtractTranslatedText( HttpTranslationContext context )
-      {
-         var dataIndex = context.DestinationLanguage == "romaji" ? 3 : 0;
-
-         var data = context.ResultData;
-         var arr = JSON.Parse( data );
-         var lineBuilder = new StringBuilder( data.Length );
-
-         foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
-         {
-            var token = entry.AsArray[ dataIndex ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
-
-            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-            lineBuilder.Append( token );
-         }
-
-         var translated = lineBuilder.ToString();
-
-         context.Complete( translated );
       }
    }
 }

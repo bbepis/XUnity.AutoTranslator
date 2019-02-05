@@ -15,12 +15,12 @@ namespace ReverseTranslator
 
       public int MaxConcurrency => 50;
 
-      public void Initialize( InitializationContext context )
+      public void Initialize( IInitializationContext context )
       {
 
       }
 
-      public IEnumerator Translate( TranslationContext context )
+      public IEnumerator Translate( ITranslationContext context )
       {
          var reversedText = new string( context.UntranslatedText.Reverse().ToArray() );
          context.Complete( reversedText );

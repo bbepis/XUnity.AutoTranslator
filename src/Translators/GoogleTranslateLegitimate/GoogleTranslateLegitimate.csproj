@@ -9,9 +9,6 @@
    </ItemGroup>
 
    <ItemGroup>
-      <Reference Include="ExIni">
-         <HintPath>..\..\..\libs\ExIni.dll</HintPath>
-      </Reference>
       <Reference Include="UnityEngine">
          <HintPath>..\..\..\libs\UnityEngine.dll</HintPath>
       </Reference>

@@ -15,24 +15,23 @@ namespace LecPowerTranslator15
 
       public override string FriendlyName => "LEC Power Translator 15";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         var pathToLec = context.Config.Preferences[ "LecPowerTranslator15" ][ "InstallationPath" ].GetOrDefault( "" );
+         var pathToLec = context.GetOrCreateSetting( "LecPowerTranslator15", "InstallationPath", "" );
          if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
 
-         var path1 = context.Config.DataPath;
-         var exePath1 = Path.Combine( path1, @"Translators\Lec.ExtProtocol.exe" );
-         var file1Exists = File.Exists( exePath1 );
-         if( !file1Exists )
+         var exePath = Path.Combine( context.PluginDirectory, @"Translators\Lec.ExtProtocol.exe" );
+         var fileExists = File.Exists( exePath );
+         if( !fileExists )
          {
-            throw new Exception( $"Could not find any executable at '{exePath1}'" );
+            throw new Exception( $"Could not find any executable at '{exePath}'" );
          }
 
          _arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( pathToLec ) );
 
-         if( file1Exists )
+         if( fileExists )
          {
-            _exePath = exePath1;
+            _exePath = exePath;
          }
          else
          {

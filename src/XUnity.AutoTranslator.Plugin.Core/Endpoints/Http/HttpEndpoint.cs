@@ -13,19 +13,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public int MaxConcurrency => 1;
 
-      public abstract void Initialize( InitializationContext context );
+      public abstract void Initialize( IInitializationContext context );
 
-      public abstract void ExtractTranslatedText( HttpTranslationContext context );
+      public abstract void OnExtractTranslation( IHttpTranslationExtractionContext context );
 
-      public abstract XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context );
+      public abstract void OnCreateRequest( IHttpRequestCreationContext context );
 
-      public virtual void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
-      {
-      }
+      public virtual void OnInspectResponse( IHttpResponseInspectionContext context ) { }
 
-      public virtual IEnumerator OnBeforeTranslate( HttpTranslationContext context ) => null;
+      public virtual IEnumerator OnBeforeTranslate( IHttpTranslationContext context ) => null;
 
-      public IEnumerator Translate( TranslationContext context )
+      public IEnumerator Translate( ITranslationContext context )
       {
          var httpContext = new HttpTranslationContext( context );
 
@@ -43,9 +41,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          try
          {
             // prepare request
+            OnCreateRequest( httpContext );
+            if( httpContext.Request == null )
+            {
+               httpContext.Fail( "No request object was provided by the translator.", null );
+               yield break;
+            }
+
             var client = new XUnityWebClient();
-            var request = CreateTranslationRequest( httpContext );
-            response = client.Send( request );
+            response = client.Send( httpContext.Request );
          }
          catch( Exception e )
          {
@@ -66,7 +70,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             }
          }
 
-         InspectTranslationResponse( httpContext, response );
+         httpContext.Response = response;
+         OnInspectResponse( httpContext );
 
          // failure
          if( response.Error != null )
@@ -76,18 +81,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          }
 
          // failure
-         if( response.Result == null )
+         if( response.Data == null )
          {
             httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned.", null );
             yield break;
          }
 
-         httpContext.ResultData = response.Result;
-
          try
          {
             // attempt to extract translation from data
-            ExtractTranslatedText( httpContext );
+            OnExtractTranslation( httpContext );
          }
          catch( Exception e )
          {

@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
       {
          get
          {
-            return ( _file ?? ( _file = ReloadConfig() ) ); ;
+            return ( _file ?? ( _file = ReloadConfig() ) );
          }
       }
 

@@ -33,18 +33,18 @@ namespace GoogleTranslateLegitimate
 
       public override string FriendlyName => "Google! Translate (Authenticated)";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         _key = context.Config.Preferences[ "GoogleLegitimate" ][ "GoogleAPIKey" ].GetOrDefault( "" );
+         _key = context.GetOrCreateSetting( "GoogleLegitimate", "GoogleAPIKey", "" );
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         context.HttpSecurity.EnableSslFor( "translation.googleapis.com" );
+         context.EnableSslFor( "translation.googleapis.com" );
 
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          var b = new StringBuilder();
          b.Append( "{" );
@@ -60,13 +60,14 @@ namespace GoogleTranslateLegitimate
             string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( _key ) ),
             data );
 
-         return request;
+         context.Complete( request );
       }
 
-      public override void ExtractTranslatedText( HttpTranslationContext context )
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         var obj = JSON.Parse( context.ResultData );
-         var lineBuilder = new StringBuilder( context.ResultData.Length );
+         var data = context.Response.Data;
+         var obj = JSON.Parse( data );
+         var lineBuilder = new StringBuilder( data.Length );
 
          foreach( JSONNode entry in obj.AsObject[ "data" ].AsObject[ "translations" ].AsArray )
          {

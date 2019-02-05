@@ -2,7 +2,7 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
-   public class TranslationContext
+   internal class TranslationContext : ITranslationContext
    {
       private Action<string> _complete;
       private Action<string, Exception> _fail;
@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       public string SourceLanguage { get; }
       public string DestinationLanguage { get; }
 
-      internal bool Completed { get; set; }
+      internal bool IsDone { get; private set; }
 
       public void Complete( string translatedText )
       {
@@ -43,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          }
          finally
          {
-            Completed = true;
+            IsDone = true;
          }
       }
 
@@ -55,15 +55,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          }
          finally
          {
-            Completed = true;
+            IsDone = true;
          }
       }
 
       internal void FailIfNotCompleted()
       {
-         if( !Completed )
+         if( !IsDone )
          {
-            Fail( "The translation request was not completed before returning from translator!", null );
+            Fail( "The translation request was not completed before returning from translator.", null );
          }
       }
    }

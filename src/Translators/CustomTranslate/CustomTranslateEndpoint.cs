@@ -26,18 +26,18 @@ namespace CustomTranslate
 
       public override string FriendlyName => _friendlyName;
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         _endpoint = context.Config.Preferences[ "Custom" ][ "Url" ].GetOrDefault( "" );
+         _endpoint = context.GetOrCreateSetting( "Custom", "Url", "" );
          if( string.IsNullOrEmpty( _endpoint ) ) throw new ArgumentException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
-         context.HttpSecurity.EnableSslFor( uri.Host );
+         context.EnableSslFor( uri.Host );
 
          _friendlyName += " (" + uri.Host + ")";
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          var request = new XUnityWebRequest(
             string.Format(
@@ -47,12 +47,12 @@ namespace CustomTranslate
                context.DestinationLanguage,
                WWW.EscapeURL( context.UntranslatedText ) ) );
 
-         return request;
+         context.Complete( request );
       }
 
-      public override void ExtractTranslatedText( HttpTranslationContext context )
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         context.Complete( context.ResultData );
+         context.Complete( context.Response.Data );
       }
    }
 }

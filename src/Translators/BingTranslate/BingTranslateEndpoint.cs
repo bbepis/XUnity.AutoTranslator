@@ -63,15 +63,31 @@ namespace BingTranslate
 
       public override string FriendlyName => "Bing Translator";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
          // Configure service points / service point manager
-         context.HttpSecurity.EnableSslFor( "www.bing.com" );
+         context.EnableSslFor( "www.bing.com" );
 
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
+      {
+         if( !_hasSetup || AutoTranslatorState.TranslationCount % _resetAfter == 0 )
+         {
+            _resetAfter = RandomNumbers.Next( 75, 125 );
+            _hasSetup = true;
+
+            // Setup TKK and cookies
+            var enumerator = SetupIGAndIID();
+            while( enumerator.MoveNext() )
+            {
+               yield return enumerator.Current;
+            }
+         }
+      }
+
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          _translationCount++;
          string address = null;
@@ -96,7 +112,30 @@ namespace BingTranslate
          request.Cookies = _cookieContainer;
          AddHeaders( request, true );
 
-         return request;
+         context.Complete( request );
+      }
+
+      public override void OnInspectResponse( IHttpResponseInspectionContext context )
+      {
+         InspectResponse( context.Response );
+      }
+
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
+      {
+         var obj = JSON.Parse( context.Response.Data );
+
+         var code = obj[ "statusCode" ].AsInt;
+         if( code != 200 )
+         {
+            return;
+         }
+
+         var token = obj[ "translationResponse" ].ToString();
+         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+
+         var translated = token;
+
+         context.Complete( translated );
       }
 
       private XUnityWebRequest CreateWebSiteRequest()
@@ -111,7 +150,7 @@ namespace BingTranslate
 
       private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
       {
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? DefaultUserAgent : AutoTranslationState.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? DefaultUserAgent : AutoTranslatorSettings.UserAgent;
 
          if( AcceptLanguage != null )
          {
@@ -139,7 +178,7 @@ namespace BingTranslate
          }
       }
 
-      public override void InspectTranslationResponse( HttpTranslationContext context, XUnityWebResponse response )
+      private void InspectResponse( XUnityWebResponse response )
       {
          CookieCollection cookies = response.NewCookies;
 
@@ -147,23 +186,7 @@ namespace BingTranslate
          _cookieContainer.Add( cookies );
       }
 
-      public override IEnumerator OnBeforeTranslate( HttpTranslationContext context )
-      {
-         if( !_hasSetup || AutoTranslationState.TranslationCount % _resetAfter == 0 )
-         {
-            _resetAfter = RandomNumbers.Next( 75, 125 );
-            _hasSetup = true;
-
-            // Setup TKK and cookies
-            var enumerator = SetupIGAndIID( context );
-            while( enumerator.MoveNext() )
-            {
-               yield return enumerator.Current;
-            }
-         }
-      }
-
-      public IEnumerator SetupIGAndIID( HttpTranslationContext context )
+      public IEnumerator SetupIGAndIID()
       {
          XUnityWebResponse response = null;
 
@@ -194,7 +217,7 @@ namespace BingTranslate
             }
          }
 
-         InspectTranslationResponse( context, response );
+         InspectResponse( response );
 
          // failure
          if( response.Error != null )
@@ -204,7 +227,7 @@ namespace BingTranslate
          }
 
          // failure
-         if( response.Result == null )
+         if( response.Data == null )
          {
             XuaLogger.Current.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
@@ -212,7 +235,7 @@ namespace BingTranslate
 
          try
          {
-            var html = response.Result;
+            var html = response.Data;
 
             _ig = Lookup( "ig\":\"", html );
             _iid = Lookup( ".init(\"/feedback/submission?\",\"", html );
@@ -244,24 +267,6 @@ namespace BingTranslate
             }
          }
          return null;
-      }
-
-      public override void ExtractTranslatedText( HttpTranslationContext context )
-      {
-         var obj = JSON.Parse( context.ResultData );
-
-         var code = obj[ "statusCode" ].AsInt;
-         if( code != 200 )
-         {
-            return;
-         }
-
-         var token = obj[ "translationResponse" ].ToString();
-         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
-
-         var translated = token;
-
-         context.Complete( translated );
       }
    }
 }

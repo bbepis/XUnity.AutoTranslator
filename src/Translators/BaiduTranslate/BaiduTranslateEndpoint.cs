@@ -29,17 +29,17 @@ namespace BaiduTranslate
 
       public override string FriendlyName => "Baidu Translator";
 
-      public override void Initialize( InitializationContext context )
+      public override void Initialize( IInitializationContext context )
       {
-         _appId = context.Config.Preferences[ "Baidu" ][ "BaiduAppId" ].GetOrDefault( "" );
-         _appSecret = context.Config.Preferences[ "Baidu" ][ "BaiduAppSecret" ].GetOrDefault( "" );
+         _appId = context.GetOrCreateSetting( "Baidu", "BaiduAppId", "" );
+         _appSecret = context.GetOrCreateSetting( "Baidu", "BaiduAppSecret", "" );
          if( string.IsNullOrEmpty( _appId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
          if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
-         context.HttpSecurity.EnableSslFor( "api.fanyi.baidu.com" );
+         context.EnableSslFor( "api.fanyi.baidu.com" );
       }
 
-      public override XUnityWebRequest CreateTranslationRequest( HttpTranslationContext context )
+      public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          string salt = DateTime.UtcNow.Millisecond.ToString();
          var md5 = CreateMD5( _appId + context.UntranslatedText + salt + _appSecret );
@@ -54,20 +54,20 @@ namespace BaiduTranslate
                salt,
                md5 ) );
 
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslationState.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" : AutoTranslationState.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" : AutoTranslatorSettings.UserAgent;
          request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
 
-         return request;
+         context.Complete( request );
       }
 
-      public override void ExtractTranslatedText( HttpTranslationContext context )
+      public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         if( context.ResultData.StartsWith( "{\"error" ) )
+         var data = context.Response.Data;
+         if( data.StartsWith( "{\"error" ) )
          {
             return;
          }
-
-         var data = context.ResultData;
+         
          var obj = JSON.Parse( data );
          var lineBuilder = new StringBuilder( data.Length );
 
