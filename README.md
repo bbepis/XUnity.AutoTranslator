@@ -442,13 +442,50 @@ This approach requires version 2.15.0 or later!
 ## Implementing a Translator
 Since version 3.0.0, you can now also implement your own translators.
 
+In order to do so, all you have to do is implement the following interface, build the assembly and place the generated DLL in the `Translators` folder.
+
+```C#
+public interface ITranslateEndpoint
+{
+   /// <summary>
+   /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
+   /// </summary>
+   string Id { get; }
+
+   /// <summary>
+   /// Gets a friendly name that can be displayed to the user representing the plugin.
+   /// </summary>
+   string FriendlyName { get; }
+
+   /// <summary>
+   /// Gets the maximum concurrency for the endpoint. This specifies how many times "Translate"
+   /// can be called before it returns.
+   /// </summary>
+   int MaxConcurrency { get; }
+
+   /// <summary>
+   /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
+   /// </summary>
+   void Initialize( IInitializationContext context );
+
+   /// <summary>
+   /// Attempt to translated the provided untranslated text. Will be used in a "coroutine",
+   /// so it can be implemented in an asynchronous fashion.
+   /// </summary>
+   IEnumerator Translate( ITranslationContext context );
+}
+```
+
+Often an implementation of this interface will access an external web service. If this is the case, you do not need to implement the entire interface yourself. Instead you can rely on a base class in the `XUnity.AutoTranslator.Plugin.Core` assembly. But more on this later.
+
 ### Important Notes on Implementing a Translator based on an Online Service
 Whenever you implement a translator based on an online service, it is important to not use it in an abusive way. For example by:
  * Establishing a large number of connections to it
  * Performing web scraping instead of using an available API
+ * *This is especially important if the service is not authenticated*
 
 With that in mind, consider the following:
- * The `WWW` class in Unity establishes a new TCP connection on each request you make, making it extremely poor at this kind of job. Especially if SSL (https) is involved because it has to do the entire handshake procedure each time.
+ * The `WWW` class in Unity establishes a new TCP connection on each request you make, making it extremely poor at this kind of job. Especially if SSL (https) is involved because it has to do the entire handshake procedure each time. Yuck.
  * The `UnityWebRequest` class in Unity does not exist in most games, because they use an old engine, so it is not a good choice either.
  * The `WebClient` class from .NET is capable of using persistent connections (it does so by default), but has its own problems with SSL. The version of Mono used in most Unity games rejects all certificates by default making all HTTPS connections fail. This, however, can be remedied during the initialization phase of the translator (see examples below). Another shortcoming of this API is the fact that the runtime will never release the TCP connections it has used until the process ends. The API also integrates terribly with Unity because callbacks return on a background thread.
  * The `WebRequest` class from .NET is essentially the same as WebClient.
@@ -456,7 +493,7 @@ With that in mind, consider the following:
 
 None of these are therefore an ideal solution.
 
-To remedy this, I have made a class `XUnityWebClient`, which is based on Mono's version of WebClient. However, it adds the following features:
+To remedy this, the plugin implements a class `XUnityWebClient`, which is based on Mono's version of WebClient. However, it adds the following features:
  * Enables integration with Unity by returning result classes that can be 'yielded'.
  * Properly closes connections that has not been used for 50 seconds.
 
@@ -466,29 +503,32 @@ I recommend using this class, or in case that cannot be used, falling back to th
 Follow these steps:
  * Start a new project in Visual Studio 2017 or later. (Be a good boy and choose the "Class Library (.NET Standard)" template. After choosing that, edit the generated .csproj file and change the TargetFramework element to 'net35')
  * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll
- * Add a reference to UnityEngine.dll
- * Add a reference to ExIni.dll
+ * Add a reference to UnityEngine.dll (Consider using an old version of this assembly (if `Translators` exists in the Managed folder, it is not an old version!))
  * Create a new class that either:
    * Implements the `ITranslateEndpoint` interface
    * Inherits from the `HttpEndpoint` class
+   * Inherits from the `WwwEndpoint` class
+   * Inherits from the `ExtProtocolEndpoint` class
 
-Here's an example that simply reverses the text:
+Here's an example that simply reverses the text and also reads some configuration from the configuration file the plugin uses:
 
 ```C#
-public class ReverseTranslator : ITranslateEndpoint
+public class ReverseTranslatorEndpoint : ITranslateEndpoint
 {
-   public string Id => "Reverser";
+   private bool _myConfig;
+
+   public string Id => "ReverseTranslator";
 
    public string FriendlyName => "Reverser";
 
    public int MaxConcurrency => 50;
 
-   public void Initialize( InitializationContext context )
+   public void Initialize( IInitializationContext context )
    {
-
+      _myConfig = context.GetOrCreateSetting( "Reverser", "MyConfig", true );
    }
 
-   public IEnumerator Translate( TranslationContext context )
+   public IEnumerator Translate( ITranslationContext context )
    {
       var reversedText = new string( context.UntranslatedText.Reverse().ToArray() );
       context.Complete( reversedText );
@@ -498,12 +538,84 @@ public class ReverseTranslator : ITranslateEndpoint
 }
 ```
 
-Here's a more real example of one of the existing endpoints based on the HttpEndpoint:
+Arguably, this is not a particularly interesting example, but it illustrates the basic principles of what must be done in order to implement a Translator.
 
-...
+Let's take a look at a more advanced example that accesses the web:
 
-As you can see, the `XUnityWebClient` class is not even used. We simply return a request object that the `HttpEndpoint` will use internally to perform the request.
+```C#
+internal class YandexTranslateEndpoint : HttpEndpoint
+{
+   private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
 
-After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory (you may have to create it) of the plugin folder. That's it.
+   private string _key;
 
+   public override string Id => "YandexTranslate";
 
+   public override string FriendlyName => "Yandex Translate";
+
+   public override void Initialize( IInitializationContext context )
+   {
+      _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
+      context.EnableSslFor( "translate.yandex.net" );
+
+      // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
+      if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
+      if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+      if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+   }
+
+   public override void OnCreateRequest( IHttpRequestCreationContext context )
+   {
+      var request = new XUnityWebRequest(
+         string.Format(
+            HttpsServicePointTemplateUrl,
+            context.SourceLanguage,
+            context.DestinationLanguage,
+            WWW.EscapeURL( context.UntranslatedText ),
+            _key ) );
+
+      request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" : AutoTranslatorSettings.UserAgent;
+      request.Headers[ HttpRequestHeader.Accept ] = "*/*";
+      request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
+
+      context.Complete( request );
+   }
+
+   public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
+   {
+      var data = context.Response.Data;
+      var obj = JSON.Parse( data );
+      var lineBuilder = new StringBuilder( data.Length );
+
+      var code = obj.AsObject[ "code" ].ToString();
+
+      if( code == "200" )
+      {
+         var token = obj.AsObject[ "text" ].ToString();
+         token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
+
+         if( string.IsNullOrEmpty( token ) ) return; 
+
+         if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+         lineBuilder.Append( token );
+
+         var translated = lineBuilder.ToString();
+
+         context.Complete( translated );
+      }
+   }
+}
+```
+
+This plugin extends from `HttpEndpoint`. Let's look at the three methods it overrides:
+ * `Initialize` is used to read the API key the user has configured. In addition it calls `context.EnableSslFor( "translate.yandex.net" )` in order to disable the certificate check for this specific hostname. If this is neglected, SSL will fail in most versions of Unity. Finally, it throws an exception if the plugin cannot be used with the specified configuration.
+ * `OnCreateRequest` is used to construct the `XUnityWebRequest` object that will be sent to the external endpoint. The call to `context.Complete( request )` specifies the request to use.
+ * `OnExtractTranslation` is used to extract the text from the response returned from the web server.
+
+As you can see, the `XUnityWebClient` class is not even used. We simply specify a request object that the `HttpEndpoint` will use internally to perform the request.
+
+After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory of the plugin folder. That's it.
+
+As mentioned earlier, you  can also use the abstract class `WwwEndpoint` to implement roughly the same thing. However, I do not recommend doing so, unless it is an authenticated service.
+
+Another way to implement a translator is to implement the `ExtProtocolEndpoint` class. This can be used to delegate the actual translation logic to an external process. Currently there is no documentation on this, but you can take a look at the LEC implementation, which uses it.

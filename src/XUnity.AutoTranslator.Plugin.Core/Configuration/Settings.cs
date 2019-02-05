@@ -93,6 +93,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
 
+      public static void SetEndpoint( string id )
+      {
+         ServiceEndpoint = id;
+         Config.Current.Preferences[ "Service" ][ "Endpoint" ].Value = id;
+         Config.Current.SaveConfig();
+      }
+
       public static void Configure()
       {
          try

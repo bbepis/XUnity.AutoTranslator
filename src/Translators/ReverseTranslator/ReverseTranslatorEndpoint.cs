@@ -9,7 +9,9 @@ namespace ReverseTranslator
 {
    public class ReverseTranslatorEndpoint : ITranslateEndpoint
    {
-      public string Id => "Reverser";
+      private bool _myConfig;
+
+      public string Id => "ReverseTranslator";
 
       public string FriendlyName => "Reverser";
 
@@ -17,7 +19,7 @@ namespace ReverseTranslator
 
       public void Initialize( IInitializationContext context )
       {
-
+         _myConfig = context.GetOrCreateSetting( "Reverser", "MyConfig", true );
       }
 
       public IEnumerator Translate( ITranslationContext context )

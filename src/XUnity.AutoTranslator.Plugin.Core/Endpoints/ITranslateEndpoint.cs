@@ -10,7 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
    public interface ITranslateEndpoint
    {
       /// <summary>
-      /// Gets the id of the IKnownEndpoint that is used as a configuration parameter.
+      /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
       /// </summary>
       string Id { get; }
 
@@ -31,8 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       void Initialize( IInitializationContext context );
 
       /// <summary>
-      /// Attempt to translated the provided untranslated text. Will be used in a "coroutine", so it can be implemented
-      /// in an async fashion.
+      /// Attempt to translated the provided untranslated text. Will be used in a "coroutine",
+      /// so it can be implemented in an asynchronous fashion.
       /// </summary>
       IEnumerator Translate( ITranslationContext context );
    }

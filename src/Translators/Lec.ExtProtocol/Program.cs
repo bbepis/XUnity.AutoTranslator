@@ -26,12 +26,14 @@ namespace Lec.ExtProtocol
 
             using( var translator = new LecTranslationLibrary( dllPath ) )
             {
-               while( true )
+               using( var stdout = Console.OpenStandardOutput() )
+               using( var writer = new StreamWriter( stdout ) )
+               using( var stdin = Console.OpenStandardInput() )
+               using( var reader = new StreamReader( stdin ) )
                {
-                  using( var stdout = Console.OpenStandardOutput() )
-                  using( var writer = new StreamWriter( stdout ) )
-                  using( var stdin = Console.OpenStandardInput() )
-                  using( var reader = new StreamReader( stdin ) )
+                  writer.AutoFlush = true;
+
+                  while( true )
                   {
                      var receivedPayload = reader.ReadLine();
                      if( string.IsNullOrEmpty( receivedPayload ) ) return;

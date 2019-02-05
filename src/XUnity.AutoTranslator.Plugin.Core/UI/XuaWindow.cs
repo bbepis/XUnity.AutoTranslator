@@ -57,10 +57,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             IsShown = false;
          }
 
+
+         var halfSpacing = GUIUtil.ComponentSpacing / 2;
+
+         // GROUP
+         var groupHeight = ( GUIUtil.RowHeight * _toggles.Count ) + ( GUIUtil.ComponentSpacing * ( _toggles.Count ) ) - halfSpacing;
+         GUI.Box( GUIUtil.R( halfSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+
          foreach( var vm in _toggles )
          {
             var previousValue = vm.IsToggled();
-            var newValue = GUI.Toggle( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight ), previousValue, vm.Text );
+            var newValue = GUI.Toggle( GUIUtil.R( col1x, posy + 3, col12, GUIUtil.RowHeight - 3 ), previousValue, vm.Text );
             if( previousValue != newValue )
             {
                vm.OnToggled();
@@ -68,13 +75,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
          }
 
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Command Panel ----", GUIUtil.LabelCenter );
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-
          const int buttonsPerRow = 3;
          const int buttonWidth = ( col12 - ( GUIUtil.ComponentSpacing * ( buttonsPerRow - 1 ) ) ) / buttonsPerRow;
          var rows = _commandButtons.Count / buttonsPerRow;
          if( _commandButtons.Count % 3 != 0 ) rows++;
+
+         // GROUP
+         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * rows ) + ( GUIUtil.ComponentSpacing * ( rows + 1 ) ) - halfSpacing;
+         GUI.Box( GUIUtil.R( halfSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+
+         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Command Panel ----", GUIUtil.LabelCenter );
+         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
          for( int row = 0 ; row < rows ; row++ )
          {
             for( int col = 0 ; col < buttonsPerRow ; col++ )
@@ -96,7 +108,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
          }
 
-
+         // GROUP
+         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 1 ) + ( GUIUtil.ComponentSpacing * ( 2 ) ) - halfSpacing;
+         GUI.Box( GUIUtil.R( halfSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
          GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Select a Translator ----", GUIUtil.LabelCenter );
          posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
@@ -104,6 +118,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight ), "Translator: " );
          int endpointDropdownPosy = posy;
          posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+         // GROUP
+         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * _labels.Count ) + ( GUIUtil.ComponentSpacing * ( _labels.Count + 1 ) ) - halfSpacing;
+         GUI.Box( GUIUtil.R( halfSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
          GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Status ----", GUIUtil.LabelCenter );
          posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;

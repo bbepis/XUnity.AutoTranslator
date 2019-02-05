@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
       public abstract string FriendlyName { get; }
 
-      public int MaxConcurrency => 1;
+      public virtual int MaxConcurrency => 1;
 
       public abstract void Initialize( IInitializationContext context );
 

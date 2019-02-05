@@ -15,6 +15,8 @@ namespace LecPowerTranslator15
 
       public override string FriendlyName => "LEC Power Translator 15";
 
+      public override int MaxConcurrency => 15;
+
       public override void Initialize( IInitializationContext context )
       {
          var pathToLec = context.GetOrCreateSetting( "LecPowerTranslator15", "InstallationPath", "" );

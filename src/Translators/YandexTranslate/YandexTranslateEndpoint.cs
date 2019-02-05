@@ -26,17 +26,13 @@ namespace YandexTranslate
 
       public override string FriendlyName => "Yandex Translate";
 
-      public YandexTranslateEndpoint()
-      {
-      }
-
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
-         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
-
          context.EnableSslFor( "translate.yandex.net" );
-         
+
+         // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
+         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
          if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
          if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
       }
@@ -70,10 +66,8 @@ namespace YandexTranslate
          {
             var token = obj.AsObject[ "text" ].ToString();
             token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
-            if( string.IsNullOrEmpty( token ) )
-            {
-               return;
-            }
+
+            if( string.IsNullOrEmpty( token ) ) return; 
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
             lineBuilder.Append( token );

@@ -296,11 +296,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnEndpointSelected( ConfiguredEndpoint endpoint )
       {
-         _endpoint = endpoint;
-         if( Settings.IsShutdown && !Settings.IsShutdownFatal )
+         if( _endpoint != endpoint )
          {
-            RebootPlugin();
-            ManualHook();
+            _endpoint = endpoint;
+            if( Settings.IsShutdown && !Settings.IsShutdownFatal )
+            {
+               RebootPlugin();
+               ManualHook();
+            }
+
+            Settings.SetEndpoint( _endpoint.Endpoint.Id );
          }
       }
 
@@ -2268,7 +2273,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
          _batchLogicHasFailed = true;
-         
+
          foreach( var tracker in batch.Trackers )
          {
             tracker.Job.State = TranslationJobState.Failed;
