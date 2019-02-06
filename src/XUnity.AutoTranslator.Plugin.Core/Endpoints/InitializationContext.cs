@@ -42,12 +42,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public T GetOrCreateSetting<T>( string section, string key, T defaultValue )
       {
-         return Config.Current.Preferences[ section ][ key ].GetOrDefault<T>( defaultValue );
+         return Config.Current.Preferences.GetOrDefault( section, key, defaultValue );
       }
 
       public T GetOrCreateSetting<T>( string section, string key )
       {
-         return Config.Current.Preferences[ section ][ key ].GetOrDefault<T>( default( T ) );
+         return Config.Current.Preferences.GetOrDefault( section, key, default( T ) );
       }
    }
 }

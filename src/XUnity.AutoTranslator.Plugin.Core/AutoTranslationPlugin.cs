@@ -137,12 +137,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Initialize()
       {
+         // Setup 'singleton'
          Current = this;
+
+         // Setup logger, if it was not already initialized by a plugin-version
          if( XuaLogger.Current == null )
          {
             XuaLogger.Current = new ConsoleLogger();
          }
 
+         // Setup configuration
          try
          {
             Settings.Configure();
@@ -157,8 +161,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return;
          }
 
-         if( Settings.EnableConsole ) DebugConsole.Enable();
+         // Setup console, if enabled
+         if( Settings.EnableConsole )
+         {
+            DebugConsole.Enable();
+         }
 
+         // Setup hooks
          HooksSetup.InstallTextHooks();
          HooksSetup.InstallImageHooks();
          HooksSetup.InstallTextGetterCompatHooks();
@@ -253,31 +262,38 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
          LoadStaticTranslations();
 
-         _window = new XuaWindow(
-            new List<ToggleViewModel>
-            {
+         try
+         {
+            _window = new XuaWindow(
+               new List<ToggleViewModel>
+               {
                new ToggleViewModel(
                   " Translated",
                   "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
                   "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
                   ToggleTranslation, () => _isInTranslatedMode )
-            },
-            _configuredEndpoints.Select( x =>
-               new TranslatorDropdownOptionViewModel( () => x == _endpoint, x, OnEndpointSelected ) ).ToList(),
-            new List<ButtonViewModel>
-            {
+               },
+               _configuredEndpoints.Select( x =>
+                  new TranslatorDropdownOptionViewModel( () => x == _endpoint, x, OnEndpointSelected ) ).ToList(),
+               new List<ButtonViewModel>
+               {
                new ButtonViewModel( "Reboot", "<b>REBOOT PLUGIN</b>\nReboots the plugin if it has been shutdown. This only works if the plugin was shut down due to consequtive errors towards the translation endpoint.", RebootPlugin, () => Settings.IsShutdown && !Settings.IsShutdownFatal ),
                new ButtonViewModel( "Reload", "<b>RELOAD TRANSLATION</b>\nReloads all translation text files and texture files from disk.", ReloadTranslations, null ),
                new ButtonViewModel( "Hook", "<b>MANUAL HOOK</b>\nTraverses the unity object tree for looking for anything that can be translated. Performs a translation if something is found.", ManualHook, null )
-            },
-            new List<LabelViewModel>
-            {
+               },
+               new List<LabelViewModel>
+               {
                new LabelViewModel( "Version: ", () => PluginData.Version ),
                new LabelViewModel( "Status: ", () => Settings.IsShutdown ? "Shutdown" : "Running" ),
                new LabelViewModel( "Served translations: ", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
                new LabelViewModel( "Queued translations: ", () => $"{(_unstartedJobs.Count + _ongoingJobs.Count)} / {Settings.MaxUnstartedJobs}"  ),
                new LabelViewModel( "Error'ed translations: ", () => $"{_consecutiveErrors} / {Settings.MaxErrors}"  ),
-            } );
+               } );
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while setting up UI." );
+         }
 
          UnityTextParsers.Initialize( text => IsTranslatable( text ) && IsBelowMaxLength( text ) );
 
@@ -2012,7 +2028,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else if( isAltPressed && ( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) ) )
                {
-                  _window.IsShown = !_window.IsShown;
+                  if( _window != null )
+                  {
+                     _window.IsShown = !_window.IsShown;
+                  }
                }
             }
          }
@@ -2024,15 +2043,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       void OnGUI()
       {
-         try
+         if( _window != null )
          {
-            DisableAutoTranslator();
+            try
+            {
+               DisableAutoTranslator();
 
-            if( _window.IsShown ) _window.OnGUI();
-         }
-         finally
-         {
-            EnableAutoTranslator();
+               if( _window.IsShown ) _window.OnGUI();
+            }
+            catch( Exception e )
+            {
+               XuaLogger.Current.Error( e, "An error occurred in XUnity.AutoTranslator UI. Disabling the UI." );
+
+               _window = null;
+            }
+            finally
+            {
+               EnableAutoTranslator();
+            }
          }
       }
 
