@@ -18,6 +18,7 @@ namespace WatsonTranslate
 {
    internal class WatsonTranslateEndpoint : WwwEndpoint
    {
+      private static readonly HashSet<string> SupportedLanguagePairs = new HashSet<string> { "ar-en", "ca-es", "zh-en", "zh-TW-en", "cs-en", "da-en", "nl-en", "en-ar", "en-cs", "en-da", "en-de", "en-es", "en-fi", "en-fr", "en-hi", "en-it", "en-ja", "en-ko", "en-nb", "en-nl", "en-pl", "en-pt", "en-ru", "en-sv", "en-tr", "en-zh", "en-zh-TW", "fi-en", "fr-de", "fr-en", "fr-es", "de-en", "de-fr", "de-it", "hi-en", "hu-en", "it-de", "it-en", "ja-en", "ko-en", "nb-en", "pl-en", "pt-en", "ru-en", "es-ca", "es-en", "es-fr", "sv-en", "tr-en" };
       private static readonly string RequestTemplate = "{{\"text\":[\"{2}\"],\"model_id\":\"{0}-{1}\"}}";
 
       private string _fullUrl;
@@ -41,8 +42,8 @@ namespace WatsonTranslate
 
          _fullUrl = _url.TrimEnd( '/' ) + "/v3/translate?version=2018-05-01";
 
-         if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
-         if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+         var model = context.SourceLanguage + "-" + context.DestinationLanguage;
+         if( !SupportedLanguagePairs.Contains( model ) ) throw new Exception( $"The language model '{model}' is not supported." );
       }
 
       public override void OnCreateRequest( IWwwRequestCreationContext context )

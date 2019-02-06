@@ -24,14 +24,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       {
          var context = new TranslationContext( untranslatedText, from, to, success, failure );
          _ongoingTranslations++;
+
+         bool ok = false;
+         IEnumerator iterator = null;
          try
          {
-            var iterator = Endpoint.Translate( context );
+            iterator = Endpoint.Translate( context );
             if( iterator != null )
             {
-               while( iterator.MoveNext() )
+               TryMe: try
+               {
+                  ok = iterator.MoveNext();
+               }
+               catch( TranslationContextException )
+               {
+                  ok = false;
+               }
+               catch( Exception e )
+               {
+                  ok = false;
+                  context.FailWithoutThrowing( "Error occurred during translation.", e );
+               }
+
+               if( ok )
                {
                   yield return iterator.Current;
+                  goto TryMe;
                }
             }
          }

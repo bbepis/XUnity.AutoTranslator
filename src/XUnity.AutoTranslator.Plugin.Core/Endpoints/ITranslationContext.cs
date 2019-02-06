@@ -10,5 +10,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       void Complete( string translatedText );
       void Fail( string reason, Exception exception );
+      void Fail( string reason );
    }
 }

@@ -26,6 +26,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _context.Fail( reason, exception );
       }
 
+      public void Fail( string reason )
+      {
+         _context.Fail( reason );
+      }
+
       void IHttpRequestCreationContext.Complete( XUnityWebRequest request )
       {
          Request = request;

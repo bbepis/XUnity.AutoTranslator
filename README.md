@@ -24,12 +24,16 @@ Oh, and it is also capable of doing some basic image loading/dumping. Go to the 
 
 If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution).
 
+From version 3.0.0 it is possible to implement custom translators. See [this section](#implementing-a-translator) for more info.
+
 ## Translators
 The supported online translators are:
  * [GoogleTranslate](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
    * No limitations, but unstable.
  * [GoogleTranslateLegitimate](https://anonym.to/?https://cloud.google.com/translate/), based on the Google cloud translation API. Requires an API key.
    * Provides trial period of 1 year with $300 credits. Enough for 15 million characters translations.
+ * [BingTranslate](https://anonym.to/?https://www.bing.com/translator), based on the online Bing translation service. Does not require authentication.
+   * No limitations, but unstable.
  * [BingTranslateLegitimate](https://anonym.to/?https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview), based on the Azure text translation. Requires an API key.
    * Free up to 2 million characters per month.
  * [BaiduTranslate](https://anonym.to/?https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
@@ -38,16 +42,15 @@ The supported online translators are:
    * Free up to 1 million characters per day, but max 10 million characters per month.
  * [WatsonTranslate](https://anonym.to/?https://cloud.ibm.com/apidocs/language-translator), based on IBM's Watson. Requires a URL, username and password.
    * Free up to 1 million characters per month.
- * [ExciteTranslate](https://anonym.to/?https://www.excite.co.jp/world/english_japanese/), based on the Excite online translation service. Does not require authentication.
-   * No limitations, but unstable. Also very slow.
+ * LecPowerTranslator15, based on LEC's Power Translator. Does not require authentication, but does require the software installed.
+   * No limitations.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * Example Configuration:
-     * Endpoint=Custom
+     * Endpoint=CustomTranslate
      * [Custom]
      * Url=http://my-custom-translation-service.net/translate
    * Example Request: GET http://my-custom-translation-service.net/translate?from=ja&to=en&text=こんにちは
    * Example Response (only body): Hello
-   * If someone is willing to implement it, this could provide support for offline translators such as ATLAS or LEC as well, since it enables the scenario where you simply run a local web server that can serve translation requests.
  
 **Do note that if you use any of the online translators that does not require some form of authentication, that this plugin may break at any time.**
 
@@ -100,7 +103,7 @@ The default configuration file, looks as such (2.6.0+):
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "GoogleTranslateLegitimate", "BingTranslateLegitimate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "ExciteTranslate", "*any custom http endpoint*", ""]. If empty, it simply means: Only use cached translations
+Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "GoogleTranslateLegitimate", "BingTranslate", "BingTranslateLegitimate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "LecPowerTranslator15", "CustomTranslate", ""]. If empty, it simply means: Only use cached translations. Additional translators can also be used if downloaded externally.
 
 [General]
 Language=en                      ;The language to translate into
@@ -137,6 +140,7 @@ ResizeUILineSpacingScale=        ;A decimal value that the default line spacing 
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
+GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from
@@ -168,6 +172,12 @@ YandexAPIKey=                    ;OPTIONAL, needed if YandexTranslate is configu
 WatsonAPIUrl=                    ;OPTIONAL, needed if WatsonTranslate is configured
 WatsonAPIUsername=               ;OPTIONAL, needed if WatsonTranslate is configured
 WatsonAPIPassword=               ;OPTIONAL, needed if WatsonTranslate is configured
+
+[Custom]
+Url=                             ;Optional, needed if CustomTranslated is configured
+
+[LecPowerTranslator15]
+InstallationPath=                ;Optional, needed if LecPowerTranslator15 is configured
 
 [Debug]
 EnablePrintHierarchy=False       ;Used for debugging
@@ -227,7 +237,7 @@ The following aims at reducing the number of requests send to the translation en
 
 ## Key Mapping
 The following key inputs are mapped:
- * ALT + 0: Enable XUnity AutoTranslator UI. (That's a zero, not an O)
+ * ALT + 0: Toggle XUnity AutoTranslator UI. (That's a zero, not an O)
  * ALT + T: Alternate between translated and untranslated versions of all texts provided by this plugin.
  * ALT + D: Dump untranslated texts (if no endpoint is configured)
  * ALT + R: Reload translation files. Useful if you change the text and texture files on the fly. Not guaranteed to work for all textures.
@@ -249,6 +259,7 @@ The file structure should like like this:
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.BepInEx.dll
 {GameDirectory}/BepInEx/ExIni.dll
+{GameDirectory}/BepInEx/Translators/{Translator}.dll
 {GameDirectory}/BepInEx/Translation/AnyTranslationFile.txt (these files will be auto generated by plugin!)
 ```
 
@@ -264,6 +275,7 @@ The file structure should like like this
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.Core.IPA.dll
 {GameDirectory}/Plugins/0Harmony.dll
 {GameDirectory}/Plugins/ExIni.dll
+{GameDirectory}/Plugins/Translators/{Translator}.dll
 {GameDirectory}/Plugins/Translation/AnyTranslationFile.txt (these files will be auto generated by plugin!)
  ```
 
@@ -279,6 +291,7 @@ The file structure should like like this
 {GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.Core.UnityInjector.dll
 {GameDirectory}/UnityInjector/0Harmony.dll
 {GameDirectory}/UnityInjector/ExIni.dll
+{GameDirectory}/UnityInjector/Translators/{Translator}.dll
 {GameDirectory}/UnityInjector/Translation/AnyTranslationFile.txt (these files will be auto generated by plugin!)
  ```
  
@@ -288,7 +301,7 @@ REQUIRES: Nothing, ReiPatcher is provided by this download.
  1. Download XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that "SetupReiPatcherAndAutoTranslator.exe" is placed alongside other exe files.
  3. Execute "SetupReiPatcherAndAutoTranslator.exe". This will setup up ReiPatcher correctly.
- 4. Execute the shortcut {GameExeName}.lnk that was created besides existing executables. This will patch and launch the game.
+ 4. Execute the shortcut {GameExeName} (Patch and Run).lnk that was created besides existing executables. This will patch and launch the game.
  5. From now on you can launch the game from the {GameExeName}.exe instead.
 
 The file structure should like like this
@@ -305,7 +318,8 @@ The file structure should like like this
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/{GameExeName}_Data/Managed/0Harmony.dll
 {GameDirectory}/{GameExeName}_Data/Managed/ExIni.dll
-{GameDirectory}/AutoTranslator/AnyTranslationFile.txt (these files will be auto generated by plugin!)
+{GameDirectory}/AutoTranslator/Translators/{Translator}.dll
+{GameDirectory}/AutoTranslator/Translation/AnyTranslationFile.txt (these files will be auto generated by plugin!)
  ```
 
 ## Translating Mods
@@ -501,9 +515,9 @@ I recommend using this class, or in case that cannot be used, falling back to th
 
 ### How-To
 Follow these steps:
- * Start a new project in Visual Studio 2017 or later. (Be a good boy and choose the "Class Library (.NET Standard)" template. After choosing that, edit the generated .csproj file and change the TargetFramework element to 'net35')
+ * Start a new project in Visual Studio 2017 or later. I recommend using the same name for your assembly/project as the "Id" you are going to use in your interface implementation.
  * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll
- * Add a reference to UnityEngine.dll (Consider using an old version of this assembly (if `Translators` exists in the Managed folder, it is not an old version!))
+ * Add a reference to UnityEngine.dll (Consider using an old version of this assembly (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!))
  * Create a new class that either:
    * Implements the `ITranslateEndpoint` interface
    * Inherits from the `HttpEndpoint` class
@@ -545,6 +559,7 @@ Let's take a look at a more advanced example that accesses the web:
 ```C#
 internal class YandexTranslateEndpoint : HttpEndpoint
 {
+   private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "az", "sq", "am", "en", "ar", "hy", "af", "eu", "ba", "be", "bn", "my", "bg", "bs", "cy", "hu", "vi", "ht", "gl", "nl", "mrj", "el", "ka", "gu", "da", "he", "yi", "id", "ga", "it", "is", "es", "kk", "kn", "ca", "ky", "zh", "ko", "xh", "km", "lo", "la", "lv", "lt", "lb", "mg", "ms", "ml", "mt", "mk", "mi", "mr", "mhr", "mn", "de", "ne", "no", "pa", "pap", "fa", "pl", "pt", "ro", "ru", "ceb", "sr", "si", "sk", "sl", "sw", "su", "tg", "th", "tl", "ta", "tt", "te", "tr", "udm", "uz", "uk", "ur", "fi", "fr", "hi", "hr", "cs", "sv", "gd", "et", "eo", "jv", "ja" };
    private static readonly string HttpsServicePointTemplateUrl = "https://translate.yandex.net/api/v1.5/tr.json/translate?key={3}&text={2}&lang={0}-{1}&format=plain";
 
    private string _key;
@@ -560,8 +575,8 @@ internal class YandexTranslateEndpoint : HttpEndpoint
 
       // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
       if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
-      if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
-      if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+      if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
+      if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
    }
 
    public override void OnCreateRequest( IHttpRequestCreationContext context )
@@ -619,3 +634,5 @@ After implementing the class, simply build the project and place the generated D
 As mentioned earlier, you  can also use the abstract class `WwwEndpoint` to implement roughly the same thing. However, I do not recommend doing so, unless it is an authenticated service.
 
 Another way to implement a translator is to implement the `ExtProtocolEndpoint` class. This can be used to delegate the actual translation logic to an external process. Currently there is no documentation on this, but you can take a look at the LEC implementation, which uses it.
+
+If instead, you use the interface, it is also possible to extend from MonoBehaviour to get access to all the normal lifecycle callbacks of Unity components.

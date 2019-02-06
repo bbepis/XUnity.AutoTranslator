@@ -5,6 +5,8 @@
       <TargetFramework>net40</TargetFramework>
       <AssemblyName>SetupReiPatcherAndAutoTranslator</AssemblyName>
       <Version>3.0.0</Version>
+      <ApplicationIcon>icon.ico</ApplicationIcon>
+      <Win32Resource />
    </PropertyGroup>
 
    <ItemGroup>

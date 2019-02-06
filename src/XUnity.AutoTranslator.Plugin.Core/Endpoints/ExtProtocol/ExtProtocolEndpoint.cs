@@ -140,7 +140,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          if( _failed )
          {
             context.Fail( "Translator failed.", null );
-            yield break;
          }
 
          var result = new StreamReaderResult();

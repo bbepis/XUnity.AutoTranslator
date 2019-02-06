@@ -37,6 +37,8 @@ namespace BaiduTranslate
          if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
          context.EnableSslFor( "api.fanyi.baidu.com" );
+
+         // frankly, I have no idea what languages this does, or does not support...
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )

@@ -37,25 +37,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
             }
          }
 
-         XUnityWebResponse response = null;
-         try
+         // prepare request
+         OnCreateRequest( httpContext );
+         if( httpContext.Request == null )
          {
-            // prepare request
-            OnCreateRequest( httpContext );
-            if( httpContext.Request == null )
-            {
-               httpContext.Fail( "No request object was provided by the translator.", null );
-               yield break;
-            }
+            httpContext.Fail( "No request object was provided by the translator.", null );
+         }
 
-            var client = new XUnityWebClient();
-            response = client.Send( httpContext.Request );
-         }
-         catch( Exception e )
-         {
-            httpContext.Fail( "Error occurred while setting up translation request.", e );
-            yield break;
-         }
+         // execute request
+         var client = new XUnityWebClient();
+         var response = client.Send( httpContext.Request );
 
          // wait for completion
          if( Features.SupportsCustomYieldInstruction )
@@ -77,25 +68,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          if( response.Error != null )
          {
             httpContext.Fail( "Error occurred while retrieving translation.", response.Error );
-            yield break;
          }
 
          // failure
          if( response.Data == null )
          {
             httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned.", null );
-            yield break;
          }
 
-         try
-         {
-            // attempt to extract translation from data
-            OnExtractTranslation( httpContext );
-         }
-         catch( Exception e )
-         {
-            httpContext.Fail( "Error occurred while retrieving translation.", e );
-         }
+         // extract text
+         OnExtractTranslation( httpContext );
       }
    }
 }

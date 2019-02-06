@@ -9,5 +9,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       string DestinationLanguage { get; }
 
       void Fail( string reason, Exception exception );
+      void Fail( string reason );
    }
 }

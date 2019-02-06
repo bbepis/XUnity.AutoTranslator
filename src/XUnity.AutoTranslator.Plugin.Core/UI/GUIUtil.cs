@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    internal static class GUIUtil
    {
-      public const int WindowTitleClearance = 15;
+      public const int WindowTitleClearance = 10;
       public const int ComponentSpacing = 10;
       public const int LabelWidth = 60;
       public const int LabelHeight = 21;

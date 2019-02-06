@@ -60,7 +60,8 @@ namespace GoogleTranslate
       {
          context.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
 
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language {context.DestinationLanguage} is not supported." );
+         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )

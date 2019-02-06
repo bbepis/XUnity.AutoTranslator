@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    internal class XuaWindow
    {
-      private const int WindowHeight = 510;
+      private const int WindowHeight = 480;
       private const int WindowWidth = 320;
 
       private const int AvailableWidth = WindowWidth - ( GUIUtil.ComponentSpacing * 2 );
@@ -132,9 +132,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             GUI.Label( GUIUtil.R( col2x, posy, col2, GUIUtil.LabelHeight ), label.GetValue(), GUIUtil.LabelRight );
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
          }
-
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "<b>_______________________________________</b>", GUIUtil.LabelCenter );
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
 
          var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, ConfiguredEndpoint>( col2x, endpointDropdownPosy, col2, _endpointOptions ) );
          endpointDropdown.OnGUI();

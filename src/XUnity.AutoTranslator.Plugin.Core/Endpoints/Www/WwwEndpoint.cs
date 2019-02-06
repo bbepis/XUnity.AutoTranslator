@@ -43,75 +43,50 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
             }
          }
 
-         object www = null;
-         try
+         // prepare request
+         OnCreateRequest( wwwContext );
+         if( wwwContext.RequestInfo == null )
          {
-            // prepare request
-            OnCreateRequest( wwwContext );
-            if( wwwContext.RequestInfo == null )
-            {
-               wwwContext.Fail( "No request object was provided by the translator.", null );
-               yield break;
-            }
-
-            var request = wwwContext.RequestInfo;
-            var url = request.Address;
-            var data = request.Data;
-            var headers = request.Headers;
-
-            // execute request
-            www = WwwConstructor.Invoke( new object[] { request.Address, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
-         }
-         catch( Exception e )
-         {
-            wwwContext.Fail( "Error occurred while setting up translation request.", e );
-            yield break;
+            wwwContext.Fail( "No request object was provided by the translator.", null );
          }
 
-         if( www == null )
-         {
-            wwwContext.Fail( "Unexpected error occurred while retrieving translation.", null );
-            yield break;
-         }
+         var request = wwwContext.RequestInfo;
+         var url = request.Address;
+         var data = request.Data;
+         var headers = request.Headers;
+
+         // execute request
+         var www = WwwConstructor.Invoke( new object[] { request.Address, data != null ? Encoding.UTF8.GetBytes( data ) : null, headers } );
 
          // wait for completion
          yield return www;
 
+         // extract error
+         string error = null;
          try
          {
-            // extract error
-            string error = null;
-            try
-            {
-               error = (string)AccessTools.Property( Constants.ClrTypes.WWW, "error" ).GetValue( www, null );
-            }
-            catch( Exception e )
-            {
-               error = e.ToString();
-            }
-
-            if( error != null )
-            {
-               wwwContext.Fail( "Error occurred while retrieving translation." + Environment.NewLine + error, null );
-               yield break;
-            }
-
-            // extract text
-            var text = (string)AccessTools.Property( Constants.ClrTypes.WWW, "text" ).GetValue( www, null );
-            if( text == null )
-            {
-               wwwContext.Fail( "Error occurred while extracting text from response.", null );
-               yield break;
-            }
-
-            wwwContext.ResponseData = text;
-
-            OnExtractTranslation( wwwContext );
+            error = (string)AccessTools.Property( Constants.ClrTypes.WWW, "error" ).GetValue( www, null );
          }
          catch( Exception e )
          {
-            wwwContext.Fail( "Error occurred while retrieving translation.", e );
+            error = e.ToString();
          }
+
+         if( error != null )
+         {
+            wwwContext.Fail( "Error occurred while retrieving translation." + Environment.NewLine + error, null );
+         }
+
+         // extract text
+         var text = (string)AccessTools.Property( Constants.ClrTypes.WWW, "text" ).GetValue( www, null );
+         if( text == null )
+         {
+            wwwContext.Fail( "Error occurred while extracting text from response.", null );
+         }
+
+         wwwContext.ResponseData = text;
+
+         OnExtractTranslation( wwwContext );
       }
    }
 }

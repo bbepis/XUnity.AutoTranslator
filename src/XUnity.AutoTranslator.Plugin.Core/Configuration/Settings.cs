@@ -108,6 +108,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
+            ApplicationName = "Unknown";
             XuaLogger.Current.Error( e, "An error occurred while getting application name." );
          }
 

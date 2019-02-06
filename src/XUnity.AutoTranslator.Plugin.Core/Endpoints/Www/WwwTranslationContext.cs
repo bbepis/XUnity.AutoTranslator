@@ -34,5 +34,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       {
          _context.Fail( reason, exception );
       }
+
+      public void Fail( string reason )
+      {
+         _context.Fail( reason );
+      }
    }
 }

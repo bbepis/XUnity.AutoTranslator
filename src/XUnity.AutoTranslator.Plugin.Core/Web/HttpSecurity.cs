@@ -8,7 +8,7 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
-   public class HttpSecurity
+   internal class HttpSecurity
    {
       public readonly HashSet<string> _hosts = new HashSet<string>();
 

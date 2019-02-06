@@ -91,12 +91,14 @@ namespace XUnity.AutoTranslator.Setup
                Console.WriteLine( iniInfo.Name + " already exists. skipping..." );
             }
 
-            var lnkInfo = new FileInfo( Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".lnk" );
+            var shortcutPath = Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + " (Patch and Run).lnk";
+            var lnkInfo = new FileInfo( shortcutPath );
             if( !lnkInfo.Exists )
             {
                // create shortcuts
                CreateShortcut(
-                  Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".lnk",
+                  launcher.Executable.FullName,
+                  shortcutPath,
                   gamePath,
                   Path.Combine( reiPath, "ReiPatcher.exe" ) );
 
@@ -132,7 +134,7 @@ namespace XUnity.AutoTranslator.Setup
          }
       }
 
-      public static void CreateShortcut( string shortcutName, string shortcutPath, string targetFileLocation )
+      public static void CreateShortcut( string gameExePath, string shortcutName, string shortcutPath, string targetFileLocation )
       {
          string shortcutLocation = Path.Combine( shortcutPath, shortcutName );
 
@@ -147,8 +149,9 @@ namespace XUnity.AutoTranslator.Setup
 
          // Set the .lnk file properties
          lnk.Path = targetFileLocation;
-         lnk.Arguments = "-c \"" + Path.GetFileNameWithoutExtension( shortcutName ) + ".ini\"";
+         lnk.Arguments = "-c \"" + Path.GetFileNameWithoutExtension( gameExePath ) + ".ini\"";
          lnk.WorkingDirectory = Path.GetDirectoryName( targetFileLocation );
+         lnk.SetIconLocation( gameExePath.Replace( '\\', '/' ), 0 );
 
          lnk.Save( shortcutName );
       }

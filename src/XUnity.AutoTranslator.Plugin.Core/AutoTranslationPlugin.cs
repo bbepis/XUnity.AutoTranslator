@@ -98,8 +98,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
 
-      private readonly List<string> _kickedOff = new List<string>();
-
       private Component _advEngine;
       private float? _nextAdvUpdate;
 
@@ -2076,7 +2074,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   var key = kvp.Key;
                   var job = kvp.Value;
-                  _kickedOff.Add( key );
+                  _unstartedJobs.Remove( key );
 
                   if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
 
@@ -2090,20 +2088,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   var untranslatedText = batch.GetFullTranslationKey();
                   XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
-                  StartCoroutine( _endpoint.Translate( untranslatedText, Settings.FromLanguage, Settings.Language, translatedText => OnBatchTranslationCompleted( batch, translatedText ),
-                  ( msg, e ) => OnTranslationFailed( batch, msg, e ) ) );
+                  StartCoroutine(
+                     _endpoint.Translate(
+                        untranslatedText,
+                        Settings.FromLanguage,
+                        Settings.Language,
+                        translatedText => OnBatchTranslationCompleted( batch, translatedText ),
+                        ( msg, e ) => OnTranslationFailed( batch, msg, e ) ) );
                }
             }
          }
          else
          {
-            foreach( var kvp in _unstartedJobs )
+            while( _unstartedJobs.Count > 0 )
             {
                if( _endpoint.IsBusy ) break;
 
+               // ERROR ERROR ERROR --- MEGA BUG MEGA BUG, MUST REMOVE FROM _unstartedJobs INSIDE LOOP!!!!
+
+               var kvp = _unstartedJobs.FirstOrDefault();
+
                var key = kvp.Key;
                var job = kvp.Value;
-               _kickedOff.Add( key );
+               _unstartedJobs.Remove( key );
 
                // lets see if the text should still be translated before kicking anything off
                if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
@@ -2112,17 +2119,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                var untranslatedText = job.Key.GetDictionaryLookupKey();
                XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
-               StartCoroutine( _endpoint.Translate( untranslatedText, Settings.FromLanguage, Settings.Language, translatedText => OnSingleTranslationCompleted( job, translatedText ),
-               ( msg, e ) => OnTranslationFailed( job, msg, e ) ) );
+               StartCoroutine(
+                  _endpoint.Translate(
+                     untranslatedText,
+                     Settings.FromLanguage,
+                     Settings.Language,
+                     translatedText => OnSingleTranslationCompleted( job, translatedText ),
+                     ( msg, e ) => OnTranslationFailed( job, msg, e ) ) );
             }
          }
-
-         for( int i = 0 ; i < _kickedOff.Count ; i++ )
-         {
-            _unstartedJobs.Remove( _kickedOff[ i ] );
-         }
-
-         _kickedOff.Clear();
       }
 
       private void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
