@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -30,7 +29,7 @@ namespace YandexTranslate
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
-         context.EnableSslFor( "translate.yandex.net" );
+         context.DisableCerfificateChecksFor( "translate.yandex.net" );
 
          // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
@@ -45,7 +44,7 @@ namespace YandexTranslate
                HttpsServicePointTemplateUrl,
                context.SourceLanguage,
                context.DestinationLanguage,
-               WWW.EscapeURL( context.UntranslatedText ),
+               WwwHelper.EscapeUrl( context.UntranslatedText ),
                _key ) );
 
          request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" : AutoTranslatorSettings.UserAgent;
@@ -62,21 +61,19 @@ namespace YandexTranslate
          var lineBuilder = new StringBuilder( data.Length );
 
          var code = obj.AsObject[ "code" ].ToString();
+         if( code != "200" ) context.Fail( "Received bad response code: " + code );
 
-         if( code == "200" )
-         {
-            var token = obj.AsObject[ "text" ].ToString();
-            token = token.Substring( 2, token.Length - 4 ).UnescapeJson();
+         var token = obj.AsObject[ "text" ].ToString();
+         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
-            if( string.IsNullOrEmpty( token ) ) return; 
+         if( string.IsNullOrEmpty( token ) ) return;
 
-            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-            lineBuilder.Append( token );
+         if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+         lineBuilder.Append( token );
 
-            var translated = lineBuilder.ToString();
+         var translated = lineBuilder.ToString();
 
-            context.Complete( translated );
-         }
+         context.Complete( translated );
       }
    }
 }

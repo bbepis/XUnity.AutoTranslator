@@ -2,12 +2,15 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 {
-   public interface IHttpTranslationExtractionContext : IHttpTranslationContext
+   /// <summary>
+   /// Interface used in the context of extracting a translated text from a web response.
+   /// </summary>
+   public interface IHttpTranslationExtractionContext : IHttpResponseInspectionContext
    {
-      XUnityWebRequest Request { get; }
-
-      XUnityWebResponse Response { get; }
-
+      /// <summary>
+      /// Completes the translation by providing the translated text.
+      /// </summary>
+      /// <param name="translatedText"></param>
       void Complete( string translatedText );
    }
 }

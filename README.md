@@ -517,7 +517,8 @@ I recommend using this class, or in case that cannot be used, falling back to th
 Follow these steps:
  * Start a new project in Visual Studio 2017 or later. I recommend using the same name for your assembly/project as the "Id" you are going to use in your interface implementation.
  * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll
- * Add a reference to UnityEngine.dll (Consider using an old version of this assembly (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!))
+ * You do not need to directly reference the UnityEngine.dll assembly. This is good, because you do not need to worry about which version of Unity is used then.
+   * If you do need a reference to this assembly consider using an old version of it (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!)
  * Create a new class that either:
    * Implements the `ITranslateEndpoint` interface
    * Inherits from the `HttpEndpoint` class

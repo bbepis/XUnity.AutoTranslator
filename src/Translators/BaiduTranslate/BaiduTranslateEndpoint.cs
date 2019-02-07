@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
@@ -36,7 +31,7 @@ namespace BaiduTranslate
          if( string.IsNullOrEmpty( _appId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
          if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
-         context.EnableSslFor( "api.fanyi.baidu.com" );
+         context.DisableCerfificateChecksFor( "api.fanyi.baidu.com" );
 
          // frankly, I have no idea what languages this does, or does not support...
       }
@@ -49,7 +44,7 @@ namespace BaiduTranslate
          var request = new XUnityWebRequest(
             string.Format(
                HttpServicePointTemplateUrl,
-               WWW.EscapeURL( context.UntranslatedText ),
+               WwwHelper.EscapeUrl( context.UntranslatedText ),
                context.SourceLanguage,
                context.DestinationLanguage,
                _appId,
@@ -76,7 +71,7 @@ namespace BaiduTranslate
          foreach( JSONNode entry in obj.AsObject[ "trans_result" ].AsArray )
          {
             var token = entry.AsObject[ "dst" ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 

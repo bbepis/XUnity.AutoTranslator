@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
@@ -47,7 +46,7 @@ namespace BingTranslateLegitimate
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         context.EnableSslFor( "api.cognitive.microsofttranslator.com" );
+         context.DisableCerfificateChecksFor( "api.cognitive.microsofttranslator.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -58,7 +57,7 @@ namespace BingTranslateLegitimate
          var request = new XUnityWebRequest(
             "POST",
             string.Format( HttpsServicePointTemplateUrl, context.SourceLanguage, context.DestinationLanguage ),
-            string.Format( RequestTemplate, context.UntranslatedText.EscapeJson() ) );
+            string.Format( RequestTemplate, JsonHelper.Escape( context.UntranslatedText ) ) );
 
          if( Accept != null )
          {
@@ -78,7 +77,7 @@ namespace BingTranslateLegitimate
          var arr = JSON.Parse( context.Response.Data );
 
          var token = arr.AsArray[ 0 ]?.AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
-         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
          var translated = token;
 

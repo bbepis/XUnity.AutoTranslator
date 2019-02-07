@@ -12,7 +12,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.IPA
 {
-   public class AutoTranslatorPlugin : IPlugin, IConfiguration
+   public class AutoTranslatorPlugin : IPlugin, IPluginEnvironment
    {
       private IniFile _file;
       private string _configPath;

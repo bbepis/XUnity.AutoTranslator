@@ -14,6 +14,9 @@ using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
 {
+   /// <summary>
+   /// Web client that can be used to send web requests in a unity compatible way.
+   /// </summary>
    public class XUnityWebClient : ConnectionTrackingWebClient
    {
       private HttpStatusCode? _responseCode;
@@ -22,6 +25,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
       private CookieContainer _requestCookies;
       private WebHeaderCollection _requestHeaders;
 
+      /// <summary>
+      /// Default constructor.
+      /// </summary>
       public XUnityWebClient()
       {
          Encoding = Encoding.UTF8;
@@ -45,6 +51,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          handle.SetCompleted( _responseCode.Value, ev.Result, responseHeaders, _responseCookies, ev.Error );
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="address"></param>
+      /// <returns></returns>
       protected override WebRequest GetWebRequest( Uri address )
       {
          var request = base.GetWebRequest( address );
@@ -52,6 +63,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return request;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="request"></param>
+      /// <param name="result"></param>
+      /// <returns></returns>
       protected override WebResponse GetWebResponse( WebRequest request, IAsyncResult result )
       {
          WebResponse response = base.GetWebResponse( request, result );
@@ -59,6 +76,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          return response;
       }
 
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="request"></param>
+      /// <returns></returns>
       protected override WebResponse GetWebResponse( WebRequest request )
       {
          WebResponse response = base.GetWebResponse( request );
@@ -92,6 +114,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          }
       }
 
+      /// <summary>
+      /// Sends a web request and received a response object that can be yielded.
+      /// </summary>
+      /// <param name="request"></param>
+      /// <returns></returns>
       public XUnityWebResponse Send( XUnityWebRequest request )
       {
          var handle = new XUnityWebResponse();

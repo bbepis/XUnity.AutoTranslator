@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -54,7 +53,7 @@ namespace WatsonTranslate
                RequestTemplate,
                context.SourceLanguage,
                context.DestinationLanguage,
-               TextHelper.EscapeJson( context.UntranslatedText ) ) );
+               JsonHelper.Escape( context.UntranslatedText ) ) );
 
          request.Headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "curl/7.55.1" : AutoTranslatorSettings.UserAgent;
          request.Headers[ "Accept" ] = "application/json";
@@ -73,7 +72,7 @@ namespace WatsonTranslate
          foreach( JSONNode entry in obj.AsObject[ "translations" ].AsArray )
          {
             var token = entry.AsObject[ "translation" ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 

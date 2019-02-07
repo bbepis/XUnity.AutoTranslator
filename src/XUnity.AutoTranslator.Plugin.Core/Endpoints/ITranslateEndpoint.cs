@@ -7,6 +7,9 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
+   /// <summary>
+   /// The interface that must be implemented by a translator.
+   /// </summary>
    public interface ITranslateEndpoint
    {
       /// <summary>

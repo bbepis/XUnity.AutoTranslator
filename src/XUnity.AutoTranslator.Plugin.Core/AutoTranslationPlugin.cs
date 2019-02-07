@@ -34,6 +34,9 @@ using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   /// <summary>
+   /// Main plugin class for the AutoTranslator.
+   /// </summary>
    public class AutoTranslationPlugin : MonoBehaviour
    {
       private static readonly char[][] TranslationSplitters = new char[][] { new char[] { '\t' }, new char[] { '=' } };
@@ -135,6 +138,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _lastSpriteUpdateFrame = -1;
       private bool _isCalledFromSceneManager = false;
 
+      /// <summary>
+      /// Initialized the plugin.
+      /// </summary>
       public void Initialize()
       {
          // Setup 'singleton'
@@ -177,7 +183,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var context = new InitializationContext( _httpSecurity, Settings.FromLanguage, Settings.Language );
 
-            _configuredEndpoints = KnownEndpoints.CreateEndpoints( gameObject, context )
+            _configuredEndpoints = KnownTranslateEndpoints.CreateEndpoints( gameObject, context )
                .OrderBy( x => x.Error != null )
                .ThenBy( x => x.Endpoint.FriendlyName )
                .ToList();
@@ -216,7 +222,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Save again because configuration may be modified by endpoints
          try
          {
-            Config.Current.SaveConfig();
+            PluginEnvironment.Current.SaveConfig();
          }
          catch( Exception e )
          {
@@ -325,13 +331,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
       private IEnumerable<string> GetTextureFiles()
       {
-         return Directory.GetFiles( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize(), $"*.png", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize(), $"*.png", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -392,7 +398,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void EnableSceneLoadScan()
       {
          XuaLogger.Current.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
-         if( Features.SupportsScenes )
+         if( Features.SupportsSceneManager )
          {
             XuaLogger.Current.Info( "SceneManager is supported in this version of Unity." );
             EnableSceneLoadScanInternal();
@@ -424,7 +430,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnLevelWasLoaded( int id )
       {
-         if( !Features.SupportsScenes || ( Features.SupportsScenes && _isCalledFromSceneManager ) )
+         if( !Features.SupportsSceneManager || ( Features.SupportsSceneManager && _isCalledFromSceneManager ) )
          {
             if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
             {
@@ -448,7 +454,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             lock( _writeToFileSync )
             {
-               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TranslationDirectory ).Parameterize() );
+               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TranslationDirectory ).Parameterize() );
                Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
@@ -463,7 +469,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                _translatedImages.Clear();
                _untranslatedImages.Clear();
-               Directory.CreateDirectory( Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize() );
+               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize() );
                foreach( var fullFileName in GetTextureFiles() )
                {
                   RegisterImageFromFile( fullFileName );
@@ -544,7 +550,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void RegisterImageFromData( string textureName, string key, byte[] data )
       {
          var name = textureName.SanitizeForFileSystem();
-         var root = Path.Combine( Config.Current.DataPath, Settings.TextureDirectory ).Parameterize();
+         var root = Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize();
          var originalHash = HashHelper.Compute( data );
 
          // allow hash and key to be the same; only store one of them then!
@@ -2769,11 +2775,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      /// <summary>
+      /// Temporarily disables the Auto Translator functionality.
+      /// </summary>
       public void DisableAutoTranslator()
       {
          _temporarilyDisabled = true;
       }
 
+      /// <summary>
+      /// Re-enables the Auto Translator functionality after
+      /// having disabled it thorugh DisableAutoTranslator
+      /// </summary>
       public void EnableAutoTranslator()
       {
          _temporarilyDisabled = false;

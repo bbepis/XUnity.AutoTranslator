@@ -11,18 +11,17 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.BepIn
 {
-   [BepInEx.BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
-   public class AutoTranslatorPlugin : BepInEx.BaseUnityPlugin, IConfiguration
+   [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
+   public class AutoTranslatorPlugin : BaseUnityPlugin, IPluginEnvironment
    {
       private IniFile _file;
       private string _configPath;
-      private string _dataFolder;
 
       public AutoTranslatorPlugin()
       {
-         _dataFolder = "BepInEx";
-         _configPath = Path.Combine( _dataFolder, "AutoTranslatorConfig.ini" );
-         Core.XuaLogger.Current = new BepInLogger();
+         DataPath = "BepInEx";
+         _configPath = Path.Combine( DataPath, "AutoTranslatorConfig.ini" );
+         XuaLogger.Current = new BepInLogger();
       }
 
       public IniFile Preferences
@@ -33,13 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
          }
       }
 
-      public string DataPath
-      {
-         get
-         {
-            return _dataFolder;
-         }
-      }
+      public string DataPath { get; }
 
       public IniFile ReloadConfig()
       {

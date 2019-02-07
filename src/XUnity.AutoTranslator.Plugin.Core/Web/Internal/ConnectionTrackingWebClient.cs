@@ -13,6 +13,8 @@ using System.Threading;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
    #region EventArgs
 
    public delegate void XUnityDownloadStringCompletedEventHandler( object sender, XUnityDownloadStringCompletedEventArgs e );
@@ -419,7 +421,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
 
       public event XUnityDownloadStringCompletedEventHandler DownloadStringCompleted;
       public event XUnityUploadStringCompletedEventHandler UploadStringCompleted;
-
       public event XUnityDownloadDataCompletedEventHandler DownloadDataCompleted;
       public event XUnityAsyncCompletedEventHandler DownloadFileCompleted;
       public event XUnityDownloadProgressChangedEventHandler DownloadProgressChanged;
@@ -1996,4 +1997,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
       }
    }
 
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

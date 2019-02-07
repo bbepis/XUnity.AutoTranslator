@@ -30,6 +30,7 @@ using System.Text;
 * * * * */
 namespace SimpleJSON
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
    public enum JSONNodeType
    {
       Array = 1,
@@ -1281,4 +1282,5 @@ namespace SimpleJSON
          return JSONNode.Parse( aJSON );
       }
    }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

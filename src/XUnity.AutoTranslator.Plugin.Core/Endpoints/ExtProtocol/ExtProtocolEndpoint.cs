@@ -7,16 +7,18 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Shim;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {
-
+   /// <summary>
+   /// An implementation of ITranslateEndpoint that simplifies implementing
+   /// the interface based on an external program.
+   /// </summary>
    public abstract class ExtProtocolEndpoint : MonoBehaviour, ITranslateEndpoint, IDisposable
    {
-      private readonly Dictionary<Guid, StreamReaderResult> _pendingRequests = new Dictionary<Guid, StreamReaderResult>();
+      private readonly Dictionary<Guid, ProtocolTransactionHandle> _transactionHandles = new Dictionary<Guid, ProtocolTransactionHandle>();
       private readonly object _sync = new object();
 
       private bool _disposed = false;
@@ -26,15 +28,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       private bool _initializing;
       private bool _failed;
 
-      protected string _exePath;
-      protected string _arguments;
-
+      /// <summary>
+      /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
+      /// </summary>
       public abstract string Id { get; }
 
+      /// <summary>
+      /// Gets a friendly name that can be displayed to the user representing the plugin.
+      /// </summary>
       public abstract string FriendlyName { get; }
 
+      /// <summary>
+      /// Gets the maximum concurrency for the endpoint. This specifies how many times "Translate"
+      /// can be called before it returns.
+      /// </summary>
       public virtual int MaxConcurrency => 1;
 
+      /// <summary>
+      /// Gets the path to the executable that should be communicated with.
+      /// </summary>
+      protected string ExecutablePath { get; set; }
+
+      /// <summary>
+      /// Gets the arguments that should be supplied to the executable.
+      /// </summary>
+      protected string Arguments { get; set; }
+
+      /// <summary>
+      /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
+      ///
+      /// Must set the ExecutablePath and optionally the Arguments property.
+      /// </summary>
       public abstract void Initialize( IInitializationContext context );
 
       private void EnsureInitialized()
@@ -57,8 +81,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             if( _process == null )
             {
                _process = new Process();
-               _process.StartInfo.FileName = _exePath;
-               _process.StartInfo.Arguments = _arguments;
+               _process.StartInfo.FileName = ExecutablePath;
+               _process.StartInfo.Arguments = Arguments;
                _process.EnableRaisingEvents = false;
                _process.StartInfo.UseShellExecute = false;
                _process.StartInfo.CreateNoWindow = true;
@@ -81,7 +105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             {
                var returnedPayload = _process.StandardOutput.ReadLine();
                var response = ExtProtocolConvert.Decode( returnedPayload );
-               HandleProtocolMessage( response );
+               HandleProtocolMessageResponse( response );
             }
          }
          catch( Exception e )
@@ -102,7 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                var time = Time.realtimeSinceStartup;
 
                List<Guid> idsToRemove = null;
-               foreach( var kvp in _pendingRequests )
+               foreach( var kvp in _transactionHandles )
                {
                   var elapsed = time - kvp.Value.StartTime;
                   if( elapsed > 60 )
@@ -121,33 +145,31 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                {
                   foreach( var id in idsToRemove )
                   {
-                     _pendingRequests.Remove( id );
+                     _transactionHandles.Remove( id );
                   }
                }
             }
          }
       }
 
+      /// <summary>
+      /// Attempt to translated the provided untranslated text. Will be used in a "coroutine",
+      /// so it can be implemented in an asynchronous fashion.
+      /// </summary>
       public IEnumerator Translate( ITranslationContext context )
       {
          EnsureInitialized();
 
-         while( _initializing && !_failed )
-         {
-            yield return new WaitForSeconds( 0.2f );
-         }
+         while( _initializing && !_failed ) yield return new WaitForSeconds( 0.2f ); 
 
-         if( _failed )
-         {
-            context.Fail( "Translator failed.", null );
-         }
+         if( _failed ) context.Fail( "Translator failed.", null );
 
-         var result = new StreamReaderResult();
+         var result = new ProtocolTransactionHandle();
          var id = Guid.NewGuid();
 
          lock( _sync )
          {
-            _pendingRequests[ id ] = result;
+            _transactionHandles[ id ] = result;
          }
 
          try
@@ -169,29 +191,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          }
 
          // yield-wait for completion
-         if( Features.SupportsCustomYieldInstruction )
-         {
-            yield return result;
-         }
-         else
-         {
-            while( !result.IsCompleted )
-            {
-               yield return new WaitForSeconds( 0.2f );
-            }
-         }
+         var iterator = result.GetSupportedEnumerator();
+         while( iterator.MoveNext() ) yield return iterator.Current;
 
-         if( result.Succeeded )
-         {
-            context.Complete( result.Result );
-         }
-         else
-         {
-            context.Fail( "Error occurred while retrieving translation." + Environment.NewLine + result.Error, null );
-         }
+         if( !result.Succeeded ) context.Fail( "Error occurred while retrieving translation. " + result.Error );
+
+         context.Complete( result.Result );
       }
 
-      private void HandleProtocolMessage( ProtocolMessage message )
+      private void HandleProtocolMessageResponse( ProtocolMessage message )
       {
          switch( message )
          {
@@ -210,10 +218,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       {
          lock( _sync )
          {
-            if( _pendingRequests.TryGetValue( message.Id, out var result ) )
+            if( _transactionHandles.TryGetValue( message.Id, out var result ) )
             {
                result.SetCompleted( message.TranslatedText, null );
-               _pendingRequests.Remove( message.Id );
+               _transactionHandles.Remove( message.Id );
             }
          }
       }
@@ -222,43 +230,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       {
          lock( _sync )
          {
-            if( _pendingRequests.TryGetValue( message.Id, out var result ) )
+            if( _transactionHandles.TryGetValue( message.Id, out var result ) )
             {
                result.SetCompleted( null, message.Reason );
-               _pendingRequests.Remove( message.Id );
+               _transactionHandles.Remove( message.Id );
             }
          }
       }
 
-      private class StreamReaderResult : CustomYieldInstructionShim
-      {
-         public StreamReaderResult()
-         {
-            StartTime = Time.realtimeSinceStartup;
-         }
-
-         public void SetCompleted( string result, string error )
-         {
-            IsCompleted = true;
-            Result = result;
-            Error = error;
-         }
-
-         public override bool keepWaiting => !IsCompleted;
-
-         public float StartTime { get; set; }
-
-         public string Result { get; set; }
-
-         public string Error { get; set; }
-
-         public bool IsCompleted { get; private set; } = false;
-
-         public bool Succeeded => Error == null;
-      }
-
       #region IDisposable Support
 
+      /// <summary>
+      /// Disposes the endpoint and kills the external process.
+      /// </summary>
+      /// <param name="disposing"></param>
       protected virtual void Dispose( bool disposing )
       {
          if( !_disposed )
@@ -277,7 +262,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          }
       }
 
-      // This code added to correctly implement the disposable pattern.
+      /// <summary>
+      /// Disposes the endpoint and kills the external process.
+      /// </summary>
       public void Dispose()
       {
          Dispose( true );

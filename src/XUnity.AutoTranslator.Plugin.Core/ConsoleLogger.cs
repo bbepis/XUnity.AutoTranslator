@@ -6,7 +6,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       protected override void Log( LogLevel level, string message )
       {
-         Console.WriteLine( $"{GetPrefix( level )} {message}" );
+         Console.WriteLine( $"{GetDefaultPrefix( level )} {message}" );
       }
    }
 }

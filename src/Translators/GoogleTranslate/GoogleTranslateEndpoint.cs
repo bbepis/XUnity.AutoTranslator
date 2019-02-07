@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -52,13 +51,13 @@ namespace GoogleTranslate
          _cookieContainer = new CookieContainer();
       }
 
-      public override string Id => KnownEndpointNames.GoogleTranslate;
+      public override string Id => KnownTranslateEndpointNames.GoogleTranslate;
 
       public override string FriendlyName => "Google! Translate";
 
       public override void Initialize( IInitializationContext context )
       {
-         context.EnableSslFor( "translate.google.com", "translate.googleapis.com" );
+         context.DisableCerfificateChecksFor( "translate.google.com", "translate.googleapis.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -89,7 +88,7 @@ namespace GoogleTranslate
                   HttpsServicePointRomanizeTemplateUrl,
                   context.SourceLanguage,
                   Tk( context.UntranslatedText ),
-                  WWW.EscapeURL( context.UntranslatedText ) ) );
+                  Uri.EscapeDataString( context.UntranslatedText ) ) );
          }
          else
          {
@@ -99,7 +98,7 @@ namespace GoogleTranslate
                   context.SourceLanguage,
                   context.DestinationLanguage,
                   Tk( context.UntranslatedText ),
-                  WWW.EscapeURL( context.UntranslatedText ) ) );
+                  Uri.EscapeDataString( context.UntranslatedText ) ) );
          }
 
          request.Cookies = _cookieContainer;
@@ -124,7 +123,7 @@ namespace GoogleTranslate
          foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
          {
             var token = entry.AsArray[ dataIndex ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 
@@ -198,17 +197,9 @@ namespace GoogleTranslate
             yield break;
          }
 
-         if( Features.SupportsCustomYieldInstruction )
-         {
-            yield return response;
-         }
-         else
-         {
-            while( response.keepWaiting )
-            {
-               yield return new WaitForSeconds( 0.2f );
-            }
-         }
+         // wait for response completion
+         var iterator = response.GetSupportedEnumerator();
+         while( iterator.MoveNext() ) yield return iterator.Current;
 
          InspectResponse( response );
 

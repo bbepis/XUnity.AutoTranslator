@@ -33,21 +33,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// </summary>
       public string DestinationLanguage { get; }
 
-      public string PluginDirectory => Config.Current.DataPath;
+      public string PluginDirectory => PluginEnvironment.Current.DataPath;
 
-      public void EnableSslFor( params string[] hosts )
+      public void DisableCerfificateChecksFor( params string[] hosts )
       {
          _security.EnableSslFor( hosts );
       }
 
       public T GetOrCreateSetting<T>( string section, string key, T defaultValue )
       {
-         return Config.Current.Preferences.GetOrDefault( section, key, defaultValue );
+         return PluginEnvironment.Current.Preferences.GetOrDefault( section, key, defaultValue );
       }
 
       public T GetOrCreateSetting<T>( string section, string key )
       {
-         return Config.Current.Preferences.GetOrDefault( section, key, default( T ) );
+         return PluginEnvironment.Current.Preferences.GetOrDefault( section, key, default( T ) );
       }
    }
 }

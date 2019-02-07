@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using ExIni;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Configuration
+namespace XUnity.AutoTranslator.Plugin.Core
 {
-   internal class DefaultConfiguration : IConfiguration
+   internal class DefaultPluginEnvironment : IPluginEnvironment
    {
       private IniFile _file;
       private string _configPath;
       private string _dataFolder;
 
-      public DefaultConfiguration()
+      public DefaultPluginEnvironment()
       {
          _dataFolder = "AutoTranslator";
          _configPath = Path.Combine( _dataFolder, "Config.ini" );

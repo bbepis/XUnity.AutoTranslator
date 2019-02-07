@@ -29,11 +29,11 @@ namespace LecPowerTranslator15
             throw new Exception( $"Could not find any executable at '{exePath}'" );
          }
 
-         _arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( pathToLec ) );
+         Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( pathToLec ) );
 
          if( fileExists )
          {
-            _exePath = exePath;
+            ExecutablePath = exePath;
          }
          else
          {

@@ -8,17 +8,26 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   /// <summary>
+   /// PluginLoader class used to load the plugin during startup.
+   ///
+   /// This is not meant to be used by Translators plugins!
+   /// </summary>
    public static class PluginLoader
    {
       private static bool _loaded;
       private static bool _bootstrapped;
 
-      public static void LoadWithConfig( IConfiguration config )
+      /// <summary>
+      /// Loads the plugin with the specified environment.
+      /// </summary>
+      /// <param name="config"></param>
+      public static void LoadWithConfig( IPluginEnvironment config )
       {
          if( !_loaded )
          {
             _loaded = true;
-            Config.Current = config;
+            PluginEnvironment.Current = config;
 
             var obj = new GameObject( "___XUnityAutoTranslator" );
             var instance = obj.AddComponent<AutoTranslationPlugin>();
@@ -26,11 +35,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      /// <summary>
+      /// Loads the plugin with default environment.
+      /// </summary>
       public static void Load()
       {
-         LoadWithConfig( new DefaultConfiguration() );
+         LoadWithConfig( new DefaultPluginEnvironment() );
       }
 
+      /// <summary>
+      /// Loads the plugin in a delayed fashion.
+      /// </summary>
       public static void LoadThroughBootstrapper()
       {
          if( !_bootstrapped )
@@ -47,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       }
    }
 
-   class Bootstrapper : MonoBehaviour
+   internal class Bootstrapper : MonoBehaviour
    {
       public event Action Destroyed = delegate { };
 

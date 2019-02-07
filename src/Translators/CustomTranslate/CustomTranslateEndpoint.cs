@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
@@ -32,7 +31,7 @@ namespace CustomTranslate
          if( string.IsNullOrEmpty( _endpoint ) ) throw new ArgumentException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
-         context.EnableSslFor( uri.Host );
+         context.DisableCerfificateChecksFor( uri.Host );
 
          _friendlyName += " (" + uri.Host + ")";
       }
@@ -45,7 +44,7 @@ namespace CustomTranslate
                _endpoint,
                context.SourceLanguage,
                context.DestinationLanguage,
-               WWW.EscapeURL( context.UntranslatedText ) ) );
+               Uri.EscapeDataString( context.UntranslatedText ) ) );
 
          context.Complete( request );
       }

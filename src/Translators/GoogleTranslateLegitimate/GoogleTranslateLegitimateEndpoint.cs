@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
@@ -20,11 +19,7 @@ namespace GoogleTranslateLegitimate
 {
    internal class GoogleTranslateLegitimateEndpoint : HttpEndpoint
    {
-      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
-      {
-         "af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","zh-CN","zh-TW","co","hr","cs","da","nl","en","eo","et","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu","is","ig","id","ga","it","ja","jw","kn","kk","km","ko","ku","ky","lo","la","lv","lt","lb","mk","mg","ms","ml","mt","mi","mr","mn","my","ne","no","ny","ps","fa","pl","pt","pa","ro","ru","sm","gd","sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tl","tg","ta","te","th","tr","uk","ur","uz","vi","cy","xh","yi","yo","zu"
-      };
-
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","zh-CN","zh-TW","co","hr","cs","da","nl","en","eo","et","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu","is","ig","id","ga","it","ja","jw","kn","kk","km","ko","ku","ky","lo","la","lv","lt","lb","mk","mg","ms","ml","mt","mi","mr","mn","my","ne","no","ny","ps","fa","pl","pt","pa","ro","ru","sm","gd","sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tl","tg","ta","te","th","tr","uk","ur","uz","vi","cy","xh","yi","yo","zu" };
       private static readonly string HttpsServicePointTemplateUrl = "https://translation.googleapis.com/language/translate/v2?key={0}";
 
       private string _key;
@@ -39,7 +34,7 @@ namespace GoogleTranslateLegitimate
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         context.EnableSslFor( "translation.googleapis.com" );
+         context.DisableCerfificateChecksFor( "translation.googleapis.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -49,7 +44,7 @@ namespace GoogleTranslateLegitimate
       {
          var b = new StringBuilder();
          b.Append( "{" );
-         b.Append( "\"q\":\"" ).Append( context.UntranslatedText.EscapeJson() ).Append( "\"," );
+         b.Append( "\"q\":\"" ).Append( JsonHelper.Escape( context.UntranslatedText ) ).Append( "\"," );
          b.Append( "\"target\":\"" ).Append( context.DestinationLanguage ).Append( "\"," );
          b.Append( "\"source\":\"" ).Append( context.SourceLanguage ).Append( "\"," );
          b.Append( "\"format\":\"text\"" );
@@ -58,7 +53,7 @@ namespace GoogleTranslateLegitimate
 
          var request = new XUnityWebRequest(
             "POST",
-            string.Format( HttpsServicePointTemplateUrl, WWW.EscapeURL( _key ) ),
+            string.Format( HttpsServicePointTemplateUrl, Uri.EscapeDataString( _key ) ),
             data );
 
          context.Complete( request );
@@ -73,7 +68,7 @@ namespace GoogleTranslateLegitimate
          foreach( JSONNode entry in obj.AsObject[ "data" ].AsObject[ "translations" ].AsArray )
          {
             var token = entry.AsObject[ "translatedText" ].ToString();
-            token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+            token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
 

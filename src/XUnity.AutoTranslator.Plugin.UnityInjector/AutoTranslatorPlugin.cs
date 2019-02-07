@@ -12,9 +12,9 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 namespace XUnity.AutoTranslator.Plugin.UnityInjector
 {
    [PluginName( PluginData.Name ), PluginVersion( PluginData.Version )]
-   public class AutoTranslatorPlugin : PluginBase, IConfiguration
+   public class AutoTranslatorPlugin : PluginBase, IPluginEnvironment
    {
-      void IConfiguration.SaveConfig()
+      void IPluginEnvironment.SaveConfig()
       {
          SaveConfig();
       }

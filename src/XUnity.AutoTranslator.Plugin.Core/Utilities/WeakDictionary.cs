@@ -6,6 +6,8 @@ using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
    // Adds strong typing to WeakReference.Target using generics. Also,
    // the Create factory method is used in place of a constructor
    // to handle the case where target is null, but we want the 
@@ -269,12 +271,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    /// <summary>
    /// Represents a dictionary mapping keys to values.
    /// </summary>
-   /// 
-   /// <remarks>
-   /// Provides the plumbing for the portions of IDictionary<TKey,
-   /// TValue> which can reasonably be implemented without any
-   /// dependency on the underlying representation of the dictionary.
-   /// </remarks>
    [DebuggerDisplay( "Count = {Count}" )]
    [DebuggerTypeProxy( PREFIX + "DictionaryDebugView`2" + SUFFIX )]
    public abstract class BaseDictionary<TKey, TValue> : IDictionary<TKey, TValue>
@@ -478,4 +474,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             array[ arrayIndex++ ] = item;
       }
    }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 }

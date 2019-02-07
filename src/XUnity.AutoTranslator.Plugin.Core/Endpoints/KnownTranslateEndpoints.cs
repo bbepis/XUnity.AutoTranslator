@@ -10,7 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
-   internal static class KnownEndpoints
+   internal static class KnownTranslateEndpoints
    {
       public static List<ConfiguredEndpoint> CreateEndpoints( GameObject go, InitializationContext context )
       {
@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          // could dynamically load types from other assemblies...
          //var integratedTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( typeof( KnownEndpoints ).Assembly );
-         var pluginFolder = Path.Combine( Config.Current.DataPath, Settings.PluginFolder );
+         var pluginFolder = Path.Combine( PluginEnvironment.Current.DataPath, Settings.PluginFolder );
          var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
 
          foreach( var type in dynamicTypes )

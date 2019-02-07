@@ -7,7 +7,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using SimpleJSON;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -66,7 +65,7 @@ namespace BingTranslate
       public override void Initialize( IInitializationContext context )
       {
          // Configure service points / service point manager
-         context.EnableSslFor( "www.bing.com" );
+         context.DisableCerfificateChecksFor( "www.bing.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -104,7 +103,7 @@ namespace BingTranslate
 
          var data = string.Format(
             RequestTemplate,
-            WWW.EscapeURL( context.UntranslatedText ),
+            Uri.EscapeDataString( context.UntranslatedText ),
             context.SourceLanguage,
             context.DestinationLanguage );
 
@@ -132,7 +131,7 @@ namespace BingTranslate
          }
 
          var token = obj[ "translationResponse" ].ToString();
-         token = token.Substring( 1, token.Length - 2 ).UnescapeJson();
+         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
          var translated = token;
 
@@ -206,17 +205,8 @@ namespace BingTranslate
             yield break;
          }
 
-         if( Features.SupportsCustomYieldInstruction )
-         {
-            yield return response;
-         }
-         else
-         {
-            while( response.keepWaiting )
-            {
-               yield return new WaitForSeconds( 0.2f );
-            }
-         }
+         var iterator = response.GetSupportedEnumerator();
+         while( iterator.MoveNext() ) yield return iterator.Current;
 
          InspectResponse( response );
 

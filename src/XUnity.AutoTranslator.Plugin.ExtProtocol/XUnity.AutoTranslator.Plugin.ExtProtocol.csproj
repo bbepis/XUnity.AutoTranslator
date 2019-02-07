@@ -4,6 +4,10 @@
     <TargetFramework>net35</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Proj\Secret\XUnity.AutoTranslator\src\XUnity.AutoTranslator.Plugin.ExtProtocol\bin\Release\net35\XUnity.AutoTranslator.Plugin.ExtProtocol.xml</DocumentationFile>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\&quot;&#xD;&#xA;)" />
   </Target>

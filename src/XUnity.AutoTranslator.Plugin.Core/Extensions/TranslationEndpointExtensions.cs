@@ -13,8 +13,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       public static bool SupportsLineSplitting( this ITranslateEndpoint endpoint )
       {
-         return endpoint.Id == KnownEndpointNames.GoogleTranslate
-            || endpoint.Id == KnownEndpointNames.GoogleTranslateLegitimate;
+         return endpoint.Id == KnownTranslateEndpointNames.GoogleTranslate
+            || endpoint.Id == KnownTranslateEndpointNames.GoogleTranslateLegitimate;
       }
    }
 }

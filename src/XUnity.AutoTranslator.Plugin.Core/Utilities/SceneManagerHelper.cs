@@ -12,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
    {
       public static string GetActiveSceneId()
       {
-         if( Features.SupportsScenes )
+         if( Features.SupportsSceneManager )
          {
             return GetActiveSceneIdBySceneManager();
          }
@@ -26,7 +26,9 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
 
       private static string GetActiveSceneIdByApplication()
       {
+#pragma warning disable CS0618 // Type or member is obsolete
          return Application.loadedLevel.ToString();
+#pragma warning restore CS0618 // Type or member is obsolete
       }
    }
 }

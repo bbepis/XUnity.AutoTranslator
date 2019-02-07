@@ -5,13 +5,22 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   /// <summary>
+   /// Class that allows you to check which features are availble of the Unity version that is used.
+   /// </summary>
    public static class Features
    {
-      public static readonly bool SupportsClipboard = false;
+      internal static bool SupportsClipboard { get; } = false;
 
-      public static readonly bool SupportsCustomYieldInstruction = false;
+      /// <summary>
+      /// Gets a bool indicating if the class CustomYieldInstruction is available.
+      /// </summary>
+      public static bool SupportsCustomYieldInstruction { get; } = false;
 
-      public static readonly bool SupportsScenes = false;
+      /// <summary>
+      /// Gets a bool indicating if the SceneManager class is available.
+      /// </summary>
+      public static bool SupportsSceneManager { get; } = false;
 
       static Features()
       {
@@ -35,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
-            SupportsScenes = ClrTypes.Scene != null && ClrTypes.SceneManager != null;
+            SupportsSceneManager = ClrTypes.Scene != null && ClrTypes.SceneManager != null;
          }
          catch( Exception )
          {

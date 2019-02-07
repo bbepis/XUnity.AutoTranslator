@@ -46,7 +46,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          int posx = GUIUtil.ComponentSpacing;
          int posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
-         const int col1 = GUIUtil.LabelWidth;
          const int col2 = WindowWidth - GUIUtil.LabelWidth - ( 3 * GUIUtil.ComponentSpacing );
          const int col1x = GUIUtil.ComponentSpacing;
          const int col2x = GUIUtil.LabelWidth + ( GUIUtil.ComponentSpacing * 2 );
