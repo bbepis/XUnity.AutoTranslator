@@ -64,7 +64,7 @@ namespace YandexTranslate
          if( code != "200" ) context.Fail( "Received bad response code: " + code );
 
          var token = obj.AsObject[ "text" ].ToString();
-         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
+         token = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
 
          if( string.IsNullOrEmpty( token ) ) return;
 
