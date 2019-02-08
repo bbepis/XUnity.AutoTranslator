@@ -61,9 +61,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool IsSpammingComponent( this object ui )
       {
-         if( ui == null ) return false;
+         if( ui == null ) return true;
 
-         return ui is UnityEngine.GUIContent;
+         return ui is GUIContent;
       }
 
       public static bool IsWhitelistedForImmediateRichTextTranslation( this object ui )

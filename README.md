@@ -515,11 +515,12 @@ I recommend using this class, or in case that cannot be used, falling back to th
 
 ### How-To
 Follow these steps:
- * Start a new project in Visual Studio 2017 or later. I recommend using the same name for your assembly/project as the "Id" you are going to use in your interface implementation.
- * Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll
- * You do not need to directly reference the UnityEngine.dll assembly. This is good, because you do not need to worry about which version of Unity is used then.
-   * If you do need a reference to this assembly consider using an old version of it (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!)
- * Create a new class that either:
+ 1. Download XUnity.AutoTranslator-Developer-{VERSION}.zip from [releases](../../releases)
+ 2. Start a new project in Visual Studio 2017 or later. I recommend using the same name for your assembly/project as the "Id" you are going to use in your interface implementation. This makes it easier for users to know how to configure your translator
+ 3. Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll that you downloaded in step 1
+ 4. You do not need to directly reference the UnityEngine.dll assembly. This is good, because you do not need to worry about which version of Unity is used.
+   * If you do need a reference to this assembly (because you need functionality from it) consider using an old version of it (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!)
+ 5. Create a new class that either:
    * Implements the `ITranslateEndpoint` interface
    * Inherits from the `HttpEndpoint` class
    * Inherits from the `WwwEndpoint` class
@@ -607,7 +608,7 @@ internal class YandexTranslateEndpoint : HttpEndpoint
       if( code != "200" ) context.Fail( "Received bad response code: " + code );
 
       var token = obj.AsObject[ "text" ].ToString();
-      token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
+      token = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
 
       if( string.IsNullOrEmpty( token ) ) return;
 
@@ -629,6 +630,10 @@ This plugin extends from `HttpEndpoint`. Let's look at the three methods it over
 As you can see, the `XUnityWebClient` class is not even used. We simply specify a request object that the `HttpEndpoint` will use internally to perform the request.
 
 After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory of the plugin folder. That's it.
+
+**NOTE**: If you implement a class based on the `HttpEndpoint` and you get an error where the web request is never completed, then it is likely due to the web server requiring Tls1.2. Unity-mono has issues with this spec and it will cause the request to lock up forever. The only solutions to this for now are:
+ * Disable SSL, if you can. There are many sitauations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endoint.
+ * Use the `WwwEndpoint` instead.
 
 As mentioned earlier, you  can also use the abstract class `WwwEndpoint` to implement roughly the same thing. However, I do not recommend doing so, unless it is an authenticated service.
 
