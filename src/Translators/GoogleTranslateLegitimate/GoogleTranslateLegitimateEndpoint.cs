@@ -28,6 +28,8 @@ namespace GoogleTranslateLegitimate
 
       public override string FriendlyName => "Google! Translate (Authenticated)";
 
+      public override int MaxTranslationsPerRequest => 10;
+
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "GoogleLegitimate", "GoogleAPIKey", "" );
@@ -42,9 +44,11 @@ namespace GoogleTranslateLegitimate
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
+         var allUntranslatedText = string.Join( "\n", context.UntranslatedTexts );
+
          var b = new StringBuilder();
          b.Append( "{" );
-         b.Append( "\"q\":\"" ).Append( JsonHelper.Escape( context.UntranslatedText ) ).Append( "\"," );
+         b.Append( "\"q\":\"" ).Append( JsonHelper.Escape( allUntranslatedText ) ).Append( "\"," );
          b.Append( "\"target\":\"" ).Append( context.DestinationLanguage ).Append( "\"," );
          b.Append( "\"source\":\"" ).Append( context.SourceLanguage ).Append( "\"," );
          b.Append( "\"format\":\"text\"" );
@@ -75,9 +79,41 @@ namespace GoogleTranslateLegitimate
             lineBuilder.Append( token );
          }
 
-         var translated = lineBuilder.ToString();
+         var allTranslation = lineBuilder.ToString();
 
-         context.Complete( translated );
+         if( context.UntranslatedTexts.Length == 1 )
+         {
+            context.Complete( allTranslation );
+         }
+         else
+         {
+            var translatedLines = allTranslation.Split( '\n' );
+            var translatedTexts = new List<string>();
+
+            int current = 0;
+            foreach( var untranslatedText in context.UntranslatedTexts )
+            {
+               var untranslatedLines = untranslatedText.Split( '\n' );
+               var untranslatedLinesCount = untranslatedLines.Length;
+               var translatedText = string.Empty;
+
+               for( int i = 0 ; i < untranslatedLinesCount ; i++ )
+               {
+                  if( current >= translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
+
+                  var translatedLine = translatedLines[ current++ ];
+                  translatedText += translatedLine;
+
+                  if( i != untranslatedLinesCount - 1 ) translatedText += '\n';
+               }
+
+               translatedTexts.Add( translatedText );
+            }
+
+            if( current != translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
+
+            context.Complete( translatedTexts.ToArray() );
+         }
       }
    }
 }

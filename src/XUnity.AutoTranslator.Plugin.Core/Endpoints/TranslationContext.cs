@@ -4,17 +4,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    internal class TranslationContext : ITranslationContext
    {
-      private Action<string> _complete;
+      private Action<string[]> _complete;
       private Action<string, Exception> _fail;
 
       public TranslationContext(
-         string untranslatedText,
+         string[] untranslatedTexts,
          string sourceLanguage,
          string destinationLanguage,
-         Action<string> complete,
+         Action<string[]> complete,
          Action<string, Exception> fail )
       {
-         UntranslatedText = untranslatedText;
+         UntranslatedTexts = untranslatedTexts;
          SourceLanguage = sourceLanguage;
          DestinationLanguage = destinationLanguage;
 
@@ -22,26 +22,42 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          _fail = fail;
       }
 
-      public string UntranslatedText { get; }
+      public string UntranslatedText => UntranslatedTexts[ 0 ];
+      public string[] UntranslatedTexts { get; }
       public string SourceLanguage { get; }
       public string DestinationLanguage { get; }
 
       internal bool IsDone { get; private set; }
 
+
       public void Complete( string translatedText )
+      {
+         Complete( new[] { translatedText } );
+      }
+
+      public void Complete( string[] translatedTexts )
       {
          if( IsDone ) return;
 
          try
          {
-            if( !string.IsNullOrEmpty( translatedText ) )
-            {
-               _complete( translatedText );
-            }
-            else
+            if( translatedTexts.Length == 0 )
             {
                _fail( "Received empty translation from translator.", null );
+               return;
             }
+
+            for( int i = 0 ; i < translatedTexts.Length ; i++ )
+            {
+               var translatedText = translatedTexts[ 0 ];
+               if( string.IsNullOrEmpty( translatedText ) )
+               {
+                  _fail( "Received empty translation from translator.", null );
+                  return;
+               }
+            }
+
+            _complete( translatedTexts );
          }
          finally
          {

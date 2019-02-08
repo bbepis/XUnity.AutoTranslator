@@ -16,6 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       }
 
       public string UntranslatedText => _context.UntranslatedText;
+      public string[] UntranslatedTexts => _context.UntranslatedTexts;
       public string SourceLanguage => _context.SourceLanguage;
       public string DestinationLanguage => _context.DestinationLanguage;
       public XUnityWebResponse Response { get; internal set; }
@@ -31,6 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          _context.Fail( reason );
       }
 
+
       void IHttpRequestCreationContext.Complete( XUnityWebRequest request )
       {
          Request = request;
@@ -39,6 +41,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       void IHttpTranslationExtractionContext.Complete( string translatedText )
       {
          _context.Complete( translatedText );
+      }
+
+      void IHttpTranslationExtractionContext.Complete( string[] translatedTexts )
+      {
+         _context.Complete( translatedTexts );
       }
    }
 }

@@ -27,6 +27,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       public virtual int MaxConcurrency => 1;
 
       /// <summary>
+      /// Gets the maximum number of translations that can be served per translation request.
+      /// </summary>
+      public virtual int MaxTranslationsPerRequest => 1;
+
+      /// <summary>
       /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
       /// </summary>
       public abstract void Initialize( IInitializationContext context );

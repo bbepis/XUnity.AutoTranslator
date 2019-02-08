@@ -459,6 +459,9 @@ Since version 3.0.0, you can now also implement your own translators.
 In order to do so, all you have to do is implement the following interface, build the assembly and place the generated DLL in the `Translators` folder.
 
 ```C#
+/// <summary>
+/// The interface that must be implemented by a translator.
+/// </summary>
 public interface ITranslateEndpoint
 {
    /// <summary>
@@ -476,6 +479,11 @@ public interface ITranslateEndpoint
    /// can be called before it returns.
    /// </summary>
    int MaxConcurrency { get; }
+
+   /// <summary>
+   /// Gets the maximum number of translations that can be served per translation request.
+   /// </summary>
+   int MaxTranslationsPerRequest { get; }
 
    /// <summary>
    /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
@@ -538,6 +546,8 @@ public class ReverseTranslatorEndpoint : ITranslateEndpoint
    public string FriendlyName => "Reverser";
 
    public int MaxConcurrency => 50;
+
+   public int MaxTranslationsPerRequest => 1;
 
    public void Initialize( IInitializationContext context )
    {

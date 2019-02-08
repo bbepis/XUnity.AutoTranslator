@@ -13,6 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          _context = context;
       }
 
+      public string[] UntranslatedTexts => _context.UntranslatedTexts;
       public string UntranslatedText => _context.UntranslatedText;
       public string SourceLanguage => _context.SourceLanguage;
       public string DestinationLanguage => _context.DestinationLanguage;
@@ -28,6 +29,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       void IWwwTranslationExtractionContext.Complete( string translatedText )
       {
          _context.Complete( translatedText );
+      }
+
+      void IWwwTranslationExtractionContext.Complete( string[] translatedTexts )
+      {
+         _context.Complete( translatedTexts );
       }
 
       public void Fail( string reason, Exception exception )

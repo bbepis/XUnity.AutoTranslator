@@ -29,7 +29,7 @@ namespace GoogleTranslate
       private static readonly string HttpsServicePointRomanizeTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl=en&dt=rm&tk={1}&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
       private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
-      private static readonly System.Random RandomNumbers = new System.Random();
+      private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
       private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US", "en" };
@@ -54,6 +54,8 @@ namespace GoogleTranslate
       public override string Id => KnownTranslateEndpointNames.GoogleTranslate;
 
       public override string FriendlyName => "Google! Translate";
+
+      public override int MaxTranslationsPerRequest => 10;
 
       public override void Initialize( IInitializationContext context )
       {
@@ -80,6 +82,8 @@ namespace GoogleTranslate
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
+         var allUntranslatedText = string.Join( "\n", context.UntranslatedTexts );
+
          XUnityWebRequest request;
          if( context.DestinationLanguage == "romaji" )
          {
@@ -87,8 +91,8 @@ namespace GoogleTranslate
                string.Format(
                   HttpsServicePointRomanizeTemplateUrl,
                   context.SourceLanguage,
-                  Tk( context.UntranslatedText ),
-                  Uri.EscapeDataString( context.UntranslatedText ) ) );
+                  Tk( allUntranslatedText ),
+                  Uri.EscapeDataString( allUntranslatedText ) ) );
          }
          else
          {
@@ -97,8 +101,8 @@ namespace GoogleTranslate
                   HttpsServicePointTranslateTemplateUrl,
                   context.SourceLanguage,
                   context.DestinationLanguage,
-                  Tk( context.UntranslatedText ),
-                  Uri.EscapeDataString( context.UntranslatedText ) ) );
+                  Tk( allUntranslatedText ),
+                  Uri.EscapeDataString( allUntranslatedText ) ) );
          }
 
          request.Cookies = _cookieContainer;
@@ -125,14 +129,46 @@ namespace GoogleTranslate
             var token = entry.AsArray[ dataIndex ].ToString();
             token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
-            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
+            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( '\n' );
 
             lineBuilder.Append( token );
          }
 
-         var translated = lineBuilder.ToString();
+         var allTranslation = lineBuilder.ToString();
 
-         context.Complete( translated );
+         if( context.UntranslatedTexts.Length == 1 )
+         {
+            context.Complete( allTranslation );
+         }
+         else
+         {
+            var translatedLines = allTranslation.Split( '\n' );
+            var translatedTexts = new List<string>();
+
+            int current = 0;
+            foreach( var untranslatedText in context.UntranslatedTexts )
+            {
+               var untranslatedLines = untranslatedText.Split( '\n' );
+               var untranslatedLinesCount = untranslatedLines.Length;
+               var translatedText = string.Empty;
+
+               for( int i = 0 ; i < untranslatedLinesCount ; i++ )
+               {
+                  if( current >= translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
+
+                  var translatedLine = translatedLines[ current++ ];
+                  translatedText += translatedLine;
+
+                  if( i != untranslatedLinesCount - 1 ) translatedText += '\n';
+               }
+
+               translatedTexts.Add( translatedText );
+            }
+
+            if( current != translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
+
+            context.Complete( translatedTexts.ToArray() );
+         }
       }
 
       private XUnityWebRequest CreateWebSiteRequest()

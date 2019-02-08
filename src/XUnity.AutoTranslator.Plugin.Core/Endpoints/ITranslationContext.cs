@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
+﻿namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    /// <summary>
    /// Interface used in the context of translating a text.
@@ -12,39 +10,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// </summary>
       /// <param name="translatedText"></param>
       void Complete( string translatedText );
-   }
-
-   /// <summary>
-   /// Interface used in the context of translating a text.
-   /// </summary>
-   public interface ITranslationContextBase
-   {
-      /// <summary>
-      /// Gets the untranslated text.
-      /// </summary>
-      string UntranslatedText { get; }
 
       /// <summary>
-      /// Gets the source language.
+      /// Completes the translation by providing the translated texts.
+      ///
+      /// The indices of the translations must match the indices of the
+      /// untranslated texts.
       /// </summary>
-      string SourceLanguage { get; }
-
-      /// <summary>
-      /// Gets the destination language.
-      /// </summary>
-      string DestinationLanguage { get; }
-
-      /// <summary>
-      /// Fails the translation. Immediately throws an exception.
-      /// </summary>
-      /// <param name="reason"></param>
-      /// <param name="exception"></param>
-      void Fail( string reason, Exception exception );
-
-      /// <summary>
-      /// Fails the translation. Immediately throws an exception.
-      /// </summary>
-      /// <param name="reason"></param>
-      void Fail( string reason );
+      /// <param name="translatedTexts"></param>
+      void Complete( string[] translatedTexts );
    }
 }

@@ -45,6 +45,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       public virtual int MaxConcurrency => 1;
 
       /// <summary>
+      /// Gets the maximum number of translations that can be served per translation request.
+      /// </summary>
+      public int MaxTranslationsPerRequest => 1;
+
+      /// <summary>
       /// Gets the path to the executable that should be communicated with.
       /// </summary>
       protected string ExecutablePath { get; set; }

@@ -24,7 +24,6 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
-using XUnity.AutoTranslator.Plugin.Core.Batching;
 using Harmony;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using System.Diagnostics;
@@ -2095,14 +2094,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _endpoint == null ) return;
 
-         if( Settings.EnableBatching && _endpoint.Endpoint.SupportsLineSplitting() && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _availableBatchOperations > 0 )
+         if( Settings.EnableBatching && _endpoint.Endpoint.MaxTranslationsPerRequest > 1 && !_batchLogicHasFailed && _unstartedJobs.Count > 1 && _availableBatchOperations > 0 )
          {
             while( _unstartedJobs.Count > 0 && _availableBatchOperations > 0 )
             {
                if( _endpoint.IsBusy ) break;
 
-               var kvps = _unstartedJobs.Take( Settings.BatchSize ).ToList();
-               var batch = new TranslationBatch();
+               var kvps = _unstartedJobs.Take( _endpoint.Endpoint.MaxTranslationsPerRequest ).ToList();
+               //var batch = new TranslationBatch();
+               var untranslatedTexts = new List<string>();
+               var jobs = new List<TranslationJob>();
 
                foreach( var kvp in kvps )
                {
@@ -2112,23 +2113,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
 
-                  batch.Add( job );
+                  jobs.Add( job );
+                  untranslatedTexts.Add( job.Key.GetDictionaryLookupKey() );
+
                   _ongoingJobs[ key ] = job;
                }
 
-               if( !batch.IsEmpty )
+               if( jobs.Count > 0 )
                {
                   _availableBatchOperations--;
+                  var jobsArray = jobs.ToArray();
 
-                  var untranslatedText = batch.GetFullTranslationKey();
-                  XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
+                  foreach( var untranslatedText in untranslatedTexts )
+                  {
+                     XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
+                  }
                   StartCoroutine(
                      _endpoint.Translate(
-                        untranslatedText,
+                        untranslatedTexts.ToArray(),
                         Settings.FromLanguage,
                         Settings.Language,
-                        translatedText => OnBatchTranslationCompleted( batch, translatedText ),
-                        ( msg, e ) => OnTranslationFailed( batch, msg, e ) ) );
+                        translatedText => OnBatchTranslationCompleted( jobsArray, translatedText ),
+                        ( msg, e ) => OnTranslationFailed( jobsArray, msg, e ) ) );
                }
             }
          }
@@ -2155,29 +2161,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
                XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
                StartCoroutine(
                   _endpoint.Translate(
-                     untranslatedText,
+                     new[] { untranslatedText },
                      Settings.FromLanguage,
                      Settings.Language,
                      translatedText => OnSingleTranslationCompleted( job, translatedText ),
-                     ( msg, e ) => OnTranslationFailed( job, msg, e ) ) );
+                     ( msg, e ) => OnTranslationFailed( new[] { job }, msg, e ) ) );
             }
          }
       }
 
-      private void OnBatchTranslationCompleted( TranslationBatch batch, string translatedTextBatch )
+      private void OnBatchTranslationCompleted( TranslationJob[] jobs, string[] translatedTexts )
       {
          _consecutiveErrors = 0;
-         XuaLogger.Current.Debug( $"Translation for '{batch.GetFullTranslationKey()}' succeded. Result: {translatedTextBatch}" );
 
-         var succeeded = batch.MatchWithTranslations( translatedTextBatch );
+         var succeeded = jobs.Length == translatedTexts.Length;
          if( succeeded )
          {
-            foreach( var tracker in batch.Trackers )
+            for( int i = 0 ; i < jobs.Length ; i++ )
             {
                Settings.TranslationCount++;
 
-               var job = tracker.Job;
-               var translatedText = tracker.RawTranslatedText;
+               var job = jobs[ i ];
+               var translatedText = translatedTexts[ i ];
                if( !string.IsNullOrEmpty( translatedText ) )
                {
                   if( Settings.ForceSplitTextAfterCharacters > 0 )
@@ -2193,20 +2198,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
                AddTranslation( job.Key, job.TranslatedText );
                job.State = TranslationJobState.Succeeded;
                _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
+
+               XuaLogger.Current.Debug( $"Translation for '{job.Key.GetDictionaryLookupKey()}' succeded. Result: {translatedText}" );
             }
          }
          else
          {
             // might as well re-add all translation jobs, and never do this again!
             _batchLogicHasFailed = true;
-            foreach( var tracker in batch.Trackers )
+            for( int i = 0 ; i < jobs.Length ; i++ )
             {
                Settings.TranslationCount++;
+               var job = jobs[ i ];
 
-               var key = tracker.Job.Key.GetDictionaryLookupKey();
+               var key = job.Key.GetDictionaryLookupKey();
                if( !_unstartedJobs.ContainsKey( key ) )
                {
-                  _unstartedJobs[ key ] = tracker.Job;
+                  _unstartedJobs[ key ] = job;
                }
                _ongoingJobs.Remove( key );
             }
@@ -2229,8 +2237,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnSingleTranslationCompleted( TranslationJob job, string translatedText )
+      private void OnSingleTranslationCompleted( TranslationJob job, string[] translatedTextArray )
       {
+         var translatedText = translatedTextArray[ 0 ];
+
          Settings.TranslationCount++;
          XuaLogger.Current.Debug( $"Translation for '{job.Key.GetDictionaryLookupKey()}' succeded. Result: {translatedText}" );
 
@@ -2267,7 +2277,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnTranslationFailed( TranslationJob job, string error, Exception e )
+      private void OnTranslationFailed( TranslationJob[] jobs, string error, Exception e )
       {
          if( e == null )
          {
@@ -2278,45 +2288,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
             XuaLogger.Current.Error( e, error );
          }
 
-         Settings.TranslationCount++; // counts as a translation
          _consecutiveErrors++;
 
-         job.State = TranslationJobState.Failed;
-         _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
-
-         if( !Settings.IsShutdown )
+         if( jobs.Length == 1 )
          {
-            if( _consecutiveErrors >= Settings.MaxErrors )
+            Settings.TranslationCount++; // counts as a translation
+            foreach( var job in jobs )
             {
-               Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down plugin." );
-
-               _unstartedJobs.Clear();
-               _completedJobs.Clear();
-               _ongoingJobs.Clear();
+               job.State = TranslationJobState.Failed;
+               _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
             }
          }
-      }
-
-      private void OnTranslationFailed( TranslationBatch batch, string error, Exception e )
-      {
-         if( e == null )
-         {
-            XuaLogger.Current.Error( error );
-         }
          else
          {
-            XuaLogger.Current.Error( e, error );
-         }
+            _batchLogicHasFailed = true;
+            for( int i = 0 ; i < jobs.Length ; i++ )
+            {
+               Settings.TranslationCount++;
+               var job = jobs[ i ];
 
-         Settings.TranslationCount++; // counts as a translation
-         _consecutiveErrors++;
-         _batchLogicHasFailed = true;
+               var key = job.Key.GetDictionaryLookupKey();
+               if( !_unstartedJobs.ContainsKey( key ) )
+               {
+                  _unstartedJobs[ key ] = job;
+               }
+               _ongoingJobs.Remove( key );
+            }
 
-         foreach( var tracker in batch.Trackers )
-         {
-            tracker.Job.State = TranslationJobState.Failed;
-            _ongoingJobs.Remove( tracker.Job.Key.GetDictionaryLookupKey() );
+            XuaLogger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
          }
 
          if( !Settings.IsShutdown )

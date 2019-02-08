@@ -20,9 +20,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public bool IsBusy => _ongoingTranslations >= Endpoint.MaxConcurrency;
 
-      public IEnumerator Translate( string untranslatedText, string from, string to, Action<string> success, Action<string, Exception> failure )
+      public IEnumerator Translate( string[] untranslatedTexts, string from, string to, Action<string[]> success, Action<string, Exception> failure )
       {
-         var context = new TranslationContext( untranslatedText, from, to, success, failure );
+         var context = new TranslationContext( untranslatedTexts, from, to, success, failure );
          _ongoingTranslations++;
 
          bool ok = false;

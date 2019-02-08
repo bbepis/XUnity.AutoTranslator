@@ -17,6 +17,8 @@ namespace ReverseTranslator
 
       public int MaxConcurrency => 50;
 
+      public int MaxTranslationsPerRequest => 1;
+
       public void Initialize( IInitializationContext context )
       {
          _myConfig = context.GetOrCreateSetting( "Reverser", "MyConfig", true );

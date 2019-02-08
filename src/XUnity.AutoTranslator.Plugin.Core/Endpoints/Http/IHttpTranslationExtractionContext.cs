@@ -12,5 +12,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
       /// </summary>
       /// <param name="translatedText"></param>
       void Complete( string translatedText );
+
+      /// <summary>
+      /// Completes the translation by providing the translated texts.
+      ///
+      /// The indices of the translations must match the indices of the
+      /// untranslated texts.
+      /// </summary>
+      /// <param name="translatedTexts"></param>
+      void Complete( string[] translatedTexts );
    }
 }
