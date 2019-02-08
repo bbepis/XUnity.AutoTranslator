@@ -7,6 +7,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using SimpleJSON;
+using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
@@ -25,8 +26,7 @@ namespace BingTranslateLegitimate
       };
 
       private static readonly string HttpsServicePointTemplateUrl = "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from={0}&to={1}";
-      private static readonly string RequestTemplate = "[{{\"Text\":\"{0}\"}}]";
-      private static readonly System.Random RandomNumbers = new System.Random();
+      private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { "application/json" };
       private static readonly string[] ContentTypes = new string[] { "application/json" };
@@ -39,6 +39,8 @@ namespace BingTranslateLegitimate
       public override string Id => "BingTranslateLegitimate";
 
       public override string FriendlyName => "Bing Translator (Authenticated)";
+
+      public override int MaxTranslationsPerRequest => 10;
 
       public override void Initialize( IInitializationContext context )
       {
@@ -54,10 +56,27 @@ namespace BingTranslateLegitimate
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
+         StringBuilder data = new StringBuilder();
+         data.Append( "[" );
+         for( int i = 0 ; i < context.UntranslatedTexts.Length ; i++ )
+         {
+            var untranslatedText = JsonHelper.Escape( context.UntranslatedTexts[ i ] );
+            data.Append( "{\"Text\":\"" );
+            data.Append( untranslatedText );
+            data.Append( "\"}" );
+
+            if( context.UntranslatedTexts.Length - 1 != i )
+            {
+               data.Append( "," );
+            }
+         }
+         data.Append( "]" );
+
+
          var request = new XUnityWebRequest(
             "POST",
             string.Format( HttpsServicePointTemplateUrl, context.SourceLanguage, context.DestinationLanguage ),
-            string.Format( RequestTemplate, JsonHelper.Escape( context.UntranslatedText ) ) );
+            data.ToString() );
 
          if( Accept != null )
          {
@@ -74,14 +93,18 @@ namespace BingTranslateLegitimate
 
       public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         var arr = JSON.Parse( context.Response.Data );
+         var arr = JSON.Parse( context.Response.Data ).AsArray;
 
-         var token = arr.AsArray[ 0 ]?.AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
-         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
+         var translations = new List<string>();
+         for( int i = 0 ; i < arr.Count ; i++ )
+         {
+            var token = arr[ i ].AsObject[ "translations" ]?.AsArray[ 0 ]?.AsObject[ "text" ]?.ToString();
+            var translation = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
-         var translated = token;
+            translations.Add( translation );
+         }
 
-         context.Complete( translated );
+         context.Complete( translations.ToArray() );
       }
    }
 }

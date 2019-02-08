@@ -45,6 +45,7 @@ namespace GoogleTranslate
       private bool _hasSetup = false;
       private long m = 427761;
       private long s = 1179739010;
+      private int _translationsPerRequest = 10;
 
       public GoogleTranslateEndpoint()
       {
@@ -55,11 +56,16 @@ namespace GoogleTranslate
 
       public override string FriendlyName => "Google! Translate";
 
-      public override int MaxTranslationsPerRequest => 10;
+      public override int MaxTranslationsPerRequest => _translationsPerRequest;
 
       public override void Initialize( IInitializationContext context )
       {
          context.DisableCerfificateChecksFor( "translate.google.com", "translate.googleapis.com" );
+
+         if( context.DestinationLanguage == "romaji" )
+         {
+            _translationsPerRequest = 1;
+         }
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );

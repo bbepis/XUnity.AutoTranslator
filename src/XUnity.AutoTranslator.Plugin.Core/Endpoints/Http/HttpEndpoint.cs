@@ -79,11 +79,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          // prepare request
          OnCreateRequest( httpContext );
          if( httpContext.Request == null ) httpContext.Fail( "No request object was provided by the translator.", null );
-
+         
          // execute request
          var client = new XUnityWebClient();
          var response = client.Send( httpContext.Request );
-
+         
          // wait for completion
          var iterator = response.GetSupportedEnumerator();
          while( iterator.MoveNext() ) yield return iterator.Current;

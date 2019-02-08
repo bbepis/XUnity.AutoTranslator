@@ -527,12 +527,12 @@ Follow these steps:
  2. Start a new project in Visual Studio 2017 or later. I recommend using the same name for your assembly/project as the "Id" you are going to use in your interface implementation. This makes it easier for users to know how to configure your translator
  3. Add a reference to the XUnity.AutoTranslator.Plugin.Core.dll that you downloaded in step 1
  4. You do not need to directly reference the UnityEngine.dll assembly. This is good, because you do not need to worry about which version of Unity is used.
-   * If you do need a reference to this assembly (because you need functionality from it) consider using an old version of it (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!)
+    * If you do need a reference to this assembly (because you need functionality from it) consider using an old version of it (if `UnityEngine.CoreModule.dll` exists in the Managed folder, it is not an old version!)
  5. Create a new class that either:
-   * Implements the `ITranslateEndpoint` interface
-   * Inherits from the `HttpEndpoint` class
-   * Inherits from the `WwwEndpoint` class
-   * Inherits from the `ExtProtocolEndpoint` class
+    * Implements the `ITranslateEndpoint` interface
+    * Inherits from the `HttpEndpoint` class
+    * Inherits from the `WwwEndpoint` class
+    * Inherits from the `ExtProtocolEndpoint` class
 
 Here's an example that simply reverses the text and also reads some configuration from the configuration file the plugin uses:
 
@@ -612,28 +612,22 @@ internal class YandexTranslateEndpoint : HttpEndpoint
    {
       var data = context.Response.Data;
       var obj = JSON.Parse( data );
-      var lineBuilder = new StringBuilder( data.Length );
 
       var code = obj.AsObject[ "code" ].ToString();
       if( code != "200" ) context.Fail( "Received bad response code: " + code );
 
       var token = obj.AsObject[ "text" ].ToString();
-      token = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
+      var translation = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
 
-      if( string.IsNullOrEmpty( token ) ) return;
+      if( string.IsNullOrEmpty( translation ) ) context.Fail( "Received no translation." );
 
-      if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-      lineBuilder.Append( token );
-
-      var translated = lineBuilder.ToString();
-
-      context.Complete( translated );
+      context.Complete( translation );
    }
 }
 ```
 
 This plugin extends from `HttpEndpoint`. Let's look at the three methods it overrides:
- * `Initialize` is used to read the API key the user has configured. In addition it calls `context.EnableSslFor( "translate.yandex.net" )` in order to disable the certificate check for this specific hostname. If this is neglected, SSL will fail in most versions of Unity. Finally, it throws an exception if the plugin cannot be used with the specified configuration.
+ * `Initialize` is used to read the API key the user has configured. In addition it calls `context.DisableCerfificateChecksFor( "translate.yandex.net" )` in order to disable the certificate check for this specific hostname. If this is neglected, SSL will fail in most versions of Unity. Finally, it throws an exception if the plugin cannot be used with the specified configuration.
  * `OnCreateRequest` is used to construct the `XUnityWebRequest` object that will be sent to the external endpoint. The call to `context.Complete( request )` specifies the request to use.
  * `OnExtractTranslation` is used to extract the text from the response returned from the web server.
 
@@ -643,10 +637,8 @@ After implementing the class, simply build the project and place the generated D
 
 **NOTE**: If you implement a class based on the `HttpEndpoint` and you get an error where the web request is never completed, then it is likely due to the web server requiring Tls1.2. Unity-mono has issues with this spec and it will cause the request to lock up forever. The only solutions to this for now are:
  * Disable SSL, if you can. There are many sitauations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endoint.
- * Use the `WwwEndpoint` instead.
-
-As mentioned earlier, you  can also use the abstract class `WwwEndpoint` to implement roughly the same thing. However, I do not recommend doing so, unless it is an authenticated service.
+ * Use the `WwwEndpoint` instead. I do not recommend using this base class unless it is an authenticated endpoint though.
 
 Another way to implement a translator is to implement the `ExtProtocolEndpoint` class. This can be used to delegate the actual translation logic to an external process. Currently there is no documentation on this, but you can take a look at the LEC implementation, which uses it.
 
-If instead, you use the interface, it is also possible to extend from MonoBehaviour to get access to all the normal lifecycle callbacks of Unity components.
+If instead, you use the interface directly, it is also possible to extend from MonoBehaviour to get access to all the normal lifecycle callbacks of Unity components.

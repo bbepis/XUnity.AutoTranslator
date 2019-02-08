@@ -58,22 +58,16 @@ namespace YandexTranslate
       {
          var data = context.Response.Data;
          var obj = JSON.Parse( data );
-         var lineBuilder = new StringBuilder( data.Length );
 
          var code = obj.AsObject[ "code" ].ToString();
          if( code != "200" ) context.Fail( "Received bad response code: " + code );
 
          var token = obj.AsObject[ "text" ].ToString();
-         token = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
+         var translation = JsonHelper.Unescape( token.Substring( 2, token.Length - 4 ) );
 
-         if( string.IsNullOrEmpty( token ) ) return;
+         if( string.IsNullOrEmpty( translation ) ) context.Fail( "Received no translation." );
 
-         if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-         lineBuilder.Append( token );
-
-         var translated = lineBuilder.ToString();
-
-         context.Complete( translated );
+         context.Complete( translation );
       }
    }
 }

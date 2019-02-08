@@ -1938,6 +1938,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          onContinue();
       }
 
+      private IEnumerator EnableBatchingAfterDelay()
+      {
+         yield return new WaitForSeconds( 60 );
+
+         _batchLogicHasFailed = false;
+
+         XuaLogger.Current.Error( "Re-enabled batching." );
+      }
+
       void Awake()
       {
          if( !_initialized )
@@ -2101,7 +2110,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( _endpoint.IsBusy ) break;
 
                var kvps = _unstartedJobs.Take( _endpoint.Endpoint.MaxTranslationsPerRequest ).ToList();
-               //var batch = new TranslationBatch();
                var untranslatedTexts = new List<string>();
                var jobs = new List<TranslationJob>();
 
@@ -2143,8 +2151,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             while( _unstartedJobs.Count > 0 )
             {
                if( _endpoint.IsBusy ) break;
-
-               // ERROR ERROR ERROR --- MEGA BUG MEGA BUG, MUST REMOVE FROM _unstartedJobs INSIDE LOOP!!!!
 
                var kvp = _unstartedJobs.FirstOrDefault();
 
@@ -2204,7 +2210,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else
          {
-            // might as well re-add all translation jobs, and never do this again!
+            if( !_batchLogicHasFailed )
+            {
+               StartCoroutine( EnableBatchingAfterDelay() );
+            }
+
             _batchLogicHasFailed = true;
             for( int i = 0 ; i < jobs.Length ; i++ )
             {
@@ -2301,6 +2311,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else
          {
+            if( !_batchLogicHasFailed )
+            {
+               StartCoroutine( EnableBatchingAfterDelay() );
+            }
+
             _batchLogicHasFailed = true;
             for( int i = 0 ; i < jobs.Length ; i++ )
             {
