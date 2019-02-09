@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputPath>bin</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Translators\BaiduTranslate\BaiduTranslate.csproj" />
+    <ProjectReference Include="..\Translators\BingTranslateLegitimate\BingTranslateLegitimate.csproj" />
+    <ProjectReference Include="..\Translators\BingTranslate\BingTranslate.csproj" />
+    <ProjectReference Include="..\Translators\CustomTranslate\CustomTranslate.csproj" />
+    <ProjectReference Include="..\Translators\GoogleTranslateLegitimate\GoogleTranslateLegitimate.csproj" />
+    <ProjectReference Include="..\Translators\GoogleTranslate\GoogleTranslate.csproj" />
+    <ProjectReference Include="..\Translators\LecPowerTranslator15\LecPowerTranslator15.csproj" />
+    <ProjectReference Include="..\Translators\ReverseTranslator\ReverseTranslator.csproj" />
+    <ProjectReference Include="..\Translators\WatsonTranslate\WatsonTranslate.csproj" />
+    <ProjectReference Include="..\Translators\YandexTranslate\YandexTranslate.csproj" />
+    <ProjectReference Include="..\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj" />
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+  </ItemGroup>
+
+</Project>

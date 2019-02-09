@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+    <RootNamespace>XUnity.AutoTranslator.Setup.Build_x86</RootNamespace>
+    <Platforms>AnyCPU;x86</Platforms>
+  </PropertyGroup>
+
+   <PropertyGroup>
+      <OutputPath>bin</OutputPath>
+   </PropertyGroup>
+
+   <ItemGroup>
+     <ProjectReference Include="..\Translators\Lec.ExtProtocol\Lec.ExtProtocol.csproj" />
+   </ItemGroup>
+
+</Project>
