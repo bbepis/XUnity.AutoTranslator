@@ -167,7 +167,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
          while( _initializing && !_failed ) yield return new WaitForSeconds( 0.2f ); 
 
-         if( _failed ) context.Fail( "Translator failed.", null );
+         if( _failed ) context.Fail( "External process failed." );
 
          var result = new ProtocolTransactionHandle();
          var id = Guid.NewGuid();

@@ -98,7 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
          // prepare request
          OnCreateRequest( wwwContext );
-         if( wwwContext.RequestInfo == null ) wwwContext.Fail( "No request object was provided by the translator.", null );
+         if( wwwContext.RequestInfo == null ) wwwContext.Fail( "No request object was provided by the translator." );
 
          var request = wwwContext.RequestInfo;
          var url = request.Address;
@@ -113,11 +113,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
          // extract error
          string error = (string)AccessTools.Property( Constants.ClrTypes.WWW, "error" ).GetValue( www, null );
-         if( error != null ) wwwContext.Fail( "Error occurred while retrieving translation. " + error, null );
+         if( error != null ) wwwContext.Fail( "Error occurred while retrieving translation. " + error );
 
          // extract text
          var text = (string)AccessTools.Property( Constants.ClrTypes.WWW, "text" ).GetValue( www, null );
-         if( text == null ) wwwContext.Fail( "Error occurred while extracting text from response.", null ); 
+         if( text == null ) wwwContext.Fail( "Error occurred while extracting text from response." ); 
 
          wwwContext.ResponseData = text;
 

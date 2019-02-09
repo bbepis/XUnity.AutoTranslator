@@ -197,18 +197,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return;
          }
 
-         try
+         var primaryEndpoint = _configuredEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.ServiceEndpoint );
+         if( primaryEndpoint != null )
          {
-            var primaryEndpoint = _configuredEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.ServiceEndpoint );
-
-            if( primaryEndpoint == null ) throw new Exception( "The primary endpoint was not properly configured." );
-            if( primaryEndpoint.Error != null ) throw new Exception( "The primary endpoint was not properly configured.", primaryEndpoint.Error );
-
-            _endpoint = primaryEndpoint;
+            if( primaryEndpoint.Error != null )
+            {
+               XuaLogger.Current.Error( primaryEndpoint.Error, "Error occurred during the initialization of the selected translate endpoint." );
+            }
+            else
+            {
+               _endpoint = primaryEndpoint;
+            }
          }
-         catch( Exception e )
+         else if( !string.IsNullOrEmpty( Settings.ServiceEndpoint ) )
          {
-            XuaLogger.Current.Error( e, "An unexpected error occurred during initialization of endpoint." );
+            XuaLogger.Current.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
          }
 
          // TODO: Perhaps some bleeding edge check to see if this is required?

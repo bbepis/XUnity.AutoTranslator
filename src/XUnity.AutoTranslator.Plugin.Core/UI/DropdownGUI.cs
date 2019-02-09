@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          _x = x;
          _y = y;
          _width = width;
-         _noSelection = new GUIContent( "----", "SELECT TRANSLATOR. No translator is currently selected, which means no new translations will be performed. Please select one from the dropdown." );
+         _noSelection = new GUIContent( "----", "<b>SELECT TRANSLATOR</b>\nNo translator is currently selected, which means no new translations will be performed. Please select one from the dropdown." );
 
          _options = new List<TDropdownOptionViewModel>();
          foreach( var item in options )

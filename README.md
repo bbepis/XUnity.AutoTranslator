@@ -634,6 +634,8 @@ As you can see, the `XUnityWebClient` class is not even used. We simply specify 
 
 After implementing the class, simply build the project and place the generated DLL file in the "Translators" directory of the plugin folder. That's it.
 
+For more examples of implementations, you can simply take a look at this projects source code.
+
 **NOTE**: If you implement a class based on the `HttpEndpoint` and you get an error where the web request is never completed, then it is likely due to the web server requiring Tls1.2. Unity-mono has issues with this spec and it will cause the request to lock up forever. The only solutions to this for now are:
  * Disable SSL, if you can. There are many sitauations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endoint.
  * Use the `WwwEndpoint` instead. I do not recommend using this base class unless it is an authenticated endpoint though.

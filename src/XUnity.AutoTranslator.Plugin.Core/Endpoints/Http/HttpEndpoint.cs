@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
 
          // prepare request
          OnCreateRequest( httpContext );
-         if( httpContext.Request == null ) httpContext.Fail( "No request object was provided by the translator.", null );
+         if( httpContext.Request == null ) httpContext.Fail( "No request object was provided by the translator." );
          
          // execute request
          var client = new XUnityWebClient();
@@ -95,7 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          if( response.Error != null ) httpContext.Fail( "Error occurred while retrieving translation.", response.Error ); 
 
          // failure
-         if( response.Data == null ) httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned.", null );
+         if( response.Data == null ) httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned." );
 
          // extract text
          OnExtractTranslation( httpContext );
