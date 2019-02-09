@@ -29,8 +29,7 @@ namespace BingTranslate
       private static readonly string HttpsServicePointTemplateUrlWithoutIG = "https://www.bing.com/ttranslate?&category=";
       private static readonly string HttpsTranslateUserSite = "https://www.bing.com/translator";
       private static readonly string RequestTemplate = "&text={0}&from={1}&to={2}";
-      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
-      private static readonly System.Random RandomNumbers = new System.Random();
+      private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { "*/*" };
       private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US", "en" };
@@ -150,7 +149,7 @@ namespace BingTranslate
 
       private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
       {
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? DefaultUserAgent : AutoTranslatorSettings.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
 
          if( AcceptLanguage != null )
          {

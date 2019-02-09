@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using SimpleJSON;
 using XUnity.AutoTranslator.Plugin.Core;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
@@ -51,7 +52,7 @@ namespace BaiduTranslate
                salt,
                md5 ) );
 
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36" : AutoTranslatorSettings.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
          request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
 
          context.Complete( request );

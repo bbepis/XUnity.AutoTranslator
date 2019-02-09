@@ -600,8 +600,7 @@ internal class YandexTranslateEndpoint : HttpEndpoint
             context.DestinationLanguage,
             WwwHelper.EscapeUrl( context.UntranslatedText ),
             _key ) );
-
-      request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.183 Safari/537.36 Vivaldi/1.96.1147.55" : AutoTranslatorSettings.UserAgent;
+         
       request.Headers[ HttpRequestHeader.Accept ] = "*/*";
       request.Headers[ HttpRequestHeader.AcceptCharset ] = "UTF-8";
 

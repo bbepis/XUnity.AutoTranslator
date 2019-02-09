@@ -7,6 +7,7 @@
  * FEATURE - Removed support for Excite translate because it only support the 'WWW' API in Unity due to missing TLS1.2 support
  * FEATURE - Updated Watson translate to v3
  * FEATURE - Support for 'romaji' as output language. Only google supports this at the moment
+ * FEATURE - Batching support for all endpoints where the API supports it
  * BUG FIX - Too many small fixes to mention
  * MISC - {GameExeName} variable can now be used in configuration of directories and files
  * MISC - Changed the way the 'Custom' endpoint works. See README for more info

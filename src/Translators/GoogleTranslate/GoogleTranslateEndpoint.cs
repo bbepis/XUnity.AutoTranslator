@@ -28,7 +28,6 @@ namespace GoogleTranslate
       private static readonly string HttpsServicePointTranslateTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl={1}&dt=t&tk={2}&q={3}";
       private static readonly string HttpsServicePointRomanizeTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl=en&dt=rm&tk={1}&q={2}";
       private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
-      private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36";
       private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
@@ -189,7 +188,7 @@ namespace GoogleTranslate
 
       private void AddHeaders( XUnityWebRequest request, bool isTranslationRequest )
       {
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? DefaultUserAgent : AutoTranslatorSettings.UserAgent;
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
          if( AcceptLanguage != null )
          {
             request.Headers[ HttpRequestHeader.AcceptLanguage ] = AcceptLanguage;

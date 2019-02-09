@@ -22,7 +22,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
          Address = new Uri( address );
          Data = data;
       }
-      
+
+      /// <summary>
+      /// Constructs a web request.
+      /// </summary>
+      /// <param name="method"></param>
+      /// <param name="address"></param>
+      public XUnityWebRequest( string method, string address )
+      {
+         Method = method;
+         Address = new Uri( address );
+         Data = string.Empty;
+      }
+
       /// <summary>
       /// Constructs a GET web request.
       /// </summary>

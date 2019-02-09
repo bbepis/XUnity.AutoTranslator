@@ -32,6 +32,8 @@ namespace WatsonTranslate
 
       public override string FriendlyName => "Watson Language Translator";
 
+      public override int MaxTranslationsPerRequest => 10;
+
       public override void Initialize( IInitializationContext context )
       {
          _url = context.GetOrCreateSetting( "Watson", "Url", "" );
@@ -47,15 +49,28 @@ namespace WatsonTranslate
 
       public override void OnCreateRequest( IWwwRequestCreationContext context )
       {
+         StringBuilder data = new StringBuilder();
+         data.Append( "{\"text\":[" );
+         for( int i = 0 ; i < context.UntranslatedTexts.Length ; i++ )
+         {
+            var untranslatedText = JsonHelper.Escape( context.UntranslatedTexts[ i ] );
+            data.Append( "\"" ).Append( untranslatedText ).Append( "\"" );
+
+            if( context.UntranslatedTexts.Length - 1 != i )
+            {
+               data.Append( "," );
+            }
+         }
+         data.Append( "],\"model_id\":\"" )
+            .Append( context.SourceLanguage )
+            .Append( "-" )
+            .Append( context.DestinationLanguage )
+            .Append( "\"}" );
+
          var request = new WwwRequestInfo(
             _fullUrl,
-            string.Format(
-               RequestTemplate,
-               context.SourceLanguage,
-               context.DestinationLanguage,
-               JsonHelper.Escape( context.UntranslatedText ) ) );
-
-         request.Headers[ "User-Agent" ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? "curl/7.55.1" : AutoTranslatorSettings.UserAgent;
+            data.ToString() );
+         
          request.Headers[ "Accept" ] = "application/json";
          request.Headers[ "Content-Type" ] = "application/json";
          request.Headers[ "Authorization" ] = "Basic " + Convert.ToBase64String( Encoding.ASCII.GetBytes( "apikey:" + _key ) );
@@ -66,21 +81,17 @@ namespace WatsonTranslate
       public override void OnExtractTranslation( IWwwTranslationExtractionContext context )
       {
          var data = context.ResponseData;
-         var obj = JSON.Parse( data );
-         var lineBuilder = new StringBuilder( data.Length );
+         var arr = JSON.Parse( data ).AsObject[ "translations" ].AsArray;
 
-         foreach( JSONNode entry in obj.AsObject[ "translations" ].AsArray )
+         var translatedTexts = new List<string>();
+         for( int i = 0 ; i < arr.Count ; i++ )
          {
-            var token = entry.AsObject[ "translation" ].ToString();
-            token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
-
-            if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( "\n" );
-
-            lineBuilder.Append( token );
+            var token = arr[ i ].AsObject[ "translation" ].ToString();
+            var translatedText = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
+            translatedTexts.Add( translatedText );
          }
-         var translated = lineBuilder.ToString();
 
-         context.Complete( translated );
+         context.Complete( translatedTexts.ToArray() );
       }
    }
 }

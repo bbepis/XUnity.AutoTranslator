@@ -673,7 +673,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
 
-         XuaLogger.Current.Debug( "Queued translation for: " + lookupKey );
+         XuaLogger.Current.Debug( "Queued: '" + lookupKey + "'" );
 
          ongoingJob = new TranslationJob( key );
          if( ui != null )
@@ -2134,7 +2134,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   foreach( var untranslatedText in untranslatedTexts )
                   {
-                     XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
+                     XuaLogger.Current.Debug( "Started: '" + untranslatedText + "'" );
                   }
                   StartCoroutine(
                      _endpoint.Translate(
@@ -2164,7 +2164,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _ongoingJobs[ key ] = job;
 
                var untranslatedText = job.Key.GetDictionaryLookupKey();
-               XuaLogger.Current.Debug( "Starting translation for: " + untranslatedText );
+               XuaLogger.Current.Debug( "Started: " + untranslatedText );
                StartCoroutine(
                   _endpoint.Translate(
                      new[] { untranslatedText },
@@ -2205,7 +2205,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                job.State = TranslationJobState.Succeeded;
                _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
 
-               XuaLogger.Current.Debug( $"Translation for '{job.Key.GetDictionaryLookupKey()}' succeded. Result: {translatedText}" );
+               XuaLogger.Current.Debug( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
             }
          }
          else
@@ -2252,7 +2252,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var translatedText = translatedTextArray[ 0 ];
 
          Settings.TranslationCount++;
-         XuaLogger.Current.Debug( $"Translation for '{job.Key.GetDictionaryLookupKey()}' succeded. Result: {translatedText}" );
+         XuaLogger.Current.Debug( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
 
          _consecutiveErrors = 0;
 
