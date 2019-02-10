@@ -77,37 +77,41 @@ namespace Lec.ExtProtocol
          IntPtr ptr = IntPtr.Zero;
 
          // we can't know the output size, so just try until we have a big enough buffer
-         do
+         try
          {
-            size = size * 2;
-            // give up when we reach 10 MB string
-            if( size > 10 * 1024 * 1024 )
+            do
             {
-               return null;
-            }
+               size = size * 2;
+               // give up when we reach 10 MB string
+               if( size > 10 * 1024 * 1024 )
+               {
+                  return null;
+               }
 
+               if( ptr != IntPtr.Zero )
+               {
+                  Marshal.FreeHGlobal( ptr );
+               }
+               ptr = Marshal.AllocHGlobal( size );
+
+               var str = ConvertStringToNative( toTranslate, JapaneseCodepage );
+               translatedSize = _translate( 0, str, size, ptr );
+
+               Marshal.FreeHGlobal( str );
+
+            } while( translatedSize > size );
+
+            var result = ConvertNativeToString( ptr, JapaneseCodepage );
+
+            return result;
+         }
+         finally
+         {
             if( ptr != IntPtr.Zero )
             {
                Marshal.FreeHGlobal( ptr );
             }
-            ptr = Marshal.AllocHGlobal( size );
-
-            var str = ConvertStringToNative( toTranslate, JapaneseCodepage );
-            translatedSize = _translate( 0, str, size, ptr );
-
-
-            Marshal.FreeHGlobal( str );
-
-         } while( translatedSize > size );
-
-         var result = ConvertNativeToString( ptr, JapaneseCodepage );
-
-         if( ptr != IntPtr.Zero )
-         {
-            Marshal.FreeHGlobal( ptr );
          }
-
-         return result;
       }
 
       protected override bool OnInitialize( string libraryPath )
