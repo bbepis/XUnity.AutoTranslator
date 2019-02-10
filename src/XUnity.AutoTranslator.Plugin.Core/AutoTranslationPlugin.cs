@@ -2124,28 +2124,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
 
-                  jobs.Add( job );
-                  untranslatedTexts.Add( job.Key.GetDictionaryLookupKey() );
-
-                  _ongoingJobs[ key ] = job;
+                  var untranslatedText = job.Key.GetDictionaryLookupKey();
+                  if( _endpoint.CanTranslate( untranslatedText ) )
+                  {
+                     jobs.Add( job );
+                     untranslatedTexts.Add( untranslatedText );
+                     _ongoingJobs[ key ] = job;
+                  }
+                  else
+                  {
+                     XuaLogger.Current.Warn( $"Unqueued: '{untranslatedText}' because the current endpoint has already failed this translation 3 times." );
+                     job.State = TranslationJobState.Failed;
+                  }
                }
 
                if( jobs.Count > 0 )
                {
                   _availableBatchOperations--;
                   var jobsArray = jobs.ToArray();
+                  var endpoint = _endpoint;
 
                   foreach( var untranslatedText in untranslatedTexts )
                   {
                      XuaLogger.Current.Debug( "Started: '" + untranslatedText + "'" );
                   }
                   StartCoroutine(
-                     _endpoint.Translate(
+                     endpoint.Translate(
                         untranslatedTexts.ToArray(),
                         Settings.FromLanguage,
                         Settings.Language,
                         translatedText => OnBatchTranslationCompleted( jobsArray, translatedText ),
-                        ( msg, e ) => OnTranslationFailed( jobsArray, msg, e ) ) );
+                        ( msg, e ) => OnTranslationFailed( endpoint, jobsArray, msg, e ) ) );
                }
             }
          }
@@ -2164,17 +2173,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // lets see if the text should still be translated before kicking anything off
                if( !job.AnyComponentsStillHasOriginalUntranslatedTextOrContextual() ) continue;
 
-               _ongoingJobs[ key ] = job;
-
                var untranslatedText = job.Key.GetDictionaryLookupKey();
-               XuaLogger.Current.Debug( "Started: " + untranslatedText );
-               StartCoroutine(
-                  _endpoint.Translate(
-                     new[] { untranslatedText },
-                     Settings.FromLanguage,
-                     Settings.Language,
-                     translatedText => OnSingleTranslationCompleted( job, translatedText ),
-                     ( msg, e ) => OnTranslationFailed( new[] { job }, msg, e ) ) );
+               if( _endpoint.CanTranslate( untranslatedText ) )
+               {
+                  var endpoint = _endpoint;
+                  _ongoingJobs[ key ] = job;
+
+                  XuaLogger.Current.Debug( "Started: " + untranslatedText );
+                  StartCoroutine(
+                     endpoint.Translate(
+                        new[] { untranslatedText },
+                        Settings.FromLanguage,
+                        Settings.Language,
+                        translatedText => OnSingleTranslationCompleted( job, translatedText ),
+                        ( msg, e ) => OnTranslationFailed( endpoint, new[] { job }, msg, e ) ) );
+               }
+               else
+               {
+                  XuaLogger.Current.Warn( $"Unqueued: '{untranslatedText}' because the current endpoint has already failed this translation 3 times." );
+                  job.State = TranslationJobState.Failed;
+               }
             }
          }
       }
@@ -2208,7 +2226,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                job.State = TranslationJobState.Succeeded;
                _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
 
-               XuaLogger.Current.Debug( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
+               XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
             }
          }
          else
@@ -2250,12 +2268,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnSingleTranslationCompleted( TranslationJob job, string[] translatedTextArray )
+      private void OnSingleTranslationCompleted( TranslationJob job, string[] translatedTexts )
       {
-         var translatedText = translatedTextArray[ 0 ];
+         var translatedText = translatedTexts[ 0 ];
 
          Settings.TranslationCount++;
-         XuaLogger.Current.Debug( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
+         XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
 
          _consecutiveErrors = 0;
 
@@ -2290,7 +2308,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void OnTranslationFailed( TranslationJob[] jobs, string error, Exception e )
+      private void OnTranslationFailed( ConfiguredEndpoint endpoint, TranslationJob[] jobs, string error, Exception e )
       {
          if( e == null )
          {
@@ -2308,8 +2326,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             Settings.TranslationCount++; // counts as a translation
             foreach( var job in jobs )
             {
+               var untranslatedText = job.Key.GetDictionaryLookupKey();
                job.State = TranslationJobState.Failed;
-               _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
+               _ongoingJobs.Remove( untranslatedText );
+
+               endpoint.RegisterTranslationFailureFor( untranslatedText );
             }
          }
          else

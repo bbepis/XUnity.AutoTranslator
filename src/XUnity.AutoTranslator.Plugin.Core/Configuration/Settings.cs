@@ -14,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    internal static class Settings
    {
       // cannot be changed
+      public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
       public static readonly string PluginFolder = "Translators";
       public static readonly int MaxMaxCharactersPerTranslation = 500;
       public static readonly string DefaultLanguage = "en";
