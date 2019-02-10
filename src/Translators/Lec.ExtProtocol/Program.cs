@@ -41,12 +41,18 @@ namespace Lec.ExtProtocol
                      var message = ExtProtocolConvert.Decode( receivedPayload ) as TranslationRequest;
                      if( message == null ) return;
 
-                     var translatedLine = translator.Translate( message.UntranslatedText );
+                     var translatedTexts = new string[ message.UntranslatedTexts.Length ];
+                     for( int i = 0 ; i < message.UntranslatedTexts.Length ; i++ )
+                     {
+                        var untranslatedText = message.UntranslatedTexts[ i ];
+                        var translatedText = translator.Translate( untranslatedText );
+                        translatedTexts[ i ] = translatedText;
+                     }
 
                      var response = new TranslationResponse
                      {
                         Id = message.Id,
-                        TranslatedText = translatedLine
+                        TranslatedTexts = translatedTexts
                      };
 
                      var translatedPayload = ExtProtocolConvert.Encode( response );

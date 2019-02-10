@@ -47,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// <summary>
       /// Gets the maximum number of translations that can be served per translation request.
       /// </summary>
-      public int MaxTranslationsPerRequest => 1;
+      public virtual int MaxTranslationsPerRequest => 1;
 
       /// <summary>
       /// Gets the path to the executable that should be communicated with.
@@ -184,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                Id = id,
                SourceLanguage = context.SourceLanguage,
                DestinationLanguage = context.DestinationLanguage,
-               UntranslatedText = context.UntranslatedText
+               UntranslatedTexts = context.UntranslatedTexts
             };
             var payload = ExtProtocolConvert.Encode( request );
 
@@ -201,7 +201,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
          if( !result.Succeeded ) context.Fail( "Error occurred while retrieving translation. " + result.Error );
 
-         context.Complete( result.Result );
+         context.Complete( result.Results );
       }
 
       private void HandleProtocolMessageResponse( ProtocolMessage message )
@@ -225,7 +225,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             if( _transactionHandles.TryGetValue( message.Id, out var result ) )
             {
-               result.SetCompleted( message.TranslatedText, null );
+               result.SetCompleted( message.TranslatedTexts, null );
                _transactionHandles.Remove( message.Id );
             }
          }

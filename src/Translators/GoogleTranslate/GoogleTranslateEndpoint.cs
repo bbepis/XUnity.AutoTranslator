@@ -123,13 +123,21 @@ namespace GoogleTranslate
 
       public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         var dataIndex = context.DestinationLanguage == "romaji" ? 3 : 0;
+         var isRomaji = context.DestinationLanguage == "romaji";
+         var dataIndex = isRomaji ? 3 : 0;
 
          var data = context.Response.Data;
          var arr = JSON.Parse( data );
          var lineBuilder = new StringBuilder( data.Length );
 
-         foreach( JSONNode entry in arr.AsArray[ 0 ].AsArray )
+         arr = arr.AsArray[ 0 ];
+         if( arr.IsNull && isRomaji )
+         {
+            context.Complete( context.UntranslatedText );
+            return;
+         }
+
+         foreach( JSONNode entry in arr.AsArray )
          {
             var token = entry.AsArray[ dataIndex ].ToString();
             token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );

@@ -43,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
          var id = TypeToId[ message.GetType() ];
          writer.WriteLine( id );
          message.Encode( writer );
-         return Convert.ToBase64String( Encoding.UTF8.GetBytes( writer.ToString() ) );
+         return Convert.ToBase64String( Encoding.UTF8.GetBytes( writer.ToString() ), Base64FormattingOptions.None );
       }
 
       /// <summary>

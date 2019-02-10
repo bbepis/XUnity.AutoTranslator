@@ -39,13 +39,13 @@ namespace Lec.ExtProtocol
          return nativeUtf8;
       }
 
-      public static string ConvertNativeToString( IntPtr nativeUtf8 )
+      public static string ConvertNativeToString( IntPtr nativeUtf8, int codepage )
       {
          int len = 0;
          while( Marshal.ReadByte( nativeUtf8, len ) != 0 ) ++len;
          byte[] buffer = new byte[ len ];
          Marshal.Copy( nativeUtf8, buffer, 0, buffer.Length );
-         return Encoding.UTF8.GetString( buffer );
+         return Encoding.GetEncoding( codepage ).GetString( buffer );
       }
 
       protected virtual void Dispose( bool disposing )

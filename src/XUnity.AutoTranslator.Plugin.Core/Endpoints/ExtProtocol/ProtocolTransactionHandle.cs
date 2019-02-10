@@ -10,10 +10,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          StartTime = Time.realtimeSinceStartup;
       }
 
-      public void SetCompleted( string result, string error )
+      public void SetCompleted( string[] translatedTexts, string error )
       {
          IsCompleted = true;
-         Result = result;
+         Results = translatedTexts;
          Error = error;
       }
 
@@ -21,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
       public float StartTime { get; set; }
 
-      public string Result { get; set; }
+      public string[] Results { get; set; }
 
       public string Error { get; set; }
 

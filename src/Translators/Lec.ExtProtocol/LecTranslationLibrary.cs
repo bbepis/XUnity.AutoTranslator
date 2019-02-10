@@ -16,7 +16,7 @@ namespace Lec.ExtProtocol
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate int eg_end();
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
-      private delegate int eg_translate_multi( int i, IntPtr in_str, int out_size, StringBuilder out_str );
+      private delegate int eg_translate_multi( int i, IntPtr in_str, int out_size, IntPtr out_str );
 
       private eg_end _end;
       private eg_translate_multi _translate;
@@ -73,8 +73,9 @@ namespace Lec.ExtProtocol
       {
          toTranslate = PreprocessString( toTranslate );
          var size = toTranslate.Length * 3;
-         var builder = new StringBuilder();
          int translatedSize;
+         IntPtr ptr = IntPtr.Zero;
+
          // we can't know the output size, so just try until we have a big enough buffer
          do
          {
@@ -85,16 +86,30 @@ namespace Lec.ExtProtocol
                return null;
             }
 
-            builder.Capacity = size;
+            if( ptr != IntPtr.Zero )
+            {
+               Marshal.FreeHGlobal( ptr );
+            }
+            ptr = Marshal.AllocHGlobal( size );
+
             var str = ConvertStringToNative( toTranslate, JapaneseCodepage );
-            translatedSize = _translate( 0, str, size, builder );
+            translatedSize = _translate( 0, str, size, ptr );
+
+
             Marshal.FreeHGlobal( str );
 
          } while( translatedSize > size );
 
-         return builder.ToString();
+         var result = ConvertNativeToString( ptr, JapaneseCodepage );
+
+         if( ptr != IntPtr.Zero )
+         {
+            Marshal.FreeHGlobal( ptr );
+         }
+
+         return result;
       }
-      
+
       protected override bool OnInitialize( string libraryPath )
       {
          try

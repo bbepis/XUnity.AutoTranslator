@@ -6,6 +6,15 @@
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Optimize>false</Optimize>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
       <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\&quot;&#xD;&#xA;)" />
    </Target>
