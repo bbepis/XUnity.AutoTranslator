@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public string PluginDirectory => PluginEnvironment.Current.DataPath;
 
-      public void DisableCerfificateChecksFor( params string[] hosts )
+      public void DisableCertificateChecksFor( params string[] hosts )
       {
          _security.EnableSslFor( hosts );
       }

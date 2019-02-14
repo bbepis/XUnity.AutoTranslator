@@ -59,7 +59,7 @@ namespace GoogleTranslate
 
       public override void Initialize( IInitializationContext context )
       {
-         context.DisableCerfificateChecksFor( "translate.google.com", "translate.googleapis.com" );
+         context.DisableCertificateChecksFor( "translate.google.com", "translate.googleapis.com" );
 
          if( context.DestinationLanguage == "romaji" )
          {
@@ -148,7 +148,6 @@ namespace GoogleTranslate
          }
 
          var allTranslation = lineBuilder.ToString();
-
          if( context.UntranslatedTexts.Length == 1 )
          {
             context.Complete( allTranslation );

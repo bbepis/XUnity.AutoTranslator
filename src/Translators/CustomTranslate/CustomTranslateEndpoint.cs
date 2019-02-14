@@ -31,7 +31,7 @@ namespace CustomTranslate
          if( string.IsNullOrEmpty( _endpoint ) ) throw new ArgumentException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
-         context.DisableCerfificateChecksFor( uri.Host );
+         context.DisableCertificateChecksFor( uri.Host );
 
          _friendlyName += " (" + uri.Host + ")";
       }

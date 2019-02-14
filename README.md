@@ -141,6 +141,7 @@ ForceUIResizing=True             ;Indicates whether the UI resize behavior shoul
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
+RomajiPostProcessing=RemoveAllDiacritics;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -228,6 +229,14 @@ The following aims at reducing the number of requests send to the translation en
  * `EnableBatching`: Batches several translation requests into a single with supported endpoints (Only GoogleTranslate and GoogleTranslateLegitimate at the moment)
  * `UseStaticTranslations`: Enables usage of internal lookup dictionary of various english-to-japanese terms.
  * `MaxCharactersPerTranslation`: Specifies the maximum length of a text to translate. Any texts longer than this is ignored by the plugin. Cannot be greater than 500.
+
+#### Romaji 'translation'
+One of the possible values as output `Language` is 'romaji'. If you choose this as language, you will find that games often has problems showing the translations because the font does not understand the special characters used, for example the [macron diacritic](https://en.wikipedia.org/wiki/Macron_(diacritic)).
+
+To rememdy this, post processing can be applied to translations when 'romaji' is chosen as `Language`. This is done through the option `RomajiPostProcessing`. This option is a ';'-seperated list of values:
+ * `RemoveAllDiacritics`: Remove all diacritics from the translated text
+ * `ReplaceMacronWithCircumflex`: Replaces the macron diacritic with a circumflex.
+ * `RemoveApostrophes`: Some translators might decide to include apostrophes after the 'n'-character. Applying this option removes those.
 
 #### Other Options
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
@@ -584,7 +593,7 @@ internal class YandexTranslateEndpoint : HttpEndpoint
    public override void Initialize( IInitializationContext context )
    {
       _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
-      context.DisableCerfificateChecksFor( "translate.yandex.net" );
+      context.DisableCertificateChecksFor( "translate.yandex.net" );
 
       // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
       if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
@@ -627,7 +636,7 @@ internal class YandexTranslateEndpoint : HttpEndpoint
 ```
 
 This plugin extends from `HttpEndpoint`. Let's look at the three methods it overrides:
- * `Initialize` is used to read the API key the user has configured. In addition it calls `context.DisableCerfificateChecksFor( "translate.yandex.net" )` in order to disable the certificate check for this specific hostname. If this is neglected, SSL will fail in most versions of Unity. Finally, it throws an exception if the plugin cannot be used with the specified configuration.
+ * `Initialize` is used to read the API key the user has configured. In addition it calls `context.DisableCertificateChecksFor( "translate.yandex.net" )` in order to disable the certificate check for this specific hostname. If this is neglected, SSL will fail in most versions of Unity. Finally, it throws an exception if the plugin cannot be used with the specified configuration.
  * `OnCreateRequest` is used to construct the `XUnityWebRequest` object that will be sent to the external endpoint. The call to `context.Complete( request )` specifies the request to use.
  * `OnExtractTranslation` is used to extract the text from the response returned from the web server.
 

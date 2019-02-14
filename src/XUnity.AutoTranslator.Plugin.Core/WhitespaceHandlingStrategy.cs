@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal enum WhitespaceHandlingStrategy
    {
-      AllOccurrences,
-      TrimPerNewline
+      TrimPerNewline,
+      AllOccurrences
    }
 }

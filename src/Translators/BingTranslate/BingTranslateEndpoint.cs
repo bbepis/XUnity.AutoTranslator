@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -30,6 +31,8 @@ namespace BingTranslate
       private static readonly string HttpsTranslateUserSite = "https://www.bing.com/translator";
       private static readonly string RequestTemplate = "&text={0}&from={1}&to={2}";
       private static readonly Random RandomNumbers = new Random();
+      private static readonly string TranslationSeparator = "---";
+      private static readonly string TranslationSeparatorWithNewlines = "\r\n---\r\n";
 
       private static readonly string[] Accepts = new string[] { "*/*" };
       private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US", "en" };
@@ -61,10 +64,12 @@ namespace BingTranslate
 
       public override string FriendlyName => "Bing Translator";
 
+      public override int MaxTranslationsPerRequest => 10;
+
       public override void Initialize( IInitializationContext context )
       {
          // Configure service points / service point manager
-         context.DisableCerfificateChecksFor( "www.bing.com" );
+         context.DisableCertificateChecksFor( "www.bing.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -72,17 +77,14 @@ namespace BingTranslate
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
       {
-         if( !_hasSetup || AutoTranslatorState.TranslationCount % _resetAfter == 0 )
+         if( !_hasSetup || _translationCount % _resetAfter == 0 )
          {
             _resetAfter = RandomNumbers.Next( 75, 125 );
             _hasSetup = true;
 
             // Setup TKK and cookies
             var enumerator = SetupIGAndIID();
-            while( enumerator.MoveNext() )
-            {
-               yield return enumerator.Current;
-            }
+            while( enumerator.MoveNext() ) yield return enumerator.Current;
          }
       }
 
@@ -100,9 +102,11 @@ namespace BingTranslate
             address = string.Format( HttpsServicePointTemplateUrl, _ig, _iid, _translationCount );
          }
 
+         var requestData = string.Join( TranslationSeparatorWithNewlines, context.UntranslatedTexts );
+
          var data = string.Format(
             RequestTemplate,
-            Uri.EscapeDataString( context.UntranslatedText ),
+            Uri.EscapeDataString( requestData ),
             context.SourceLanguage,
             context.DestinationLanguage );
 
@@ -124,17 +128,40 @@ namespace BingTranslate
          var obj = JSON.Parse( context.Response.Data );
 
          var code = obj[ "statusCode" ].AsInt;
-         if( code != 200 )
-         {
-            return;
-         }
+         if( code != 200 ) context.Fail( "Bad response code received from service: " + code );
 
          var token = obj[ "translationResponse" ].ToString();
-         token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
+         var allTranslatedText = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
-         var translated = token;
+         if( context.UntranslatedTexts.Length > 1 )
+         {
+            var translatedTexts = allTranslatedText
+               .Split( new[] { TranslationSeparator }, StringSplitOptions.RemoveEmptyEntries )
+               .Select( x => x.Trim( ' ', '\r', '\n' ) )
+               .ToArray();
 
-         context.Complete( translated );
+            if( translatedTexts.Length != context.UntranslatedTexts.Length ) context.Fail( "Batch operation received incorrect number of translations." );
+
+            // lets fix the translation line breaks
+            for( int i = 0 ; i < translatedTexts.Length ; i++ )
+            {
+               var translatedText = translatedTexts[ i ];
+               var untranslatedText = context.UntranslatedTexts[ i ];
+
+               if( !untranslatedText.Contains( "\n" ) )
+               {
+                  translatedText = translatedText.Replace( "\r\n", " " ).Replace( "\n", " " ).Replace( "  ", " " );
+               }
+
+               translatedTexts[ i ] = translatedText;
+            }
+
+            context.Complete( translatedTexts );
+         }
+         else
+         {
+            context.Complete( allTranslatedText );
+         }
       }
 
       private XUnityWebRequest CreateWebSiteRequest()

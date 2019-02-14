@@ -32,7 +32,7 @@ namespace BaiduTranslate
          if( string.IsNullOrEmpty( _appId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
          if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
-         context.DisableCerfificateChecksFor( "api.fanyi.baidu.com" );
+         context.DisableCertificateChecksFor( "api.fanyi.baidu.com" );
 
          // frankly, I have no idea what languages this does, or does not support...
       }

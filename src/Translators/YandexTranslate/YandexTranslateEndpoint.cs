@@ -29,7 +29,7 @@ namespace YandexTranslate
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
-         context.DisableCerfificateChecksFor( "translate.yandex.net" );
+         context.DisableCertificateChecksFor( "translate.yandex.net" );
 
          // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );

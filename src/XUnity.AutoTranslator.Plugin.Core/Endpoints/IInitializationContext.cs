@@ -33,7 +33,7 @@
       /// Disables the certificate check for the specified hostnames.
       /// </summary>
       /// <param name="hosts"></param>
-      void DisableCerfificateChecksFor( params string[] hosts );
+      void DisableCertificateChecksFor( params string[] hosts );
 
       /// <summary>
       /// Gets the source language that the plugin is configured with.

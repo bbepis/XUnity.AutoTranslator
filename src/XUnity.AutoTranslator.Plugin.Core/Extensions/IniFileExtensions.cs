@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using ExIni;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -22,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                {
                   if( typeOfT.IsEnum )
                   {
-                     iniKey.Value = Enum.GetName( typeOfT, defaultValue );
+                     iniKey.Value = EnumHelper.GetNames( typeOfT, defaultValue );
                   }
                   else
                   {
@@ -43,7 +45,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                {
                   if( typeOfT.IsEnum )
                   {
-                     return (T)Enum.Parse( typeOfT, iniKey.Value, true );
+                     return (T)EnumHelper.GetValues( typeOfT, iniKey.Value );
                   }
                   else
                   {
@@ -61,7 +63,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                if( typeOfT.IsEnum )
                {
-                  iniKey.Value = Enum.GetName( typeOfT, defaultValue );
+                  iniKey.Value = EnumHelper.GetNames( typeOfT, defaultValue );
                }
                else
                {

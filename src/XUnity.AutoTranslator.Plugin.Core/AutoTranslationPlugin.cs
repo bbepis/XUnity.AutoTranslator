@@ -1943,11 +1943,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private IEnumerator EnableBatchingAfterDelay()
       {
-         yield return new WaitForSeconds( 60 );
+         yield return new WaitForSeconds( 240 );
 
          _batchLogicHasFailed = false;
 
-         XuaLogger.Current.Error( "Re-enabled batching." );
+         XuaLogger.Current.Info( "Re-enabled batching." );
       }
 
       void Awake()
@@ -2212,17 +2212,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var translatedText = translatedTexts[ i ];
                if( !string.IsNullOrEmpty( translatedText ) )
                {
+                  translatedText = job.Key.RepairTemplate( translatedText );
+
+                  if( Settings.RomajiPostProcessing != RomajiPostProcessing.None && Settings.Language == Settings.Romaji )
+                  {
+                     translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
+                  }
+
                   if( Settings.ForceSplitTextAfterCharacters > 0 )
                   {
                      translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
                   }
-                  job.TranslatedText = job.Key.RepairTemplate( translatedText );
+
+                  job.TranslatedText = translatedText;
 
                   QueueNewTranslationForDisk( job.Key, translatedText );
                   _completedJobs.Add( job );
                }
 
-               AddTranslation( job.Key, job.TranslatedText );
+               AddTranslation( job.Key, translatedText );
                job.State = TranslationJobState.Succeeded;
                _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
 
@@ -2273,25 +2281,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var translatedText = translatedTexts[ 0 ];
 
          Settings.TranslationCount++;
-         XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
 
          _consecutiveErrors = 0;
 
          if( !string.IsNullOrEmpty( translatedText ) )
          {
+            translatedText = job.Key.RepairTemplate( translatedText );
+
+            if( Settings.RomajiPostProcessing != RomajiPostProcessing.None && Settings.Language == Settings.Romaji )
+            {
+               translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
+            }
+            
             if( Settings.ForceSplitTextAfterCharacters > 0 )
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
             }
-            job.TranslatedText = job.Key.RepairTemplate( translatedText );
+
+            job.TranslatedText = translatedText;
 
             QueueNewTranslationForDisk( job.Key, translatedText );
             _completedJobs.Add( job );
          }
 
-         AddTranslation( job.Key, job.TranslatedText );
+         AddTranslation( job.Key, translatedText );
          job.State = TranslationJobState.Succeeded;
          _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
+
+         XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{translatedText}'" );
 
          if( !Settings.IsShutdown )
          {

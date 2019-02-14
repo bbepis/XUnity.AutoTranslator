@@ -48,7 +48,7 @@ namespace BingTranslateLegitimate
          if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
-         context.DisableCerfificateChecksFor( "api.cognitive.microsofttranslator.com" );
+         context.DisableCertificateChecksFor( "api.cognitive.microsofttranslator.com" );
 
          if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
