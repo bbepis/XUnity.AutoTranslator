@@ -4,7 +4,7 @@
  * FEATURE - Support BingTranslate API
  * FEATURE - Support LEC Offline Power Translator 15
  * FEATURE - Enable custom implementations of translators
- * FEATURE - Removed support for Excite translate because it only support the 'WWW' API in Unity due to missing TLS1.2 support
+ * FEATURE - Removed support for Excite translate because it only support the 'WWW' API in Unity due to missing Tls1.2 support
  * FEATURE - Updated Watson translate to v3
  * FEATURE - Support for 'romaji' as output language. Only google supports this at the moment
  * FEATURE - Batching support for all endpoints where the API supports it
