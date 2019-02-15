@@ -12,17 +12,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    /// </summary>
    internal static class RomanizationHelper
    {
-      public static string PostProcess( string text, RomajiPostProcessing postProcessing )
+      public static string PostProcess( string text, TextPostProcessing postProcessing )
       {
-         if( ( postProcessing & RomajiPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
+         if( ( postProcessing & TextPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
          {
             text = ConvertMacronToCircumflex( text );
          }
-         if( ( postProcessing & RomajiPostProcessing.RemoveAllDiacritics ) != 0 )
+         if( ( postProcessing & TextPostProcessing.RemoveAllDiacritics ) != 0 )
          {
             text = RemoveAllDiacritics( text );
          }
-         if( ( postProcessing & RomajiPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
+         if( ( postProcessing & TextPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
          {
             text = RemoveNApostrophe( text );
          }

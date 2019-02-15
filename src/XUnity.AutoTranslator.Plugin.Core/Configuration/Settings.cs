@@ -79,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string[] IgnoreTextStartingWith;
       public static HashSet<string> GameLogTextPaths;
       public static bool TextGetterCompatibilityMode;
-      public static RomajiPostProcessing RomajiPostProcessing;
+      public static TextPostProcessing RomajiPostProcessing;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -150,7 +150,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
          GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
          WhitespaceRemovalStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "WhitespaceRemovalStrategy", WhitespaceHandlingStrategy.TrimPerNewline );
-         RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", RomajiPostProcessing.ReplaceMacronWithCircumflex | RomajiPostProcessing.RemoveApostrophes );
+         RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
 
          TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
          EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );

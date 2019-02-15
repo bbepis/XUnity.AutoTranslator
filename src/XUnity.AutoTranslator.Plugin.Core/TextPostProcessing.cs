@@ -6,7 +6,7 @@ using System.Text;
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    [Flags]
-   internal enum RomajiPostProcessing
+   internal enum TextPostProcessing
    {
       None                         = 0,
       ReplaceMacronWithCircumflex  = 1 << 0,
