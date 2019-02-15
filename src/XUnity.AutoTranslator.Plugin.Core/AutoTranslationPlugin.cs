@@ -2214,7 +2214,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   translatedText = job.Key.RepairTemplate( translatedText );
 
-                  if( Settings.RomajiPostProcessing != RomajiPostProcessing.None && Settings.Language == Settings.Romaji )
+                  if( Settings.Language == Settings.Romaji && Settings.RomajiPostProcessing != RomajiPostProcessing.None )
                   {
                      translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
                   }
@@ -2288,7 +2288,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             translatedText = job.Key.RepairTemplate( translatedText );
 
-            if( Settings.RomajiPostProcessing != RomajiPostProcessing.None && Settings.Language == Settings.Romaji )
+            if( Settings.Language == Settings.Romaji && Settings.RomajiPostProcessing != RomajiPostProcessing.None )
             {
                translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
             }
