@@ -87,8 +87,8 @@ namespace BingTranslate
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          _translationCount++;
-         string address = null;
 
+         string address = null;
          if( _ig == null || _iid == null )
          {
             address = HttpsServicePointTemplateUrlWithoutIG;
