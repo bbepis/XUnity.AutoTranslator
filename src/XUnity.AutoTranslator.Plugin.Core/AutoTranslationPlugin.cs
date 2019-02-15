@@ -45,7 +45,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       internal static AutoTranslationPlugin Current;
 
-
       private XuaWindow _window;
 
       /// <summary>
