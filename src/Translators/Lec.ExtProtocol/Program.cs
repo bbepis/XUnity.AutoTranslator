@@ -10,6 +10,8 @@ namespace Lec.ExtProtocol
    {
       static void Main( string[] args )
       {
+         // Implementation of this is based off of texel-sensei's LEC implementation
+
          try
          {
             if( args.Length == 0 )

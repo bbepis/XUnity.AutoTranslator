@@ -518,6 +518,7 @@ Often an implementation of this interface will access an external web service. I
 Whenever you implement a translator based on an online service, it is important to not use it in an abusive way. For example by:
  * Establishing a large number of connections to it
  * Performing web scraping instead of using an available API
+ * Making concurrent requests towards it
  * *This is especially important if the service is not authenticated*
 
 With that in mind, consider the following:
@@ -653,7 +654,7 @@ For more examples of implementations, you can simply take a look at this project
 
 **NOTE**: If you implement a class based on the `HttpEndpoint` and you get an error where the web request is never completed, then it is likely due to the web server requiring Tls1.2. Unity-mono has issues with this spec and it will cause the request to lock up forever. The only solutions to this for now are:
  * Disable SSL, if you can. There are many situations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endoint.
- * Use the `WwwEndpoint` instead. I highly advice against this though, unless it is an authenticated endpoint though.
+ * Use the `WwwEndpoint` instead. I highly advice against this though, unless it is an authenticated endpoint.
 
 Another way to implement a translator is to implement the `ExtProtocolEndpoint` class. This can be used to delegate the actual translation logic to an external process. Currently there is no documentation on this, but you can take a look at the LEC implementation, which uses it.
 
