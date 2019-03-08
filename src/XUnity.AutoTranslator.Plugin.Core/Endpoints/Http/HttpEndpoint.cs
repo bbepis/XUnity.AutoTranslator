@@ -79,20 +79,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Http
          // prepare request
          OnCreateRequest( httpContext );
          if( httpContext.Request == null ) httpContext.Fail( "No request object was provided by the translator." );
-         
+
          // execute request
          var client = new XUnityWebClient();
          var response = client.Send( httpContext.Request );
-         
+
          // wait for completion
          var iterator = response.GetSupportedEnumerator();
          while( iterator.MoveNext() ) yield return iterator.Current;
+
+         if( response.IsTimedOut ) httpContext.Fail( "Error occurred while retrieving translation. Timeout." );
 
          httpContext.Response = response;
          OnInspectResponse( httpContext );
 
          // failure
-         if( response.Error != null ) httpContext.Fail( "Error occurred while retrieving translation.", response.Error ); 
+         if( response.Error != null ) httpContext.Fail( "Error occurred while retrieving translation.", response.Error );
 
          // failure
          if( response.Data == null ) httpContext.Fail( "Error occurred while retrieving translation. Nothing was returned." );

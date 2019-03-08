@@ -22,6 +22,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public static bool SupportsSceneManager { get; } = false;
 
+      /// <summary>
+      /// Gets a bool indicating if this game is running in a .NET 4.x runtime.
+      /// </summary>
+      public static bool SupportsNet4x { get; } = false;
+
       static Features()
       {
          try
@@ -45,6 +50,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             SupportsSceneManager = ClrTypes.Scene != null && ClrTypes.SceneManager != null;
+         }
+         catch( Exception )
+         {
+
+         }
+
+         try
+         {
+            SupportsNet4x = ClrTypes.Task != null;
          }
          catch( Exception )
          {

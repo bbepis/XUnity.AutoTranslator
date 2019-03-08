@@ -46,6 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          while( --i >= 0 )
          {
             path.Append( "/" ).Append( _objects[ i ].name );
+            _objects[ i ] = null;
          }
 
 

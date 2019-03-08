@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -18,12 +19,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private DropdownGUI<TranslatorDropdownOptionViewModel, ConfiguredEndpoint> _endpointDropdown;
 
+      private bool _isShown;
       private List<ToggleViewModel> _toggles;
       private List<TranslatorDropdownOptionViewModel> _endpointOptions;
       private List<ButtonViewModel> _commandButtons;
       private List<LabelViewModel> _labels;
 
-      public bool IsShown { get; set; }
+      public bool IsShown
+      {
+         get
+         {
+            return _isShown;
+         }
+         set
+         {
+            _isShown = value;
+         }
+      }
 
       public XuaWindow(
          List<ToggleViewModel> toggles,
@@ -39,6 +51,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public void OnGUI()
       {
+         GUI.Box( _windowRect, GUIContent.none, GUIUtil.GetWindowBackgroundStyle() );
+
          _windowRect = GUI.Window( 5464332, _windowRect, CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
       }
 

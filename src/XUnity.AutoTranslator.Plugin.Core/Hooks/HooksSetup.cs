@@ -139,7 +139,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             XuaLogger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
          }
-
       }
 
       public static bool SetupHook( string eventName, Func<object, string, string> callback )

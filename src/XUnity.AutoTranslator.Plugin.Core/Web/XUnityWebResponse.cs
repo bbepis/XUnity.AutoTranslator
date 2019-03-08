@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Net;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Shim;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web
@@ -11,6 +12,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
    /// </summary>
    public class XUnityWebResponse : CustomYieldInstructionShim
    {
+      /// <summary>
+      /// Default construcutor.
+      /// </summary>
+      public XUnityWebResponse()
+      {
+         InGameTimeout = Settings.Timeout;
+      }
+
       internal void SetCompleted( HttpStatusCode code, string data, WebHeaderCollection headers, CookieCollection newCookies, Exception error )
       {
          IsCompleted = true;

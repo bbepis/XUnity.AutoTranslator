@@ -12,11 +12,38 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shim
    /// </summary>
    public abstract class CustomYieldInstructionShim : IEnumerator
    {
+      private float? _startTime;
+
       /// <summary>
       /// Default constructor.
       /// </summary>
       protected CustomYieldInstructionShim()
       {
+      }
+
+      internal bool DetermineKeepWaiting()
+      {
+         if( !keepWaiting || IsTimedOut ) return false;
+         
+         if( InGameTimeout.HasValue )
+         {
+            if( !_startTime.HasValue )
+            {
+               _startTime = Time.realtimeSinceStartup;
+            }
+
+            var startTime = _startTime.Value;
+            var time = Time.realtimeSinceStartup - startTime;
+
+            if( time > InGameTimeout )
+            {
+               IsTimedOut = true;
+
+               return false;
+            }
+         }
+
+         return true;
       }
 
       /// <summary>
@@ -25,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shim
       /// <returns></returns>
       public bool MoveNext()
       {
-         return keepWaiting;
+         return DetermineKeepWaiting();
       }
 
       /// <summary>
@@ -54,6 +81,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shim
       public abstract bool keepWaiting { get; }
 
       /// <summary>
+      /// Gets or sets a timeout in in-game seconds.
+      /// </summary>
+      public float? InGameTimeout { get; set; }
+
+      /// <summary>
+      /// Gets or sets a bool indicating if the CustomYieldOperation timed out.
+      /// </summary>
+      public bool IsTimedOut { get; set; }
+
+      /// <summary>
       /// Gets an enumerator that can be iterated through
       /// in a co-routine and will work in even ancient versions
       /// of Unity.
@@ -67,7 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shim
          }
          else
          {
-            while( keepWaiting )
+            while( DetermineKeepWaiting() )
             {
                yield return new WaitForSeconds( 0.2f );
             }

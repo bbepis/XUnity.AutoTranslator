@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony]
    internal static class Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -24,8 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         var text = AccessTools.Property( ClrTypes.Text, "text" );
-         return text.GetGetMethod();
+         return AccessTools.Property( ClrTypes.Text, "text" )?.GetGetMethod();
       }
 
       static void Postfix( object __instance, ref string __result )
@@ -34,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony]
    internal static class TMP_Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -44,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.TMP_Text, "text" ).GetGetMethod();
+         return AccessTools.Property( ClrTypes.TMP_Text, "text" )?.GetGetMethod();
       }
 
       static void Postfix( object __instance, ref string __result )

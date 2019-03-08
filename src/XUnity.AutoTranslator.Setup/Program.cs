@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Setup
          foreach( var launcher in launchers )
          {
             var managedDir = Path.Combine( gamePath, launcher.Data.Name, "Managed" );
-            AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony );
+            AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony, true );
             AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
             AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );

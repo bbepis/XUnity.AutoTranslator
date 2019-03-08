@@ -27,7 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_BeginGroup_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -49,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_Box_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -72,7 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoRepeatButton_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -94,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoLabel_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -116,7 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoButton_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -138,7 +138,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoModalWindow_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -160,7 +160,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoWindow_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -182,7 +182,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoButtonGrid_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -207,7 +207,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoTextField_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -229,7 +229,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_DoToggle_Hook
    {
       static bool Prepare( HarmonyInstance instance )

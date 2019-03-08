@@ -54,7 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.SpriteRenderer, "sprite" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.SpriteRenderer, "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -73,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.CubismRenderer, "MainTexture" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.CubismRenderer, "MainTexture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture2D value )
@@ -111,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( typeof( Material ), "mainTexture" ).GetSetMethod();
+         return AccessTools.Property( typeof( Material ), "mainTexture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture value )
@@ -155,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( typeof( Image ), "sprite" ).GetSetMethod();
+         return AccessTools.Property( typeof( Image ), "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -174,7 +174,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( typeof( Image ), "overrideSprite" ).GetSetMethod();
+         return AccessTools.Property( typeof( Image ), "overrideSprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -193,7 +193,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( typeof( Image ), "material" ).GetSetMethod();
+         return AccessTools.Property( typeof( Image ), "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -212,7 +212,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( typeof( RawImage ), "texture" ).GetSetMethod();
+         return AccessTools.Property( typeof( RawImage ), "texture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture value )
@@ -253,7 +253,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UIAtlas, "spriteMaterial" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UIAtlas, "spriteMaterial" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -291,7 +291,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UISprite, "material" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UISprite, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -310,7 +310,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UISprite, "atlas" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UISprite, "atlas" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -329,7 +329,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UITexture, "mainTexture" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UITexture, "mainTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -348,7 +348,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UITexture, "material" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UITexture, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -386,7 +386,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UI2DSprite, "sprite2D" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UI2DSprite, "sprite2D" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -405,7 +405,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UI2DSprite, "material" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UI2DSprite, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -424,7 +424,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UIPanel, "clipTexture" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UIPanel, "clipTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -444,7 +444,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UIFont, "material" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UIFont, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -463,7 +463,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UIFont, "dynamicFont" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UIFont, "dynamicFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -482,7 +482,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UILabel, "bitmapFont" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UILabel, "bitmapFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -501,7 +501,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.UILabel, "trueTypeFont" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.UILabel, "trueTypeFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )

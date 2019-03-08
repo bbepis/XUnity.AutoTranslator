@@ -141,7 +141,8 @@ ForceUIResizing=True             ;Indicates whether the UI resize behavior shoul
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
-RomajiPostProcessing=RemoveAllDiacritics;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
+RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
+TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -236,6 +237,8 @@ To rememdy this, post processing can be applied to translations when 'romaji' is
  * `RemoveAllDiacritics`: Remove all diacritics from the translated text
  * `ReplaceMacronWithCircumflex`: Replaces the macron diacritic with a circumflex.
  * `RemoveApostrophes`: Some translators might decide to include apostrophes after the 'n'-character. Applying this option removes those.
+
+This type of post processing is also applied to normal translations, but instead uses the option `TranslationPostProcessing`, which can use the same values.
 
 #### Other Options
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).

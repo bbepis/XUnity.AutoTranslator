@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using Harmony;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 
@@ -101,6 +102,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
             {
                Headers = _requestHeaders;
             }
+            httpRequest.ReadWriteTimeout = (int)( Settings.Timeout * 1000 ) - 10000;
+            httpRequest.Timeout = (int)( Settings.Timeout * 1000 ) - 5000;
          }
       }
 

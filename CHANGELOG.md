@@ -1,4 +1,19 @@
-﻿### 3.0.0
+﻿### 3.0.1
+ * BUG FIX - Fixed bug that could in certain situation cause IMGUI translation to drain on performance
+ * BUG FIX - Never close a service point while a request is ongoing. Previously this could cause the plugin to lockup
+ * BUG FIX - Only disable certificate checks if the .NET version is at or below 3.5
+ * BUG FIX - Improved cleanup of object references
+ * BUG FIX - Improved 'text stagger' check. Sometimes the plugin was identifying text as scrolling in, even though it was not
+ * MISC - Proper test and support for .NET 4.x equivalent scripting backend for Unity
+ * MISC - Timeout handling if an endpoint becomes unresponsive
+ * MISC - Support post processing for normal text translations
+ * MISC - Change harmony text hook priority to 'Last' instead of simply be executed 'after DTL'
+ * MISC - More resilient harmony hook implementation to support potentially different versions of harmony being used
+ * MISC - Updated harmony version deployed with the plugin (for IPA, ReiPatcher and UnityInjector), so it is no longer the homebrew version that was distributed with BepInEx
+ * MISC - Made UI more readable by using a solid background
+ * MISC - Changed max queued translations from 3500 to 4000
+
+### 3.0.0
  * FEATURE - UI to control plugin more conveniently (press ALT + 0 (that's a zero))
  * FEATURE - Dynamic selection of translator during game session
  * FEATURE - Support BingTranslate API

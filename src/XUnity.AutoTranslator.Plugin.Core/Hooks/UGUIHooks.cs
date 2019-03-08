@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -28,8 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         var text = AccessTools.Property( ClrTypes.Text, "text" );
-         return text.GetSetMethod();
+         return AccessTools.Property( ClrTypes.Text, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -42,7 +41,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class Text_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -52,8 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         var OnEnable = AccessTools.Method( ClrTypes.Text, "OnEnable" );
-         return OnEnable;
+         return AccessTools.Method( ClrTypes.Text, "OnEnable" );
       }
 
       static void Postfix( object __instance )

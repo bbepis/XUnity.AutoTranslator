@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class UILabel_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( Constants.ClrTypes.UILabel, "text" ).GetSetMethod();
+         return AccessTools.Property( Constants.ClrTypes.UILabel, "text" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -43,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class UILabel_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )

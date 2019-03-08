@@ -36,6 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
       public static readonly Type SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
       public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
+      //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );
@@ -50,6 +51,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       // Live2D
       public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );
+
+      // Harmony
+      public static readonly Type HarmonyInstance = FindType( "Harmony.HarmonyInstance" );
+      public static readonly Type HarmonyMethod = FindType( "Harmony.HarmonyMethod" );
+
+      // Mono / .NET
+      public static readonly Type MethodBase = FindType( "System.Reflection.MethodBase" );
+      public static readonly Type Task = FindType( "System.Threading.Tasks.Task" );
 
       private static Type FindType( string name )
       {

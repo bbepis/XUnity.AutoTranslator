@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
@@ -50,19 +51,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public IEnumerator Translate( string[] untranslatedTexts, string from, string to, Action<string[]> success, Action<string, Exception> failure )
       {
+         var startTime = Time.realtimeSinceStartup;
          var context = new TranslationContext( untranslatedTexts, from, to, success, failure );
          _ongoingTranslations++;
 
-         bool ok = false;
-         IEnumerator iterator = null;
          try
          {
-            iterator = Endpoint.Translate( context );
+            bool ok = false;
+            var iterator = Endpoint.Translate( context );
             if( iterator != null )
             {
                TryMe: try
                {
                   ok = iterator.MoveNext();
+
+                  // check for timeout
+                  var now = Time.realtimeSinceStartup;
+                  if( now - startTime > Settings.Timeout )
+                  {
+                     ok = false;
+                     context.FailWithoutThrowing( $"Timeout occurred during translation (took more than {Settings.Timeout} seconds)", null );
+                  }
                }
                catch( TranslationContextException )
                {

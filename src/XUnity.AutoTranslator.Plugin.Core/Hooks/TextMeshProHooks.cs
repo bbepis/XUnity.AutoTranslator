@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       };
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TeshMeshProUGUI_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -48,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TeshMeshPro_OnEnable_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -71,7 +71,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_text_Hook
    {
       static bool Prepare( HarmonyInstance instance )
@@ -81,7 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( HarmonyInstance instance )
       {
-         return AccessTools.Property( ClrTypes.TMP_Text, "text" ).GetSetMethod();
+         return AccessTools.Property( ClrTypes.TMP_Text, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -94,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetText_Hook1
    {
       static bool Prepare( HarmonyInstance instance )
@@ -117,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetText_Hook2
    {
       static bool Prepare( HarmonyInstance instance )
@@ -140,7 +140,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetText_Hook3
    {
       static bool Prepare( HarmonyInstance instance )
@@ -163,7 +163,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetCharArray_Hook1
    {
       static bool Prepare( HarmonyInstance instance )
@@ -186,7 +186,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetCharArray_Hook2
    {
       static bool Prepare( HarmonyInstance instance )
@@ -209,7 +209,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [Harmony, HarmonyAfter( Constants.KnownPlugins.DynamicTranslationLoader )]
+   [Harmony, HarmonyPriority( Priority.Last )]
    internal static class TMP_Text_SetCharArray_Hook3
    {
       static bool Prepare( HarmonyInstance instance )

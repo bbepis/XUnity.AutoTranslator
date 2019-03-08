@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxErrors = 5;
       public static readonly float ClipboardDebounceTime = 1f;
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
-      public static readonly int MaxUnstartedJobs = 3500;
+      public static readonly int MaxUnstartedJobs = 4000;
       public static readonly float IncreaseBatchOperationsEvery = 30;
       public static readonly int MaximumStaggers = 6;
       public static readonly int PreviousTextStaggerCount = 3;
@@ -32,6 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
       public static bool UsesWhitespaceBetweenWords = false;
       public static string ApplicationName;
+      public static float Timeout = 50.0f;
 
 
       public static bool IsShutdown = false;
@@ -80,6 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static HashSet<string> GameLogTextPaths;
       public static bool TextGetterCompatibilityMode;
       public static TextPostProcessing RomajiPostProcessing;
+      public static TextPostProcessing TranslationPostProcessing;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -151,6 +153,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
          WhitespaceRemovalStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "WhitespaceRemovalStrategy", WhitespaceHandlingStrategy.TrimPerNewline );
          RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
+         TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
 
          TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
          EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );

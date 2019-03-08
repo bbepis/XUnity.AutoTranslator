@@ -51,6 +51,39 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          padding = Empty
       };
 
+      public static GUIStyle WindowBackgroundStyle = new GUIStyle
+      {
+         normal = new GUIStyleState
+         {
+            background = CreateBackgroundTexture()
+         }
+      };
+
       public static Rect R( int x, int y, int width, int height ) => new Rect( x, y, width, height );
+
+      private static Texture2D CreateBackgroundTexture()
+      {
+         var windowBackground = new Texture2D( 1, 1, TextureFormat.ARGB32, false );
+         windowBackground.SetPixel( 0, 0, new Color( 0.6f, 0.6f, 0.6f, 1 ) );
+         windowBackground.Apply();
+         GameObject.DontDestroyOnLoad( windowBackground );
+         return windowBackground;
+      }
+
+      public static GUIStyle GetWindowBackgroundStyle()
+      {
+         if( !WindowBackgroundStyle.normal.background )
+         {
+            WindowBackgroundStyle = new GUIStyle
+            {
+               normal = new GUIStyleState
+               {
+                  background = CreateBackgroundTexture()
+               }
+            };
+         }
+
+         return WindowBackgroundStyle;
+      }
    }
 }

@@ -394,6 +394,46 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
          }
       }
 
+      internal static void CloseServicePoints()
+      {
+         List<KeyValuePair<string, ServicePointState>> idleEntries = null;
+
+         lock( ActiveConnections )
+         {
+            var timestamp = DateTime.UtcNow;
+            foreach( var kvp in ActiveConnections )
+            {
+               if( idleEntries == null )
+               {
+                  idleEntries = new List<KeyValuePair<string, ServicePointState>>();
+               }
+
+               idleEntries.Add( kvp );
+            }
+
+            if( idleEntries != null )
+            {
+               foreach( var idleEntry in idleEntries )
+               {
+                  ActiveConnections.Remove( idleEntry.Key );
+                  XuaLogger.Current.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to force shutdown." );
+               }
+            }
+         }
+
+         if( idleEntries != null )
+         {
+            ThreadPool.QueueUserWorkItem( delegate ( object state )
+            {
+               // never do a job like this on the game loop thread
+               foreach( var kvp in idleEntries )
+               {
+                  kvp.Value.ServicePoint.CloseConnectionGroup( ConnectionGroupName );
+               }
+            } );
+         }
+      }
+
       private class ServicePointState
       {
          public ServicePointState( ServicePoint servicePoint )

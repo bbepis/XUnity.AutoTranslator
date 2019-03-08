@@ -121,6 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string[] _previouslyQueuedText = new string[ Settings.PreviousTextStaggerCount ];
       private int _staggerTextCursor = 0;
       private int _concurrentStaggers = 0;
+      private int _lastStaggerCheckFrame = -1;
 
       private int _frameForLastQueuedTranslation = -1;
       private int _consecutiveFramesTranslated = 0;
@@ -215,9 +216,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          // TODO: Perhaps some bleeding edge check to see if this is required?
          var callback = _httpSecurity.GetCertificateValidationCheck();
-         if( callback != null )
+         if( callback != null && !Features.SupportsNet4x )
          {
+            XuaLogger.Current.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
+
             ServicePointManager.ServerCertificateValidationCallback += callback;
+         }
+         else
+         {
+            XuaLogger.Current.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
          }
 
          // Save again because configuration may be modified by endpoints
@@ -453,6 +460,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            var startTime = Time.realtimeSinceStartup;
             lock( _writeToFileSync )
             {
                Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TranslationDirectory ).Parameterize() );
@@ -465,9 +473,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   LoadTranslationsInFile( fullFileName );
                }
             }
+            var endTime = Time.realtimeSinceStartup;
+            XuaLogger.Current.Info( $"Loaded text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
 
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
+               startTime = Time.realtimeSinceStartup;
+
                _translatedImages.Clear();
                _untranslatedImages.Clear();
                Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize() );
@@ -475,6 +487,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   RegisterImageFromFile( fullFileName );
                }
+
+               endTime = Time.realtimeSinceStartup;
+               XuaLogger.Current.Info( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             }
          }
          catch( Exception e )
@@ -777,44 +792,50 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckStaggerText( string untranslatedText )
       {
-         bool wasProblematic = false;
-
-         for( int i = 0 ; i < _previouslyQueuedText.Length ; i++ )
+         var currentFrame = Time.frameCount;
+         if( currentFrame != _lastStaggerCheckFrame )
          {
-            var previouslyQueuedText = _previouslyQueuedText[ i ];
+            _lastStaggerCheckFrame = currentFrame;
 
-            if( previouslyQueuedText != null )
+            bool wasProblematic = false;
+
+            for( int i = 0 ; i < _previouslyQueuedText.Length ; i++ )
             {
-               if( untranslatedText.RemindsOf( previouslyQueuedText ) )
+               var previouslyQueuedText = _previouslyQueuedText[ i ];
+
+               if( previouslyQueuedText != null )
                {
-                  wasProblematic = true;
-                  break;
+                  if( untranslatedText.RemindsOf( previouslyQueuedText ) )
+                  {
+                     wasProblematic = true;
+                     break;
+                  }
+
                }
-
             }
-         }
 
-         if( wasProblematic )
-         {
-            _concurrentStaggers++;
-            if( _concurrentStaggers > Settings.MaximumStaggers )
+            if( wasProblematic )
             {
-               _unstartedJobs.Clear();
-               _completedJobs.Clear();
-               _ongoingJobs.Clear();
+               _concurrentStaggers++;
+               if( _concurrentStaggers > Settings.MaximumStaggers )
+               {
+                  _unstartedJobs.Clear();
+                  _completedJobs.Clear();
+                  _ongoingJobs.Clear();
 
-               Settings.IsShutdown = true;
-               Settings.IsShutdownFatal = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+                  Settings.IsShutdown = true;
+                  Settings.IsShutdownFatal = true;
+                  XuaLogger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+               }
             }
-         }
-         else
-         {
-            _concurrentStaggers = 0;
-         }
+            else
+            {
+               _concurrentStaggers = 0;
+            }
 
-         _previouslyQueuedText[ _staggerTextCursor % _previouslyQueuedText.Length ] = untranslatedText;
-         _staggerTextCursor++;
+            _previouslyQueuedText[ _staggerTextCursor % _previouslyQueuedText.Length ] = untranslatedText;
+            _staggerTextCursor++;
+         }
       }
 
       private void CheckThresholds()
@@ -1596,6 +1617,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             info?.Reset( originalText );
             var isSpammer = ui.IsSpammingComponent();
+            if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
+
             var textKey = new TranslationKey( ui, text, isSpammer, context != null );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
@@ -1869,8 +1892,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             yield return new WaitForSeconds( delay );
             var afterText = ui.GetText();
 
-            //Logger.Current.Debug( "WAITING: " + ui.GetType().Name + ": " + afterText );
-
             if( beforeText == afterText )
             {
                onTextStabilized( afterText );
@@ -1983,12 +2004,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            // perform this check every 100 frames!
-            if( Time.frameCount % 100 == 0 )
-            {
-               ConnectionTrackingWebClient.CheckServicePoints();
-            }
-
             if( Features.SupportsClipboard )
             {
                CopyToClipboard();
@@ -2008,6 +2023,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   _nextAdvUpdate = null;
                   UpdateUtageText();
                }
+            }
+
+            // perform this check every 100 frames!
+            if( Time.frameCount % 100 == 0 && _ongoingJobs.Count == 0 )
+            {
+               ConnectionTrackingWebClient.CheckServicePoints();
             }
 
             if( Input.anyKey )
@@ -2042,6 +2063,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   RebootPlugin();
                }
+               //else if( isAltPressed && Input.GetKeyDown( KeyCode.B ) )
+               //{
+               //   ConnectionTrackingWebClient.CloseServicePoints();
+               //}
                else if( isAltPressed && ( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) ) )
                {
                   if( _window != null )
@@ -2217,6 +2242,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
                   }
+                  else if( Settings.TranslationPostProcessing != TextPostProcessing.None )
+                  {
+                     translatedText = RomanizationHelper.PostProcess( translatedText, Settings.TranslationPostProcessing );
+                  }
 
                   if( Settings.ForceSplitTextAfterCharacters > 0 )
                   {
@@ -2291,7 +2320,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                translatedText = RomanizationHelper.PostProcess( translatedText, Settings.RomajiPostProcessing );
             }
-            
+            else if( Settings.TranslationPostProcessing != TextPostProcessing.None )
+            {
+               translatedText = RomanizationHelper.PostProcess( translatedText, Settings.TranslationPostProcessing );
+            }
+
             if( Settings.ForceSplitTextAfterCharacters > 0 )
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
