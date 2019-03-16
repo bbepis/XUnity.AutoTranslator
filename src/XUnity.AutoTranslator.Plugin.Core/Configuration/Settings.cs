@@ -74,6 +74,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool UseStaticTranslations;
       public static string OverrideFont;
       public static string UserAgent;
+      public static bool DisableCertificateValidation;
       public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
@@ -82,6 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool TextGetterCompatibilityMode;
       public static TextPostProcessing RomajiPostProcessing;
       public static TextPostProcessing TranslationPostProcessing;
+      public static bool EnableExperimentalHooks;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -154,6 +156,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          WhitespaceRemovalStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "WhitespaceRemovalStrategy", WhitespaceHandlingStrategy.TrimPerNewline );
          RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
          TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
+         EnableExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableExperimentalHooks", false );
 
          TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
          EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );
@@ -163,7 +166,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableSpriteRendererHooking = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableSpriteRendererHooking", false );
          LoadUnmodifiedTextures = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "LoadUnmodifiedTextures", false );
          TextureHashGenerationStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureHashGenerationStrategy", TextureHashGenerationStrategy.FromImageName );
-
+         
          if( MaxCharactersPerTranslation > MaxMaxCharactersPerTranslation )
          {
             PluginEnvironment.Current.Preferences[ "Behaviour" ][ "MaxCharactersPerTranslation" ].Value = MaxMaxCharactersPerTranslation.ToString( CultureInfo.InvariantCulture );
@@ -171,6 +174,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
 
          UserAgent = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "UserAgent", string.Empty );
+         DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", false );
 
          EnablePrintHierarchy = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnablePrintHierarchy", false );
          EnableConsole = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableConsole", false );

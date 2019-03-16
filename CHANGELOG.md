@@ -1,4 +1,12 @@
-﻿### 3.0.1
+﻿### 3.0.2
+ * BUG FIX - UnityInjector installer package now uses correct folder structure (Translators has been moved into Config folder) and ExIni is no longer distributed
+ * BUG FIX - Fixed harmony priority usage, which was incorrectly used in 3.0.1
+ * MISC - Plugin should no longer translate text input fields for NGUI
+ * MISC - Added config option to 'DisableCertificateValidation' for all hosts under all circumstances in case the plugin locks up. This option is only required by very few games
+ * MISC - Experimental hooking support for methods with no body (configured through 'EnableExperimentalHooks' setting)
+ * MISC - Restructured README file. New order: 1. Installation, 2. Usage, 3. Configuration, 4. Integration 
+
+### 3.0.1
  * BUG FIX - Fixed bug that could in certain situation cause IMGUI translation to drain on performance
  * BUG FIX - Never close a service point while a request is ongoing. Previously this could cause the plugin to lockup
  * BUG FIX - Only disable certificate checks if the .NET version is at or below 3.5

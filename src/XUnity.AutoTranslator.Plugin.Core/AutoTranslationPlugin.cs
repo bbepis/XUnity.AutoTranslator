@@ -213,18 +213,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.Current.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
          }
-
-         // TODO: Perhaps some bleeding edge check to see if this is required?
-         var callback = _httpSecurity.GetCertificateValidationCheck();
-         if( callback != null && !Features.SupportsNet4x )
+         
+         if( Settings.DisableCertificateValidation )
          {
-            XuaLogger.Current.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
+            XuaLogger.Current.Info( $"Disabling certificate checks for endpoints because of configuration." );
 
-            ServicePointManager.ServerCertificateValidationCallback += callback;
+            ServicePointManager.ServerCertificateValidationCallback += (a1, a2, a3, a4) => true;
          }
          else
          {
-            XuaLogger.Current.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
+            var callback = _httpSecurity.GetCertificateValidationCheck();
+            if( callback != null && !Features.SupportsNet4x )
+            {
+               XuaLogger.Current.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
+
+               ServicePointManager.ServerCertificateValidationCallback += callback;
+            }
+            else
+            {
+               XuaLogger.Current.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
+            }
          }
 
          // Save again because configuration may be modified by endpoints
@@ -1034,7 +1042,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          return _reverseTranslations.TryGetValue( value, out key );
       }
-
+      
       internal string Hook_TextChanged_WithResult( object ui, string text )
       {
          if( !ui.IsKnownTextType() ) return null;
@@ -1269,8 +1277,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            var inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField )
-               ?? component.gameObject.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField );
+            var inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField )
+               ?? go.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField )
+               ?? go.GetFirstComponentInSelfOrAncestor( ClrTypes.UIInput );
 
             return inputField == null;
          }

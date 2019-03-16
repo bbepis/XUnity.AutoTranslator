@@ -22,6 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( RawImage_texture_Hook ),
          typeof( Cursor_SetCursor_Hook ),
          typeof( SpriteRenderer_sprite_Hook ),
+         typeof( Sprite_texture_Hook ),
 
          // fallback hooks on material (Prefix hooks)
          typeof( Material_mainTexture_Hook ),
@@ -42,6 +43,36 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( UIPanel_clipTexture_Hook ),
          typeof( UIRect_OnInit_Hook ),
       };
+   }
+
+   [Harmony]
+   internal static class Sprite_texture_Hook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return ClrTypes.Sprite != null;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Property( ClrTypes.Sprite, "texture" )?.GetGetMethod();
+      }
+
+      static object Override( object __instance )
+      {
+         return Caller.Func( () => ActualOverride( __instance ) );
+      }
+
+      static object ActualOverride( object __instance )
+      {
+         var texture = ( (Sprite)__instance ).texture;
+
+         AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
+
+         return texture;
+      }
+
+      static JumpedMethodCaller Caller { get; set; }
    }
 
    [Harmony]

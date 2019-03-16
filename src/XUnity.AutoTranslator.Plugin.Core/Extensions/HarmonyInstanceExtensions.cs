@@ -4,7 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Harmony;
+using Harmony.ILCopying;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -30,15 +34,66 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                var original = (MethodBase)type.GetMethod( "TargetMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public ).Invoke( null, new object[] { instance } );
                if( original != null )
                {
-                  var prefix = type.GetMethod( "Prefix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-                  var postfix = type.GetMethod( "Postfix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-                  var transpiler = type.GetMethod( "Transpiler", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+                  var overrider = type.GetMethod( "Override", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+                  var callerProperty = type.GetProperty( "Caller", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
 
-                  var harmonyPrefix = prefix != null ? new HarmonyMethod( prefix ) : null;
-                  var harmonyPostfix = postfix != null ? new HarmonyMethod( postfix ) : null;
-                  var harmonyTranspiler = transpiler != null ? new HarmonyMethod( transpiler ) : null;
+                  if( overrider != null && callerProperty != null )
+                  {
+                     if( Settings.EnableExperimentalHooks )
+                     {
+                        long replacementMethodLocation = MemoryHelper.GetMethodStartLocation( overrider );
+                        long originalMethodLocation = MemoryHelper.GetMethodStartLocation( original );
+                        byte[] originalCode = null;
 
-                  PatchMethod.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
+                        try
+                        {
+                           originalCode = MemoryHelper.GetInstructionsAtLocationRequiredToWriteJump( originalMethodLocation );
+                           var caller = new JumpedMethodCaller( originalMethodLocation, replacementMethodLocation, originalCode );
+                           callerProperty.SetValue( null, caller, null );
+
+                           MemoryHelper.WriteJump( true, originalMethodLocation, replacementMethodLocation );
+                        }
+                        catch
+                        {
+                           if( originalCode != null )
+                           {
+                              MemoryHelper.RestoreInstructionsAtLocation( true, originalMethodLocation, originalCode );
+                           }
+
+                           throw;
+                        }
+                     }
+                  }
+                  else
+                  {
+                     var priority = type.GetCustomAttributes( typeof( HarmonyPriority ), false )
+                        .OfType<HarmonyPriority>()
+                        .FirstOrDefault()
+                        ?.info.prioritiy;
+
+                     var prefix = type.GetMethod( "Prefix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+                     var postfix = type.GetMethod( "Postfix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+                     var transpiler = type.GetMethod( "Transpiler", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+
+                     var harmonyPrefix = prefix != null ? new HarmonyMethod( prefix ) : null;
+                     var harmonyPostfix = postfix != null ? new HarmonyMethod( postfix ) : null;
+                     var harmonyTranspiler = transpiler != null ? new HarmonyMethod( transpiler ) : null;
+
+                     if( priority.HasValue )
+                     {
+                        if( harmonyPrefix != null )
+                        {
+                           harmonyPrefix.prioritiy = priority.Value;
+                        }
+
+                        if( harmonyPostfix != null )
+                        {
+                           harmonyPostfix.prioritiy = priority.Value;
+                        }
+                     }
+
+                     PatchMethod.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
+                  }
                }
                else
                {

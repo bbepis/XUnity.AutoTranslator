@@ -22,6 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type UIFont = FindType( "UIFont" );
       public static readonly Type UIPanel = FindType( "UIPanel" );
       public static readonly Type UIRect = FindType( "UIRect" );
+      public static readonly Type UIInput = FindType( "UIInput" );
 
       // Unity
       public static readonly Type WWW = FindType( "UnityEngine.WWW" );
@@ -31,11 +32,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type ImageConversion = FindType( "UnityEngine.ImageConversion" );
       public static readonly Type Texture = FindType( "UnityEngine.Texture" );
       public static readonly Type SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
+      public static readonly Type Sprite = FindType( "UnityEngine.Sprite" );
       public static readonly Type Object = FindType( "UnityEngine.Object" );
       public static readonly Type TextEditor = FindType( "UnityEngine.TextEditor" );
       public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
       public static readonly Type SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
       public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
+      //public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
 
       // Something...
