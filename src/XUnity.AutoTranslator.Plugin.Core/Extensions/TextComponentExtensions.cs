@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,8 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ( Settings.EnableUGUI && ui is Text )
             || ( Settings.EnableIMGUI && ui is GUIContent )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) )
-            || ( Settings.EnableUtage && ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) );
+            || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) );
       }
 
       public static bool SupportsRichText( this object ui )
@@ -36,7 +36,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return ( ui as Text )?.supportRichText == true
             || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( RichTextPropertyName )?.GetValue( ui, null ), true ) )
-            || ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )
             || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) );
       }
 
@@ -66,14 +65,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ui is GUIContent;
       }
 
-      public static bool IsWhitelistedForImmediateRichTextTranslation( this object ui )
-      {
-         if( ui == null ) return false;
+      //public static bool IsWhitelistedForImmediateRichTextTranslation( this object ui )
+      //{
+      //   if( ui == null ) return false;
 
-         var type = ui.GetType();
+      //   var type = ui.GetType();
 
-         return ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type );
-      }
+      //   return ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type );
+      //}
 
       public static bool IsNGUI( this object ui )
       {
@@ -113,6 +112,55 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          if( ui == null ) return;
 
          var type = ui.GetType();
+
+         if( ClrTypes.UguiNovelText?.IsAssignableFrom( type ) == true )
+         {
+            var uguiMessageWindow = GameObject.FindObjectOfType( ClrTypes.AdvUguiMessageWindow );
+            if( uguiMessageWindow != null )
+            {
+               var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+               var uguiNovelText = uguiMessageWindow.GetType().GetProperty( "Text" ).GetValue( uguiMessageWindow, null );
+               if( Equals( uguiNovelText, ui ) )
+               {
+                  string previousNameText = null;
+                  var nameText = (Text)uguiMessageWindow.GetType().GetField( "nameText", flags ).GetValue( uguiMessageWindow );
+                  if( nameText )
+                  {
+                     previousNameText = nameText.text;
+                  }
+
+                  var engine = uguiMessageWindow.GetType().GetProperty( "Engine", flags ).GetValue( uguiMessageWindow, null );
+                  var page = engine.GetType().GetProperty( "Page", flags ).GetValue( engine, null );
+                  var textData = ClrTypes.TextData.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
+                  var length = (int)textData.GetType().GetProperty( "Length", flags ).GetValue( textData, null );
+
+                  try
+                  {
+                     Settings.InvokeEvents = false;
+                     Settings.RemakeTextData = advPage =>
+                     {
+                        advPage.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
+                        page.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
+                     };
+
+                     page.GetType().GetMethod( "RemakeText" ).Invoke( page, null );
+                  }
+                  finally
+                  {
+                     Settings.InvokeEvents = true;
+                     Settings.RemakeTextData = null;
+                  }
+
+                  if( nameText )
+                  {
+                     nameText.text = previousNameText;
+                  }
+
+                  return;
+               }
+            }
+         }
 
          if( ui is Text )
          {

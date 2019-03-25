@@ -64,9 +64,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateLegitimate",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.ExtProtocol", "src\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj", "{65500234-7AD4-48B8-B51B-945ADBFF1133}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Setup.Build", "src\XUnity.AutoTranslator.Setup.Build\XUnity.AutoTranslator.Setup.Build.csproj", "{848D741E-A4F2-4680-AFD2-74C8723CE3C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup.Build", "src\XUnity.AutoTranslator.Setup.Build\XUnity.AutoTranslator.Setup.Build.csproj", "{848D741E-A4F2-4680-AFD2-74C8723CE3C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Setup.Build-x86", "src\XUnity.AutoTranslator.Setup.Build-x86\XUnity.AutoTranslator.Setup.Build-x86.csproj", "{1C574D77-FCC8-4249-8890-0B00EF092705}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup.Build-x86", "src\XUnity.AutoTranslator.Setup.Build-x86\XUnity.AutoTranslator.Setup.Build-x86.csproj", "{1C574D77-FCC8-4249-8890-0B00EF092705}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

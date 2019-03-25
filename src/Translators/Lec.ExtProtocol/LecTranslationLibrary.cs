@@ -7,16 +7,38 @@ namespace Lec.ExtProtocol
 {
    class LecTranslationLibrary : UnmanagedTranslationLibrary
    {
-      public const int JapaneseCodepage = 932;
-
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate int eg_init( string path );
+
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate int eg_init2( string path, int i );
+
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate int eg_end();
+
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate int eg_translate_multi( int i, IntPtr in_str, int out_size, IntPtr out_str );
+
+      public const int ShiftJIS = 932;
+
+      private static IntPtr ConvertStringToNative( string managedString, int codepage )
+      {
+         var encoding = Encoding.GetEncoding( codepage );
+         var buffer = encoding.GetBytes( managedString );
+         IntPtr nativeUtf8 = Marshal.AllocHGlobal( buffer.Length + 1 );
+         Marshal.Copy( buffer, 0, nativeUtf8, buffer.Length );
+         Marshal.WriteByte( nativeUtf8, buffer.Length, 0 );
+         return nativeUtf8;
+      }
+
+      private static string ConvertNativeToString( IntPtr nativeUtf8, int codepage )
+      {
+         int len = 0;
+         while( Marshal.ReadByte( nativeUtf8, len ) != 0 ) ++len;
+         byte[] buffer = new byte[ len ];
+         Marshal.Copy( nativeUtf8, buffer, 0, buffer.Length );
+         return Encoding.GetEncoding( codepage ).GetString( buffer );
+      }
 
       private eg_end _end;
       private eg_translate_multi _translate;
@@ -35,35 +57,39 @@ namespace Lec.ExtProtocol
 
          foreach( var c in str )
          {
-            char o;
-
             switch( c )
             {
                case '『':
                case '｢':
                case '「':
-                  o = '['; break;
+                  builder.Append( '[' );
+                  break;
                case '』':
                case '｣':
                case '」':
-                  o = ']'; break;
+                  builder.Append( ']' );
+                  break;
                case '≪':
                case '（':
-                  o = '('; break;
+                  builder.Append( '(' );
+                  break;
                case '≫':
                case '）':
-                  o = ')'; break;
+                  builder.Append( ')' );
+                  break;
                case '…':
-                  o = ' '; break;
+                  builder.Append( "..." );
+                  break;
                case '：':
-                  o = '￤'; break;
+                  builder.Append( '￤' );
+                  break;
                case '・':
-                  o = '.'; break;
+                  builder.Append( '.' );
+                  break;
                default:
-                  o = c;
+                  builder.Append( c );
                   break;
             }
-            builder.Append( c );
          }
 
          return builder.ToString();
@@ -72,41 +98,56 @@ namespace Lec.ExtProtocol
       public override string Translate( string toTranslate )
       {
          toTranslate = PreprocessString( toTranslate );
+
+         // allocate three times the size of the untranslated text for the result (initial)
          var size = toTranslate.Length * 3;
-         int translatedSize;
          IntPtr ptr = IntPtr.Zero;
+         IntPtr str = IntPtr.Zero;
 
          // we can't know the output size, so just try until we have a big enough buffer
          try
          {
+            // get an unmanaged version of the untranslated text encoded as ShiftJIS
+            str = ConvertStringToNative( toTranslate, ShiftJIS );
+
+            int translatedSize;
             do
             {
+               // double the size of the allocated unmanaged memory
                size = size * 2;
-               // give up when we reach 10 MB string
+
+               // give up when we reach 10 MB
                if( size > 10 * 1024 * 1024 )
                {
                   return null;
                }
 
+               // free up previous allocated memory for the result
                if( ptr != IntPtr.Zero )
                {
                   Marshal.FreeHGlobal( ptr );
                }
+
+               // allocate memory for result
                ptr = Marshal.AllocHGlobal( size );
 
-               var str = ConvertStringToNative( toTranslate, JapaneseCodepage );
+               // perform translation
                translatedSize = _translate( 0, str, size, ptr );
-
-               Marshal.FreeHGlobal( str );
 
             } while( translatedSize > size );
 
-            var result = ConvertNativeToString( ptr, JapaneseCodepage );
+            // convert the unamanged ShiftJIS string to a managed C# string
+            var result = ConvertNativeToString( ptr, ShiftJIS );
 
             return result;
          }
          finally
          {
+            if( str != null )
+            {
+               Marshal.FreeHGlobal( str );
+            }
+
             if( ptr != IntPtr.Zero )
             {
                Marshal.FreeHGlobal( ptr );
@@ -114,16 +155,16 @@ namespace Lec.ExtProtocol
          }
       }
 
-      protected override bool OnInitialize( string libraryPath )
+      protected override void Initialize( string libraryPath )
       {
          try
          {
             _end = Loader.LoadFunction<eg_end>( "eg_end" );
             _translate = Loader.LoadFunction<eg_translate_multi>( "eg_translate_multi" );
          }
-         catch( Exception )
+         catch( Exception e )
          {
-            return false;
+            throw new Exception( $"Could not load functions from LEC library '{libraryPath}'.", e );
          }
 
          try
@@ -136,18 +177,24 @@ namespace Lec.ExtProtocol
             {
                _init = Loader.LoadFunction<eg_init>( "eg_init" );
             }
-            catch
+            catch( Exception e )
             {
-               return false;
+               throw new Exception( $"Could not load functions from LEC library '{libraryPath}'.", e );
             }
          }
 
          var directory = Path.GetDirectoryName( libraryPath ) + '\\';
 
-         var succeded = _init2?.Invoke( directory, 0 );
-         var initialized = succeded ?? _init( directory );
+         var initializationCode = _init2?.Invoke( directory, 0 );
+         if( initializationCode == null )
+         {
+            initializationCode = _init( directory );
+         }
 
-         return initialized == 0;
+         if( initializationCode != 0 )
+         {
+            throw new Exception( $"Could not initialize LEC library. Received code '{initializationCode}'." );
+         }
       }
 
       protected override void Dispose( bool disposing )

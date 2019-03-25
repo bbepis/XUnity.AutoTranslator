@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          if( !Settings.TextGetterCompatibilityMode ) return;
 
          var tti = instance.GetTextTranslationInfo();
-         if( tti.IsTranslated )
+         if( tti?.IsTranslated == true )
          {
             // 0. This method
             // 1. Postfix

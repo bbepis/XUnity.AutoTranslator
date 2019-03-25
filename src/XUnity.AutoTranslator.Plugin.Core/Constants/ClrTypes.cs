@@ -38,6 +38,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
       public static readonly Type SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
       public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
+      public static readonly Type UnityEventBase = FindType( "UnityEngine.Events.UnityEventBase" );
+      public static readonly Type BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
       //public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
 
@@ -46,8 +48,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       // Utage
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
-      public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );
       public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
+      public static readonly Type AdvPage = FindType( "Utage.AdvPage" );
+      public static readonly Type TextData = FindType( "Utage.TextData" );
+      public static readonly Type AdvUguiMessageWindow = FindType( "Utage.AdvUguiMessageWindow" );
       public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
       public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );

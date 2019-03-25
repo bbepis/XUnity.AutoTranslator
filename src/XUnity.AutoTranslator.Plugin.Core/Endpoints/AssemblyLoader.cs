@@ -16,26 +16,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          var files = Directory.GetFiles( directory, "*.dll" );
          var allTypes = new HashSet<Type>();
 
-         foreach( var file in files )
+         var currentDirectory = Environment.CurrentDirectory;
+         foreach( var relativeFilePath in files )
          {
-            try
-            {
-               var assemblyName = AssemblyName.GetAssemblyName( file );
-               var assembly = Assembly.Load( assemblyName );
-               var types = GetAllTypesOf<TService>( assembly );
-
-               foreach( var type in types )
-               {
-                  allTypes.Add( type );
-               }
-            }
-            catch( Exception e )
-            {
-               XuaLogger.Current.Error( e, "An error occurred while loading types in assembly: " + file );
-            }
+            LoadAssembliesInFile<TService>( relativeFilePath, allTypes );
          }
 
          return allTypes.ToList();
+      }
+
+      private static bool LoadAssembliesInFile<TService>( string file, HashSet<Type> allTypes )
+      {
+         try
+         {
+            var assembly = LoadAssembly( file );
+            var types = GetAllTypesOf<TService>( assembly );
+
+            foreach( var type in types )
+            {
+               allTypes.Add( type );
+            }
+
+            return true;
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while loading types in assembly: " + file );
+         }
+
+         return false;
+      }
+
+      private static Assembly LoadAssembly( string file )
+      {
+         try
+         {
+            var assemblyName = AssemblyName.GetAssemblyName( file );
+            var assembly = Assembly.Load( assemblyName );
+            return assembly;
+         }
+         catch
+         {
+            // fallback to legacy API
+            var assembly = Assembly.LoadFrom( file );
+            return assembly;
+         }
       }
 
       internal static List<Type> GetAllTypesOf<TService>( Assembly assembly )

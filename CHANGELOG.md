@@ -1,4 +1,11 @@
-﻿### 3.0.2
+﻿### 3.0.3
+ * BUG FIX - Bug fixes and improvements to Utage hooking implementation - EnableUtage config option also removed (always on now)
+ * BUG FIX - Rich text parser bug fixes when only a single tag with no ending was used
+ * BUG FIX - Fixed potential NullReferenceException in TextGetterCompatibilityMode
+ * BUG FIX - Load translator assemblies even if a '#' is present in file path
+ * MISC - Determine whether to disable certificate checks at config initialization based on scripting backend and unity version
+
+### 3.0.2
  * BUG FIX - UnityInjector installer package now uses correct folder structure (Translators has been moved into Config folder) and ExIni is no longer distributed
  * BUG FIX - Fixed harmony priority usage, which was incorrectly used in 3.0.1
  * MISC - Plugin should no longer translate text input fields for NGUI

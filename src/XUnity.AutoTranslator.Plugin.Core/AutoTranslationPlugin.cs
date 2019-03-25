@@ -99,9 +99,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
 
-      private Component _advEngine;
-      private float? _nextAdvUpdate;
-
       private HttpSecurity _httpSecurity;
       private List<ConfiguredEndpoint> _configuredEndpoints;
       private ConfiguredEndpoint _endpoint;
@@ -213,12 +210,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.Current.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
          }
-         
+
          if( Settings.DisableCertificateValidation )
          {
             XuaLogger.Current.Info( $"Disabling certificate checks for endpoints because of configuration." );
 
-            ServicePointManager.ServerCertificateValidationCallback += (a1, a2, a3, a4) => true;
+            ServicePointManager.ServerCertificateValidationCallback += ( a1, a2, a3, a4 ) => true;
          }
          else
          {
@@ -278,7 +275,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while settings up texture scene-load scans." );
+            XuaLogger.Current.Error( e, "An error occurred while settings up scene-load scans." );
          }
 
          LoadTranslations();
@@ -328,6 +325,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var t2 = new Thread( SaveTranslationsLoop );
          t2.IsBackground = true;
          t2.Start();
+
+         XuaLogger.Current.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
       private void OnEndpointSelected( ConfiguredEndpoint endpoint )
@@ -416,8 +415,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          XuaLogger.Current.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
          if( Features.SupportsSceneManager )
          {
-            XuaLogger.Current.Info( "SceneManager is supported in this version of Unity." );
             EnableSceneLoadScanInternal();
+            XuaLogger.Current.Info( "SceneManager is supported in this version of Unity." );
          }
          else
          {
@@ -1042,14 +1041,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          return _reverseTranslations.TryGetValue( value, out key );
       }
-      
+
       internal string Hook_TextChanged_WithResult( object ui, string text )
       {
          if( !ui.IsKnownTextType() ) return null;
 
          if( _textHooksEnabled && !_temporarilyDisabled )
          {
-            return TranslateOrQueueWebJob( ui, text, false );
+            var translation = TranslateOrQueueWebJob( ui, text, false );
+            return _isInTranslatedMode ? translation : null;
          }
          return null;
       }
@@ -1610,7 +1610,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string TranslateOrQueueWebJobImmediate( object ui, string text, TextTranslationInfo info, bool supportsStabilization, bool ignoreComponentState, TranslationContext context = null )
       {
          text = text ?? ui.GetText();
-
+         
          // make sure text exists
          var originalText = text;
          if( context == null )
@@ -1667,17 +1667,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var result = UnityTextParsers.RichTextParser.Parse( text );
                      if( result.Succeeded )
                      {
-                        var isWhitelisted = ui.IsWhitelistedForImmediateRichTextTranslation();
+                        //var isWhitelisted = ui.IsWhitelistedForImmediateRichTextTranslation();
 
-                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, isWhitelisted );
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
                         if( translation != null )
                         {
                            SetTranslatedText( ui, translation, info );
                            return translation;
-                        }
-                        else if( isWhitelisted )
-                        {
-                           return null;
                         }
                      }
                   }
@@ -2026,12 +2022,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ResetThresholdTimerIfRequired();
                KickoffTranslations();
                FinishTranslations();
-
-               if( ClrTypes.AdvEngine != null && _nextAdvUpdate.HasValue && Time.time > _nextAdvUpdate )
-               {
-                  _nextAdvUpdate = null;
-                  UpdateUtageText();
-               }
             }
 
             // perform this check every 100 frames!
@@ -2212,7 +2202,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var endpoint = _endpoint;
                   _ongoingJobs[ key ] = job;
 
-                  XuaLogger.Current.Debug( "Started: " + untranslatedText );
+                  XuaLogger.Current.Debug( "Started: '" + untranslatedText + "'" );
                   StartCoroutine(
                      endpoint.Translate(
                         new[] { untranslatedText },
@@ -2494,29 +2484,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
                }
-
-
-               // Utage support
-               if( ClrTypes.AdvEngine != null
-                  && job.OriginalSources.Any( x => ClrTypes.AdvCommand.IsAssignableFrom( x.GetType() ) ) )
-               {
-                  _nextAdvUpdate = Time.time + 0.5f;
-               }
             }
-         }
-      }
-
-      private void UpdateUtageText()
-      {
-         // After an object is destroyed, an equality check with null will return true. The variable does not go to null, you can still call GetInstanceID() on it, but the "==" operator is overloaded and behaves as expected.
-         if( _advEngine == null || _advEngine?.gameObject == null )
-         {
-            _advEngine = (Component)GameObject.FindObjectOfType( Constants.ClrTypes.AdvEngine );
-         }
-
-         if( _advEngine != null )
-         {
-            AccessTools.Method( Constants.ClrTypes.AdvEngine, "ChangeLanguage" )?.Invoke( _advEngine, new object[ 0 ] );
          }
       }
 

@@ -13,40 +13,15 @@ namespace Lec.ExtProtocol
 
       public UnmanagedTranslationLibrary( string libraryPath )
       {
-         var ok = Initialize( libraryPath );
+         if( !File.Exists( libraryPath ) ) throw new FileNotFoundException( "Could not find file.", libraryPath );
 
-         if( !ok ) throw new Exception( "Could not load library." );
+         Loader.LoadLibrary( libraryPath );
+         Initialize( libraryPath );
       }
 
-      public bool Initialize( string libraryPath )
-      {
-         if( !File.Exists( libraryPath ) ) return false;
-
-         return Loader.LoadLibrary( libraryPath ) && OnInitialize( libraryPath );
-      }
-
-      protected abstract bool OnInitialize( string libraryPath );
+      protected abstract void Initialize( string libraryPath );
 
       public abstract string Translate( string untranslatedText );
-
-      public static IntPtr ConvertStringToNative( string managedString, int codepage )
-      {
-         var encoding = Encoding.GetEncoding( codepage );
-         var buffer = encoding.GetBytes( managedString );
-         IntPtr nativeUtf8 = Marshal.AllocHGlobal( buffer.Length + 1 );
-         Marshal.Copy( buffer, 0, nativeUtf8, buffer.Length );
-         Marshal.WriteByte( nativeUtf8, buffer.Length, 0 );
-         return nativeUtf8;
-      }
-
-      public static string ConvertNativeToString( IntPtr nativeUtf8, int codepage )
-      {
-         int len = 0;
-         while( Marshal.ReadByte( nativeUtf8, len ) != 0 ) ++len;
-         byte[] buffer = new byte[ len ];
-         Marshal.Copy( nativeUtf8, buffer, 0, buffer.Length );
-         return Encoding.GetEncoding( codepage ).GetString( buffer );
-      }
 
       protected virtual void Dispose( bool disposing )
       {

@@ -210,7 +210,6 @@ EnableUGUI=True                  ;Enable or disable UGUI translation
 EnableNGUI=True                  ;Enable or disable NGUI translation
 EnableTextMeshPro=True           ;Enable or disable TextMeshPro translation
 EnableIMGUI=False                ;Enable or disable IMGUI translation
-EnableUtage=True                 ;Enable or disable Utage-specific translation
 AllowPluginHookOverride=True     ;Allow other text translation plugins to override this plugin's hooks
 
 [Behaviour]

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
@@ -34,6 +35,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string ApplicationName;
       public static float Timeout = 50.0f;
 
+      public static bool InvokeEvents = true;
+      public static Action<object> RemakeTextData = null;
 
       public static bool IsShutdown = false;
       public static bool IsShutdownFatal = false;
@@ -60,7 +63,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUGUI;
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
-      public static bool EnableUtage;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static bool IgnoreWhitespaceInNGUI;
@@ -129,7 +131,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          EnableUGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableUGUI", true );
          EnableNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableNGUI", true );
          EnableTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMeshPro", true );
-         EnableUtage = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableUtage", true );
          AllowPluginHookOverride = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "AllowPluginHookOverride", true );
 
          Delay = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "Delay", 0f );
@@ -174,7 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
 
          UserAgent = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "UserAgent", string.Empty );
-         DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", false );
+         DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", GetInitialDisableCertificateChecks() );
 
          EnablePrintHierarchy = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnablePrintHierarchy", false );
          EnableConsole = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableConsole", false );
@@ -199,6 +200,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       
       private static void Migrate()
       {
+      }
+
+      private static bool GetInitialDisableCertificateChecks()
+      {
+         var is2017 = Application.unityVersion.StartsWith( "2017" );
+         var isNet4x = Features.SupportsNet4x;
+
+         return is2017 && isNet4x;
       }
    }
 }

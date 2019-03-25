@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
       private static readonly Regex TagRegex = new Regex( "<.*?>" );
       private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "group" };
-      private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound" };
+      private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound", "line-height" };
 
       public RichTextParser()
       {
@@ -32,6 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          var template = new StringBuilder( input.Length );
          var offset = 0;
          var arg = 'A';
+         var foundIgnoredTag = false;
 
          foreach( Match m in matches )
          {
@@ -57,7 +58,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                for( int j = 0 ; j < endIdx ; j++ )
                {
                   var c = value[ j ];
-                  if( !( ( c >= '\u0041' && c <= '\u005a' ) || ( c >= '\u0061' && c <= '\u007a' ) ) )
+                  if( !( ( c >= '\u0041' && c <= '\u005a' ) || ( c >= '\u0061' && c <= '\u007a' ) || c == '-' || c == '_' ) )
                   {
                      allLatin = false;
                      break;
@@ -94,13 +95,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                {
                   template.Append( m.Value );
                }
+               else
+               {
+                  foundIgnoredTag = true;
+               }
             }
          }
 
          // catch any remaining text
          if( offset < input.Length )
          {
-            var argument = "{{" + ( arg ) + "}}";
+            var argument = "{{" + ( arg++ ) + "}}";
             var text = input.Substring( offset, input.Length - offset );
             args.Add( argument, text );
             template.Append( argument );
@@ -130,7 +135,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             templateString = templateString.Replace( fullKey, newKey );
          }
 
-         return new ParserResult( input, templateString, arg != 'A', true, args );
+         var success = foundIgnoredTag || ( arg != 'A' && templateString.Length > 5 );
+         return new ParserResult( input, templateString, success, true, args );
       }
    }
 }

@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void InstallOverrideTextHooks()
       {
-         if( Settings.EnableUGUI || Settings.EnableUtage )
+         if( Settings.EnableUGUI )
          {
             UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
          }
@@ -82,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          try
          {
-            if( Settings.EnableUGUI || Settings.EnableUtage )
+            if( Settings.EnableUGUI )
             {
                _harmony.PatchAll( UGUIHooks.All );
             }
@@ -130,10 +130,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          try
          {
-            if( Settings.EnableUtage )
-            {
-               _harmony.PatchAll( UtageHooks.All );
-            }
+            _harmony.PatchAll( UtageHooks.All );
          }
          catch( Exception e )
          {
