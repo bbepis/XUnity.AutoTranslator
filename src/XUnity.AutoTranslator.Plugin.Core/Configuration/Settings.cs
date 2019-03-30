@@ -86,6 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static TextPostProcessing RomajiPostProcessing;
       public static TextPostProcessing TranslationPostProcessing;
       public static bool EnableExperimentalHooks;
+      public static bool ForceExperimentalHooks;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -158,6 +159,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
          TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
          EnableExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableExperimentalHooks", false );
+         ForceExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceExperimentalHooks", false );
 
          TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
          EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );

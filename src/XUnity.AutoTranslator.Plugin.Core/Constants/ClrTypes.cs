@@ -47,6 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type Typewriter = FindType( "Typewriter" );
 
       // Utage
+      //public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
       public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
       public static readonly Type AdvPage = FindType( "Utage.AdvPage" );

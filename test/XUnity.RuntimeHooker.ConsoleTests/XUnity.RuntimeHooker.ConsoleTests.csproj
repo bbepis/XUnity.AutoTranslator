@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net35</TargetFramework>
+      <Platforms>AnyCPU;x86</Platforms>
+   </PropertyGroup>
+
+   <ItemGroup>
+     <ProjectReference Include="..\..\src\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj" />
+   </ItemGroup>
+
+</Project>

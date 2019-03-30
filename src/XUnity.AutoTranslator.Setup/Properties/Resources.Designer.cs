@@ -263,6 +263,26 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] XUnity_RuntimeHooker {
+            get {
+                object obj = ResourceManager.GetObject("XUnity_RuntimeHooker", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] XUnity_RuntimeHooker_Core {
+            get {
+                object obj = ResourceManager.GetObject("XUnity_RuntimeHooker_Core", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] YandexTranslate {
             get {
                 object obj = ResourceManager.GetObject("YandexTranslate", resourceCulture);

@@ -58,21 +58,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.Sprite, "texture" )?.GetGetMethod();
       }
 
-      static object Override( object __instance )
+      static void Postfix( Sprite __instance )
       {
-         return Caller.Func( () => ActualOverride( __instance ) );
-      }
-
-      static object ActualOverride( object __instance )
-      {
-         var texture = ( (Sprite)__instance ).texture;
+         var texture = __instance.texture;
 
          AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
-
-         return texture;
       }
 
-      static JumpedMethodCaller Caller { get; set; }
+      static bool RequireRuntimeHooker => true;
    }
 
    [Harmony]

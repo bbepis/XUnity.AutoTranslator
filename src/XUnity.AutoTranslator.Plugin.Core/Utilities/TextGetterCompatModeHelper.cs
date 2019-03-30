@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          {
             // 0. This method
             // 1. Postfix
-            // 2. Harmony-related method
+            // 2. Harmony-related trampoline method
             // 3. Original method
             var callingMethod = new StackFrame( 3 ).GetMethod();
 

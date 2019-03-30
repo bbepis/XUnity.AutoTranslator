@@ -12,8 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var current = e;
          while( current != null )
          {
-            if( e is TException ) return true;
-
+            if( current is TException ) return true;
             current = current.InnerException;
          }
 

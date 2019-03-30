@@ -25,7 +25,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ( Settings.EnableUGUI && ui is Text )
             || ( Settings.EnableIMGUI && ui is GUIContent )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) );
+            || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) )
+            /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
       }
 
       public static bool SupportsRichText( this object ui )
@@ -36,7 +37,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return ( ui as Text )?.supportRichText == true
             || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( RichTextPropertyName )?.GetValue( ui, null ), true ) )
-            || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) );
+            || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) )
+            /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
       }
 
       public static bool SupportsStabilization( this object ui )
@@ -135,21 +137,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   var textData = ClrTypes.TextData.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
                   var length = (int)textData.GetType().GetProperty( "Length", flags ).GetValue( textData, null );
 
-                  try
+                  var remakeTextData = page.GetType().GetMethod( "RemakeTextData", flags );
+                  if( remakeTextData == null )
                   {
-                     Settings.InvokeEvents = false;
-                     Settings.RemakeTextData = advPage =>
+                     try
                      {
-                        advPage.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
-                        page.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
-                     };
+                        Settings.InvokeEvents = false;
 
-                     page.GetType().GetMethod( "RemakeText" ).Invoke( page, null );
+                        page.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
+                        page.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
+                        page.GetType().GetProperty( "Status", flags ).GetSetMethod( true ).Invoke( page, new object[] { 1 /*SendChar*/ } );
+
+                        var messageWindowManager = engine.GetType().GetProperty( "MessageWindowManager", flags ).GetValue( engine, null );
+                        messageWindowManager.GetType().GetMethod( "OnPageTextChange", flags ).Invoke( messageWindowManager, new object[] { page } );
+                     }
+                     finally
+                     {
+                        Settings.InvokeEvents = true;
+                     }
                   }
-                  finally
+                  else
                   {
-                     Settings.InvokeEvents = true;
-                     Settings.RemakeTextData = null;
+                     try
+                     {
+                        Settings.InvokeEvents = false;
+                        Settings.RemakeTextData = advPage =>
+                        {
+                           advPage.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
+                           advPage.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
+                        };
+
+                        page.GetType().GetMethod( "RemakeText" ).Invoke( page, null );
+                     }
+                     finally
+                     {
+                        Settings.InvokeEvents = true;
+                        Settings.RemakeTextData = null;
+                     }
                   }
 
                   if( nameText )

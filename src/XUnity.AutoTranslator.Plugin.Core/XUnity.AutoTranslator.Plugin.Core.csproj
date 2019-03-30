@@ -2,7 +2,7 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <Version>3.0.2</Version>
+      <Version>3.1.0</Version>
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
    </PropertyGroup>
 
@@ -27,6 +27,7 @@
 
    <ItemGroup>
      <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+     <ProjectReference Include="..\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj" />
    </ItemGroup>
 
    <ItemGroup>

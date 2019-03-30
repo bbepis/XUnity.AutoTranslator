@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+     <AssemblyName>b979b301af8b4ef48f224de6dcf2ddf6</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XUnity.RuntimeHooker.Core\XUnity.RuntimeHooker.Core.csproj" />
+  </ItemGroup>
+
+</Project>

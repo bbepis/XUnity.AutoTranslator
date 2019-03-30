@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    //{
    //   static bool Prepare( HarmonyInstance instance )
    //   {
-   //      return ClrTypes.AdvCommand != null;
+   //      return ClrTypes.AdvCommand != null && AdvPage_RemakeTextData_Hook.TargetMethod( instance ) == null;
    //   }
 
    //   static MethodBase TargetMethod( HarmonyInstance instance )

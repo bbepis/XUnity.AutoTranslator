@@ -61,7 +61,8 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
-            //AddFile( Path.Combine( managedDir, "XUnity.RuntimeHooker.dll" ), Resources.XUnity_RuntimeHooker, true );
+            AddFile( Path.Combine( managedDir, "XUnity.RuntimeHooker.dll" ), Resources.XUnity_RuntimeHooker, true );
+            AddFile( Path.Combine( managedDir, "XUnity.RuntimeHooker.Core.dll" ), Resources.XUnity_RuntimeHooker_Core, true );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );

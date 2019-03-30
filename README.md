@@ -8,6 +8,7 @@
  * [Text Frameworks](#text-frameworks)
  * [Plugin Frameworks](#plugin-frameworks)
  * [Configuration](#configuration)
+ * [Frequently Asked Questions](#frequently-asked-questions)
  * [Translating Mods](#translating-mods)
  * [Manual Translations](#manual-translations)
  * [Regarding Redistribution](#regarding-redistribution)
@@ -235,6 +236,7 @@ GameLogTextPaths=                ;Indicates specific paths for game objects that
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 EnableExperimentalHooks=False    ;Indicates whether to use experimental hooks to improve the hooking capability of the plugin (currently being tested)
+ForceExperimentalHooks=False     ;Indicates that the plugin must use experimental hooks instead of harmony hooks. Only used for debugging
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -333,11 +335,38 @@ To rememdy this, post processing can be applied to translations when 'romaji' is
 
 This type of post processing is also applied to normal translations, but instead uses the option `TranslationPostProcessing`, which can use the same values.
 
+#### Experimental Hooks
+Experimental hooks are hooks are created at runtime, but not through the Harmony dependency. Harmony has two primary problems that these hooks attempt to solve:
+ * Harmony cannot hook methods with no body.
+ * Harmony cannot hook methods under the `netstandard2.0` API surface, which later versions of Unity can be build under.
+
+The experimental hooks implemented in this library can do this. However, unless it is absolutely required by the game, it is not recommended to enable them.
+
+The following configuration controls the experimental hooks:
+ * `EnableExperimentalHooks`: Will allow the plugin to use these hooks, if a standard Harmony hook cannot be applied.
+ * `ForceExperimentalHooks`: Forces the plugin to use experimental hooks over Harmony hooks. `EnableExperimentalHooks` must also be enabled for this to work. Only used for debugging.
+
 #### Other Options
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
  * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
  * `Delay`: Required delay from a text appears until a translation request is queued in seconds. IMGUI not supported.
+
+## Frequently Asked Questions
+> **Q: Why doesn't this plugin work in game X?**  
+A: If the plugin does not work in a game, you can try to set the following configuration parameter `DisableCertificateValidation=True`. If it still does not work, it likely uses a technique to display text that this plugin is not aware of. In that case you can make an issue and maybe it will get fixed in a later version.
+
+> **Q: The game stops working when this plugin applies translations.**  
+A: Try setting the following configuration parameter `TextGetterCompatibilityMode=True`.
+
+> **Q: Can this plugin translate other plugins/mods?**  
+A: Likely yes, see [here](#translating-mods).
+
+> **Q: How do I use CustomTranslate?**  
+A: If you have to ask, you probably can't. CustomTranslate is intended for developers of a translation service. They would be able to expose an API that conforms to CustomTranslate's API specification without needing to implement a custom ITranslateEndpoint in this plugin as well.
+
+> **Q: Please provide support for translation service X.**  
+A: For now, additional support for services that does not require some form of authentication is unlikely. Do note though, that it is possible to implement custom translators independently of this plugin. And it takes remarkably little code to do so.
 
 ## Translating Mods
 Often other mods UI are implemented through IMGUI. As you can see above, this is disabled by default. By changing the "EnableIMGUI" value to "True", it will start translating IMGUI as well, which likely means that other mods UI will be translated.
@@ -355,6 +384,7 @@ In this context, the `Translation\_AutoGeneratedTranslations.{lang}.txt` (Output
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:
  * **Distribute the _AutoGeneratedTranslations.{lang}.txt file along with the redistribution with as many translations as possible to ensure the online translator is hit as little as possible.**
  * **Do not redistribute the mod with the configuration option `EnableIMGUI=True`.**
+ * **Test your redistribution with logging/console enabled to ensure the game does not exhibit undesirable behaviour such as spamming the endpoints.**
  * Ensure you keep the plugin up-to-date, as much as reasonably possible.
  * If you use image loading feature, make sure you read [this section](#texture-translation).
 

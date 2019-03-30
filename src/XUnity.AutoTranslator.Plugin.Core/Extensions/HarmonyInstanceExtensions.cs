@@ -9,6 +9,8 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.RuntimeHooker;
+using XUnity.RuntimeHooker.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -26,73 +28,82 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void PatchType( this HarmonyInstance instance, Type type )
       {
+         MethodBase original = null;
          try
          {
-            var prepare = type.GetMethod( "Prepare", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+            var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
+            var prepare = type.GetMethod( "Prepare", flags );
             if( prepare == null || (bool)prepare.Invoke( null, new object[] { instance } ) )
             {
-               var original = (MethodBase)type.GetMethod( "TargetMethod", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public ).Invoke( null, new object[] { instance } );
+               original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { instance } );
                if( original != null )
                {
-                  var overrider = type.GetMethod( "Override", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-                  var callerProperty = type.GetProperty( "Caller", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
+                  var requireRuntimeHooker = (bool?)type.GetProperty( "RequireRuntimeHooker", flags )?.GetValue( null, null ) == true;
 
-                  if( overrider != null && callerProperty != null )
+                  var priority = type.GetCustomAttributes( typeof( HarmonyPriority ), false )
+                     .OfType<HarmonyPriority>()
+                     .FirstOrDefault()
+                     ?.info.prioritiy;
+
+                  var prefix = type.GetMethod( "Prefix", flags );
+                  var postfix = type.GetMethod( "Postfix", flags );
+                  var transpiler = type.GetMethod( "Transpiler", flags );
+
+                  var harmonyPrefix = prefix != null ? new HarmonyMethod( prefix ) : null;
+                  var harmonyPostfix = postfix != null ? new HarmonyMethod( postfix ) : null;
+                  var harmonyTranspiler = transpiler != null ? new HarmonyMethod( transpiler ) : null;
+
+                  if( priority.HasValue )
+                  {
+                     if( harmonyPrefix != null )
+                     {
+                        harmonyPrefix.prioritiy = priority.Value;
+                     }
+
+                     if( harmonyPostfix != null )
+                     {
+                        harmonyPostfix.prioritiy = priority.Value;
+                     }
+                  }
+
+                  if( requireRuntimeHooker || Settings.ForceExperimentalHooks )
                   {
                      if( Settings.EnableExperimentalHooks )
                      {
-                        long replacementMethodLocation = MemoryHelper.GetMethodStartLocation( overrider );
-                        long originalMethodLocation = MemoryHelper.GetMethodStartLocation( original );
-                        byte[] originalCode = null;
+                        XuaLogger.Current.Info( $"Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
 
-                        try
-                        {
-                           originalCode = MemoryHelper.GetInstructionsAtLocationRequiredToWriteJump( originalMethodLocation );
-                           var caller = new JumpedMethodCaller( originalMethodLocation, replacementMethodLocation, originalCode );
-                           callerProperty.SetValue( null, caller, null );
+                        var hookPrefix = harmonyPrefix != null ? new HookMethod( harmonyPrefix.method, harmonyPrefix.prioritiy ) : null;
+                        var hookPostfix = harmonyPostfix != null ? new HookMethod( harmonyPostfix.method, harmonyPostfix.prioritiy ) : null;
 
-                           MemoryHelper.WriteJump( true, originalMethodLocation, replacementMethodLocation );
-                        }
-                        catch
-                        {
-                           if( originalCode != null )
-                           {
-                              MemoryHelper.RestoreInstructionsAtLocation( true, originalMethodLocation, originalCode );
-                           }
-
-                           throw;
-                        }
+                        RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
+                     }
+                     else
+                     {
+                        XuaLogger.Current.Info( $"Skipping hook on '{original.DeclaringType.FullName}.{original.Name}' because it requires 'EnableExperimentalHooks' enabled is config file." );
                      }
                   }
                   else
                   {
-                     var priority = type.GetCustomAttributes( typeof( HarmonyPriority ), false )
-                        .OfType<HarmonyPriority>()
-                        .FirstOrDefault()
-                        ?.info.prioritiy;
-
-                     var prefix = type.GetMethod( "Prefix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-                     var postfix = type.GetMethod( "Postfix", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-                     var transpiler = type.GetMethod( "Transpiler", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public );
-
-                     var harmonyPrefix = prefix != null ? new HarmonyMethod( prefix ) : null;
-                     var harmonyPostfix = postfix != null ? new HarmonyMethod( postfix ) : null;
-                     var harmonyTranspiler = transpiler != null ? new HarmonyMethod( transpiler ) : null;
-
-                     if( priority.HasValue )
+                     try
                      {
-                        if( harmonyPrefix != null )
+                        PatchMethod.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
+                     }
+                     catch( Exception e ) when( e.IsCausedBy<PlatformNotSupportedException>() )
+                     {
+                        if( Settings.EnableExperimentalHooks )
                         {
-                           harmonyPrefix.prioritiy = priority.Value;
-                        }
+                           XuaLogger.Current.Info( $"Harmony is not supported in this runtime. Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
 
-                        if( harmonyPostfix != null )
+                           var hookPrefix = harmonyPrefix != null ? new HookMethod( harmonyPrefix.method, harmonyPrefix.prioritiy ) : null;
+                           var hookPostfix = harmonyPostfix != null ? new HookMethod( harmonyPostfix.method, harmonyPostfix.prioritiy ) : null;
+
+                           RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
+                        }
+                        else
                         {
-                           harmonyPostfix.prioritiy = priority.Value;
+                           XuaLogger.Current.Error( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime. You can try to 'EnableExperimentalHooks' in the config file to enable support for this game." );
                         }
                      }
-
-                     PatchMethod.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
                   }
                }
                else
@@ -103,7 +114,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Warn( e, "An error occurred while patching a property/method on a class. Failing class: " + type.Name );
+            if( original != null )
+            {
+               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method '{original.DeclaringType.FullName}.{original.Name}'." );
+            }
+            else
+            {
+               XuaLogger.Current.Warn( e, $"An error occurred while patching a property/method. Failing hook: '{type.Name}'." );
+            }
          }
       }
    }

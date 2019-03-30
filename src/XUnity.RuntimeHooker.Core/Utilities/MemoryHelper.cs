@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using Harmony.ILCopying;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.RuntimeHooker.Unmanaged;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Utilities
+namespace XUnity.RuntimeHooker.Core.Utilities
 {
-   internal static class MemoryHelper
+   public static class MemoryHelper
    {
       private static readonly HashSet<PlatformID> WindowsPlatformIDSet = new HashSet<PlatformID> { PlatformID.Win32NT, PlatformID.Win32S, PlatformID.Win32Windows, PlatformID.WinCE };
       private static readonly bool IsWindows = WindowsPlatformIDSet.Contains( Environment.OSVersion.Platform );
 
       private static readonly byte[] Prefix = new byte[] { 0xe9 };
-      private static readonly byte[] Instruction_Start_64bit = new byte[] { 0x48, 0xB8 };
-      private static readonly byte[] Instruction_End_64bit = new byte[] { 0xFF, 0xE0 };
-      private const byte Instruction_Start_32bit = 0x68;
-      private const byte Instruction_End_32bit = 0xc3;
+      private static readonly byte[] Instruction_1_64bit = new byte[] { 0x48, 0xB8 };
+      private static readonly byte[] Instruction_2_64bit = new byte[] { 0xFF, 0xE0 };
+      private const byte Instruction_1_32bit = 0x68;
+      private const byte Instruction_2_32bit = 0xc3;
       private const int MemoryRequiredForJumpInstruction_32bit = 6;
       private const int MemoryRequiredForJumpInstruction_64bit = 12;
 
@@ -39,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       }
 
 
-      public static string WriteJump( bool unprotect, long memory, long destination )
+      public static void WriteJump( bool unprotect, long memory, long destination )
       {
          if( unprotect )
          {
@@ -54,17 +52,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                memory += 5 + offset;
             }
 
-            memory = WriteBytes( memory, Instruction_Start_64bit );
+            memory = WriteBytes( memory, Instruction_1_64bit );
             memory = WriteLong( memory, destination );
-            memory = WriteBytes( memory, Instruction_End_64bit );
+            memory = WriteBytes( memory, Instruction_2_64bit );
          }
          else
          {
-            memory = WriteByte( memory, Instruction_Start_32bit );
+            memory = WriteByte( memory, Instruction_1_32bit );
             memory = WriteInt( memory, (int)destination );
-            memory = WriteByte( memory, Instruction_End_32bit );
+            memory = WriteByte( memory, Instruction_2_32bit );
          }
-         return null;
       }
 
       public static byte[] GetInstructionsAtLocationRequiredToWriteJump( long location )
@@ -103,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          {
             UnprotectMemoryPage( location );
          }
-
+         
          var flag = IntPtr.Size == sizeof( long );
          if( flag )
          {
@@ -113,11 +110,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                location += 5 + num;
             }
          }
-
+         
          foreach( var b in array )
          {
             location = WriteByte( location, b );
-         }            
+         }
       }
 
       public static unsafe bool CompareBytes( long memory, byte[] values )

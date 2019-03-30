@@ -1675,6 +1675,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            SetTranslatedText( ui, translation, info );
                            return translation;
                         }
+                        //else if( isWhitelisted )
+                        //{
+                        //   return null;
+                        //}
                      }
                   }
                }
