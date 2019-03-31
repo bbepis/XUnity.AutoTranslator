@@ -58,11 +58,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessTools.Property( ClrTypes.Sprite, "texture" )?.GetGetMethod();
       }
 
-      static void Postfix( Sprite __instance )
+      static void Postfix( Texture2D __result )
       {
-         var texture = __instance.texture;
-
-         AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
+         AutoTranslationPlugin.Current.Hook_ImageChanged( __result, true );
       }
 
       static bool RequireRuntimeHooker => true;
