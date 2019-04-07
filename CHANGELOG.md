@@ -1,4 +1,7 @@
-﻿### 3.1.0
+﻿### 3.1.1
+ * BUG FIX - Interacting with UI now blocks input to game
+
+### 3.1.0
  * FEATURE - Support for games with 'netstandard2.0' API surface through config option 'EnableExperimentalHooks'
  * BUG FIX - Bug fixes and improvements to Utage hooking implementation - EnableUtage config option also removed (always on now)
  * BUG FIX - Rich text parser bug fixes when only a single tag with no ending was used

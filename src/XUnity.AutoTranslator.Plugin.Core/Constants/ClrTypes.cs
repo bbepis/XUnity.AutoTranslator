@@ -25,6 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type UIInput = FindType( "UIInput" );
 
       // Unity
+      public static readonly Type GUIContent = FindType( "UnityEngine.GUIContent" );
       public static readonly Type WWW = FindType( "UnityEngine.WWW" );
       public static readonly Type InputField = FindType( "UnityEngine.UI.InputField" );
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );

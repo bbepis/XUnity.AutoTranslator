@@ -281,8 +281,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
          LoadStaticTranslations();
 
+         UnityTextParsers.Initialize( text => IsTranslatable( text ) && IsBelowMaxLength( text ) );
+
+         // start a thread that will periodically removed unused references
+         var t1 = new Thread( MaintenanceLoop );
+         t1.IsBackground = true;
+         t1.Start();
+
+         // start a thread that will periodically save new translations
+         var t2 = new Thread( SaveTranslationsLoop );
+         t2.IsBackground = true;
+         t2.Start();
+
          try
          {
+            DisableAutoTranslator();
+
             _window = new XuaWindow(
                new List<ToggleViewModel>
                {
@@ -313,18 +327,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.Current.Error( e, "An error occurred while setting up UI." );
          }
-
-         UnityTextParsers.Initialize( text => IsTranslatable( text ) && IsBelowMaxLength( text ) );
-
-         // start a thread that will periodically removed unused references
-         var t1 = new Thread( MaintenanceLoop );
-         t1.IsBackground = true;
-         t1.Start();
-
-         // start a thread that will periodically save new translations
-         var t2 = new Thread( SaveTranslationsLoop );
-         t2.IsBackground = true;
-         t2.Start();
+         finally
+         {
+            EnableAutoTranslator();
+         }
 
          XuaLogger.Current.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
@@ -1570,6 +1576,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             info?.Reset( text );
 
+            //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var textKey = new TranslationKey( ui, text, ui.IsSpammingComponent(), false );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
@@ -1622,12 +1629,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !string.IsNullOrEmpty( text ) && IsTranslatable( text ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
-            //Logger.Current.Debug( "START: " + ui.GetType().Name + ": " + text );
-
             info?.Reset( originalText );
             var isSpammer = ui.IsSpammingComponent();
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
 
+            //var textKey = new TranslationKey( ui, text, !supportsStabilization, context != null );
             var textKey = new TranslationKey( ui, text, isSpammer, context != null );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text

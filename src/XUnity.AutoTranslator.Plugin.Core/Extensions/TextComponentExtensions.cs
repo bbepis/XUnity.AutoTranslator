@@ -13,6 +13,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextComponentExtensions
    {
+      //private static readonly GUIContent[] TemporaryGUIContents = ClrTypes.GUIContent
+      //   .GetFields( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic )
+      //   .Where( x => x.DeclaringType == typeof( GUIContent ) && ( x.Name == "s_Text" || x.Name == "s_TextImage" ) )
+      //   .Select( x => (GUIContent)x.GetValue( null ) )
+      //   .ToArray();
+
       private static readonly string RichTextPropertyName = "richText";
       private static readonly string TextPropertyName = "text";
 
@@ -46,7 +52,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          if( ui == null ) return false;
 
          // shortcircuit for spammy component, to avoid reflective calls
-         if( ui is GUIContent ) return false;
+         if( ui is GUIContent )
+         {
+            return false;
+
+            //var len = TemporaryGUIContents.Length;
+            //for( int i = 0; i < len; i++ )
+            //{
+            //   if( ReferenceEquals( ui, TemporaryGUIContents[ i ] ) )
+            //   {
+            //      return false;
+            //   }
+            //}
+            //return true;
+         }
 
          var type = ui.GetType();
 

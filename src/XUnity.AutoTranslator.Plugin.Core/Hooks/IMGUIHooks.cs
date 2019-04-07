@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Harmony;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
@@ -14,6 +15,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       public static bool HooksOverriden = false;
 
       public static readonly Type[] All = new[] {
+         //typeof( GUIContent_text_Hook ),
+         //typeof( GUIContent_Temp_Hook1 ),
+         //typeof( GUIContent_Temp_Hook2 ),
+         //typeof( GUIContent_Temp_Hook3 ),
+
          typeof( GUI_BeginGroup_Hook ),
          typeof( GUI_Box_Hook ),
          typeof( GUI_DoRepeatButton_Hook ),
@@ -26,6 +32,106 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          typeof( GUI_DoToggle_Hook ),
       };
    }
+
+
+   //[Harmony, HarmonyPriority( Priority.Last )]
+   //internal static class GUIContent_text_Hook
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return ClrTypes.GUIContent != null;
+   //   }
+
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Property( ClrTypes.GUIContent, "text" )?.GetSetMethod();
+   //   }
+
+   //   static void Postfix( GUIContent __instance )
+   //   {
+   //      if( !IMGUIHooks.HooksOverriden )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
+   //      }
+   //   }
+   //}
+
+   //[Harmony, HarmonyPriority( Priority.Last )]
+   //internal static class GUIContent_Temp_Hook1
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return ClrTypes.GUIContent != null;
+   //   }
+
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ) } );
+   //   }
+
+   //   static void Postfix( GUIContent __result )
+   //   {
+   //      if( !IMGUIHooks.HooksOverriden )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_TextChanged( __result, false );
+   //      }
+   //   }
+   //}
+
+   //[Harmony, HarmonyPriority( Priority.Last )]
+   //internal static class GUIContent_Temp_Hook2
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return ClrTypes.GUIContent != null;
+   //   }
+
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ), typeof( string ) } );
+   //   }
+
+   //   static void Postfix( GUIContent __result )
+   //   {
+   //      if( !IMGUIHooks.HooksOverriden )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_TextChanged( __result, false );
+   //      }
+   //   }
+   //}
+
+   //[Harmony, HarmonyPriority( Priority.Last )]
+   //internal static class GUIContent_Temp_Hook3
+   //{
+   //   static bool Prepare( HarmonyInstance instance )
+   //   {
+   //      return ClrTypes.GUIContent != null;
+   //   }
+
+   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   {
+   //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ), typeof( Texture ) } );
+   //   }
+
+   //   static void Postfix( GUIContent __result )
+   //   {
+   //      if( !IMGUIHooks.HooksOverriden )
+   //      {
+   //         AutoTranslationPlugin.Current.Hook_TextChanged( __result, false );
+   //      }
+   //   }
+   //}
+
+
+
+
+
+
+
+
+
+
+
 
    [Harmony, HarmonyPriority( Priority.Last )]
    internal static class GUI_BeginGroup_Hook

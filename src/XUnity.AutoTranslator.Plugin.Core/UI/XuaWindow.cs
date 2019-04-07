@@ -9,6 +9,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    internal class XuaWindow
    {
+      private const int WindowId = 5464332;
       private const int WindowHeight = 480;
       private const int WindowWidth = 320;
 
@@ -18,30 +19,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
 
       private DropdownGUI<TranslatorDropdownOptionViewModel, ConfiguredEndpoint> _endpointDropdown;
-
-      private bool _isShown;
       private List<ToggleViewModel> _toggles;
       private List<TranslatorDropdownOptionViewModel> _endpointOptions;
       private List<ButtonViewModel> _commandButtons;
       private List<LabelViewModel> _labels;
+      private bool _isMouseDownOnWindow = false;
 
-      public bool IsShown
-      {
-         get
-         {
-            return _isShown;
-         }
-         set
-         {
-            _isShown = value;
-         }
-      }
+      public bool IsShown { get; set; }
 
       public XuaWindow(
-         List<ToggleViewModel> toggles,
-         List<TranslatorDropdownOptionViewModel> endpoints,
-         List<ButtonViewModel> commandButtons,
-         List<LabelViewModel> labels )
+       List<ToggleViewModel> toggles,
+       List<TranslatorDropdownOptionViewModel> endpoints,
+       List<ButtonViewModel> commandButtons,
+       List<LabelViewModel> labels )
       {
          _toggles = toggles;
          _endpointOptions = endpoints;
@@ -53,7 +43,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          GUI.Box( _windowRect, GUIContent.none, GUIUtil.GetWindowBackgroundStyle() );
 
-         _windowRect = GUI.Window( 5464332, _windowRect, CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
+         _windowRect = GUI.Window( WindowId, _windowRect, CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
+
+         if( GUIUtil.IsAnyMouseButtonOrScrollWheelDown )
+         {
+            var point = new Vector2( Input.mousePosition.x, Screen.height - Input.mousePosition.y );
+            _isMouseDownOnWindow = _windowRect.Contains( point );
+         }
+
+         if( !_isMouseDownOnWindow || !GUIUtil.IsAnyMouseButtonOrScrollWheel )
+            return;
+
+         // make sure window is focused if scroll wheel is used to indicate we consumed that event
+         GUI.FocusWindow( WindowId );
+
+         var point1 = new Vector2( Input.mousePosition.x, Screen.height - Input.mousePosition.y );
+         if( !_windowRect.Contains( point1 ) )
+            return;
+
+         Input.ResetInputAxes();
       }
 
       private void CreateWindowUI( int id )
@@ -100,9 +108,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Command Panel ----", GUIUtil.LabelCenter );
          posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
 
-         for( int row = 0 ; row < rows ; row++ )
+         for( int row = 0; row < rows; row++ )
          {
-            for( int col = 0 ; col < buttonsPerRow ; col++ )
+            for( int col = 0; col < buttonsPerRow; col++ )
             {
                int idx = ( row * buttonsPerRow ) + col;
                if( idx >= _commandButtons.Count ) break;

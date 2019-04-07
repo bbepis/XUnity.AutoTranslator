@@ -85,5 +85,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          return WindowBackgroundStyle;
       }
+
+      public static bool IsAnyMouseButtonOrScrollWheelDown
+      {
+         get
+         {
+            return Input.mouseScrollDelta.y > 0f
+               || Input.GetMouseButtonDown( 0 )
+               || Input.GetMouseButtonDown( 1 )
+               || Input.GetMouseButtonDown( 2 );
+         }
+      }
+
+      public static bool IsAnyMouseButtonOrScrollWheel
+      {
+         get
+         {
+            return Input.mouseScrollDelta.y > 0f
+               || Input.GetMouseButton( 0 )
+               || Input.GetMouseButton( 1 )
+               || Input.GetMouseButton( 2 );
+         }
+      }
    }
 }
