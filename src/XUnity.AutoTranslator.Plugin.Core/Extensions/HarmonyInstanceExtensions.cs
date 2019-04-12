@@ -121,7 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             }
             else
             {
-               XuaLogger.Current.Warn( e, $"An error occurred while patching a property/method. Failing hook: '{type.Name}'." );
+               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
             }
          }
       }

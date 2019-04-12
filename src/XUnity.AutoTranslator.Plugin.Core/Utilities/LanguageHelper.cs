@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class LanguageHelper
    {
+      private static Func<string, bool> DefaultSymbolCheck;
       private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
       {
          { "ja", ContainsJapaneseSymbols },
@@ -39,6 +41,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             return check;
          }
          return text => true;
+      }
+
+      public static bool ContainsLanguageSymbolsForSourceLanguage( string text )
+      {
+         if( DefaultSymbolCheck == null )
+         {
+            DefaultSymbolCheck = GetSymbolCheck( Settings.FromLanguage );
+         }
+
+         return DefaultSymbolCheck( text );
       }
 
       public static bool ContainsJapaneseSymbols( string text )

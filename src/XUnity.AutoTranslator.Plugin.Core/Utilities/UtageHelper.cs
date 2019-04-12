@@ -62,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
          if( !Labels.Contains( label ) )
          {
-            if( AutoTranslationPlugin.Current.TryGetReverseTranslation( label, out string key ) )
+            if( AutoTranslationPlugin.Current.TextCache.TryGetReverseTranslation( label, out string key ) )
             {
                label = key;
             }

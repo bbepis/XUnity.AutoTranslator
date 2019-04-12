@@ -10,7 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    internal class XuaWindow
    {
       private const int WindowId = 5464332;
-      private const int WindowHeight = 480;
+      private const int WindowHeight = 520;
       private const int WindowWidth = 320;
 
       private const int AvailableWidth = WindowWidth - ( GUIUtil.ComponentSpacing * 2 );
@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
 
-      private DropdownGUI<TranslatorDropdownOptionViewModel, ConfiguredEndpoint> _endpointDropdown;
+      private DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager> _endpointDropdown;
       private List<ToggleViewModel> _toggles;
       private List<TranslatorDropdownOptionViewModel> _endpointOptions;
       private List<ButtonViewModel> _commandButtons;
@@ -154,7 +154,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
          }
 
-         var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, ConfiguredEndpoint>( col2x, endpointDropdownPosy, col2, _endpointOptions ) );
+         var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _endpointOptions ) );
          endpointDropdown.OnGUI();
 
          GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight * 5 ), GUI.tooltip, GUIUtil.LabelRich );

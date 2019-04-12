@@ -4,26 +4,30 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TranslationJob
    {
-      public TranslationJob( TranslationKey key )
+      public TranslationJob( TranslationEndpointManager endpoint, TranslationKey key, bool saveResult )
       {
+         Endpoint = endpoint;
          Key = key;
+         SaveResult = saveResult;
 
          Components = new List<object>();
-         OriginalSources = new HashSet<object>();
-         Contexts = new HashSet<TranslationContext>();
+         Contexts = new HashSet<ParserTranslationContext>();
       }
 
-      public HashSet<TranslationContext> Contexts { get; private set; }
+      public bool SaveResult { get; private set; }
+
+      public TranslationEndpointManager Endpoint { get; private set; }
+
+      public HashSet<ParserTranslationContext> Contexts { get; private set; }
 
       public List<object> Components { get; private set; }
-
-      public HashSet<object> OriginalSources { get; private set; }
 
       public TranslationKey Key { get; private set; }
 
@@ -31,37 +35,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationJobState State { get; set; }
 
-      public bool AnyComponentsStillHasOriginalUntranslatedTextOrContextual()
-      {
-         if( Components.Count == 0 || Contexts.Count > 0 ) return true; // we do not know
-
-         for( int i = Components.Count - 1 ; i >= 0 ; i-- )
-         {
-            var component = Components[ i ];
-            try
-            {
-               var text = component.GetText().TrimIfConfigured(); 
-               if( text == Key.OriginalText )
-               {
-                  return true;
-               }
-            }
-            catch( NullReferenceException )
-            {
-               // might fail if compoent is no longer associated to game
-               Components.RemoveAt( i );
-            }
-         }
-
-         return false;
-      }
-
-      public void Associate( TranslationContext context )
+      public void Associate( object ui, ParserTranslationContext context )
       {
          if( context != null )
          {
             Contexts.Add( context );
             context.Jobs.Add( this );
+         }
+         else
+         {
+            if( ui != null && !ui.IsSpammingComponent() )
+            {
+               Components.Add( ui );
+            }
          }
       }
    }

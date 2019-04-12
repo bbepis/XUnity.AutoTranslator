@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   internal class TranslationContext
+   internal class ParserTranslationContext
    {
-      public TranslationContext( object component, ParserResult result )
+      public ParserTranslationContext( object component, ParserResult result )
       {
          Jobs = new HashSet<TranslationJob>();
          Component = component;
@@ -17,5 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public HashSet<TranslationJob> Jobs { get; private set; }
 
       public object Component { get; private set; }
+
+      public TranslationEndpointManager Endpoint => Jobs.FirstOrDefault()?.Endpoint;
    }
 }

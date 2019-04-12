@@ -26,13 +26,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public Action<TSelection> OnSelected { get; set; }
    }
 
-   internal class TranslatorDropdownOptionViewModel : DropdownOptionViewModel<ConfiguredEndpoint>
+   internal class TranslatorDropdownOptionViewModel : DropdownOptionViewModel<TranslationEndpointManager>
    {
       private GUIContent _selected;
       private GUIContent _normal;
       private GUIContent _disabled;
 
-      public TranslatorDropdownOptionViewModel( Func<bool> isSelected, ConfiguredEndpoint selection, Action<ConfiguredEndpoint> onSelected ) : base( selection.Endpoint.FriendlyName, isSelected, () => selection.Error == null, selection, onSelected )
+      public TranslatorDropdownOptionViewModel( Func<bool> isSelected, TranslationEndpointManager selection, Action<TranslationEndpointManager> onSelected ) : base( selection.Endpoint.FriendlyName, isSelected, () => selection.Error == null, selection, onSelected )
       {
          _selected = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CURRENT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} is the currently selected translator that will be used to perform translations." );
          _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because the initialization failed. {selection.Error?.Message}" );

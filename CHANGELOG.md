@@ -1,5 +1,7 @@
 ﻿### 3.1.1
  * BUG FIX - Interacting with UI now blocks input to game
+ * BUG FIX - Better handling of error'ed translations in relation to rich text
+ * MISC - Removed 'Dump Untranslated Texts' hotkey due to feature bloat
 
 ### 3.1.0
  * FEATURE - Support for games with 'netstandard2.0' API surface through config option 'EnableExperimentalHooks'
