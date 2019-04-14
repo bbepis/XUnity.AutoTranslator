@@ -15,13 +15,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          Endpoint = endpoint;
          Key = key;
-         SaveResult = saveResult;
+         SaveResultGlobally = saveResult;
 
          Components = new List<object>();
          Contexts = new HashSet<ParserTranslationContext>();
+         TranslationResults = new HashSet<TranslationResult>();
       }
 
-      public bool SaveResult { get; private set; }
+      public bool SaveResultGlobally { get; private set; }
 
       public TranslationEndpointManager Endpoint { get; private set; }
 
@@ -29,13 +30,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public List<object> Components { get; private set; }
 
+      public HashSet<TranslationResult> TranslationResults { get; private set; }
+
       public TranslationKey Key { get; private set; }
 
       public string TranslatedText { get; set; }
 
+      public string ErrorMessage { get; set; }
+
       public TranslationJobState State { get; set; }
 
-      public void Associate( object ui, ParserTranslationContext context )
+      public void Associate( object ui, TranslationResult translationResult, ParserTranslationContext context )
       {
          if( context != null )
          {
@@ -47,6 +52,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( ui != null && !ui.IsSpammingComponent() )
             {
                Components.Add( ui );
+            }
+
+            if( translationResult != null )
+            {
+               TranslationResults.Add( translationResult );
             }
          }
       }

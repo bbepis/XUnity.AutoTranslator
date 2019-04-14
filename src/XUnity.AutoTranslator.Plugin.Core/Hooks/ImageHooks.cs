@@ -42,7 +42,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( UITexture_material_Hook ),
          typeof( UIPanel_clipTexture_Hook ),
          typeof( UIRect_OnInit_Hook ),
+
+         // Utage
+         typeof( DicingTextures_GetTexture_Hook ),
       };
+   }
+
+   [Harmony]
+   internal static class DicingTextures_GetTexture_Hook
+   {
+      static bool Prepare( HarmonyInstance instance )
+      {
+         return ClrTypes.DicingTextures != null;
+      }
+
+      static MethodBase TargetMethod( HarmonyInstance instance )
+      {
+         return AccessTools.Method( ClrTypes.DicingTextures, "GetTexture", new[] { typeof( string ) } );
+      }
+
+      public static void Postfix( object __instance, Texture2D __result )
+      {
+         AutoTranslationPlugin.Current.Hook_ImageChanged( __result, false );
+      }
    }
 
    [Harmony]

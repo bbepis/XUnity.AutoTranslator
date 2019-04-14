@@ -15,8 +15,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       private Dictionary<string, byte> _failedTranslations;
       private Dictionary<string, TranslationJob> _unstartedJobs;
       private Dictionary<string, TranslationJob> _ongoingJobs;
-      
+
       private int _ongoingTranslations;
+
+      // used for prototyping
+      private Dictionary<string, string> _translations;
 
       public TranslationEndpointManager( ITranslateEndpoint endpoint, Exception error )
       {
@@ -27,6 +30,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          _failedTranslations = new Dictionary<string, byte>();
          _unstartedJobs = new Dictionary<string, TranslationJob>();
          _ongoingJobs = new Dictionary<string, TranslationJob>();
+
+         _translations = new Dictionary<string, string>();
 
          HasBatchLogicFailed = false;
          AvailableBatchOperations = Settings.MaxAvailableBatchOperations;
@@ -53,6 +58,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       public bool HasUnstartedJob => _unstartedJobs.Count > 0;
 
       public bool HasFailedDueToConsecutiveErrors => ConsecutiveErrors >= Settings.MaxErrors;
+
+      public bool TryGetTranslation( TranslationKey key, out string value )
+      {
+         return TryGetTranslation( key.GetDictionaryLookupKey(), out value );
+      }
+
+      public bool TryGetTranslation( string key, out string value )
+      {
+         return _translations.TryGetValue( key, out value );
+      }
+
+      private void AddTranslation( TranslationKey key, string value )
+      {
+         var lookup = key.GetDictionaryLookupKey();
+         _translations[ lookup ] = value;
+      }
+
+      private void AddTranslation( string key, string value )
+      {
+         _translations[ key ] = value;
+      }
+
+      private void QueueNewTranslationForDisk( string key, string value )
+      {
+         // FIXME: Implement
+      }
+
+      public void AddTranslationToCache( TranslationKey key, string value )
+      {
+         AddTranslationToCache( key.GetDictionaryLookupKey(), value );
+      }
+
+      public void AddTranslationToCache( string key, string value )
+      {
+         if( !HasTranslated( key ) )
+         {
+            AddTranslation( key, value );
+            QueueNewTranslationForDisk( key, value );
+         }
+      }
+
+      private bool HasTranslated( string key )
+      {
+         return _translations.ContainsKey( key );
+      }
 
       public void HandleNextBatch()
       {
@@ -81,6 +131,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                {
                   XuaLogger.Current.Warn( $"Dequeued: '{untranslatedText}' because the current endpoint has already failed this translation 3 times." );
                   job.State = TranslationJobState.Failed;
+                  job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
                   Manager.InvokeJobFailed( job );
                }
@@ -144,6 +195,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                XuaLogger.Current.Warn( $"Dequeued: '{untranslatedText}' because the current endpoint has already failed this translation 3 times." );
                job.State = TranslationJobState.Failed;
+               job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
                Manager.InvokeJobFailed( job );
             }
@@ -261,6 +313,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                var untranslatedText = job.Key.GetDictionaryLookupKey();
                job.State = TranslationJobState.Failed;
+               job.ErrorMessage = error;
+
                _ongoingJobs.Remove( untranslatedText );
                Manager.OngoingTranslations--;
 
@@ -312,16 +366,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          XuaLogger.Current.Info( "Re-enabled batching." );
       }
 
-      public bool EnqueueTranslation( object ui, TranslationKey key, ParserTranslationContext context, bool checkOtherEndpoints )
+      public bool EnqueueTranslation( object ui, TranslationKey key, TranslationResult translationResult, ParserTranslationContext context )
       {
          var lookupKey = key.GetDictionaryLookupKey();
 
-         var added = AssociateWithExistingJobIfPossible( ui, lookupKey, context );
+         var added = AssociateWithExistingJobIfPossible( ui, lookupKey, translationResult, context );
          if( added )
          {
             return false;
          }
 
+         var checkOtherEndpoints = translationResult == null;
          if( checkOtherEndpoints )
          {
             var endpoints = Manager.ConfiguredEndpoints;
@@ -331,7 +386,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                var endpoint = endpoints[ i ];
                if( endpoint == this ) continue;
 
-               added = endpoint.AssociateWithExistingJobIfPossible( ui, lookupKey, context );
+               added = endpoint.AssociateWithExistingJobIfPossible( ui, lookupKey, translationResult, context );
                if( added )
                {
                   return false;
@@ -341,23 +396,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          XuaLogger.Current.Debug( "Queued: '" + lookupKey + "'" );
 
-         var newJob = new TranslationJob( this, key, true );
-         newJob.Associate( ui, context );
+         var saveResultGlobally = checkOtherEndpoints;
+         var newJob = new TranslationJob( this, key, saveResultGlobally );
+         newJob.Associate( ui, translationResult, context );
 
          return AddUnstartedJob( lookupKey, newJob );
       }
 
-      public bool AssociateWithExistingJobIfPossible( object ui, string key, ParserTranslationContext context )
+      public bool AssociateWithExistingJobIfPossible( object ui, string key, TranslationResult translationResult, ParserTranslationContext context )
       {
          if( _unstartedJobs.TryGetValue( key, out TranslationJob unstartedJob ) )
          {
-            unstartedJob.Associate( ui, context );
+            unstartedJob.Associate( ui, translationResult, context );
             return true;
          }
 
          if( _ongoingJobs.TryGetValue( key, out TranslationJob ongoingJob ) )
          {
-            ongoingJob.Associate( ui, context );
+            ongoingJob.Associate( ui, translationResult, context );
             return true;
          }
 
@@ -397,6 +453,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             XuaLogger.Current.Warn( $"Dequeued: '{job.Key}'" );
             job.Value.State = TranslationJobState.Failed;
+            job.Value.ErrorMessage = "Translation failed because all jobs on endpoint was cleared.";
 
             Manager.InvokeJobFailed( job.Value );
          }

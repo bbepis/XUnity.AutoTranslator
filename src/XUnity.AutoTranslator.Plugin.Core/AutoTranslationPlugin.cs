@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// <summary>
    /// Main plugin class for the AutoTranslator.
    /// </summary>
-   public class AutoTranslationPlugin : MonoBehaviour
+   public class AutoTranslationPlugin : MonoBehaviour, ITranslator
    {
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
@@ -44,9 +44,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal static AutoTranslationPlugin Current;
 
       internal XuaWindow MainWindow;
+      internal TranslationAggregatorWindow TranslationAggregatorWindow;
+      internal TranslationAggregatorOptionsWindow TranslationAggregatorOptionsWindow;
       internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal TextureTranslationCache TextureCache;
+      internal SpamChecker SpamChecker;
 
       /// <summary>
       /// Keeps track of things to copy to clipboard.
@@ -66,26 +69,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
-      private int[] _currentTranslationsQueuedPerSecondRollingWindow = new int[ Settings.TranslationQueueWatchWindow ];
-      private float? _timeExceededThreshold;
-      private float _translationsQueuedPerSecond;
-
       private bool _isInTranslatedMode = true;
       private bool _textHooksEnabled = true;
       private bool _imageHooksEnabled = true;
 
       private float _batchOperationSecondCounter = 0;
-
-      private string[] _previouslyQueuedText = new string[ Settings.PreviousTextStaggerCount ];
-      private int _staggerTextCursor = 0;
-      private int _concurrentStaggers = 0;
-      private int _lastStaggerCheckFrame = -1;
-
-      private int _frameForLastQueuedTranslation = -1;
-      private int _consecutiveFramesTranslated = 0;
-
-      private int _secondForQueuedTranslation = -1;
-      private int _consecutiveSecondsTranslated = 0;
 
       private bool _hasValidOverrideFont = false;
       private bool _hasOverridenFont = false;
@@ -126,6 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          TranslationManager.JobCompleted += OnJobCompleted;
          TranslationManager.JobFailed += OnJobFailed;
          TranslationManager.InitializeEndpoints( gameObject );
+         SpamChecker = new SpamChecker( TranslationManager );
 
          // WORKAROUND: Initialize text parsers with delegate indicating if text should be translated
          UnityTextParsers.Initialize( text => TextCache.IsTranslatable( text ) && IsBelowMaxLength( text ) );
@@ -154,32 +143,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             DisableAutoTranslator();
 
-            MainWindow = new XuaWindow(
-               new List<ToggleViewModel>
-               {
-                  new ToggleViewModel(
-                     " Translated",
-                     "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
-                     "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
-                     ToggleTranslation, () => _isInTranslatedMode )
-               },
-               TranslationManager.AllEndpoints.Select( x => new TranslatorDropdownOptionViewModel( () => x == TranslationManager.CurrentEndpoint, x, OnEndpointSelected ) ).ToList(),
-               new List<ButtonViewModel>
-               {
-                  new ButtonViewModel( "Reboot", "<b>REBOOT PLUGIN</b>\nReboots the plugin if it has been shutdown. This only works if the plugin was shut down due to consequtive errors towards the translation endpoint.", RebootPlugin, null ),
-                  new ButtonViewModel( "Reload", "<b>RELOAD TRANSLATION</b>\nReloads all translation text files and texture files from disk.", ReloadTranslations, null ),
-                  new ButtonViewModel( "Hook", "<b>MANUAL HOOK</b>\nTraverses the unity object tree for looking for anything that can be translated. Performs a translation if something is found.", ManualHook, null )
-               },
-               new List<LabelViewModel>
-               {
-                  new LabelViewModel( "Version: ", () => PluginData.Version ),
-                  new LabelViewModel( "Plugin status: ", () => Settings.IsShutdown ? "Shutdown" : "Running" ),
-                  new LabelViewModel( "Translator status: ", () => TranslationManager.CurrentEndpoint.HasFailedDueToConsecutiveErrors ? "Shutdown" : "Running" ),
-                  new LabelViewModel( "Running translations: ", () => $"{(TranslationManager.OngoingTranslations)}" ),
-                  new LabelViewModel( "Served translations: ", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
-                  new LabelViewModel( "Queued translations: ", () => $"{(TranslationManager.UnstartedTranslations)} / {Settings.MaxUnstartedJobs}" ),
-                  new LabelViewModel( "Error'ed translations: ", () => $"{TranslationManager.CurrentEndpoint?.ConsecutiveErrors ?? 0} / {Settings.MaxErrors}"  ),
-               } );
+            MainWindow = new XuaWindow( CreateXuaViewModel() );
+
+            var vm = CreateTranslationAggregatorViewModel();
+            TranslationAggregatorWindow = new TranslationAggregatorWindow( vm );
+            TranslationAggregatorOptionsWindow = new TranslationAggregatorOptionsWindow( vm );
          }
          catch( Exception e )
          {
@@ -189,6 +157,41 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             EnableAutoTranslator();
          }
+      }
+
+      private TranslationAggregatorViewModel CreateTranslationAggregatorViewModel()
+      {
+         return new TranslationAggregatorViewModel( TranslationManager.ConfiguredEndpoints );
+      }
+
+      private XuaViewModel CreateXuaViewModel()
+      {
+         return new XuaViewModel(
+            new List<ToggleViewModel>
+            {
+               new ToggleViewModel(
+                  " Translated",
+                  "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
+                  "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
+                  ToggleTranslation, () => _isInTranslatedMode )
+            },
+            TranslationManager.AllEndpoints.Select( x => new TranslatorDropdownOptionViewModel( () => x == TranslationManager.CurrentEndpoint, x, OnEndpointSelected ) ).ToList(),
+            new List<ButtonViewModel>
+            {
+               new ButtonViewModel( "Reboot", "<b>REBOOT PLUGIN</b>\nReboots the plugin if it has been shutdown. This only works if the plugin was shut down due to consequtive errors towards the translation endpoint.", RebootPlugin, null ),
+               new ButtonViewModel( "Reload", "<b>RELOAD TRANSLATION</b>\nReloads all translation text files and texture files from disk.", ReloadTranslations, null ),
+               new ButtonViewModel( "Hook", "<b>MANUAL HOOK</b>\nTraverses the unity object tree for looking for anything that can be translated. Performs a translation if something is found.", ManualHook, null )
+            },
+            new List<LabelViewModel>
+            {
+               new LabelViewModel( "Version: ", () => PluginData.Version ),
+               new LabelViewModel( "Plugin status: ", () => Settings.IsShutdown ? "Shutdown" : "Running" ),
+               new LabelViewModel( "Translator status: ", () => TranslationManager.CurrentEndpoint.HasFailedDueToConsecutiveErrors ? "Shutdown" : "Running" ),
+               new LabelViewModel( "Running translations: ", () => $"{(TranslationManager.OngoingTranslations)}" ),
+               new LabelViewModel( "Served translations: ", () => $"{Settings.TranslationCount} / {Settings.MaxTranslationsBeforeShutdown}" ),
+               new LabelViewModel( "Queued translations: ", () => $"{(TranslationManager.UnstartedTranslations)} / {Settings.MaxUnstartedJobs}" ),
+               new LabelViewModel( "Error'ed translations: ", () => $"{TranslationManager.CurrentEndpoint?.ConsecutiveErrors ?? 0} / {Settings.MaxErrors}"  ),
+            } );
       }
 
       private void StartMaintenance()
@@ -345,176 +348,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          TextureCache.LoadTranslationFiles();
       }
 
-      private void CreateTranslationJobFor( TranslationEndpointManager endpoint, object ui, TranslationKey key, ParserTranslationContext context )
+      private void CreateTranslationJobFor( TranslationEndpointManager endpoint, object ui, TranslationKey key, TranslationResult translationResult, ParserTranslationContext context )
       {
-         var added = endpoint.EnqueueTranslation( ui, key, context, true );
-         if( added )
+         var added = endpoint.EnqueueTranslation( ui, key, translationResult, context );
+         if( added && translationResult == null )
          {
-            CheckStaggerText( key.GetDictionaryLookupKey() );
-            CheckConsecutiveFrames();
-            CheckConsecutiveSeconds();
-            CheckThresholds();
-         }
-      }
-
-      private void CheckConsecutiveSeconds()
-      {
-         var currentSecond = (int)Time.time;
-         var lastSecond = currentSecond - 1;
-
-         if( lastSecond == _secondForQueuedTranslation )
-         {
-            // we also queued something last frame, lets increment our counter
-            _consecutiveSecondsTranslated++;
-
-            if( _consecutiveSecondsTranslated > Settings.MaximumConsecutiveSecondsTranslated )
-            {
-               // Shutdown, this wont be tolerated!!!
-               TranslationManager.ClearAllJobs();
-
-               Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: Translations were queued every second for more than {Settings.MaximumConsecutiveSecondsTranslated} consecutive seconds. Shutting down plugin." );
-            }
-
-         }
-         else if( currentSecond == _secondForQueuedTranslation )
-         {
-            // do nothing, there may be multiple translations per frame, that wont increase this counter
-         }
-         else
-         {
-            // but if multiple Update frames has passed, we will reset the counter
-            _consecutiveSecondsTranslated = 0;
-         }
-
-         _secondForQueuedTranslation = currentSecond;
-      }
-
-      private void CheckConsecutiveFrames()
-      {
-         var currentFrame = Time.frameCount;
-         var lastFrame = currentFrame - 1;
-
-         if( lastFrame == _frameForLastQueuedTranslation )
-         {
-            // we also queued something last frame, lets increment our counter
-            _consecutiveFramesTranslated++;
-
-            if( _consecutiveFramesTranslated > Settings.MaximumConsecutiveFramesTranslated )
-            {
-               // Shutdown, this wont be tolerated!!!
-               TranslationManager.ClearAllJobs();
-
-               Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConsecutiveFramesTranslated} consecutive frames. Shutting down plugin." );
-            }
-
-         }
-         else if( currentFrame == _frameForLastQueuedTranslation )
-         {
-            // do nothing, there may be multiple translations per frame, that wont increase this counter
-         }
-         else if( _consecutiveFramesTranslated > 0 )
-         {
-            // but if multiple Update frames has passed, we will reset the counter
-            _consecutiveFramesTranslated--;
-         }
-
-         _frameForLastQueuedTranslation = currentFrame;
-      }
-
-      private void PeriodicResetFrameCheck()
-      {
-         var currentSecond = (int)Time.time;
-         if( currentSecond % 100 == 0 )
-         {
-            _consecutiveFramesTranslated = 0;
-         }
-      }
-
-      private void CheckStaggerText( string untranslatedText )
-      {
-         var currentFrame = Time.frameCount;
-         if( currentFrame != _lastStaggerCheckFrame )
-         {
-            _lastStaggerCheckFrame = currentFrame;
-
-            bool wasProblematic = false;
-
-            for( int i = 0; i < _previouslyQueuedText.Length; i++ )
-            {
-               var previouslyQueuedText = _previouslyQueuedText[ i ];
-
-               if( previouslyQueuedText != null )
-               {
-                  if( untranslatedText.RemindsOf( previouslyQueuedText ) )
-                  {
-                     wasProblematic = true;
-                     break;
-                  }
-
-               }
-            }
-
-            if( wasProblematic )
-            {
-               _concurrentStaggers++;
-               if( _concurrentStaggers > Settings.MaximumStaggers )
-               {
-                  TranslationManager.ClearAllJobs();
-
-                  Settings.IsShutdown = true;
-                  XuaLogger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
-               }
-            }
-            else
-            {
-               _concurrentStaggers = 0;
-            }
-
-            _previouslyQueuedText[ _staggerTextCursor % _previouslyQueuedText.Length ] = untranslatedText;
-            _staggerTextCursor++;
-         }
-      }
-
-      private void CheckThresholds()
-      {
-         if( TranslationManager.UnstartedTranslations > Settings.MaxUnstartedJobs )
-         {
-            TranslationManager.ClearAllJobs();
-
-            Settings.IsShutdown = true;
-            XuaLogger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
-         }
-
-         var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
-         var newIdx = ( (int)Time.time ) % Settings.TranslationQueueWatchWindow;
-         if( previousIdx != newIdx )
-         {
-            _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ] = 0;
-         }
-         _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ]++;
-
-         var translationsInWindow = _currentTranslationsQueuedPerSecondRollingWindow.Sum();
-         _translationsQueuedPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
-         if( _translationsQueuedPerSecond > Settings.MaxTranslationsQueuedPerSecond )
-         {
-            if( !_timeExceededThreshold.HasValue )
-            {
-               _timeExceededThreshold = Time.time;
-            }
-
-            if( Time.time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
-            {
-               TranslationManager.ClearAllJobs();
-
-               Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
-            }
-         }
-         else
-         {
-            _timeExceededThreshold = null;
+            // FIXME: Check that we still enter this!
+            SpamChecker.PerformChecks( key.GetDictionaryLookupKey() );
          }
       }
 
@@ -534,24 +374,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             _batchOperationSecondCounter = 0;
-         }
-      }
-
-      private void ResetThresholdTimerIfRequired()
-      {
-         var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
-         var newIdx = ( (int)Time.time ) % Settings.TranslationQueueWatchWindow;
-         if( previousIdx != newIdx )
-         {
-            _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ] = 0;
-         }
-
-         var translationsInWindow = _currentTranslationsQueuedPerSecondRollingWindow.Sum();
-         _translationsQueuedPerSecond = (float)translationsInWindow / Settings.TranslationQueueWatchWindow;
-
-         if( _translationsQueuedPerSecond <= Settings.MaxTranslationsQueuedPerSecond )
-         {
-            _timeExceededThreshold = null;
          }
       }
 
@@ -743,6 +565,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ui.SetText( text );
 
                info?.ResetScrollIn( ui );
+
+               if( TranslationAggregatorWindow != null && info != null && !ui.IsSpammingComponent() )
+               {
+                  TranslationAggregatorWindow.OnNewTranslationAdded( info );
+               }
             }
             catch( TargetInvocationException )
             {
@@ -1126,6 +953,125 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
+      // "public" endpoint to perform translations
+      TranslationResult ITranslator.Translate( TranslationEndpointManager endpoint, string untranslatedText )
+      {
+         return Translate( untranslatedText, endpoint, null );
+      }
+
+      private TranslationResult Translate( string text, TranslationEndpointManager endpoint, ParserTranslationContext context )
+      {
+         var result = new TranslationResult();
+
+         if( context == null )
+         {
+            // Get the trimmed text
+            text = text.TrimIfConfigured();
+         }
+
+         // Ensure that we actually want to translate this text and its owning UI element.
+         // FIXME: Using TextCache here is wrong!
+         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text ) && IsBelowMaxLength( text ) )
+         {
+            var textKey = new TranslationKey( null, text, false, context != null );
+
+            // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+            string translation;
+            if( endpoint.TryGetTranslation( textKey, out translation ) )
+            {
+               if( !string.IsNullOrEmpty( translation ) )
+               {
+                  result.SetCompleted( translation, true );
+               }
+               else
+               {
+                  result.SetEmptyResponse( true );
+               }
+               return result;
+            }
+            else
+            {
+               if( context == null )
+               {
+                  var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+                  if( parserResult.Succeeded )
+                  {
+                     translation = TranslateByParserResult( endpoint, parserResult, result, true );
+                     if( translation != null )
+                     {
+                        result.SetCompleted( translation, true );
+                     }
+
+                     // return because result will be completed later by recursive call
+
+                     return result;
+                  }
+               }
+
+               if( Settings.IsShutdown )
+               {
+                  result.SetErrorWithMessage( "The plugin is shutdown.", true );
+               }
+               else if( endpoint.HasFailedDueToConsecutiveErrors )
+               {
+                  result.SetErrorWithMessage( "The translation endpoint is shutdown.", true );
+               }
+               else
+               {
+                  CreateTranslationJobFor( endpoint, null, textKey, result, context );
+               }
+
+               return result;
+            }
+         }
+         else
+         {
+            result.SetErrorWithMessage( $"The provided text ({text}) cannot be translated.", true );
+
+            return result;
+         }
+      }
+
+      private string TranslateByParserResult( TranslationEndpointManager endpoint, ParserResult result, TranslationResult translationResult, bool allowStartJob )
+      {
+         Dictionary<string, string> translations = new Dictionary<string, string>();
+
+         // attempt to lookup ALL strings immediately; return result if possible; queue operations
+         foreach( var kvp in result.Arguments )
+         {
+            var variableName = kvp.Key;
+            var untranslatedTextPart = kvp.Value;
+            if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart ) && IsBelowMaxLength( untranslatedTextPart ) )
+            {
+               string partTranslation;
+               if( endpoint.TryGetTranslation( untranslatedTextPart, out partTranslation ) )
+               {
+                  translations.Add( variableName, partTranslation );
+               }
+               else if( allowStartJob )
+               {
+                  // incomplete, must start job
+                  var context = new ParserTranslationContext( null, endpoint, translationResult, result );
+                  Translate( untranslatedTextPart, endpoint, context );
+               }
+            }
+            else
+            {
+               // the value will do
+               translations.Add( variableName, untranslatedTextPart );
+            }
+         }
+
+         if( result.Arguments.Count == translations.Count )
+         {
+            return result.Untemplate( translations );
+         }
+         else
+         {
+            return null; // could not perform complete translation
+         }
+      }
+
       /// <summary>
       /// Translates the string of a UI  text or queues it up to be translated
       /// by the HTTP translation service.
@@ -1156,7 +1102,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string translation;
             if( TextCache.TryGetTranslation( textKey, out translation ) )
             {
-               QueueNewUntranslatedForClipboard( textKey );
+               if( context == null && !isSpammer )
+               {
+                  QueueNewUntranslatedForClipboard( textKey );
+               }
 
                if( !string.IsNullOrEmpty( translation ) )
                {
@@ -1224,7 +1173,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      StartCoroutine(
                         WaitForTextStablization(
                            ui: ui,
-                           delay: 1.0f, // 1 second to prevent '1 second tickers' from getting translated
+                           delay: 0.9f, // 0.9 second to prevent '1 second tickers' from getting translated
                            maxTries: 60, // 50 tries, about 1 minute
                            currentTries: 0,
                            onMaxTriesExceeded: () =>
@@ -1297,7 +1246,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                        {
                                           if( !Settings.IsShutdown || !endpoint.HasFailedDueToConsecutiveErrors )
                                           {
-                                             CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, context );
+                                             CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context );
                                           }
                                        }
                                     }
@@ -1322,7 +1271,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( !Settings.IsShutdown || !endpoint.HasFailedDueToConsecutiveErrors )
                         {
                            // once the text has stabilized, attempt to look it up
-                           CreateTranslationJobFor( endpoint, ui, textKey, context );
+                           CreateTranslationJobFor( endpoint, ui, textKey, null, context );
                         }
                      }
                   }
@@ -1331,7 +1280,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      StartCoroutine(
                         WaitForTextStablization(
                            textKey: textKey,
-                           delay: 1.0f,
+                           delay: 0.9f,
                            onTextStabilized: () =>
                            {
                               // Lets try not to spam a service that might not be there...
@@ -1343,7 +1292,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  {
                                     if( !TextCache.TryGetTranslation( textKey, out translation ) )
                                     {
-                                       CreateTranslationJobFor( endpoint, ui, textKey, context );
+                                       CreateTranslationJobFor( endpoint, ui, textKey, null, context );
                                     }
                                  }
                               }
@@ -1368,8 +1317,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var untranslatedTextPart = kvp.Value;
             if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart ) && IsBelowMaxLength( untranslatedTextPart ) )
             {
-               // FIXME: Only allow use of 'local cache' of endpoint?? Otherwise translation will bleed between endpoints!
-
                string partTranslation;
                if( TextCache.TryGetTranslation( untranslatedTextPart, out partTranslation ) )
                {
@@ -1378,7 +1325,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                else if( allowStartJob )
                {
                   // incomplete, must start job
-                  var context = new ParserTranslationContext( ui, result );
+                  var context = new ParserTranslationContext( ui, TranslationManager.CurrentEndpoint, null, result );
                   TranslateOrQueueWebJobImmediate( ui, untranslatedTextPart, null, false, true, context );
                }
             }
@@ -1526,11 +1473,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !Settings.IsShutdown )
             {
+               SpamChecker.Update();
+
                UpdateSpriteRenderers();
-               PeriodicResetFrameCheck();
                IncrementBatchOperations();
-               ResetThresholdTimerIfRequired();
                KickoffTranslations();
+
+               TranslationAggregatorWindow?.Update();
             }
 
             // perform this check every 100 frames!
@@ -1578,6 +1527,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      MainWindow.IsShown = !MainWindow.IsShown;
                   }
                }
+               else if( isAltPressed && ( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) ) )
+               {
+                  if( TranslationAggregatorWindow != null )
+                  {
+                     TranslationAggregatorWindow.IsShown = !TranslationAggregatorWindow.IsShown;
+                  }
+               }
             }
          }
          catch( Exception e )
@@ -1588,24 +1544,55 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       void OnGUI()
       {
-         if( MainWindow != null )
+         try
          {
-            try
-            {
-               DisableAutoTranslator();
+            DisableAutoTranslator();
 
-               if( MainWindow.IsShown ) MainWindow.OnGUI();
-            }
-            catch( Exception e )
+            if( MainWindow != null )
             {
-               XuaLogger.Current.Error( e, "An error occurred in XUnity.AutoTranslator UI. Disabling the UI." );
+               try
+               {
+                  if( MainWindow.IsShown ) MainWindow.OnGUI();
+               }
+               catch( Exception e )
+               {
+                  XuaLogger.Current.Error( e, "An error occurred in XUnity.AutoTranslator UI. Disabling the UI." );
 
-               MainWindow = null;
+                  MainWindow = null;
+               }
             }
-            finally
+
+            if( TranslationAggregatorWindow != null )
             {
-               EnableAutoTranslator();
+               try
+               {
+                  if( TranslationAggregatorWindow.IsShown ) TranslationAggregatorWindow.OnGUI();
+               }
+               catch( Exception e )
+               {
+                  XuaLogger.Current.Error( e, "An error occurred in Translation Aggregator UI. Disabling the UI." );
+
+                  TranslationAggregatorWindow = null;
+               }
             }
+
+            if( TranslationAggregatorOptionsWindow != null )
+            {
+               try
+               {
+                  if( TranslationAggregatorOptionsWindow.IsShown ) TranslationAggregatorOptionsWindow.OnGUI();
+               }
+               catch( Exception e )
+               {
+                  XuaLogger.Current.Error( e, "An error occurred in Translation Aggregator Options UI. Disabling the UI." );
+
+                  TranslationAggregatorOptionsWindow = null;
+               }
+            }
+         }
+         finally
+         {
+            EnableAutoTranslator();
          }
       }
 
@@ -1627,31 +1614,44 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnJobFailed( TranslationJob job )
       {
-         //foreach( var context in job.Contexts )
-         //{
-         //   // are all jobs within this context completed? If so, we can set the text
-         //   if( context.Jobs.Any( x => x.State == TranslationJobState.Failed ) )
-         //   {
-         //      // FIXME: Mark coroutine as failed!
-         //   }
-         //}
+         foreach( var translationResult in job.TranslationResults )
+         {
+            translationResult.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error.", false );
+         }
 
-         //// FIXME: Mark coroutine related to job itself as failed
+         foreach( var context in job.Contexts )
+         {
+            var translationResult = context.TranslationResult;
+            if( translationResult != null )
+            {
+               // are all jobs within this context completed? If so, we can set the text
+               if( context.Jobs.Any( x => x.State == TranslationJobState.Failed ) )
+               {
+                  translationResult.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error.", false );
+               }
+            }
+         }
       }
 
       private void OnJobCompleted( TranslationJob job )
       {
-         // FIXME: Complete potential Coroutines
-
-         // Do NOT do this if the job is endpoint specific!!!
-
-         // or we could ask, if the endpoint, the current endpoint????
-         if( job.SaveResult )
+         if( job.SaveResultGlobally )
          {
-            TextCache.AddTranslation( job.Key, job.TranslatedText );
+            TextCache.AddTranslationToCache( job.Key, job.TranslatedText );
+         }
+
+         job.Endpoint.AddTranslationToCache( job.Key, job.TranslatedText );
+
+         // fix translation results directly on jobs
+         foreach( var translationResult in job.TranslationResults )
+         {
             if( !string.IsNullOrEmpty( job.TranslatedText ) )
             {
-               TextCache.QueueNewTranslationForDisk( job.Key, job.TranslatedText );
+               translationResult.SetCompleted( job.TranslatedText, false );
+            }
+            else
+            {
+               translationResult.SetEmptyResponse( false );
             }
          }
 
@@ -1687,14 +1687,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var text = context.Component.GetText().TrimIfConfigured();
                   var result = context.Result;
                   Dictionary<string, string> translations = new Dictionary<string, string>();
-                  var translatedText = TranslateOrQueueWebJobImmediateByParserResult( context.Component, result, false );
+
+                  string translatedText;
+                  if( context.TranslationResult == null )
+                  {
+                     translatedText = TranslateOrQueueWebJobImmediateByParserResult( context.Component, result, false );
+                  }
+                  else
+                  {
+                     translatedText = TranslateByParserResult( context.Endpoint, result, null, false );
+                  }
 
                   if( !string.IsNullOrEmpty( translatedText ) )
                   {
-                     if( result.PersistCombinedResult && !TextCache.HasTranslated( context.Result.OriginalText ) && job.SaveResult )
+                     if( result.PersistCombinedResult )
                      {
-                        TextCache.AddTranslation( context.Result.OriginalText, translatedText );
-                        TextCache.QueueNewTranslationForDisk( context.Result.OriginalText, translatedText );
+                        if( job.SaveResultGlobally )
+                        {
+                           TextCache.AddTranslationToCache( context.Result.OriginalText, translatedText );
+                        }
+
+                        job.Endpoint.AddTranslationToCache( job.Key, job.TranslatedText );
                      }
 
                      if( text == result.OriginalText )
@@ -1702,11 +1715,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var info = context.Component.GetOrCreateTextTranslationInfo();
                         SetTranslatedText( context.Component, translatedText, info );
                      }
+
+                     if( context.TranslationResult != null )
+                     {
+                        context.TranslationResult.SetCompleted( translatedText, false );
+                     }
+                  }
+                  else
+                  {
+                     if( context.TranslationResult != null )
+                     {
+                        context.TranslationResult.SetEmptyResponse( false );
+                     }
                   }
                }
                catch( NullReferenceException )
                {
-
                }
             }
          }

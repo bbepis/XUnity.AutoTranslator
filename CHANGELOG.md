@@ -1,7 +1,9 @@
-﻿### 3.1.1
+﻿### 3.2.0
+ * CHANGE - Restructured large portions of the internal code to support more features going forward
  * BUG FIX - Interacting with UI now blocks input to game
  * BUG FIX - Better handling of error'ed translations in relation to rich text
  * MISC - Removed 'Dump Untranslated Texts' hotkey due to feature bloat
+ * MISC - Improved Utage image hooking to support DicingImage
 
 ### 3.1.0
  * FEATURE - Support for games with 'netstandard2.0' API surface through config option 'EnableExperimentalHooks'

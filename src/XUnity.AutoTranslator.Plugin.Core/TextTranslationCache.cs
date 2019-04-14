@@ -148,42 +148,41 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal bool HasTranslated( string key )
+      private bool HasTranslated( string key )
       {
          return _translations.ContainsKey( key );
       }
 
-      internal bool IsTranslation( string translation )
+      private bool IsTranslation( string translation )
       {
          return _reverseTranslations.ContainsKey( translation );
       }
 
-      internal void AddTranslation( string key, string value )
+      private void AddTranslation( string key, string value )
       {
          _translations[ key ] = value;
          _reverseTranslations[ value ] = key;
       }
 
-      internal void AddTranslation( TranslationKey key, string value )
-      {
-         var lookup = key.GetDictionaryLookupKey();
-         _translations[ lookup ] = value;
-         _reverseTranslations[ value ] = lookup;
-      }
-
-      internal void QueueNewTranslationForDisk( TranslationKey key, string value )
-      {
-         lock( _writeToFileSync )
-         {
-            _newTranslations[ key.GetDictionaryLookupKey() ] = value;
-         }
-      }
-
-      internal void QueueNewTranslationForDisk( string key, string value )
+      private void QueueNewTranslationForDisk( string key, string value )
       {
          lock( _writeToFileSync )
          {
             _newTranslations[ key ] = value;
+         }
+      }
+
+      internal void AddTranslationToCache( TranslationKey key, string value )
+      {
+         AddTranslation( key.GetDictionaryLookupKey(), value );
+      }
+
+      internal void AddTranslationToCache( string key, string value )
+      {
+         if( !HasTranslated( key ) )
+         {
+            AddTranslation( key, value );
+            QueueNewTranslationForDisk( key, value );
          }
       }
 

@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly string EnglishLanguage = "en";
       public static readonly string Romaji = "romaji";
       public static readonly int MaxErrors = 5;
-      public static readonly float ClipboardDebounceTime = 1f;
+      public static readonly float ClipboardDebounceTime = 1.250f;
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
       public static readonly int MaxUnstartedJobs = 4000;
       public static readonly float IncreaseBatchOperationsEvery = 30;
@@ -126,7 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             MinDialogueChars = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MinDialogueChars", 20 );
             ForceSplitTextAfterCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceSplitTextAfterCharacters", 0 );
             CopyToClipboard = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CopyToClipboard", false );
-            MaxClipboardCopyCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxClipboardCopyCharacters", 450 );
+            MaxClipboardCopyCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxClipboardCopyCharacters", 1000 );
             EnableUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableUIResizing", true );
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
             TrimAllText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TrimAllText", ClrTypes.AdvEngine == null );

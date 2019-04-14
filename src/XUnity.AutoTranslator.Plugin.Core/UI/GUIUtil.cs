@@ -8,13 +8,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    internal static class GUIUtil
    {
-      public const int WindowTitleClearance = 10;
-      public const int ComponentSpacing = 10;
-      public const int LabelWidth = 60;
-      public const int LabelHeight = 21;
-      public const int RowHeight = 21;
+      public const float WindowTitleClearance = 10;
+      public const float ComponentSpacing = 10;
+      public const float HalfComponentSpacing = ComponentSpacing / 2;
+      public const float LabelWidth = 60;
+      public const float LabelHeight = 21;
+      public const float RowHeight = 21;
 
       public static readonly RectOffset Empty = new RectOffset( 0, 0, 0, 0 );
+
+      public static readonly GUIStyle LabelTranslation = new GUIStyle( GUI.skin.label )
+      {
+         richText = false
+      };
 
       public static readonly GUIStyle LabelCenter = new GUIStyle( GUI.skin.label )
       {
@@ -59,7 +65,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
       };
 
-      public static Rect R( int x, int y, int width, int height ) => new Rect( x, y, width, height );
+      public static Rect R( float x, float y, float width, float height ) => new Rect( x, y, width, height );
 
       private static Texture2D CreateBackgroundTexture()
       {

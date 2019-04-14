@@ -57,6 +57,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
       public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
+      public static readonly Type DicingTextures = FindType( "Utage.DicingTextures" );
+      public static readonly Type DicingImage = FindType( "Utage.DicingImage" );
 
       // Live2D
       public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );

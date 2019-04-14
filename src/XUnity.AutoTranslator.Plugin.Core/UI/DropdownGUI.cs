@@ -3,23 +3,24 @@ using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
+
    internal class DropdownGUI<TDropdownOptionViewModel, TSelection>
       where TDropdownOptionViewModel : DropdownOptionViewModel<TSelection>
    {
 
-      private const int MaxHeight = GUIUtil.RowHeight * 5;
+      private const float MaxHeight = GUIUtil.RowHeight * 5;
 
       private GUIContent _noSelection;
       private List<TDropdownOptionViewModel> _options;
       private TDropdownOptionViewModel _currentSelection;
 
-      private int _x;
-      private int _y;
-      private int _width;
+      private float _x;
+      private float _y;
+      private float _width;
       private bool _isShown;
       private Vector2 _scrollPosition;
 
-      public DropdownGUI( int x, int y, int width, IEnumerable<TDropdownOptionViewModel> options )
+      public DropdownGUI( float x, float y, float width, IEnumerable<TDropdownOptionViewModel> options )
       {
          _x = x;
          _y = y;
@@ -64,7 +65,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
       }
 
-      private Vector2 ShowDropdown( int x, int y, int width, GUIStyle buttonStyle, Vector2 scrollPosition )
+      private Vector2 ShowDropdown( float x, float y, float width, GUIStyle buttonStyle, Vector2 scrollPosition )
       {
          var rect = GUIUtil.R( x, y, width, _options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _options.Count * GUIUtil.RowHeight );
 
