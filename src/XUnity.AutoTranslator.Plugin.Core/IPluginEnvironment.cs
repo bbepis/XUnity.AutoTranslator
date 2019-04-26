@@ -17,7 +17,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <summary>
       /// Gets the path the plugin is located at.
       /// </summary>
-      string DataPath { get; }
+      string PluginPath { get; }
+
+      /// <summary>
+      /// Gets or sets the path representing the root of the translations.
+      /// </summary>
+      string TranslationPath { get; }
+
+      /// <summary>
+      /// Gets or sets the path representing the config directory.
+      /// </summary>
+      string ConfigPath { get; }
 
       /// <summary>
       /// Gets the preferences file.

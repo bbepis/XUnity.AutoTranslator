@@ -100,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void CreateEndpoints( GameObject go, InitializationContext context )
       {
-         var pluginFolder = Path.Combine( PluginEnvironment.Current.DataPath, Settings.PluginFolder );
+         var pluginFolder = Path.Combine( PluginEnvironment.Current.PluginPath, Settings.TranslatorsFolder );
          var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
 
          foreach( var type in dynamicTypes )

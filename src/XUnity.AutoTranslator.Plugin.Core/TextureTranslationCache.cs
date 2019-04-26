@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private IEnumerable<string> GetTextureFiles()
       {
-         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize(), $"*.png", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize(), $"*.png", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                _translatedImages.Clear();
                _untranslatedImages.Clear();
-               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize() );
+               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize() );
                foreach( var fullFileName in GetTextureFiles() )
                {
                   RegisterImageFromFile( fullFileName );
@@ -107,7 +107,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal void RegisterImageFromData( string textureName, string key, byte[] data )
       {
          var name = textureName.SanitizeForFileSystem();
-         var root = Path.Combine( PluginEnvironment.Current.DataPath, Settings.TextureDirectory ).Parameterize();
+         var root = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();
          var originalHash = HashHelper.Compute( data );
 
          // allow hash and key to be the same; only store one of them then!

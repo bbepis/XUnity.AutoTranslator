@@ -34,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -45,7 +45,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var startTime = Time.realtimeSinceStartup;
             lock( _writeToFileSync )
             {
-               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.DataPath, Settings.TranslationDirectory ).Parameterize() );
+               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize() );
                Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;

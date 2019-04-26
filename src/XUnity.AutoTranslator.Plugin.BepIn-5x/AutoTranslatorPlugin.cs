@@ -19,8 +19,11 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
 
       public AutoTranslatorPlugin()
       {
-         DataPath = @"BepInEx\plugins\XUnity.AutoTranslator";
-         _configPath = Path.Combine( DataPath, "AutoTranslatorConfig.ini" );
+         PluginPath = @"BepInEx\plugins\XUnity.AutoTranslator";
+         ConfigPath = @"BepInEx\config";
+         TranslationPath = @"BepInEx";
+
+         _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
          XuaLogger.Current = new BepInLogger();
       }
 
@@ -32,7 +35,11 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
          }
       }
 
-      public string DataPath { get; }
+      public string PluginPath { get; }
+
+      public string ConfigPath { get; }
+
+      public string TranslationPath { get; }
 
       public IniFile ReloadConfig()
       {

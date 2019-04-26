@@ -16,11 +16,12 @@ namespace XUnity.AutoTranslator.Plugin.IPA
    {
       private IniFile _file;
       private string _configPath;
+      private readonly string _dataPath;
 
       public AutoTranslatorPlugin()
       {
-         DataPath = "Plugins";
-         _configPath = Path.Combine( DataPath, "AutoTranslatorConfig.ini" );
+         _dataPath = "Plugins";
+         _configPath = Path.Combine( _dataPath, "AutoTranslatorConfig.ini" );
       }
 
       public IniFile Preferences
@@ -31,7 +32,11 @@ namespace XUnity.AutoTranslator.Plugin.IPA
          }
       }
 
-      public string DataPath { get; }
+      public string PluginPath => _dataPath;
+
+      public string TranslationPath => _dataPath;
+
+      public string ConfigPath => _dataPath;
 
       public IniFile ReloadConfig()
       {

@@ -27,13 +27,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public string DataPath
-      {
-         get
-         {
-            return _dataFolder;
-         }
-      }
+      public string PluginPath => _dataFolder;
+
+      public string TranslationPath => _dataFolder;
+
+      public string ConfigPath => _dataFolder;
 
       public void SaveConfig()
       {

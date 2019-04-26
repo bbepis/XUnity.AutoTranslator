@@ -14,6 +14,12 @@ namespace XUnity.AutoTranslator.Plugin.UnityInjector
    [PluginName( PluginData.Name ), PluginVersion( PluginData.Version )]
    public class AutoTranslatorPlugin : PluginBase, IPluginEnvironment
    {
+      public string PluginPath => DataPath;
+
+      public string TranslationPath => DataPath;
+
+      public string ConfigPath => DataPath;
+
       void IPluginEnvironment.SaveConfig()
       {
          SaveConfig();

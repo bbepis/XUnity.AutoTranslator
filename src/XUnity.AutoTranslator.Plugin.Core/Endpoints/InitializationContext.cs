@@ -33,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// </summary>
       public string DestinationLanguage { get; }
 
-      public string PluginDirectory => PluginEnvironment.Current.DataPath;
+      public string PluginDirectory => PluginEnvironment.Current.PluginPath;
 
       public void DisableCertificateChecksFor( params string[] hosts )
       {

@@ -16,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    {
       // cannot be changed
       public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
-      public static readonly string PluginFolder = "Translators";
+      public static readonly string TranslatorsFolder = "Translators";
       public static readonly int MaxMaxCharactersPerTranslation = 500;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
@@ -174,7 +174,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableMigrations = PluginEnvironment.Current.Preferences.GetOrDefault( "Migrations", "Enable", true );
             MigrationsTag = PluginEnvironment.Current.Preferences.GetOrDefault( "Migrations", "Tag", string.Empty );
 
-            AutoTranslationsFilePath = Path.Combine( PluginEnvironment.Current.DataPath, OutputFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
+            AutoTranslationsFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, OutputFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
             UsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
 
 
