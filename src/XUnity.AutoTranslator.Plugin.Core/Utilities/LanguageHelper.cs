@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -51,6 +52,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          }
 
          return DefaultSymbolCheck( text );
+      }
+
+      public static bool IsTranslatable( string text )
+      {
+         return ContainsLanguageSymbolsForSourceLanguage( text )
+            //&& str.Length <= Settings.MaxCharactersPerTranslation
+            && !Settings.IgnoreTextStartingWith.Any( x => text.StartsWithStrict( x ) );
       }
 
       public static bool ContainsJapaneseSymbols( string text )

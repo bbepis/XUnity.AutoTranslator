@@ -5,8 +5,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    internal class ScrollPositioned
    {
-      private Vector2 _scrollPosition;
-
       public ScrollPositioned()
       {
       }

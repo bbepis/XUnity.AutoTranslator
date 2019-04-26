@@ -96,7 +96,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( graphic is Text )
          {
             var ui = (Text)graphic;
-
+            
             // text is likely to be longer than there is space for, simply expand out anyway then
             var componentWidth = ( (RectTransform)ui.transform ).rect.width;
             var quarterScreenSize = Screen.width / 4;

@@ -10,14 +10,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       private List<Translation> _translations;
       private TranslationAggregatorViewModel _parent;
-      private float _started;
+      private float? _started;
 
       public AggregatedTranslationViewModel( TranslationAggregatorViewModel parent, List<Translation> translations )
       {
-         _started = Time.realtimeSinceStartup;
          _parent = parent;
          _translations = translations;
-         AggregatedTranslations = parent.Endpoints.Select(
+         AggregatedTranslations = parent.AvailableTranslators.Select(
             x => new IndividualTranslatorTranslationViewModel(
                x,
                new IndividualTranslationViewModel(
@@ -35,13 +34,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          if( _parent.IsShown )
          {
-            var timeSince = Time.realtimeSinceStartup - _started;
-            if( timeSince > 1.0f )
+            if( _parent.Manager.OngoingTranslations == 0 && _parent.Manager.UnstartedTranslations == 0 )
             {
-               foreach( var additionTranslation in AggregatedTranslations )
+               if( _started.HasValue )
                {
-                  additionTranslation.Translation.Update();
+                  var timeSince = Time.realtimeSinceStartup - _started.Value;
+                  if( timeSince > 1.0f )
+                  {
+                     foreach( var additionTranslation in AggregatedTranslations )
+                     {
+                        additionTranslation.Translation.StartTranslations();
+                     }
+                  }
                }
+               else
+               {
+                  _started = Time.realtimeSinceStartup;
+               }
+            }
+
+            foreach( var additionTranslation in AggregatedTranslations )
+            {
+               additionTranslation.Translation.CheckCompleted();
             }
          }
       }

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.Harmony</name>
+    </assembly>
+    <members>
+        <member name="T:BepInEx.Harmony.ParameterByRefAttribute">
+            <summary>
+            Specifies the indices of parameters that are ByRef.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Harmony.ParameterByRefAttribute.ParameterIndices">
+            <summary>
+            The indices of parameters that are ByRef.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Harmony.ParameterByRefAttribute.#ctor(System.Int32[])">
+            <param name="parameterIndices">The indices of parameters that are ByRef.</param>
+        </member>
+        <member name="T:BepInEx.Harmony.HarmonyWrapper">
+            <summary>
+            A wrapper for Harmony based operations.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Harmony.HarmonyWrapper.DefaultInstance">
+            <summary>
+            The HarmonyInstance that is used when none is specified.
+            </summary>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Type,Harmony.HarmonyInstance)">
+            <summary>
+            Applies all patches specified in the type.
+            </summary>
+            <param name="type">The type to scan.</param>
+            <param name="harmonyInstance">The HarmonyInstance to use.</param>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Reflection.Assembly,Harmony.HarmonyInstance)">
+            <summary>
+            Applies all patches specified in the assembly.
+            </summary>
+            <param name="assembly">The assembly to scan.</param>
+            <param name="harmonyInstance">The HarmonyInstance to use.</param>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(Harmony.HarmonyInstance)">
+            <summary>
+            Applies all patches specified in the calling assembly.
+            </summary>
+            <param name="harmonyInstance">The HarmonyInstance to use.</param>
+        </member>
+    </members>
+</doc>

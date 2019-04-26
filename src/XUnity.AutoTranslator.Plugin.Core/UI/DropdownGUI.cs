@@ -6,13 +6,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
    internal class DropdownGUI<TDropdownOptionViewModel, TSelection>
       where TDropdownOptionViewModel : DropdownOptionViewModel<TSelection>
+      where TSelection : class
    {
 
       private const float MaxHeight = GUIUtil.RowHeight * 5;
 
       private GUIContent _noSelection;
-      private List<TDropdownOptionViewModel> _options;
-      private TDropdownOptionViewModel _currentSelection;
+      private GUIContent _unselect;
+      private DropdownViewModel<TDropdownOptionViewModel, TSelection> _viewModel;
 
       private float _x;
       private float _y;
@@ -20,35 +21,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       private bool _isShown;
       private Vector2 _scrollPosition;
 
-      public DropdownGUI( float x, float y, float width, IEnumerable<TDropdownOptionViewModel> options )
+      public DropdownGUI( float x, float y, float width, DropdownViewModel<TDropdownOptionViewModel, TSelection> viewModel )
       {
          _x = x;
          _y = y;
          _width = width;
          _noSelection = new GUIContent( "----", "<b>SELECT TRANSLATOR</b>\nNo translator is currently selected, which means no new translations will be performed. Please select one from the dropdown." );
+         _unselect = new GUIContent( "----", "<b>UNSELECT TRANSLATOR</b>\nThis will unselect the current translator, which means no new translations will be performed." );
 
-         _options = new List<TDropdownOptionViewModel>();
-         foreach( var item in options )
-         {
-            if( item.IsSelected() )
-            {
-               _currentSelection = item;
-            }
-            _options.Add( item );
-         }
-      }
-
-      public void Select( TDropdownOptionViewModel option )
-      {
-         if( option.IsSelected() ) return;
-
-         _currentSelection = option;
-         _currentSelection.OnSelected?.Invoke( _currentSelection.Selection );
+         _viewModel = viewModel;
       }
 
       public void OnGUI()
       {
-         bool clicked = GUI.Button( GUIUtil.R( _x, _y, _width, GUIUtil.RowHeight ), _currentSelection?.Text ?? _noSelection, _isShown ? GUIUtil.NoMarginButtonPressedStyle : GUI.skin.button );
+         bool clicked = GUI.Button( GUIUtil.R( _x, _y, _width, GUIUtil.RowHeight ), _viewModel.CurrentSelection?.Text ?? _noSelection, _isShown ? GUIUtil.NoMarginButtonPressedStyle : GUI.skin.button );
          if( clicked )
          {
             _isShown = !_isShown;
@@ -56,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          if( _isShown )
          {
-            _scrollPosition = ShowDropdown( _x, _y + GUIUtil.RowHeight, _width, GUI.skin.button, _scrollPosition );
+            ShowDropdown( _x, _y + GUIUtil.RowHeight, _width, GUI.skin.button );
          }
 
          if( !clicked && Event.current.isMouse )
@@ -65,21 +51,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
       }
 
-      private Vector2 ShowDropdown( float x, float y, float width, GUIStyle buttonStyle, Vector2 scrollPosition )
+      private void ShowDropdown( float x, float y, float width, GUIStyle buttonStyle )
       {
-         var rect = GUIUtil.R( x, y, width, _options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _options.Count * GUIUtil.RowHeight );
+         var rect = GUIUtil.R( x, y, width, _viewModel.Options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _viewModel.Options.Count * GUIUtil.RowHeight );
 
          GUILayout.BeginArea( rect, GUIUtil.NoSpacingBoxStyle );
-         scrollPosition = GUILayout.BeginScrollView( scrollPosition );
+         _scrollPosition = GUILayout.BeginScrollView( _scrollPosition );
 
-         foreach( var option in _options )
+         var style = _viewModel.CurrentSelection == null ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
+         if( GUILayout.Button( _unselect, style ) )
          {
-            var style = option.IsSelected() ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
+            _viewModel.Select( null );
+            _isShown = false;
+         }
 
+         foreach( var option in _viewModel.Options )
+         {
+            style = option.IsSelected() ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
             GUI.enabled = option?.IsEnabled() ?? true;
             if( GUILayout.Button( option.Text, style ) )
             {
-               Select( option );
+               _viewModel.Select( option );
                _isShown = false;
             }
             GUI.enabled = true;
@@ -87,8 +79,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          GUILayout.EndScrollView();
          GUILayout.EndArea();
-
-         return scrollPosition;
       }
    }
 }

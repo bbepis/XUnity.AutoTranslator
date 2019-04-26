@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    internal class TranslationAggregatorOptionsWindow
    {
       private const int WindowId = 45733721;
-      private const float WindowWidth = 300;
+      private const float WindowWidth = 320;
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, 400 );
       private bool _isMouseDownOnWindow = false;
@@ -18,13 +18,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public TranslationAggregatorOptionsWindow( TranslationAggregatorViewModel viewModel )
       {
          _viewModel = viewModel;
-         _toggles = _viewModel.Endpoints.Select( x =>
+         _toggles = _viewModel.AllTranslators.Select( x =>
          new ToggleViewModel(
-            x.Endpoint.Endpoint.FriendlyName,
+            " " + x.Endpoint.Endpoint.FriendlyName,
             null,
             null,
             () => x.IsEnabled = !x.IsEnabled,
-            () => x.IsEnabled ) ).ToList();
+            () => x.IsEnabled,
+            x.Endpoint.Error == null ) ).ToList();
       }
 
       public bool IsShown
@@ -72,22 +73,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          
          foreach( var vm in _toggles )
          {
+            var previousEnabled = GUI.enabled;
+
+            GUI.enabled = vm.Enabled;
             var previousValue = vm.IsToggled();
             var newValue = GUILayout.Toggle( previousValue, vm.Text );
             if( previousValue != newValue )
             {
                vm.OnToggled();
             }
+
+            GUI.enabled = previousEnabled;
          }
 
          GUILayout.EndScrollView();
 
-         GUILayout.Label( "Height per Translator" );
+         GUILayout.BeginHorizontal();
+         GUILayout.Label( "Height" );
+         _viewModel.Height = GUILayout.HorizontalSlider( _viewModel.Height, 50, 300, GUILayout.MaxWidth( 250 ) );
+         GUILayout.EndHorizontal();
 
-         _viewModel.HeightPerTranslator = GUILayout.HorizontalSlider( _viewModel.HeightPerTranslator, 50, 300 );
+         GUILayout.BeginHorizontal();
+         GUILayout.Label( "Width" );
+         _viewModel.Width = GUILayout.HorizontalSlider( _viewModel.Width, 200, 1000, GUILayout.MaxWidth( 250 ) );
+         GUILayout.EndHorizontal();
 
          GUI.DragWindow();
-
       }
    }
 }

@@ -191,9 +191,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             endpoint.ClearAllJobs();
          }
-
-         UnstartedTranslations = 0;
-         OngoingTranslations = 0;
       }
 
       public void RebootAllEndpoints()

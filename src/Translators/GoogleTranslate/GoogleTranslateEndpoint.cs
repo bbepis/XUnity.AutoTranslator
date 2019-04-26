@@ -249,7 +249,11 @@ namespace GoogleTranslate
          var iterator = response.GetSupportedEnumerator();
          while( iterator.MoveNext() ) yield return iterator.Current;
 
-         InspectResponse( response );
+         if( response.IsTimedOut )
+         {
+            XuaLogger.Current.Warn( "A timeout error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            yield break;
+         }
 
          // failure
          if( response.Error != null )
@@ -264,6 +268,8 @@ namespace GoogleTranslate
             XuaLogger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
+
+         InspectResponse( response );
 
          try
          {

@@ -20,6 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       // used for prototyping
       private Dictionary<string, string> _translations;
+      private Dictionary<string, string> _reverseTranslations;
 
       public TranslationEndpointManager( ITranslateEndpoint endpoint, Exception error )
       {
@@ -32,6 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          _ongoingJobs = new Dictionary<string, TranslationJob>();
 
          _translations = new Dictionary<string, string>();
+         _reverseTranslations = new Dictionary<string, string>();
 
          HasBatchLogicFailed = false;
          AvailableBatchOperations = Settings.MaxAvailableBatchOperations;
@@ -69,15 +71,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return _translations.TryGetValue( key, out value );
       }
 
-      private void AddTranslation( TranslationKey key, string value )
-      {
-         var lookup = key.GetDictionaryLookupKey();
-         _translations[ lookup ] = value;
-      }
-
       private void AddTranslation( string key, string value )
       {
          _translations[ key ] = value;
+         _reverseTranslations[ value ] = key;
       }
 
       private void QueueNewTranslationForDisk( string key, string value )
@@ -87,16 +84,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public void AddTranslationToCache( TranslationKey key, string value )
       {
-         AddTranslationToCache( key.GetDictionaryLookupKey(), value );
+         // UNRELEASED: Not included in current release
+         //AddTranslationToCache( key.GetDictionaryLookupKey(), value );
       }
 
       public void AddTranslationToCache( string key, string value )
       {
-         if( !HasTranslated( key ) )
-         {
-            AddTranslation( key, value );
-            QueueNewTranslationForDisk( key, value );
-         }
+         // UNRELEASED: Not included in current release
+         //if( !HasTranslated( key ) )
+         //{
+         //   AddTranslation( key, value );
+         //   QueueNewTranslationForDisk( key, value );
+         //}
+      }
+
+      public bool IsTranslatable( string text )
+      {
+         return LanguageHelper.IsTranslatable( text ) && !IsTranslation( text );
+      }
+
+      private bool IsTranslation( string translation )
+      {
+         return _reverseTranslations.ContainsKey( translation );
       }
 
       private bool HasTranslated( string key )
@@ -224,8 +233,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                job.TranslatedText = PostProcessTranslation( job.Key, translatedText );
                job.State = TranslationJobState.Succeeded;
 
-               _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
-               Manager.OngoingTranslations--;
+               RemoveOngoingTranslation( job.Key.GetDictionaryLookupKey() );
 
                XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{job.TranslatedText}'" );
 
@@ -246,8 +254,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                var key = job.Key.GetDictionaryLookupKey();
                AddUnstartedJob( key, job );
-               _ongoingJobs.Remove( key );
-               Manager.OngoingTranslations--;
+               RemoveOngoingTranslation( key );
             }
 
             XuaLogger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
@@ -263,8 +270,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          job.TranslatedText = PostProcessTranslation( job.Key, translatedText );
          job.State = TranslationJobState.Succeeded;
 
-         _ongoingJobs.Remove( job.Key.GetDictionaryLookupKey() );
-         Manager.OngoingTranslations--;
+         RemoveOngoingTranslation( job.Key.GetDictionaryLookupKey() );
 
          XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{job.TranslatedText}'" );
 
@@ -315,8 +321,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                job.State = TranslationJobState.Failed;
                job.ErrorMessage = error;
 
-               _ongoingJobs.Remove( untranslatedText );
-               Manager.OngoingTranslations--;
+               RemoveOngoingTranslation( untranslatedText );
 
                RegisterTranslationFailureFor( untranslatedText );
 
@@ -337,8 +342,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                var key = job.Key.GetDictionaryLookupKey();
                AddUnstartedJob( key, job );
-               _ongoingJobs.Remove( key );
-               Manager.OngoingTranslations--;
+               RemoveOngoingTranslation( key );
             }
 
             XuaLogger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
@@ -350,7 +354,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
             if( HasFailedDueToConsecutiveErrors )
             {
-               XuaLogger.Current.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down plugin." );
+               XuaLogger.Current.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down translator endpoint." );
 
                ClearAllJobs();
             }
@@ -403,7 +407,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return AddUnstartedJob( lookupKey, newJob );
       }
 
-      public bool AssociateWithExistingJobIfPossible( object ui, string key, TranslationResult translationResult, ParserTranslationContext context )
+      private bool AssociateWithExistingJobIfPossible( object ui, string key, TranslationResult translationResult, ParserTranslationContext context )
       {
          if( _unstartedJobs.TryGetValue( key, out TranslationJob unstartedJob ) )
          {
@@ -439,6 +443,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return false;
       }
 
+      private void RemoveOngoingTranslation( string key )
+      {
+         if( _ongoingJobs.Remove( key ) )
+         {
+            Manager.OngoingTranslations--;
+         }
+      }
+
       public void ClearAllJobs()
       {
          var ongoingCount = _ongoingJobs.Count;
@@ -464,7 +476,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          Manager.UnscheduleUnstartedJobs( this );
       }
 
-      public bool CanTranslate( string untranslatedText )
+      private bool CanTranslate( string untranslatedText )
       {
          if( _failedTranslations.TryGetValue( untranslatedText, out var count ) )
          {
@@ -473,7 +485,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return true;
       }
 
-      public void RegisterTranslationFailureFor( string untranslatedText )
+      private void RegisterTranslationFailureFor( string untranslatedText )
       {
          byte count;
          if( !_failedTranslations.TryGetValue( untranslatedText, out count ) )
@@ -496,36 +508,49 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          try
          {
-            bool ok = false;
-            var iterator = Endpoint.Translate( context );
-            if( iterator != null )
+            if( Settings.SimulateDelayedError )
             {
-            TryMe: try
-               {
-                  ok = iterator.MoveNext();
+               yield return new WaitForSeconds( 1 );
 
-                  // check for timeout
-                  var now = Time.realtimeSinceStartup;
-                  if( now - startTime > Settings.Timeout )
+               context.FailWithoutThrowing( "Simulating delayed error. Press CTRL+ALT+NP8 to disable!", null );
+            }
+            else if( Settings.SimulateError )
+            {
+               context.FailWithoutThrowing( "Simulating error. Press CTRL+ALT+NP9 to disable!", null );
+            }
+            else
+            {
+               bool ok = false;
+               var iterator = Endpoint.Translate( context );
+               if( iterator != null )
+               {
+               TryMe: try
+                  {
+                     ok = iterator.MoveNext();
+
+                     // check for timeout
+                     var now = Time.realtimeSinceStartup;
+                     if( now - startTime > Settings.Timeout )
+                     {
+                        ok = false;
+                        context.FailWithoutThrowing( $"Timeout occurred during translation (took more than {Settings.Timeout} seconds)", null );
+                     }
+                  }
+                  catch( TranslationContextException )
                   {
                      ok = false;
-                     context.FailWithoutThrowing( $"Timeout occurred during translation (took more than {Settings.Timeout} seconds)", null );
                   }
-               }
-               catch( TranslationContextException )
-               {
-                  ok = false;
-               }
-               catch( Exception e )
-               {
-                  ok = false;
-                  context.FailWithoutThrowing( "Error occurred during translation.", e );
-               }
+                  catch( Exception e )
+                  {
+                     ok = false;
+                     context.FailWithoutThrowing( "Error occurred during translation.", e );
+                  }
 
-               if( ok )
-               {
-                  yield return iterator.Current;
-                  goto TryMe;
+                  if( ok )
+                  {
+                     yield return iterator.Current;
+                     goto TryMe;
+                  }
                }
             }
          }

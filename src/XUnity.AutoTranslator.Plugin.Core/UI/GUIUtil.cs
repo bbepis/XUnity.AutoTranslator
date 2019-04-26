@@ -19,7 +19,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public static readonly GUIStyle LabelTranslation = new GUIStyle( GUI.skin.label )
       {
-         richText = false
+         richText = false,
+         margin = new RectOffset( GUI.skin.label.margin.left, GUI.skin.label.margin.right, 0, 0 ),
+         padding = new RectOffset( GUI.skin.label.padding.left, GUI.skin.label.padding.right, 0, 0 )
       };
 
       public static readonly GUIStyle LabelCenter = new GUIStyle( GUI.skin.label )

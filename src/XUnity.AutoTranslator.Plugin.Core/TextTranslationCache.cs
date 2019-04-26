@@ -174,7 +174,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal void AddTranslationToCache( TranslationKey key, string value )
       {
-         AddTranslation( key.GetDictionaryLookupKey(), value );
+         AddTranslationToCache( key.GetDictionaryLookupKey(), value );
       }
 
       internal void AddTranslationToCache( string key, string value )
@@ -215,12 +215,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _reverseTranslations.TryGetValue( value, out key );
       }
 
-      internal bool IsTranslatable( string str )
+      internal bool IsTranslatable( string text )
       {
-         return LanguageHelper.ContainsLanguageSymbolsForSourceLanguage( str )
-            //&& str.Length <= Settings.MaxCharactersPerTranslation
-            && !IsTranslation( str )
-            && !Settings.IgnoreTextStartingWith.Any( x => str.StartsWithStrict( x ) );
+         return LanguageHelper.IsTranslatable( text ) && !IsTranslation( text );
       }
    }
 }

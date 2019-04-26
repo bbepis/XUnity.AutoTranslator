@@ -33,7 +33,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
       public static bool UsesWhitespaceBetweenWords = false;
       public static string ApplicationName;
-      public static float Timeout = 50.0f;
+      public static float Timeout = 150.0f;
+
+      public static bool SimulateError = false;
+      public static bool SimulateDelayedError = false;
 
       public static bool InvokeEvents = true;
       public static Action<object> RemakeTextData = null;
@@ -197,6 +200,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       public static void SetEndpoint( string id )
       {
+         id = id ?? string.Empty;
+
          ServiceEndpoint = id;
          PluginEnvironment.Current.Preferences[ "Service" ][ "Endpoint" ].Value = id;
          Save();

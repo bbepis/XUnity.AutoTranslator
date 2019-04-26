@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -9,12 +10,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       public XuaViewModel(
          List<ToggleViewModel> toggles,
-         List<TranslatorDropdownOptionViewModel> endpoints,
+         DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> dropdown,
          List<ButtonViewModel> commandButtons,
          List<LabelViewModel> labels )
       {
          Toggles = toggles;
-         EndpointOptions = endpoints;
+         Dropdown = dropdown;
          CommandButtons = commandButtons;
          Labels = labels;
       }
@@ -23,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public List<ToggleViewModel> Toggles { get; }
 
-      public List<TranslatorDropdownOptionViewModel> EndpointOptions { get; }
+      public DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> Dropdown { get; }
 
       public List<ButtonViewModel> CommandButtons { get; }
 

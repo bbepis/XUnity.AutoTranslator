@@ -11,7 +11,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       private static string[] Empty = new string[ 0 ];
 
       private const int WindowId = 2387602;
-      private const float WindowWidth = 400;
 
       private Rect _windowRect;
       private bool _isMouseDownOnWindow = false;
@@ -25,11 +24,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          _viewModel = viewModel;
 
-         _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
+         _windowRect = new Rect( 20, 20, _viewModel.Width, WindowHeight );
 
          _originalText = new ScrollPositioned();
          _defaultTranslation = new ScrollPositioned();
-         _translationViews = viewModel.Endpoints.Select( x => new ScrollPositioned<TranslatorViewModel>( x ) ).ToArray();
+         _translationViews = viewModel.AvailableTranslators.Select( x => new ScrollPositioned<TranslatorViewModel>( x ) ).ToArray();
       }
 
       public bool IsShown
@@ -38,11 +37,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          set => _viewModel.IsShown = value;
       }
 
-      private float WindowHeight => ( ( _viewModel.Endpoints.Count( x => x.IsEnabled ) + 2 ) * _viewModel.HeightPerTranslator ) + 30 + GUIUtil.LabelHeight + GUIUtil.ComponentSpacing;
+      private float WindowHeight => ( ( _viewModel.AvailableTranslators.Count( x => x.IsEnabled ) + 2 ) * _viewModel.Height ) + 30 + GUIUtil.LabelHeight + GUIUtil.ComponentSpacing;
 
       public void OnGUI()
       {
          _windowRect.height = WindowHeight;
+         _windowRect.width = _viewModel.Width;
          _windowRect = GUI.Window( WindowId, _windowRect, CreateWindowUI, "---- Translation Aggregator ----" );
 
          if( GUIUtil.IsAnyMouseButtonOrScrollWheelDown )
@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          float posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
 
-         if( GUI.Button( GUIUtil.R( WindowWidth - 22, 2, 20, 16 ), "X" ) )
+         if( GUI.Button( GUIUtil.R( _viewModel.Width - 22, 2, 20, 16 ), "X" ) )
          {
             IsShown = false;
          }
@@ -87,10 +87,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          if( current != null )
          {
             DrawTextArea( posy, _originalText, "Original Text", current.OriginalTexts );
-            posy += _viewModel.HeightPerTranslator;
+            posy += _viewModel.Height;
 
             DrawTextArea( posy, _defaultTranslation, "Default Translation", current.DefaultTranslations );
-            posy += _viewModel.HeightPerTranslator;
+            posy += _viewModel.Height;
 
             for( int i = 0; i < current.AggregatedTranslations.Count; i++ )
             {
@@ -104,21 +104,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                      scroller,
                      aggregatedTranslation.Translator.Endpoint.Endpoint.FriendlyName,
                      aggregatedTranslation.Translation.Translations );
-                  posy += _viewModel.HeightPerTranslator;
+                  posy += _viewModel.Height;
                }
             }
          }
          else
          {
             DrawTextArea( posy, _originalText, "Original Text", Empty );
-            posy += _viewModel.HeightPerTranslator;
+            posy += _viewModel.Height;
 
             DrawTextArea( posy, _defaultTranslation, "Default Translation", Empty );
-            posy += _viewModel.HeightPerTranslator;
+            posy += _viewModel.Height;
 
-            for( int i = 0; i < _viewModel.Endpoints.Count; i++ )
+            for( int i = 0; i < _viewModel.AvailableTranslators.Count; i++ )
             {
-               var translator = _viewModel.Endpoints[ i ];
+               var translator = _viewModel.AvailableTranslators[ i ];
                if( translator.IsEnabled )
                {
                   var scroller = _translationViews[ i ];
@@ -128,7 +128,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                      scroller,
                      translator.Endpoint.Endpoint.FriendlyName,
                      Empty );
-                  posy += _viewModel.HeightPerTranslator;
+                  posy += _viewModel.Height;
                }
             }
          }
@@ -156,7 +156,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
 
          GUI.enabled = true;
-         if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing * 4 + 75 * 3, posy, 75, GUIUtil.LabelHeight ), "Options" ) )
+         if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 75, posy, 75, GUIUtil.LabelHeight ), "Options" ) )
          {
             _viewModel.IsShowingOptions = true;
          }
@@ -168,12 +168,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private void DrawTextArea( float posy, ScrollPositioned positioned, string title, IEnumerable<string> texts )
       {
-         GUI.Label( GUIUtil.R( GUIUtil.HalfComponentSpacing + 5, posy + 5, WindowWidth - GUIUtil.ComponentSpacing, GUIUtil.LabelHeight ), title );
+         GUI.Label( GUIUtil.R( GUIUtil.HalfComponentSpacing + 5, posy + 5, _viewModel.Width - GUIUtil.ComponentSpacing, GUIUtil.LabelHeight ), title );
 
          posy += GUIUtil.LabelHeight + GUIUtil.HalfComponentSpacing;
 
-         float boxWidth = WindowWidth - GUIUtil.ComponentSpacing;
-         float boxHeight = _viewModel.HeightPerTranslator - GUIUtil.LabelHeight;
+         float boxWidth = _viewModel.Width - GUIUtil.ComponentSpacing;
+         float boxHeight = _viewModel.Height - GUIUtil.LabelHeight;
          GUILayout.BeginArea( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, boxWidth, boxHeight ) );
          positioned.ScrollPosition = GUILayout.BeginScrollView( positioned.ScrollPosition, GUI.skin.box );
 

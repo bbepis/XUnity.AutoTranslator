@@ -200,7 +200,11 @@ namespace BingTranslate
          var iterator = response.GetSupportedEnumerator();
          while( iterator.MoveNext() ) yield return iterator.Current;
 
-         InspectResponse( response );
+         if( response.IsTimedOut )
+         {
+            XuaLogger.Current.Warn( "A timeout error occurred while setting up BingTranslate IG. Proceeding without..." );
+            yield break;
+         }
 
          // failure
          if( response.Error != null )
@@ -215,6 +219,8 @@ namespace BingTranslate
             XuaLogger.Current.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
+
+         InspectResponse( response );
 
          try
          {

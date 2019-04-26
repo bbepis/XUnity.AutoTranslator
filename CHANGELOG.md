@@ -1,9 +1,13 @@
 ﻿### 3.2.0
+ * FEATURE - BepInEx 5.x plugin support
  * CHANGE - Restructured large portions of the internal code to support more features going forward
  * BUG FIX - Interacting with UI now blocks input to game
  * BUG FIX - Better handling of error'ed translations in relation to rich text
+ * BUG FIX - Minor fixes to 'copy to clipboard' to disable IMGUI spam
+ * BUG FIX - Fixed potential NullReferenceException in GoogleTranslate and BingTranslate during timeout errors
  * MISC - Removed 'Dump Untranslated Texts' hotkey due to feature bloat
- * MISC - Improved Utage image hooking to support DicingImage
+ * MISC - Allow unselecting translation endpoint in UI
+ * MISC - Increased request timeout from 50 to 150 seconds to ensure better error logging of failed requests
 
 ### 3.1.0
  * FEATURE - Support for games with 'netstandard2.0' API surface through config option 'EnableExperimentalHooks'

@@ -145,7 +145,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
          }
 
-         var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.EndpointOptions ) );
+         var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.Dropdown ) );
          endpointDropdown.OnGUI();
 
          GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight * 5 ), GUI.tooltip, GUIUtil.LabelRich );

@@ -15,14 +15,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       private HashSet<string> _textsToAggregate = new HashSet<string>();
       private float _lastUpdate = 0.0f;
 
-      public TranslationAggregatorViewModel( IEnumerable<TranslationEndpointManager> endpoints )
+      public TranslationAggregatorViewModel( TranslationManager translationManager )
       {
          _translations = new LinkedList<AggregatedTranslationViewModel>();
 
-         HeightPerTranslator = 100; // TODO: Get from config
-         Endpoints = endpoints
-            .Where( x => x.Error == null )
+         Manager = translationManager;
+         Height = 100; // TODO: Get from config
+         Width = 400; // TODO: Get from config
+
+         AllTranslators = translationManager.AllEndpoints
             .Select( x => new TranslatorViewModel( x ) )
+            .ToList();
+
+         AvailableTranslators = AllTranslators
+            .Where( x => x.Endpoint.Error == null )
             .ToList();
       }
 
@@ -30,9 +36,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public bool IsShowingOptions { get; set; }
 
-      public float HeightPerTranslator { get; set; }
+      public float Height { get; set; }
 
-      public List<TranslatorViewModel> Endpoints { get; }
+      public float Width { get; set; }
+
+      public List<TranslatorViewModel> AvailableTranslators { get; }
+
+      public List<TranslatorViewModel> AllTranslators { get; }
+
+      public TranslationManager Manager { get; set; }
 
       public AggregatedTranslationViewModel Current => _current?.Value;
 
@@ -78,8 +90,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                }
             }
 
-            // ensure we never have more than 1000
-            if( _translations.Count >= 1000 )
+            // ensure we never have more than 100
+            if( _translations.Count >= 100 )
             {
                var first = _translations.First;
                _translations.RemoveFirst();

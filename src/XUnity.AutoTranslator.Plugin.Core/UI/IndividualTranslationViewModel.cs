@@ -37,7 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
       }
 
-      public void Update()
+      public void StartTranslations()
       {
          if( _translator.IsEnabled )
          {
@@ -50,7 +50,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                   translation.PerformTranslation( _translator.Endpoint );
                }
             }
+         }
+      }
 
+      public void CheckCompleted()
+      {
+         if( _translator.IsEnabled )
+         {
             if( !_isTranslated )
             {
                if( _translations.All( x => x.TranslatedText != null ) )
