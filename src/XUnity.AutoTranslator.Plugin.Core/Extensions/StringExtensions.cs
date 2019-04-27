@@ -60,8 +60,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       };
       private static readonly HashSet<char> InvalidFileNameChars = new HashSet<char>( Path.GetInvalidFileNameChars() );
 
-      private static readonly char[] NewlinesCharacters = new char[] { '\r', '\n' };
+      private static readonly string[] NewlinesCharacters = new string[] { "\r\n", "\n" };
       private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
+      private static readonly char[] Spaces = new char[] { ' ', '　' };
 
       public static string SanitizeForFileSystem( this string path )
       {
@@ -83,7 +84,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          StringBuilder carg = null;
          char arg = 'A';
 
-         for( int i = 0 ; i < str.Length ; i++ )
+         for( int i = 0; i < str.Length; i++ )
          {
             var c = str[ i ];
             if( isNumber )
@@ -206,8 +207,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          if( Settings.TrimAllText )
          {
-            return text.Trim();
+            return text.Trim( Spaces ).TrimEnd( WhitespacesAndNewlines );
          }
+         return text;
+      }
+
+      public static string TrimLeadingNewlines( this string text, out int newlineCount )
+      {
+         int i = 0;
+         int count = 0;
+         while( i < text.Length && char.IsWhiteSpace( text[ i ] ) )
+         {
+            if( i < text.Length && text[ i ] == '\n' )
+            {
+               count++;
+            }
+
+            i++;
+         }
+         newlineCount = count;
+
+         text = text.Substring( i, text.Length - i );
          return text;
       }
 
@@ -216,7 +236,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var builder = new StringBuilder( text.Length );
          if( Settings.WhitespaceRemovalStrategy == WhitespaceHandlingStrategy.AllOccurrences )
          {
-            for( int i = 0 ; i < text.Length ; i++ )
+            for( int i = 0; i < text.Length; i++ )
             {
                var c = text[ i ];
                switch( c )
@@ -234,15 +254,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          else // if( Settings.WhitespaceHandlingStrategy == WhitespaceHandlingStrategy.TrimPerNewline )
          {
-            var lines = text.Split( NewlinesCharacters, StringSplitOptions.RemoveEmptyEntries );
+            var lines = text.Split( NewlinesCharacters, StringSplitOptions.None );
             var lastLine = lines.Length - 1;
-            for( int i = 0 ; i < lines.Length ; i++ )
+            bool hasAddedText = false;
+            for( int i = 0; i < lines.Length; i++ )
             {
                var line = lines[ i ].Trim( WhitespacesAndNewlines );
-               for( int j = 0 ; j < line.Length ; j++ )
+               if( line != string.Empty )
                {
-                  var c = line[ j ];
-                  builder.Append( c );
+                  for( int j = 0; j < line.Length; j++ )
+                  {
+                     hasAddedText = true;
+
+                     var c = line[ j ];
+                     builder.Append( c );
+                  }
+               }
+               else if( !hasAddedText )
+               {
+                  builder.Append( "\n" );
                }
 
                // do we need to add a space when merging lines?
@@ -260,7 +290,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var len = Math.Min( str.Length, prefix.Length );
          if( len < prefix.Length ) return false;
 
-         for( int i = 0 ; i < len ; i++ )
+         for( int i = 0; i < len; i++ )
          {
             if( str[ i ] != prefix[ i ] ) return false;
          }

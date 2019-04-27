@@ -21,6 +21,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Dictionary<string, string> _translations = new Dictionary<string, string>();
       private Dictionary<string, string> _reverseTranslations = new Dictionary<string, string>();
 
+      private List<RegexTranslation> _defaultRegexes = new List<RegexTranslation>();
+      private HashSet<string> _registeredRegexes = new HashSet<string>();
+
       /// <summary>
       /// These are the new translations that has not yet been persisted to the file system.
       /// </summary>
@@ -48,6 +51,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize() );
                Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
+               _registeredRegexes.Clear();
+               _defaultRegexes.Clear();
+
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
                LoadTranslationsInFile( mainTranslationFile );
                foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile } ) )
@@ -56,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
             var endTime = Time.realtimeSinceStartup;
-            XuaLogger.Current.Info( $"Loaded text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            XuaLogger.Current.Info( $"Loaded text files ({_translations.Count} translations and {_defaultRegexes.Count} regex translations) (took {Math.Round( endTime - startTime, 2 )} seconds)" );
          }
          catch( Exception e )
          {
@@ -84,7 +90,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && IsTranslatable( key ) )
                      {
-                        AddTranslation( key, value );
+                        if( key.StartsWith( "r:" ) )
+                        {
+                           try
+                           {
+                              var regex = new RegexTranslation( key, value );
+
+                              AddTranslationRegex( regex );
+                           }
+                           catch( Exception e )
+                           {
+                              XuaLogger.Current.Warn( e, $"An error occurred while constructing regex translation: '{translation}'." );
+                           }
+                        }
+                        else
+                        {
+                           AddTranslation( key, value );
+                        }
                         break;
                      }
                   }
@@ -148,6 +170,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void AddTranslationRegex( RegexTranslation regex )
+      {
+         if( !_registeredRegexes.Contains( regex.Original ) )
+         {
+            _registeredRegexes.Add( regex.Original );
+            _defaultRegexes.Add( regex );
+         }
+         //else
+         //{
+         //   XuaLogger.Current.Warn( $"Could not register translation regex '{regex.Original}' because it has already been registered." );
+         //}
+      }
+
       private bool HasTranslated( string key )
       {
          return _translations.ContainsKey( key );
@@ -172,9 +207,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal void AddTranslationToCache( TranslationKey key, string value )
+      internal void AddTranslationToCache( UntranslatedTextInfo key, string value )
       {
-         AddTranslationToCache( key.GetDictionaryLookupKey(), value );
+         AddTranslationToCache( key.GetCacheKey(), value );
       }
 
       internal void AddTranslationToCache( string key, string value )
@@ -186,19 +221,49 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal bool TryGetTranslation( TranslationKey key, out string value )
+      internal bool TryGetTranslation( UntranslatedTextInfo key, bool allowRegex, out string value )
       {
-         return TryGetTranslation( key.GetDictionaryLookupKey(), out value );
+         return TryGetTranslation( key.GetCacheKey(), allowRegex, out value );
       }
 
-      internal bool TryGetTranslation( string key, out string value )
+      internal bool TryGetTranslation( string key, bool allowRegex, out string value )
       {
          var result = _translations.TryGetValue( key, out value );
          if( result )
          {
             return result;
          }
-         else if( _staticTranslations.Count > 0 )
+
+         if( allowRegex )
+         {
+            bool found = false;
+
+            var len = _defaultRegexes.Count;
+            for( int i = 0; i < len; i++ )
+            {
+               var regex = _defaultRegexes[ i ];
+               var match = regex.CompiledRegex.Match( key );
+               if( !match.Success ) continue;
+
+               var translation = regex.CompiledRegex.Replace( key, regex.Translation );
+               
+               //AddTranslation( key, translation );
+               AddTranslationToCache( key, translation ); // Would store it to file... Should we????
+
+               value = translation;
+               found = true;
+
+               XuaLogger.Current.Info( $"Regex translation: '{key}' => '{value}'" );
+               break;
+            }
+
+            if( found )
+            {
+               return true;
+            }
+         }
+
+         if( _staticTranslations.Count > 0 )
          {
             if( _staticTranslations.TryGetValue( key, out value ) )
             {
@@ -207,6 +272,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                return true;
             }
          }
+
          return result;
       }
 

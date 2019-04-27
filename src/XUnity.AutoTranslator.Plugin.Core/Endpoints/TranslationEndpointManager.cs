@@ -61,9 +61,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public bool HasFailedDueToConsecutiveErrors => ConsecutiveErrors >= Settings.MaxErrors;
 
-      public bool TryGetTranslation( TranslationKey key, out string value )
+      public bool TryGetTranslation( UntranslatedTextInfo key, out string value )
       {
-         return TryGetTranslation( key.GetDictionaryLookupKey(), out value );
+         return TryGetTranslation( key.GetCacheKey(), out value );
       }
 
       public bool TryGetTranslation( string key, out string value )
@@ -82,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          // FIXME: Implement
       }
 
-      public void AddTranslationToCache( TranslationKey key, string value )
+      public void AddTranslationToCache( UntranslatedTextInfo key, string value )
       {
          // UNRELEASED: Not included in current release
          //AddTranslationToCache( key.GetDictionaryLookupKey(), value );
@@ -128,7 +128,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                _unstartedJobs.Remove( key );
                Manager.UnstartedTranslations--;
 
-               var untranslatedText = job.Key.GetDictionaryLookupKey();
+               var untranslatedText = job.Key.GetUntranslatedText();
                if( CanTranslate( untranslatedText ) )
                {
                   jobs.Add( job );
@@ -185,7 +185,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             _unstartedJobs.Remove( key );
             Manager.UnstartedTranslations--;
 
-            var untranslatedText = job.Key.GetDictionaryLookupKey();
+            var untranslatedText = job.Key.GetUntranslatedText();
             if( CanTranslate( untranslatedText ) )
             {
                _ongoingJobs[ key ] = job;
@@ -233,9 +233,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                job.TranslatedText = PostProcessTranslation( job.Key, translatedText );
                job.State = TranslationJobState.Succeeded;
 
-               RemoveOngoingTranslation( job.Key.GetDictionaryLookupKey() );
+               RemoveOngoingTranslation( job.Key.GetUntranslatedText() );
 
-               XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{job.TranslatedText}'" );
+               XuaLogger.Current.Info( $"Completed: '{job.Key.GetUntranslatedText()}' => '{job.TranslatedText}'" );
 
                Manager.InvokeJobCompleted( job );
             }
@@ -252,7 +252,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                var job = jobs[ i ];
 
-               var key = job.Key.GetDictionaryLookupKey();
+               var key = job.Key.GetUntranslatedText();
                AddUnstartedJob( key, job );
                RemoveOngoingTranslation( key );
             }
@@ -270,14 +270,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          job.TranslatedText = PostProcessTranslation( job.Key, translatedText );
          job.State = TranslationJobState.Succeeded;
 
-         RemoveOngoingTranslation( job.Key.GetDictionaryLookupKey() );
+         RemoveOngoingTranslation( job.Key.GetUntranslatedText() );
 
-         XuaLogger.Current.Info( $"Completed: '{job.Key.GetDictionaryLookupKey()}' => '{job.TranslatedText}'" );
+         XuaLogger.Current.Info( $"Completed: '{job.Key.GetUntranslatedText()}' => '{job.TranslatedText}'" );
 
          Manager.InvokeJobCompleted( job );
       }
 
-      private string PostProcessTranslation( TranslationKey key, string translatedText )
+      private string PostProcessTranslation( UntranslatedTextInfo key, string translatedText )
       {
          var hasTranslation = !string.IsNullOrEmpty( translatedText );
          if( hasTranslation )
@@ -296,6 +296,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             if( Settings.ForceSplitTextAfterCharacters > 0 )
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
+            }
+
+            if( key.PrependedNewlines > 0 && key.TemplatedText == null )
+            {
+               translatedText = new string( '\n', key.PrependedNewlines ) + translatedText;
             }
          }
 
@@ -317,7 +322,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             foreach( var job in jobs )
             {
-               var untranslatedText = job.Key.GetDictionaryLookupKey();
+               var untranslatedText = job.Key.GetUntranslatedText();
                job.State = TranslationJobState.Failed;
                job.ErrorMessage = error;
 
@@ -340,7 +345,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                var job = jobs[ i ];
 
-               var key = job.Key.GetDictionaryLookupKey();
+               var key = job.Key.GetUntranslatedText();
                AddUnstartedJob( key, job );
                RemoveOngoingTranslation( key );
             }
@@ -370,9 +375,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          XuaLogger.Current.Info( "Re-enabled batching." );
       }
 
-      public bool EnqueueTranslation( object ui, TranslationKey key, TranslationResult translationResult, ParserTranslationContext context )
+      public bool EnqueueTranslation( object ui, UntranslatedTextInfo key, TranslationResult translationResult, ParserTranslationContext context )
       {
-         var lookupKey = key.GetDictionaryLookupKey();
+         var lookupKey = key.GetUntranslatedText();
 
          var added = AssociateWithExistingJobIfPossible( ui, lookupKey, translationResult, context );
          if( added )

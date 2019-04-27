@@ -9,7 +9,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    internal static class GameObjectExtensions
    {
       private static GameObject[] _objects = new GameObject[ 128 ];
-      private static readonly string DummyName = "Dummy";
       private static readonly string XuaIgnore = "XUAIGNORE";
 
       public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Type type )
@@ -57,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool HasIgnoredName( this GameObject go )
       {
-         return go.name.EndsWith( DummyName ) || go.name.Contains( XuaIgnore ) || go.transform?.parent?.name.EndsWith( DummyName ) == true;
+         return go.name.Contains( XuaIgnore );
       }
    }
 }

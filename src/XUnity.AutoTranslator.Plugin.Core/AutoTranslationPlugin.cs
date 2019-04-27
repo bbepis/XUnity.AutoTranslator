@@ -253,7 +253,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( TranslationManager.CurrentEndpoint != endpoint )
          {
             TranslationManager.CurrentEndpoint = endpoint;
-            
+
             if( TranslationManager.CurrentEndpoint != null )
             {
                if( !Settings.IsShutdown )
@@ -371,12 +371,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          TextureCache.LoadTranslationFiles();
       }
 
-      private void CreateTranslationJobFor( TranslationEndpointManager endpoint, object ui, TranslationKey key, TranslationResult translationResult, ParserTranslationContext context )
+      private void CreateTranslationJobFor( TranslationEndpointManager endpoint, object ui, UntranslatedTextInfo key, TranslationResult translationResult, ParserTranslationContext context )
       {
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context );
          if( added && translationResult == null )
          {
-            SpamChecker.PerformChecks( key.GetDictionaryLookupKey() );
+            SpamChecker.PerformChecks( key.GetUntranslatedText() );
          }
       }
 
@@ -429,14 +429,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void QueueNewUntranslatedForClipboard( TranslationKey key )
+      private void QueueNewUntranslatedForClipboard( UntranslatedTextInfo key )
       {
          if( Settings.CopyToClipboard && Features.SupportsClipboard )
          {
-            if( !_textsToCopyToClipboard.Contains( key.RelevantText ) )
+            if( !_textsToCopyToClipboard.Contains( key.UntranslatedText ) )
             {
-               _textsToCopyToClipboard.Add( key.RelevantText );
-               _textsToCopyToClipboardOrdered.Add( key.RelevantText );
+               _textsToCopyToClipboard.Add( key.UntranslatedText );
+               _textsToCopyToClipboardOrdered.Add( key.UntranslatedText );
 
                _clipboardUpdated = Time.realtimeSinceStartup;
             }
@@ -585,7 +585,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                // NGUI only behaves if you set the text after the resize behaviour
                ui.SetText( text );
-
+               
                info?.ResetScrollIn( ui );
 
                if( TranslationAggregatorWindow != null && info != null && !ui.IsSpammingComponent() )
@@ -935,18 +935,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string TranslateImmediate( object ui, string text, TextTranslationInfo info, bool ignoreComponentState )
       {
          // Get the trimmed text
+         string originalText = text;
+
          text = ( text ?? ui.GetText() ).TrimIfConfigured();
 
          if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
-            info?.Reset( text );
+            info?.Reset( originalText );
 
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
-            var textKey = new TranslationKey( ui, text, ui.IsSpammingComponent(), false );
+            var isSpammer = ui.IsSpammingComponent();
+            var textKey = GetUntranslatedTextInfo( ui, text, isSpammer, false );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
-            if( TextCache.TryGetTranslation( textKey, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, false, out translation ) )
             {
                if( !string.IsNullOrEmpty( translation ) )
                {
@@ -994,7 +997,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Ensure that we actually want to translate this text and its owning UI element.
          if( !string.IsNullOrEmpty( text ) && endpoint.IsTranslatable( text ) && IsBelowMaxLength( text ) )
          {
-            var textKey = new TranslationKey( null, text, false, context != null );
+            var textKey = GetUntranslatedTextInfo( null, text, false, context != null );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
@@ -1117,11 +1120,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
 
             //var textKey = new TranslationKey( ui, text, !supportsStabilization, context != null );
-            var textKey = new TranslationKey( ui, text, isSpammer, context != null );
+            var textKey = GetUntranslatedTextInfo( ui, text, isSpammer, context != null );
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
-            if( TextCache.TryGetTranslation( textKey, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, !isSpammer, out translation ) )
             {
                if( context == null && !isSpammer )
                {
@@ -1210,14 +1213,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( !string.IsNullOrEmpty( stabilizedText ) && TextCache.IsTranslatable( stabilizedText ) )
                               {
-                                 var stabilizedTextKey = new TranslationKey( ui, stabilizedText, false );
+                                 var stabilizedTextKey = GetUntranslatedTextInfo( ui, stabilizedText, false, false );
 
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
                                  info?.Reset( originalText );
 
                                  // once the text has stabilized, attempt to look it up
-                                 if( TextCache.TryGetTranslation( stabilizedTextKey, out translation ) )
+                                 if( TextCache.TryGetTranslation( stabilizedTextKey, true, out translation ) )
                                  {
                                     if( !string.IsNullOrEmpty( translation ) )
                                     {
@@ -1311,7 +1314,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  // once the text has stabilized, attempt to look it up
                                  if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
                                  {
-                                    if( !TextCache.TryGetTranslation( textKey, out translation ) )
+                                    if( !TextCache.TryGetTranslation( textKey, true, out translation ) )
                                     {
                                        CreateTranslationJobFor( endpoint, ui, textKey, null, context );
                                     }
@@ -1339,7 +1342,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart ) && IsBelowMaxLength( untranslatedTextPart ) )
             {
                string partTranslation;
-               if( TextCache.TryGetTranslation( untranslatedTextPart, out partTranslation ) )
+               if( TextCache.TryGetTranslation( untranslatedTextPart, false, out partTranslation ) )
                {
                   translations.Add( variableName, partTranslation );
                }
@@ -1406,9 +1409,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// for global text, where the component cannot tell us if the text
       /// has changed itself.
       /// </summary>
-      private IEnumerator WaitForTextStablization( TranslationKey textKey, float delay, Action onTextStabilized, Action onFailed = null )
+      private IEnumerator WaitForTextStablization( UntranslatedTextInfo textKey, float delay, Action onTextStabilized, Action onFailed = null )
       {
-         var text = textKey.GetDictionaryLookupKey();
+         var text = textKey.GetUntranslatedText();
 
          if( !_immediatelyTranslating.Contains( text ) )
          {
@@ -1510,7 +1513,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                ConnectionTrackingWebClient.CheckServicePoints();
             }
-            
+
             if( Input.anyKey )
             {
                var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
@@ -1700,7 +1703,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             try
             {
                var text = component.GetText().TrimIfConfigured();
-               if( text == job.Key.OriginalText )
+               if( text == job.Key.TrimmedOriginalText )
                {
                   var info = component.GetOrCreateTextTranslationInfo();
                   if( !string.IsNullOrEmpty( job.TranslatedText ) )
@@ -1787,6 +1790,33 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private static string GetCacheKey( object ui, string trimmedOriginalText, bool neverRemoveWhitespace )
+      {
+         if( !neverRemoveWhitespace
+            && ( ( Settings.IgnoreWhitespaceInDialogue && trimmedOriginalText.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && ui.IsNGUI() ) ) )
+         {
+            return trimmedOriginalText.RemoveWhitespaceAndNewlines();
+         }
+         else
+         {
+            return trimmedOriginalText;
+         }
+      }
+
+      private static UntranslatedTextInfo GetUntranslatedTextInfo( object ui, string trimmedOriginalText, bool templatizeByNumbers, bool neverRemoveWhitespace )
+      {
+         var untranslatedTextKey = GetCacheKey( ui, trimmedOriginalText, neverRemoveWhitespace );
+         var untranslatedText = untranslatedTextKey.TrimLeadingNewlines( out int count );
+
+         TemplatedString templatedText = null;
+         if( templatizeByNumbers )
+         {
+            templatedText = untranslatedText.TemplatizeByNumbers();
+         }
+
+         return new UntranslatedTextInfo( trimmedOriginalText, untranslatedTextKey, untranslatedText, count, templatedText );
+      }
+
       private void ReloadTranslations()
       {
          LoadTranslations();
@@ -1802,10 +1832,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( component.gameObject?.activeSelf ?? false )
                   {
                      var tti = kvp.Value as TextTranslationInfo;
-                     if( tti != null && !string.IsNullOrEmpty( tti.OriginalText ) )
+                     var trimmedOriginalText = tti.OriginalText.TrimIfConfigured();
+                     if( tti != null && !string.IsNullOrEmpty( trimmedOriginalText ) )
                      {
-                        var key = new TranslationKey( kvp.Key, tti.OriginalText, false );
-                        if( TextCache.TryGetTranslation( key, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+                        var key = GetCacheKey( kvp.Key, trimmedOriginalText, false );
+                        if( TextCache.TryGetTranslation( key, true, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                         {
                            SetTranslatedText( kvp.Key, translatedText, tti ); // no need to untemplatize the translated text
                         }
@@ -2056,7 +2087,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( obj != null )
          {
             var layer = LayerMask.LayerToName( obj.layer );
-            var components = string.Join( ", ", obj.GetComponents<Component>().Select( x => x?.GetType()?.Name ).Where( x => x != null ).ToArray() );
+            var components = string.Join( ", ", obj.GetComponents<Component>().Select( x =>
+            {
+               string output = null;
+               var type = x?.GetType();
+               if( type != null )
+               {
+                  output = type.Name;
+
+                  var text = x.GetText();
+                  if( !string.IsNullOrEmpty( text ) )
+                  {
+                     output += " (" + text + ")";
+                  }
+               }
+
+               return output;
+            } ).Where( x => x != null ).ToArray() );
             var line = string.Format( "{0,-50} {1,100}",
                identation + obj.name + " [" + layer + "]",
                components );

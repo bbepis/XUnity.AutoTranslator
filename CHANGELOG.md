@@ -1,4 +1,9 @@
-﻿### 3.2.0
+﻿### 3.3.0
+ * FEATURE - Support TARC regex formatting in translation files
+ * MISC - The text trimming process will now maintain all prepended newlines regardless of the translator used
+ * BUG FIX - Allow hooking of text with components named 'Dummy'
+
+### 3.2.0
  * FEATURE - BepInEx 5.x plugin support
  * CHANGE - Restructured large portions of the internal code to support more features going forward
  * BUG FIX - Interacting with UI now blocks input to game
