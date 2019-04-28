@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TranslationJob
    {
-      public TranslationJob( TranslationEndpointManager endpoint, UntranslatedTextInfo key, bool saveResult )
+      public TranslationJob( TranslationEndpointManager endpoint, UntranslatedText key, bool saveResult )
       {
          Endpoint = endpoint;
          Key = key;
@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public HashSet<TranslationResult> TranslationResults { get; private set; }
 
-      public UntranslatedTextInfo Key { get; private set; }
+      public UntranslatedText Key { get; private set; }
 
       public string TranslatedText { get; set; }
 

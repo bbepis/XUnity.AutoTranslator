@@ -29,7 +29,7 @@ From version 3.0.0 it is possible to implement custom translators. See [this sec
 
 ## Plugin Frameworks
 The mod can be installed into the following Plugin Managers:
- * [BepInEx](https://github.com/bbepis/BepInEx) (preferred approach)
+ * [BepInEx](https://github.com/bbepis/BepInEx) (recommended approach)
  * [IPA](https://github.com/Eusth/IPA)
  * UnityInjector
 
@@ -249,10 +249,9 @@ CopyToClipboard=False            ;Whether or not to copy hooked texts to clipboa
 MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard at a time
 EnableUIResizing=True            ;Whether or not the plugin should provide a "best attempt" at resizing UI components upon translation. Only work for NGUI
 EnableBatching=True              ;Indicates whether batching of translations should be enabled for supported endpoints
-TrimAllText=True                 ;Indicates whether spaces in front and behind translation candidates should be removed before translation
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
-WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline removal should be handled before attempting translation. Can be ["TrimPerNewline", "AllOccurrences"]
+WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline removal should be handled before attempting translation. Can be ["TrimPerNewline", "None"]
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
@@ -318,16 +317,17 @@ When it comes to automated translations, proper whitespace handling can really m
  * `IgnoreWhitespaceInNGUI`
  * `MinDialogueChars`
  * `ForceSplitTextAfterCharacters`
- * `TrimAllText`
  * `WhitespaceRemovalStrategy`
 
-The first thing the plugin does when it discovers a new text is trim any whitespace, if `TrimAllText` is configured. This does not include newlines or "special" whitespace such as japanese whitespace.
+The plugin first determines whether or not it should perform a special whitespace removal operation. How it removes the whitespace is based on the parameter `WhitespaceRemomvalStrategy`. The default value of this parameter is recommended. The other option 'None' may cause poor translations.
 
-After this initial trimming, the plugin determines whether or not it should perform a special whitespace removal operation. How it removes the whitespace is based on the parameter `WhitespaceRemomvalStrategy`. The default value of this parameter is recommended. The other value (AllOccurrences) is only kept for legacy reasons.
-
-It determine whether or not to perform this operation based on the parameters `IgnoreWhitespaceInDialogue`, `IgnoreWhitespaceInNGUI` and `MinDialogueChars`:
+It determines whether or not to perform this operation based on the parameters `IgnoreWhitespaceInDialogue`, `IgnoreWhitespaceInNGUI` and `MinDialogueChars`:
  * `IgnoreWhitespaceInDialogue`: If the text is longer than `MinDialogueChars`, whitespace is removed.
  * `IgnoreWhitespaceInNGUI`: If the text comes from an NGUI component, whitespace is removed.
+
+It is worth mentioning if the same whitespace character is repeating in the untranslated text, it will not be removed because it is likely used for formatting.
+
+All leading and trailing whitespace before the actual text is preserved in the translation as well. But the plugin will still be capable of reading a translation from the translation file, even if the leading/trailing whitespace does not match up exactly.
 
 After the text has been translated by the configured service, `ForceSplitTextAfterCharacters` is used to determine if the plugin should force the result into multiple lines after a certain number of characters.
 

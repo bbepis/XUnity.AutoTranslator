@@ -73,7 +73,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableMigrations;
       public static string MigrationsTag;
       public static bool EnableBatching;
-      public static bool TrimAllText;
       public static bool EnableUIResizing;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
@@ -132,7 +131,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             MaxClipboardCopyCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxClipboardCopyCharacters", 1000 );
             EnableUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableUIResizing", true );
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
-            TrimAllText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TrimAllText", ClrTypes.AdvEngine == null );
             UseStaticTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "UseStaticTranslations", true );
             OverrideFont = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFont", string.Empty );
             ResizeUILineSpacingScale = PluginEnvironment.Current.Preferences.GetOrDefault<float?>( "Behaviour", "ResizeUILineSpacingScale", null );

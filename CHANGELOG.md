@@ -1,6 +1,6 @@
 ﻿### 3.3.0
- * FEATURE - Support TARC regex formatting in translation files
- * MISC - The text trimming process will now maintain all prepended newlines regardless of the translator used
+ * FEATURE - Support 'TARC' regex formatting in translation files
+ * FEATURE - Much improved handling of whitespace and newlines. Option 'TrimAllText' removed and options for 'WhitespaceRemovalStrategy' changed
  * BUG FIX - Allow hooking of text with components named 'Dummy'
 
 ### 3.2.0
