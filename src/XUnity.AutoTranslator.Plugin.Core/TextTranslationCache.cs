@@ -53,6 +53,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                _registeredRegexes.Clear();
                _defaultRegexes.Clear();
+               _translations.Clear();
+               _reverseTranslations.Clear();
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
                LoadTranslationsInFile( mainTranslationFile );
@@ -110,9 +112,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            // also add a modified version of the translation
                            var ukey = new UntranslatedText( key, false, false );
                            var uvalue = new UntranslatedText( value, false, false );
-                           if( ukey.TrimmedText != key )
+                           if( ukey.TrimmedTranslatableText != key )
                            {
-                              AddTranslation( ukey.TrimmedText, uvalue.TrimmedText );
+                              AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
                            }
                         }
                         break;
@@ -220,6 +222,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !HasTranslated( key ) )
          {
             AddTranslation( key, value );
+
+            // also add a trimmed version of the translation
+            var ukey = new UntranslatedText( key, false, false );
+            var uvalue = new UntranslatedText( value, false, false );
+            if( ukey.TrimmedTranslatableText != key )
+            {
+               AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
+            }
+
             if( persistToDisk )
             {
                QueueNewTranslationForDisk( key, value );
@@ -236,40 +247,51 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return result;
          }
 
-         var modifiedKey = key.TrimmedText;
-         result = _translations.TryGetValue( modifiedKey, out value );
-         if( result )
+         var modifiedKey = key.TrimmedTranslatableText;
+         if( modifiedKey != unmodifiedKey )
          {
-            // add an unmodifiedKey to the dictionary
-            var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+            result = _translations.TryGetValue( modifiedKey, out value );
+            if( result )
+            {
+               // add an unmodifiedKey to the dictionary
+               var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-            XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedText}' => '{value}'" );
-            AddTranslationToCache( unmodifiedKey, unmodifiedValue, false );
+               XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
+               AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences );
 
-            value = unmodifiedValue;
-            return result;
+               value = unmodifiedValue;
+               return result;
+            }
          }
 
          if( allowRegex )
          {
             bool found = false;
 
-            var len = _defaultRegexes.Count;
-            for( int i = 0; i < len; i++ )
+            for( int i = _defaultRegexes.Count - 1; i > -1; i-- )
             {
                var regex = _defaultRegexes[ i ];
-               var match = regex.CompiledRegex.Match( unmodifiedKey );
-               if( !match.Success ) continue;
+               try
+               {
+                  var match = regex.CompiledRegex.Match( unmodifiedKey );
+                  if( !match.Success ) continue;
 
-               var translation = regex.CompiledRegex.Replace( unmodifiedKey, regex.Translation );
+                  var translation = regex.CompiledRegex.Replace( unmodifiedKey, regex.Translation );
 
-               AddTranslationToCache( unmodifiedKey, translation, false ); // Would store it to file... Should we????
+                  AddTranslationToCache( unmodifiedKey, translation, Settings.CacheRegexLookups ); // Would store it to file... Should we????
 
-               value = translation;
-               found = true;
+                  value = translation;
+                  found = true;
 
-               XuaLogger.Current.Info( $"Regex lookup: '{key.TrimmedText}' => '{value}'" );
-               break;
+                  XuaLogger.Current.Info( $"Regex lookup: '{key.TrimmedTranslatableText}' => '{value}'" );
+                  break;
+               }
+               catch( Exception e )
+               {
+                  _defaultRegexes.RemoveAt( i );
+
+                  XuaLogger.Current.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
+               }
             }
 
             if( found )

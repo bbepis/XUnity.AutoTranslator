@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          var untranslatedText = new UntranslatedText( input, false, false );
 
          Assert.Equal( input, untranslatedText.TranslatableText );
-         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedText );
+         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
          Assert.Equal( expectedTrailingWhitespace, untranslatedText.TrailingWhitespace );
       }
@@ -31,7 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       {
          var untranslatedText = new UntranslatedText( input, false, true );
          
-         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedText );
+         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
       }
 
       [Theory( DisplayName = "Can_Trim_Internal_And_Surrounding_Whitespace" )]
@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       {
          var untranslatedText = new UntranslatedText( input, false, true );
 
-         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedText );
+         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
          Assert.Equal( expectedTrailingWhitespace, untranslatedText.TrailingWhitespace );
       }
@@ -53,7 +53,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       {
          var untranslatedText = new UntranslatedText( input, true, true );
 
-         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedText );
+         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
          Assert.Equal( expectedTrailingWhitespace, untranslatedText.TrailingWhitespace );
       }

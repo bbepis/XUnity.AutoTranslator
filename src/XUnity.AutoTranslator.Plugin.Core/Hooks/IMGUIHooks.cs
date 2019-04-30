@@ -27,7 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          typeof( GUI_DoButton_Hook ),
          typeof( GUI_DoModalWindow_Hook ),
          typeof( GUI_DoWindow_Hook ),
-         typeof( GUI_DoTextField_Hook ),
+         //typeof( GUI_DoTextField_Hook ), // Why did I think this was a good idea?
          typeof( GUI_DoButtonGrid_Hook ),
          typeof( GUI_DoToggle_Hook ),
       };

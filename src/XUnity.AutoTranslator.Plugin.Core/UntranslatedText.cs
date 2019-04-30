@@ -134,11 +134,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( leadingWhitespaceCount > 0 || trailingWhitespaceCount > 0 )
          {
-            TrimmedText = TranslatableText.Substring( leadingWhitespaceCount, TranslatableText.Length - trailingWhitespaceCount - leadingWhitespaceCount );
+            TrimmedTranslatableText = TranslatableText.Substring( leadingWhitespaceCount, TranslatableText.Length - trailingWhitespaceCount - leadingWhitespaceCount );
          }
          else
          {
-            TrimmedText = TranslatableText;
+            TrimmedTranslatableText = TranslatableText;
          }
       }
 
@@ -146,9 +146,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string TrailingWhitespace { get; }
 
-      public string TrimmedText { get; }
-
       public string TranslatableText { get; }
+
+      public string TrimmedTranslatableText { get; }
 
       public string OriginalText { get; }
 

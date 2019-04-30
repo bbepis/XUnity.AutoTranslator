@@ -1,4 +1,8 @@
-﻿### 3.3.0
+﻿### 3.3.1
+ * MISC - Options to cache results of regex lookups and whitespace differences
+ * BUG FIX - Fully clear translations before reloading (ALT+R)
+
+### 3.3.0
  * FEATURE - Support 'TARC' regex formatting in translation files
  * FEATURE - Much improved handling of whitespace and newlines. Option 'TrimAllText' removed and options for 'WhitespaceRemovalStrategy' changed
  * BUG FIX - Allow hooking of text with components named 'Dummy'

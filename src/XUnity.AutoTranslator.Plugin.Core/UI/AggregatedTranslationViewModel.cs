@@ -39,7 +39,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                if( _started.HasValue )
                {
                   var timeSince = Time.realtimeSinceStartup - _started.Value;
-                  if( timeSince > 1.0f )
+                  if( timeSince > 2.0f )
                   {
                      foreach( var additionTranslation in AggregatedTranslations )
                      {

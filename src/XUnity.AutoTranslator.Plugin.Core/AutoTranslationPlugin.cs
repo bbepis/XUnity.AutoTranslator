@@ -376,7 +376,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context );
          if( added && translationResult == null )
          {
-            SpamChecker.PerformChecks( key.TrimmedText );
+            SpamChecker.PerformChecks( key.TrimmedTranslatableText );
          }
       }
 
@@ -433,10 +433,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( Settings.CopyToClipboard && Features.SupportsClipboard )
          {
-            if( !_textsToCopyToClipboard.Contains( key.TrimmedText ) )
+            if( !_textsToCopyToClipboard.Contains( key.TrimmedTranslatableText ) )
             {
-               _textsToCopyToClipboard.Add( key.TrimmedText );
-               _textsToCopyToClipboardOrdered.Add( key.TrimmedText );
+               _textsToCopyToClipboard.Add( key.TrimmedTranslatableText );
+               _textsToCopyToClipboardOrdered.Add( key.TrimmedTranslatableText );
 
                _clipboardUpdated = Time.realtimeSinceStartup;
             }
@@ -1397,7 +1397,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private IEnumerator WaitForTextStablization( UntranslatedText textKey, float delay, Action onTextStabilized, Action onFailed = null )
       {
-         var text = textKey.TrimmedText;
+         var text = textKey.TrimmedTranslatableText;
 
          if( !_immediatelyTranslating.Contains( text ) )
          {
@@ -1668,7 +1668,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             TextCache.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText );
          }
 
-         job.Endpoint.AddTranslationToCache( job.Key, job.TranslatedText );
+         job.Endpoint.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText );
 
          // fix translation results directly on jobs
          foreach( var translationResult in job.TranslationResults )

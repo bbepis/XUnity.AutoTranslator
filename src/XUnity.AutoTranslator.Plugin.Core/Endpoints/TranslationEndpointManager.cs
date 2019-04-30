@@ -70,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             return result;
          }
 
-         var modifiedKey = key.TrimmedText;
+         var modifiedKey = key.TrimmedTranslatableText;
          result = _translations.TryGetValue( modifiedKey, out value );
          if( result )
          {
@@ -94,12 +94,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       private void QueueNewTranslationForDisk( string key, string value )
       {
          // FIXME: Implement
-      }
-
-      public void AddTranslationToCache( UntranslatedText key, string value )
-      {
-         // UNRELEASED: Not included in current release
-         //AddTranslationToCache( key.GetDictionaryLookupKey(), value );
       }
 
       public void AddTranslationToCache( string key, string value )
@@ -142,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                _unstartedJobs.Remove( key );
                Manager.UnstartedTranslations--;
 
-               var untranslatedText = job.Key.TrimmedText;
+               var untranslatedText = job.Key.TrimmedTranslatableText;
                if( CanTranslate( untranslatedText ) )
                {
                   jobs.Add( job );
@@ -199,7 +193,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             _unstartedJobs.Remove( key );
             Manager.UnstartedTranslations--;
 
-            var untranslatedText = job.Key.TrimmedText;
+            var untranslatedText = job.Key.TrimmedTranslatableText;
             if( CanTranslate( untranslatedText ) )
             {
                _ongoingJobs[ key ] = job;
@@ -249,7 +243,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( job.Key );
 
-               XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedText}' => '{job.TranslatedText}'" );
+               XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedTranslatableText}' => '{job.TranslatedText}'" );
 
                Manager.InvokeJobCompleted( job );
             }
@@ -286,7 +280,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          RemoveOngoingTranslation( job.Key );
 
-         XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedText}' => '{job.TranslatedText}'" );
+         XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedTranslatableText}' => '{job.TranslatedText}'" );
 
          Manager.InvokeJobCompleted( job );
       }
@@ -338,7 +332,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( key );
 
-               RegisterTranslationFailureFor( key.TrimmedText );
+               RegisterTranslationFailureFor( key.TrimmedTranslatableText );
 
                Manager.InvokeJobFailed( job );
             }
@@ -411,7 +405,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
          }
 
-         XuaLogger.Current.Debug( "Queued: '" + key.TrimmedText + "'" );
+         XuaLogger.Current.Debug( "Queued: '" + key.TrimmedTranslatableText + "'" );
 
          var saveResultGlobally = checkOtherEndpoints;
          var newJob = new TranslationJob( this, key, saveResultGlobally );
@@ -476,7 +470,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          foreach( var job in unstartedJobs )
          {
-            XuaLogger.Current.Warn( $"Dequeued: '{job.Key.TrimmedText}'" );
+            XuaLogger.Current.Warn( $"Dequeued: '{job.Key.TrimmedTranslatableText}'" );
             job.Value.State = TranslationJobState.Failed;
             job.Value.ErrorMessage = "Translation failed because all jobs on endpoint was cleared.";
 
