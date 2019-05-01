@@ -205,8 +205,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void AddTranslation( string key, string value )
       {
-         _translations[ key ] = value;
-         _reverseTranslations[ value ] = key;
+         if( key != null && value != null )
+         {
+            _translations[ key ] = value;
+            _reverseTranslations[ value ] = key;
+         }
       }
 
       private void QueueNewTranslationForDisk( string key, string value )
@@ -226,7 +229,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // also add a trimmed version of the translation
             var ukey = new UntranslatedText( key, false, false );
             var uvalue = new UntranslatedText( value, false, false );
-            if( ukey.TrimmedTranslatableText != key )
+            if( ukey.TrimmedTranslatableText != key && !HasTranslated( ukey.TrimmedTranslatableText ) )
             {
                AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
             }

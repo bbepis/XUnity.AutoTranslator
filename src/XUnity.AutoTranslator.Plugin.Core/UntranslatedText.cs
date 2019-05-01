@@ -71,48 +71,90 @@ namespace XUnity.AutoTranslator.Plugin.Core
                builder.Append( LeadingWhitespace );
             }
 
-            char currentWhitespaceChar = default( char );
-            bool addedCurrentWhitespace = false;
+            int whitespaceStart = -1;
             for( i = firstNonWhitespace; i <= lastNonWhitespace; i++ )
             {
                var c = text[ i ];
-               if( !char.IsWhiteSpace( c ) )
-               {
-                  builder.Append( c );
 
-                  currentWhitespaceChar = default( char );
+               if( c == '\n' )
+               {
+                  // find first non-whitespace
+                  int u = i - 1;
+                  while( u > firstNonWhitespace && char.IsWhiteSpace( text[ u ] ) ) u--;
+
+                  int o = i + 1;
+                  while( o < lastNonWhitespace && char.IsWhiteSpace( text[ o ] ) ) o++;
+
+                  u++;
+                  o--;
+                  int l = o - u;
+                  if( l > 0 )
+                  {
+                     char currentWhitespaceChar = text[ u ];
+                     bool addedCurrentWhitespace = false;
+                     u++;
+
+                     for( int k = u; k <= o; k++ )
+                     {
+                        var ch = text[ k ];
+
+                        // keep repeating whitespace
+                        if( ch == currentWhitespaceChar )
+                        {
+                           if( !addedCurrentWhitespace )
+                           {
+                              builder.Append( currentWhitespaceChar );
+                              addedCurrentWhitespace = true;
+                           }
+
+                           builder.Append( ch );
+                        }
+                        else
+                        {
+                           addedCurrentWhitespace = false;
+                           currentWhitespaceChar = ch;
+                        }
+
+                        if( Settings.UsesWhitespaceBetweenWords && ( ch == '\n' || ch == '\r' ) )
+                        {
+                           if( builder.Length > 0 && builder[ builder.Length - 1 ] != ' ' )
+                           {
+                              builder.Append( ' ' );
+                           }
+
+                           var nextK = k + 1;
+                           if( nextK < lastNonWhitespace && text[ nextK ] == '\n' )
+                           {
+                              k++;
+                           }
+                        }
+                     }
+                  }
+
+                  i = o;
+                  whitespaceStart = -1;
+               }
+               else if( !char.IsWhiteSpace( c ) )
+               {
+                  if( whitespaceStart != -1 )
+                  {
+                     // add from whitespaceStart to i - 1 of characters
+                     for( int b = whitespaceStart; b < i; b++ )
+                     {
+                        builder.Append( text[ b ] );
+                     }
+
+                     whitespaceStart = -1;
+                  }
+
+                  builder.Append( c );
                }
                else
                {
-                  // keep repeating whitespace
-                  if( c == currentWhitespaceChar )
+                  // is whitespace char different from \n
+                  if( whitespaceStart == -1 )
                   {
-                     if( !addedCurrentWhitespace )
-                     {
-                        builder.Append( currentWhitespaceChar );
-                        addedCurrentWhitespace = true;
-                     }
-
-                     builder.Append( c );
-                  }
-                  else
-                  {
-                     addedCurrentWhitespace = false;
-                     currentWhitespaceChar = c;
-                  }
-               }
-
-               if( Settings.UsesWhitespaceBetweenWords && ( c == '\n' || c == '\r' ) )
-               {
-                  if( builder.Length > 0 && builder[ builder.Length - 1 ] != ' ' )
-                  {
-                     builder.Append( ' ' );
-                  }
-
-                  var nextI = i + 1;
-                  if( nextI < lastNonWhitespace && text[ nextI ] == '\n' )
-                  {
-                     i++;
+                     whitespaceStart = i;
                   }
                }
             }

@@ -87,8 +87,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private void AddTranslation( string key, string value )
       {
-         _translations[ key ] = value;
-         _reverseTranslations[ value ] = key;
+         if( key != null && value != null )
+         {
+            _translations[ key ] = value;
+            _reverseTranslations[ value ] = key;
+         }
       }
 
       private void QueueNewTranslationForDisk( string key, string value )

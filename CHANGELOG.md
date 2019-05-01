@@ -1,5 +1,6 @@
 ﻿### 3.3.1
  * MISC - Options to cache results of regex lookups and whitespace differences
+ * BUG FIX - Fixed 'WhitespaceRemovalStrategy.TrimPerNewline' which was broken to remove all non-repeating whitespace, rather than only the non-repeating whitespace surrounding newlines
  * BUG FIX - Fully clear translations before reloading (ALT+R)
 
 ### 3.3.0

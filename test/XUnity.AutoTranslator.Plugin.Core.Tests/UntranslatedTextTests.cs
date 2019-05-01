@@ -25,8 +25,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       }
 
       [Theory( DisplayName = "Can_Trim_Internal_Whitespace" )]
-      [InlineData( "Hel lo", "Hello" )]
+      [InlineData( "Hel lo", "Hel lo" )]
       [InlineData( "Hel\r\n lo", "Hello" )]
+      [InlineData( "Hel\n\nlo", "Hel\n\nlo" )]
       public void Can_Trim_Internal_Whitespace( string input, string expectedTrimmedText )
       {
          var untranslatedText = new UntranslatedText( input, false, true );
@@ -35,8 +36,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       }
 
       [Theory( DisplayName = "Can_Trim_Internal_And_Surrounding_Whitespace" )]
-      [InlineData( "\r\n \r\nHe llo", "Hello", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nHe llo", "He llo", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nHe   llo", "He   llo", "\r\n \r\n", null )]
       [InlineData( "\r\n \r\nHel\r\nlo\n", "Hello", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel\n\nlo\n", "Hel\n\nlo", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel\n\n lo\n", "Hel\n\nlo", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel\n\n  lo\n", "Hel\n\n  lo", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel  \n\n  lo\n", "Hel  \n\n  lo", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel  \n  lo\n", "Hel    lo", "\r\n \r\n", "\n" )]
+      [InlineData( "\r\n \r\nHel \n lo\n", "Hello", "\r\n \r\n", "\n" )]
       [InlineData( "\r\r\r\r\n \n　Hell\no  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
@@ -48,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       }
 
       [Theory( DisplayName = "Can_Trim_Internal_And_Surrounding_Whitespace_And_Template" )]
-      [InlineData( "\r\n \r\nFPS: 60.53", "FPS:{{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS: 60.53", "FPS: {{A}}", "\r\n \r\n", null )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace_And_Template( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
          var untranslatedText = new UntranslatedText( input, true, true );
