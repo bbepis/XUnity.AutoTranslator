@@ -443,27 +443,48 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal string Hook_TextChanged_WithResult( object ui, string text )
-      {
-         if( !ui.IsKnownTextType() ) return null;
-
-         if( _textHooksEnabled && !_temporarilyDisabled )
-         {
-            var translation = TranslateOrQueueWebJob( ui, text, false );
-            return _isInTranslatedMode ? translation : null;
-         }
-         return null;
-      }
-
       internal string ExternalHook_TextChanged_WithResult( object ui, string text )
       {
          if( !ui.IsKnownTextType() ) return null;
 
-         if( _textHooksEnabled && !_temporarilyDisabled )
+         try
          {
-            return TranslateOrQueueWebJob( ui, text, true );
+            CallOrigin.ExpectsTextToBeReturned = true;
+
+            if( _textHooksEnabled && !_temporarilyDisabled )
+            {
+               return TranslateOrQueueWebJob( ui, text, true );
+            }
+            return null;
          }
-         return null;
+         finally
+         {
+            CallOrigin.ExpectsTextToBeReturned = false;
+         }
+      }
+
+      internal string Hook_TextChanged_WithResult( object ui, string text, bool onEnable )
+      {
+         try
+         {
+            CallOrigin.ExpectsTextToBeReturned = true;
+
+            string result = null;
+            if( _textHooksEnabled && !_temporarilyDisabled )
+            {
+               result = TranslateOrQueueWebJob( ui, text, false );
+            }
+
+            if( onEnable )
+            {
+               CheckSpriteRenderer( ui );
+            }
+            return result;
+         }
+         finally
+         {
+            CallOrigin.ExpectsTextToBeReturned = false;
+         }
       }
 
       internal void Hook_TextChanged( object ui, bool onEnable )
@@ -548,8 +569,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal void SetTranslatedText( object ui, string translatedText, TextTranslationInfo info )
       {
          info?.SetTranslatedText( translatedText );
-
-         if( _isInTranslatedMode )
+         
+         if( _isInTranslatedMode && !CallOrigin.ExpectsTextToBeReturned )
          {
             SetText( ui, translatedText, true, info );
          }
@@ -585,7 +606,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                // NGUI only behaves if you set the text after the resize behaviour
                ui.SetText( text );
-               
+
                info?.ResetScrollIn( ui );
 
                if( TranslationAggregatorWindow != null && info != null && !ui.IsSpammingComponent() )
@@ -932,6 +953,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             && format != 63;
       }
 
+      internal void RenameTextureWithKey( string name, string key, string newKey )
+      {
+         TextureCache.RenameFileWithKey( name, key, newKey );
+      }
+
       private string TranslateImmediate( object ui, string text, TextTranslationInfo info, bool ignoreComponentState )
       {
          // Get the trimmed text
@@ -953,8 +979,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( !string.IsNullOrEmpty( translation ) )
                {
-                  SetTranslatedText( ui, textKey.Untemplate( translation ), info );
-                  return translation;
+                  var untemplatedTranslation = textKey.Untemplate( translation );
+                  SetTranslatedText( ui, untemplatedTranslation, info );
+                  return untemplatedTranslation;
                }
             }
             else
@@ -1935,7 +1962,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var tti = kvp.Value as TextTranslationInfo;
                         if( tti != null && tti.IsTranslated )
                         {
-                           SetText( ui, tti.OriginalText, true, tti );
+                           SetText( ui, tti.OriginalText, false, tti );
                         }
                      }
                   }

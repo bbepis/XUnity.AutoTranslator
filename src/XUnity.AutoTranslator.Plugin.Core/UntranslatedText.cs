@@ -115,6 +115,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            currentWhitespaceChar = ch;
                         }
 
+                        // FIXME: Test this...
                         if( Settings.UsesWhitespaceBetweenWords && ( ch == '\n' || ch == '\r' ) )
                         {
                            if( builder.Length > 0 && builder[ builder.Length - 1 ] != ' ' )

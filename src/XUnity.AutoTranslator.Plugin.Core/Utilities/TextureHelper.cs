@@ -52,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       }
    }
 
-   internal struct TextureDataResult
+   internal class TextureDataResult
    {
       public TextureDataResult( byte[] data, bool nonReadable, float calculationTime )
       {

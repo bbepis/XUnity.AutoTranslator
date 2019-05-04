@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TextureTranslationInfo
    {
-      //private static readonly Dictionary<int, string> KnownHashes = new Dictionary<int, string>();
+      private static Dictionary<string, string> NameToHash = new Dictionary<string, string>();
       private static readonly Encoding UTF8 = new UTF8Encoding( false );
 
       private string _key;
@@ -54,12 +54,67 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return TextureHelper.GetData( texture ).Data;
       }
 
+      private TextureDataResult SetupKeyForNameWithFallback( string name, Texture2D texture )
+      {
+         bool detectedDuplicateName = false;
+         string existingHash = null;
+         string hash = null;
+
+         TextureDataResult result = null;
+
+         if( Settings.DetectDuplicateTextureNames )
+         {
+            result = TextureHelper.GetData( texture );
+            hash = HashHelper.Compute( result.Data );
+
+            if( NameToHash.TryGetValue( name, out existingHash ) )
+            {
+               if( existingHash != hash )
+               {
+                  XuaLogger.Current.Warn( "Detected duplicate image name: " + name );
+                  detectedDuplicateName = true;
+
+                  Settings.AddDuplicateName( name );
+               }
+            }
+            else
+            {
+               NameToHash[ name ] = hash;
+            }
+         }
+
+         if( Settings.DuplicateTextureNames.Contains( name ) )
+         {
+            if( hash == null )
+            {
+               if( result == null )
+               {
+                  result = TextureHelper.GetData( texture );
+               }
+
+               hash = HashHelper.Compute( result.Data );
+            }
+
+            _key = hash;
+         }
+         else
+         {
+            _key = HashHelper.Compute( UTF8.GetBytes( name ) );
+         }
+
+         if( detectedDuplicateName )
+         {
+            var oldKey = HashHelper.Compute( UTF8.GetBytes( name ) );
+            AutoTranslationPlugin.Current.RenameTextureWithKey( name, oldKey, existingHash );
+         }
+
+         return result;
+      }
+
       private void SetupHashAndData( Texture2D texture )
       {
          if( _key == null )
          {
-            var instanceId = texture.GetInstanceID();
-
             if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageData )
             {
                var result = TextureHelper.GetData( texture );
@@ -67,43 +122,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _originalData = result.Data;
                _nonReadable = result.NonReadable;
                _key = HashHelper.Compute( _originalData );
-
-               //if( KnownHashes.TryGetValue( instanceId, out string hashValue ) )
-               //{
-               //   _key = hashValue;
-
-               //   if( Settings.EnableTextureToggling )
-               //   {
-               //      var result = TextureHelper.GetData( texture );
-
-               //      _originalData = result.Data;
-               //      _nonReadable = result.NonReadable;
-               //   }
-               //}
-               //else
-               //{
-               //   var result = TextureHelper.GetData( texture );
-
-               //   _originalData = result.Data;
-               //   _nonReadable = result.NonReadable;
-               //   _key = HashHelper.Compute( _originalData );
-
-               //   if( !string.IsNullOrEmpty( texture.name ) && result.CalculationTime > 0.6f )
-               //   {
-               //      KnownHashes[ instanceId ] = _key;
-               //   }
-               //}
             }
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageName )
             {
                var name = texture.name; // name may be duplicate, WILL be duplicate!
                if( string.IsNullOrEmpty( name ) ) return;
 
-               _key = HashHelper.Compute( UTF8.GetBytes( name ) );
+               var result = SetupKeyForNameWithFallback( name, texture );
 
-               if( Settings.EnableTextureToggling )
+               if( Settings.EnableTextureToggling || Settings.DetectDuplicateTextureNames )
                {
-                  var result = TextureHelper.GetData( texture );
+                  if( result == null )
+                  {
+                     result = TextureHelper.GetData( texture );
+                  }
 
                   _originalData = result.Data;
                   _nonReadable = result.NonReadable;
@@ -116,11 +148,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                name += "|" + SceneManagerHelper.GetActiveSceneId();
 
-               _key = HashHelper.Compute( UTF8.GetBytes( name ) );
+               var result = SetupKeyForNameWithFallback( name, texture );
 
-               if( Settings.EnableTextureToggling )
+               if( Settings.EnableTextureToggling || Settings.DetectDuplicateTextureNames )
                {
-                  var result = TextureHelper.GetData( texture );
+                  if( result == null )
+                  {
+                     result = TextureHelper.GetData( texture );
+                  }
 
                   _originalData = result.Data;
                   _nonReadable = result.NonReadable;

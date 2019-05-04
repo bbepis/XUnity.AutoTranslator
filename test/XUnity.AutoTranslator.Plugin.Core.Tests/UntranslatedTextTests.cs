@@ -11,6 +11,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
    public class UntranslatedTextTests
    {
       [Theory( DisplayName = "Can_Trim_Surrounding_Whitespace" )]
+      [InlineData( "  Hello  ", "Hello", "  ", "  " )]
+      [InlineData( " Hello", "Hello", " ", null )]
+      [InlineData( "Hello", "Hello", null, null )]
       [InlineData( "\r\n \r\nHello", "Hello", "\r\n \r\n", null )]
       [InlineData( "\r\n \r\nHello\n", "Hello", "\r\n \r\n", "\n" )]
       [InlineData( "\r\r\r\r\n \n　Hello  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
@@ -28,6 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "Hel lo", "Hel lo" )]
       [InlineData( "Hel\r\n lo", "Hello" )]
       [InlineData( "Hel\n\nlo", "Hel\n\nlo" )]
+      [InlineData( "Hello\nWhat\nYou", "HelloWhatYou" )]
+      [InlineData( "Hello\n\nWhat\nYou", "Hello\n\nWhatYou" )]
       public void Can_Trim_Internal_Whitespace( string input, string expectedTrimmedText )
       {
          var untranslatedText = new UntranslatedText( input, false, true );
@@ -57,6 +62,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
 
       [Theory( DisplayName = "Can_Trim_Internal_And_Surrounding_Whitespace_And_Template" )]
       [InlineData( "\r\n \r\nFPS: 60.53", "FPS: {{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS:   60.53", "FPS:   {{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS:\n 60.53", "FPS:{{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS:\n  60.53", "FPS:  {{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS:\n \n 60.53", "FPS:{{A}}", "\r\n \r\n", null )]
+      [InlineData( "\r\n \r\nFPS:\n  \n 60.53", "FPS:  {{A}}", "\r\n \r\n", null )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace_And_Template( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
          var untranslatedText = new UntranslatedText( input, true, true );

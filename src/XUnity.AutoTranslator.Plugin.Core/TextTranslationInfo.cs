@@ -6,6 +6,7 @@ using Harmony;
 using UnityEngine;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 
@@ -16,6 +17,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
+      private static readonly string OverflowModePropertyName = "overflowMode";
 
       private Action<object> _unresize;
       private Action<object> _unfont;
@@ -96,7 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( graphic is Text )
          {
             var ui = (Text)graphic;
-            
+
             // text is likely to be longer than there is space for, simply expand out anyway then
             var componentWidth = ( (RectTransform)ui.transform ).rect.width;
             var quarterScreenSize = Screen.width / 4;
@@ -140,7 +142,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var type = graphic.GetType();
 
             // special handling for NGUI to better handle textbox sizing
-            if( type == Constants.ClrTypes.UILabel )
+            if( type == ClrTypes.UILabel )
             {
                var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
                var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
@@ -169,13 +171,31 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   };
                }
             }
+            else if( type == ClrTypes.TextMeshPro || type == ClrTypes.TextMeshProUGUI )
+            {
+               var originalOverflowMode = ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName )?.GetValue( graphic, null );
+
+               // ellipsis (1) works
+               // masking (2) has a tendency to break in some versions of TMP
+               // truncate (3) works
+               if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
+               {
+                  ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( graphic, 3, null );
+
+                  _unresize = g =>
+                  {
+                     ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( g, 2, null );
+                  };
+               }
+
+            }
          }
       }
 
       public void UnresizeUI( object graphic )
       {
          if( graphic == null ) return;
-
+         
          _unresize?.Invoke( graphic );
          _unresize = null;
       }

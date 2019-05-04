@@ -14,6 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
+      private Dictionary<string, string> _keyToFileName = new Dictionary<string, string>();
 
       public TextureTranslationCache()
       {
@@ -36,6 +37,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                _translatedImages.Clear();
                _untranslatedImages.Clear();
+               _keyToFileName.Clear();
+
                Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize() );
                foreach( var fullFileName in GetTextureFiles() )
                {
@@ -54,53 +57,87 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void RegisterImageFromFile( string fullFileName )
       {
-         var fileName = Path.GetFileNameWithoutExtension( fullFileName );
-         var startHash = fileName.LastIndexOf( "[" );
-         var endHash = fileName.LastIndexOf( "]" );
-
-         if( endHash > -1 && startHash > -1 && endHash > startHash )
+         try
          {
-            var takeFrom = startHash + 1;
+            var fileName = Path.GetFileNameWithoutExtension( fullFileName );
+            var startHash = fileName.LastIndexOf( "[" );
+            var endHash = fileName.LastIndexOf( "]" );
 
-            // load based on whether or not the key is image hashed
-            var parts = fileName.Substring( takeFrom, endHash - takeFrom ).Split( '-' );
-            string key;
-            string originalHash;
-            if( parts.Length == 1 )
+            if( endHash > -1 && startHash > -1 && endHash > startHash )
             {
-               key = parts[ 0 ];
-               originalHash = parts[ 0 ];
-            }
-            else if( parts.Length == 2 )
-            {
-               key = parts[ 0 ];
-               originalHash = parts[ 1 ];
+               var takeFrom = startHash + 1;
+
+               // load based on whether or not the key is image hashed
+               var parts = fileName.Substring( takeFrom, endHash - takeFrom ).Split( '-' );
+               string key;
+               string originalHash;
+               if( parts.Length == 1 )
+               {
+                  key = parts[ 0 ];
+                  originalHash = parts[ 0 ];
+               }
+               else if( parts.Length == 2 )
+               {
+                  key = parts[ 0 ];
+                  originalHash = parts[ 1 ];
+               }
+               else
+               {
+                  XuaLogger.Current.Warn( $"Image not loaded (unknown hash): {fullFileName}." );
+                  return;
+               }
+
+               var data = File.ReadAllBytes( fullFileName );
+               var currentHash = HashHelper.Compute( data );
+               var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
+
+               _keyToFileName[ key ] = fullFileName;
+
+               // only load images that someone has modified!
+               if( Settings.LoadUnmodifiedTextures || isModified )
+               {
+                  RegisterTranslatedImage( key, data );
+                  XuaLogger.Current.Debug( $"Image loaded: {fullFileName}." );
+               }
+               else
+               {
+                  RegisterUntranslatedImage( key );
+                  XuaLogger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
+               }
             }
             else
             {
-               XuaLogger.Current.Warn( $"Image not loaded (unknown hash): {fullFileName}." );
-               return;
-            }
-
-            var data = File.ReadAllBytes( fullFileName );
-            var currentHash = HashHelper.Compute( data );
-            var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
-
-            // only load images that someone has modified!
-            if( Settings.LoadUnmodifiedTextures || isModified )
-            {
-               RegisterTranslatedImage( key, data );
-               XuaLogger.Current.Debug( $"Image loaded: {fullFileName}." );
-            }
-            else
-            {
-               RegisterUntranslatedImage( key );
-               XuaLogger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
+               XuaLogger.Current.Warn( $"Image not loaded (no hash): {fullFileName}." );
             }
          }
-         else
+         catch( Exception e )
          {
-            XuaLogger.Current.Warn( $"Image not loaded (no hash): {fullFileName}." );
+            XuaLogger.Current.Error( e, "An error occurred while loading texture file: " + fullFileName );
+         }
+      }
+
+      public void RenameFileWithKey( string name, string key, string newKey )
+      {
+         try
+         {
+            if( _keyToFileName.TryGetValue( key, out var currentFileName ) )
+            {
+               _keyToFileName.Remove( key );
+               var newFileName = currentFileName.Replace( key, newKey );
+
+               if( !IsImageRegistered( newKey ) )
+               {
+                  var data = File.ReadAllBytes( currentFileName );
+                  RegisterImageFromData( name, newKey, data );
+                  File.Delete( currentFileName );
+
+                  XuaLogger.Current.Warn( $"Replaced old file with name '{name}' registered with key old '{key}'." );
+               }
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, $"An error occurred while trying to rename file with key '{key}'." );
          }
       }
 
@@ -124,6 +161,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var fullName = Path.Combine( root, fileName );
          File.WriteAllBytes( fullName, data );
          XuaLogger.Current.Info( "Dumped texture file: " + fileName );
+
+         _keyToFileName[ key ] = fullName;
 
          if( Settings.LoadUnmodifiedTextures )
          {

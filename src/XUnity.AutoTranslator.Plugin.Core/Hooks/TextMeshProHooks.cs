@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -92,6 +93,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      //static void Prefix( object __instance, ref string value )
+      //{
+      //   if( !TextMeshProHooks.HooksOverriden )
+      //   {
+      //      var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, value, false );
+      //      if( result != null )
+      //      {
+      //         value = result;
+      //      }
+      //   }
+      //   AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      //}
    }
 
    [Harmony, HarmonyPriority( Priority.Last )]

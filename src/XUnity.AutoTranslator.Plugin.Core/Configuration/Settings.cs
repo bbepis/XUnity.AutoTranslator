@@ -98,6 +98,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextureScanOnSceneLoad;
       public static bool EnableSpriteRendererHooking;
       public static bool LoadUnmodifiedTextures;
+      public static bool DetectDuplicateTextureNames;
+      public static HashSet<string> DuplicateTextureNames;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
       public static bool CopyToClipboard;
@@ -158,6 +160,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextureScanOnSceneLoad = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureScanOnSceneLoad", false );
             EnableSpriteRendererHooking = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableSpriteRendererHooking", false );
             LoadUnmodifiedTextures = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "LoadUnmodifiedTextures", false );
+            DetectDuplicateTextureNames = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "DetectDuplicateTextureNames", false );
+            DuplicateTextureNames = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "DuplicateTextureNames", string.Empty )
+               ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
+
             TextureHashGenerationStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureHashGenerationStrategy", TextureHashGenerationStrategy.FromImageName );
 
             if( MaxCharactersPerTranslation > MaxMaxCharactersPerTranslation )
@@ -198,6 +204,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             IsShutdown = true;
          }
+      }
+
+      public static void AddDuplicateName( string name )
+      {
+         DuplicateTextureNames.Add( name );
+         PluginEnvironment.Current.Preferences[ "Texture" ][ "DuplicateTextureNames" ].Value = string.Join( ";", DuplicateTextureNames.ToArray() );
+         Save();
       }
 
       public static void SetEndpoint( string id )

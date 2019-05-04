@@ -11,6 +11,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly string CapitalMainTexturePropertyName = "MainTexture";
       private static readonly string MarkAsChangedMethodName = "MarkAsChanged";
 
+      public static string GetPath( this object ui )
+      {
+         if( ui is Component comp )
+         {
+            var go = comp.gameObject;
+            return go.GetPath();
+         }
+         return null;
+      }
+
       public static Texture2D GetTexture( this object ui )
       {
          if( ui == null ) return null;

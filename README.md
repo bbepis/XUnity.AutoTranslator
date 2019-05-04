@@ -271,6 +271,8 @@ EnableTextureScanOnSceneLoad=False ;Indicates whether or not the plugin should s
 EnableSpriteRendererHooking=False ;Indicates whether or not the plugin should attempt to hook SpriteRenderer. This is a seperate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
 TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameAndScene"]
+DuplicateTextureNames=           ;Indicates specific texture names that are duplicated in the game. List is separated by ';'.
+DetectDuplicateTextureNames=False;Indicates if the plugin should detect duplicate texture names.
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
@@ -429,6 +431,8 @@ EnableTextureScanOnSceneLoad=False
 EnableSpriteRendererHooking=False
 LoadUnmodifiedTextures=False
 TextureHashGenerationStrategy=FromImageName
+DuplicateTextureNames=
+DetectDuplicateTextureNames=False
 ```
 
 `TextureDirectory` specifies the directory where textures are dumped to and loaded from. Loading will happen from all subdirectories of the specified directory as well, so you can move dumped images to whatever folder structure you desire.
@@ -445,6 +449,10 @@ TextureHashGenerationStrategy=FromImageName
 
 `EnableTextureToggling` enables whether the ALT+T hotkey will also toggle textures. This is by no means guaranteed to work, especially if `EnableTextureScanOnSceneLoad` is also enabled. **Never redistribute the mod with this enabled.**
 
+`DuplicateTextureNames` specifies different textures in the game that are used under the same resource name. The plugin will fallback to the 'FromImageData' for image identification for these images.
+
+`DetectDuplicateTextureNames` specifies that the plugin should identify which image names are duplicated and update the configuration with these names automatically. **Never redistribute the mod with this enabled.**
+
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:
  * `FromImageName` means that the hash is generated from the internal resource name that the game uses for the image, which may not exist for all images or even be unique. However, it is generally fairly reliable. If an image has no resource name, it will not be dumped.
@@ -460,7 +468,7 @@ If you redistribute this mod with translated images, it is recommended you delet
 You can also change the file name to whatever you desire, as long as you keep the hash appended to the end of the file name.
 
 If you take anything away from this section, it should be these two points:
- * **Never redistribute the mod with `EnableTextureDumping=True`, `EnableTextureToggling=True` or `LoadUnmodifiedTextures=True`**
+ * **Never redistribute the mod with `EnableTextureDumping=True`, `EnableTextureToggling=True`, `LoadUnmodifiedTextures=True` or `DetectDuplicateTextureNames=true`**
  * **Only redistribute the mod with `TextureHashGenerationStrategy=FromImageData` enabled if absolutely required by the game.**
 
 ### Technical details about Hash Generation in file names
