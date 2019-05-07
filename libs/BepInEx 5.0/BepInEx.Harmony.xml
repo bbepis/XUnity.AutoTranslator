@@ -22,30 +22,53 @@
             A wrapper for Harmony based operations.
             </summary>
         </member>
-        <member name="P:BepInEx.Harmony.HarmonyWrapper.DefaultInstance">
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.EmitDelegate``1(``0)">
             <summary>
-            The HarmonyInstance that is used when none is specified.
+            Returns an instruction to call the specified delegate.
             </summary>
+            <typeparam name="T">The delegate type to emit.</typeparam>
+            <param name="action">The delegate to emit.</param>
+            <returns>The instruction to </returns>
         </member>
-        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Type,Harmony.HarmonyInstance)">
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Type,HarmonyLib.Harmony)">
             <summary>
             Applies all patches specified in the type.
             </summary>
             <param name="type">The type to scan.</param>
             <param name="harmonyInstance">The HarmonyInstance to use.</param>
         </member>
-        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Reflection.Assembly,Harmony.HarmonyInstance)">
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Type,System.String)">
+            <summary>
+            Applies all patches specified in the type.
+            </summary>
+            <param name="type">The type to scan.</param>
+            <param name="harmonyInstanceId">The ID for the Harmony instance to create, which will be used.</param>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Reflection.Assembly,HarmonyLib.Harmony)">
             <summary>
             Applies all patches specified in the assembly.
             </summary>
             <param name="assembly">The assembly to scan.</param>
             <param name="harmonyInstance">The HarmonyInstance to use.</param>
         </member>
-        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(Harmony.HarmonyInstance)">
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.Reflection.Assembly,System.String)">
+            <summary>
+            Applies all patches specified in the assembly.
+            </summary>
+            <param name="assembly">The assembly to scan.</param>
+            <param name="harmonyInstanceId">The ID for the Harmony instance to create, which will be used.</param>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(HarmonyLib.Harmony)">
             <summary>
             Applies all patches specified in the calling assembly.
             </summary>
-            <param name="harmonyInstance">The HarmonyInstance to use.</param>
+            <param name="harmonyInstance">The Harmony instance to use.</param>
+        </member>
+        <member name="M:BepInEx.Harmony.HarmonyWrapper.PatchAll(System.String)">
+            <summary>
+            Applies all patches specified in the calling assembly.
+            </summary>
+            <param name="harmonyInstanceId">The ID for the Harmony instance to create, which will be used.</param>
         </member>
     </members>
 </doc>

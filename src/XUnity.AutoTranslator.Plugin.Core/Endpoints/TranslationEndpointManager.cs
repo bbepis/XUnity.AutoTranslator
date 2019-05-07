@@ -338,6 +338,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                RegisterTranslationFailureFor( key.TrimmedTranslatableText );
 
                Manager.InvokeJobFailed( job );
+
+               XuaLogger.Current.Error( $"Failed: '{job.Key.TrimmedTranslatableText}'" );
             }
          }
          else
@@ -355,6 +357,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                var key = job.Key;
                AddUnstartedJob( key, job );
                RemoveOngoingTranslation( key );
+
+               XuaLogger.Current.Error( $"Failed: '{job.Key.TrimmedTranslatableText}'" );
             }
 
             XuaLogger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );

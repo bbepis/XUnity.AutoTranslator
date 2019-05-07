@@ -102,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _key = HashHelper.Compute( UTF8.GetBytes( name ) );
          }
 
-         if( detectedDuplicateName )
+         if( detectedDuplicateName && Settings.EnableTextureDumping )
          {
             var oldKey = HashHelper.Compute( UTF8.GetBytes( name ) );
             AutoTranslationPlugin.Current.RenameTextureWithKey( name, oldKey, existingHash );
