@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.RuntimeHooker.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
@@ -18,17 +18,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       };
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class Text_text_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.Text != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.Text, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.Text, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -41,17 +41,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class Text_OnEnable_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.Text != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( ClrTypes.Text, "OnEnable" );
+         return AccessToolsShim.Method( ClrTypes.Text, "OnEnable" );
       }
 
       static void Postfix( object __instance )

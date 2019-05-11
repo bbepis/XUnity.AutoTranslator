@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -47,18 +46,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( DicingTextures_GetTexture_Hook ),
       };
    }
-
-   [Harmony]
+   
    internal static class DicingTextures_GetTexture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.DicingTextures != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( ClrTypes.DicingTextures, "GetTexture", new[] { typeof( string ) } );
+         return AccessToolsShim.Method( ClrTypes.DicingTextures, "GetTexture", new[] { typeof( string ) } );
       }
 
       public static void Postfix( object __instance, Texture2D __result )
@@ -66,18 +64,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( __result, false );
       }
    }
-
-   [Harmony]
+   
    internal static class Sprite_texture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.Sprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.Sprite, "texture" )?.GetGetMethod();
+         return AccessToolsShim.Property( ClrTypes.Sprite, "texture" )?.GetGetMethod();
       }
 
       static void Postfix( Texture2D __result )
@@ -87,18 +84,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static bool RequireRuntimeHooker => true;
    }
-
-   [Harmony]
+   
    internal static class SpriteRenderer_sprite_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.SpriteRenderer != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.SpriteRenderer, "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.SpriteRenderer, "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -106,18 +102,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class CubismRenderer_MainTexture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.CubismRenderer != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.CubismRenderer, "MainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.CubismRenderer, "MainTexture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture2D value )
@@ -125,18 +120,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, value, true , false);
       }
    }
-
-   [Harmony]
+   
    internal static class CubismRenderer_TryInitialize_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.CubismRenderer != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( ClrTypes.CubismRenderer, "TryInitialize" );
+         return AccessToolsShim.Method( ClrTypes.CubismRenderer, "TryInitialize" );
       }
 
       public static void Prefix( object __instance )
@@ -144,18 +138,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true, true );
       }
    }
-
-   [Harmony]
+   
    internal static class Material_mainTexture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( typeof( Material ), "mainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( typeof( Material ), "mainTexture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture value )
@@ -166,18 +159,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
    }
-
-   [Harmony]
+   
    internal static class MaskableGraphic_OnEnable_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( typeof( MaskableGraphic ), "OnEnable" );
+         return AccessToolsShim.Method( typeof( MaskableGraphic ), "OnEnable" );
       }
 
       public static void Postfix( object __instance )
@@ -188,18 +180,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
    }
-
-   [Harmony]
+   
    internal static class Image_sprite_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( typeof( Image ), "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( typeof( Image ), "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -207,18 +198,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class Image_overrideSprite_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( typeof( Image ), "overrideSprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( typeof( Image ), "overrideSprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -226,18 +216,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class Image_material_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( typeof( Image ), "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( typeof( Image ), "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -245,18 +234,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class RawImage_texture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( typeof( RawImage ), "texture" )?.GetSetMethod();
+         return AccessToolsShim.Property( typeof( RawImage ), "texture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture value )
@@ -267,18 +255,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
    }
-
-   [Harmony]
+   
    internal static class Cursor_SetCursor_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return true;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( typeof( Cursor ), "SetCursor", new[] { typeof( Texture2D ), typeof( Vector2 ), typeof( CursorMode ) } );
+         return AccessToolsShim.Method( typeof( Cursor ), "SetCursor", new[] { typeof( Texture2D ), typeof( Vector2 ), typeof( CursorMode ) } );
       }
 
       public static void Prefix( Texture2D texture )
@@ -286,18 +273,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
       }
    }
-
-   [Harmony]
+   
    internal static class UIAtlas_spriteMaterial_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UIAtlas != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UIAtlas, "spriteMaterial" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UIAtlas, "spriteMaterial" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -305,18 +291,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UISprite_OnInit_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UISprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.UISprite, "OnInit" );
+         return AccessToolsShim.Method( Constants.ClrTypes.UISprite, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -324,18 +309,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
       }
    }
-
-   [Harmony]
+   
    internal static class UISprite_material_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UISprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UISprite, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UISprite, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -343,18 +327,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UISprite_atlas_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UISprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UISprite, "atlas" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UISprite, "atlas" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -362,18 +345,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UITexture_mainTexture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UITexture != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UITexture, "mainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UITexture, "mainTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -381,18 +363,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UITexture_material_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UITexture != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UITexture, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UITexture, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -400,18 +381,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UIRect_OnInit_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UIRect != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( ClrTypes.UIRect, "OnInit" );
+         return AccessToolsShim.Method( ClrTypes.UIRect, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -419,18 +399,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
       }
    }
-
-   [Harmony]
+   
    internal static class UI2DSprite_sprite2D_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UI2DSprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UI2DSprite, "sprite2D" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UI2DSprite, "sprite2D" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -438,18 +417,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UI2DSprite_material_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UI2DSprite != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UI2DSprite, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UI2DSprite, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -457,18 +435,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UIPanel_clipTexture_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UIPanel != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UIPanel, "clipTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UIPanel, "clipTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -476,19 +453,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-
-   [Harmony]
+   
    internal static class UIFont_material_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UIFont != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UIFont, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UIFont, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -496,18 +471,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UIFont_dynamicFont_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UIFont != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UIFont, "dynamicFont" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UIFont, "dynamicFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -515,18 +489,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UILabel_bitmapFont_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UILabel != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UILabel, "bitmapFont" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UILabel, "bitmapFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -534,18 +507,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
    }
-
-   [Harmony]
+   
    internal static class UILabel_trueTypeFont_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return ClrTypes.UILabel != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( ClrTypes.UILabel, "trueTypeFont" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.UILabel, "trueTypeFont" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )

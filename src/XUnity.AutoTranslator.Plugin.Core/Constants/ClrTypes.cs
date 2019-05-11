@@ -64,8 +64,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );
 
       // Harmony
+      public static readonly Type AccessTools = FindType( "Harmony.AccessTools" ) ?? FindType( "HarmonyLib.AccessTools" );
+
       public static readonly Type HarmonyInstance = FindType( "Harmony.HarmonyInstance" );
-      public static readonly Type HarmonyMethod = FindType( "Harmony.HarmonyMethod" );
+      public static readonly Type HarmonyMethod = FindType( "Harmony.HarmonyMethod" ) ?? FindType( "HarmonyLib.HarmonyMethod" );
+      public static readonly Type Harmony = FindType( "HarmonyLib.Harmony" );
 
       // Mono / .NET
       public static readonly Type MethodBase = FindType( "System.Reflection.MethodBase" );

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.RuntimeHooker.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
@@ -20,17 +20,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       };
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class UILabel_text_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.UILabel != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Property( Constants.ClrTypes.UILabel, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( Constants.ClrTypes.UILabel, "text" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -43,17 +43,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class UILabel_OnEnable_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.UILabel != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.UILabel, "OnEnable" );
+         return AccessToolsShim.Method( Constants.ClrTypes.UILabel, "OnEnable" );
       }
 
       public static void Postfix( object __instance )

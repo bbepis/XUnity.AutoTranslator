@@ -88,6 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   u++;
                   o--;
                   int l = o - u;
+                  char lastCharAdded = default( char );
                   if( l > 0 )
                   {
                      char currentWhitespaceChar = text[ u ];
@@ -108,26 +109,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            }
 
                            builder.Append( ch );
+                           lastCharAdded = ch;
                         }
                         else
                         {
                            addedCurrentWhitespace = false;
                            currentWhitespaceChar = ch;
                         }
+                     }
+                  }
 
-                        // FIXME: Test this...
-                        if( Settings.UsesWhitespaceBetweenWords && ( ch == '\n' || ch == '\r' ) )
+                  // we know we have just handled a newline
+                  // now we need to check if the last character added is a whitespace character
+                  // if it is not, we should add a space
+                  if( Settings.UsesWhitespaceBetweenWords )
+                  {
+                     if( !char.IsWhiteSpace( lastCharAdded ) )
+                     {
+                        if( builder.Length > 0 && builder[ builder.Length - 1 ] != ' ' )
                         {
-                           if( builder.Length > 0 && builder[ builder.Length - 1 ] != ' ' )
-                           {
-                              builder.Append( ' ' );
-                           }
-
-                           var nextK = k + 1;
-                           if( nextK < lastNonWhitespace && text[ nextK ] == '\n' )
-                           {
-                              k++;
-                           }
+                           builder.Append( ' ' );
                         }
                      }
                   }

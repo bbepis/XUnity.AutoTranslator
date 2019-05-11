@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Harmony;
-using Harmony.ILCopying;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -17,9 +15,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class HarmonyInstanceExtensions
    {
-      public static readonly MethodInfo PatchMethod = ClrTypes.HarmonyInstance.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
+      public static readonly MethodInfo PatchMethod12 = ClrTypes.HarmonyInstance?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
+      public static readonly MethodInfo PatchMethod20 = ClrTypes.Harmony?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
 
-      public static void PatchAll( this HarmonyInstance instance, IEnumerable<Type> types )
+      public static void PatchAll( this object instance, IEnumerable<Type> types )
       {
          foreach( var type in types )
          {
@@ -27,7 +26,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static void PatchType( this HarmonyInstance instance, Type type )
+      private static object CreateHarmonyMethod( MethodInfo method, int? priority )
+      {
+         var harmonyMethod = ClrTypes.HarmonyMethod.GetConstructor( new Type[] { typeof( MethodInfo ) } )
+            .Invoke( new object[] { method } );
+
+         if( priority.HasValue )
+         {
+            var field = ClrTypes.HarmonyMethod.GetField( "priority", BindingFlags.Public | BindingFlags.Instance )
+               ?? ClrTypes.HarmonyMethod.GetField( "prioritiy", BindingFlags.Public | BindingFlags.Instance );
+
+            field.SetValue( harmonyMethod, priority.Value );
+         }
+
+         return harmonyMethod;
+      }
+
+      public static void PatchType( this object instance, Type type )
       {
          MethodBase original = null;
          try
@@ -41,31 +56,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                {
                   var requireRuntimeHooker = (bool?)type.GetProperty( "RequireRuntimeHooker", flags )?.GetValue( null, null ) == true;
 
-                  var priority = type.GetCustomAttributes( typeof( HarmonyPriority ), false )
-                     .OfType<HarmonyPriority>()
+                  var priority = type.GetCustomAttributes( typeof( HarmonyPriorityShimAttribute ), false )
+                     .OfType<HarmonyPriorityShimAttribute>()
                      .FirstOrDefault()
-                     ?.info.prioritiy;
+                     ?.priority;
 
                   var prefix = type.GetMethod( "Prefix", flags );
                   var postfix = type.GetMethod( "Postfix", flags );
                   var transpiler = type.GetMethod( "Transpiler", flags );
 
-                  var harmonyPrefix = prefix != null ? new HarmonyMethod( prefix ) : null;
-                  var harmonyPostfix = postfix != null ? new HarmonyMethod( postfix ) : null;
-                  var harmonyTranspiler = transpiler != null ? new HarmonyMethod( transpiler ) : null;
-
-                  if( priority.HasValue )
-                  {
-                     if( harmonyPrefix != null )
-                     {
-                        harmonyPrefix.prioritiy = priority.Value;
-                     }
-
-                     if( harmonyPostfix != null )
-                     {
-                        harmonyPostfix.prioritiy = priority.Value;
-                     }
-                  }
+                  var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
+                  var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
+                  var harmonyTranspiler = transpiler != null ? CreateHarmonyMethod( transpiler, priority ) : null;
 
                   if( requireRuntimeHooker || Settings.ForceExperimentalHooks )
                   {
@@ -73,8 +75,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                      {
                         XuaLogger.Current.Info( $"Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
 
-                        var hookPrefix = harmonyPrefix != null ? new HookMethod( harmonyPrefix.method, harmonyPrefix.prioritiy ) : null;
-                        var hookPostfix = harmonyPostfix != null ? new HookMethod( harmonyPostfix.method, harmonyPostfix.prioritiy ) : null;
+                        var hookPrefix = harmonyPrefix != null ? new HookMethod( prefix, priority ?? -1 ) : null;
+                        var hookPostfix = harmonyPostfix != null ? new HookMethod( postfix, priority ?? -1 ) : null;
 
                         RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
                      }
@@ -87,7 +89,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   {
                      try
                      {
-                        PatchMethod.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
+                        if( PatchMethod12 != null )
+                        {
+                           PatchMethod12.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );
+                        }
+                        else
+                        {
+                           PatchMethod20.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler, null } );
+                        }
                      }
                      catch( Exception e ) when( e.IsCausedBy<PlatformNotSupportedException>() )
                      {
@@ -95,8 +104,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                         {
                            XuaLogger.Current.Info( $"Harmony is not supported in this runtime. Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
 
-                           var hookPrefix = harmonyPrefix != null ? new HookMethod( harmonyPrefix.method, harmonyPrefix.prioritiy ) : null;
-                           var hookPostfix = harmonyPostfix != null ? new HookMethod( harmonyPostfix.method, harmonyPostfix.prioritiy ) : null;
+                           var hookPrefix = harmonyPrefix != null ? new HookMethod( prefix, priority ?? -1 ) : null;
+                           var hookPostfix = harmonyPostfix != null ? new HookMethod( postfix, priority ?? -1 ) : null;
 
                            RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
                         }

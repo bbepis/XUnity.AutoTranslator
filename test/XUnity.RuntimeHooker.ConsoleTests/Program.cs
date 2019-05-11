@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using XUnity.RuntimeHooker.Core;
+using XUnity.RuntimeHooker.Core.Utilities;
 
 namespace XUnity.RuntimeHooker.ConsoleTests
 {
@@ -13,24 +14,24 @@ namespace XUnity.RuntimeHooker.ConsoleTests
    {
       static void Main( string[] args )
       {
-         var sayHello = typeof( Program ).GetMethod( "SayHello" );
-         var sayGoodbye = typeof( Program ).GetMethod( "SayGoodbye" );
-         RuntimeMethodPatcher.Patch( sayHello, new HookMethod( sayGoodbye ), null );
-         SayHello();
+         //var sayHello = typeof( Program ).GetMethod( "SayHello" );
+         //var sayGoodbye = typeof( Program ).GetMethod( "SayGoodbye" );
+         //RuntimeMethodPatcher.Patch( sayHello, new HookMethod( sayGoodbye ), null );
+         //SayHello();
 
-         var textComponent = new TextComponent();
-         textComponent.Text = "こんにちは";
+         //var textComponent = new TextComponent();
+         //textComponent.Text = "こんにちは";
 
-         var textGetter = typeof( TextComponent ).GetProperty( "Text" ).GetGetMethod();
-         var textGetterHook = typeof( Program ).GetMethod( "TextGetterHook" );
-         RuntimeMethodPatcher.Patch( textGetter, null, new HookMethod( textGetterHook ) );
+         //var textGetter = typeof( TextComponent ).GetProperty( "Text" ).GetGetMethod();
+         //var textGetterHook = typeof( Program ).GetMethod( "TextGetterHook" );
+         //RuntimeMethodPatcher.Patch( textGetter, null, new HookMethod( textGetterHook ) );
 
-         Console.WriteLine( textComponent.Text );
+         //Console.WriteLine( textComponent.Text );
 
-         var printValue = typeof( Program ).GetMethod( "PrintValue" );
-         var printValueHook = typeof( Program ).GetMethod( "PrintValueHook" );
-         RuntimeMethodPatcher.Patch( printValue, new HookMethod( printValueHook ), null );
-         PrintValue( 7331 );
+         //var printValue = typeof( Program ).GetMethod( "PrintValue" );
+         //var printValueHook = typeof( Program ).GetMethod( "PrintValueHook" );
+         //RuntimeMethodPatcher.Patch( printValue, new HookMethod( printValueHook ), null );
+         //PrintValue( 7331 );
       }
 
       [MethodImpl( MethodImplOptions.NoInlining )]

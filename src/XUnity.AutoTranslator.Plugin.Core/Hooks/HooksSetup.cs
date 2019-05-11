@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -20,11 +19,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
    internal static class HooksSetup
    {
-      private static HarmonyInstance _harmony;
+      private static object _harmony;
 
       static HooksSetup()
       {
-         _harmony = HarmonyInstance.Create( "gravydevsupreme.xunity.autotranslator" );
+         if( ClrTypes.HarmonyInstance != null )
+         {
+            _harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
+               .Invoke( null, new object[] { PluginData.Identifier } );
+         }
+         else if( ClrTypes.Harmony != null )
+         {
+            _harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
+               .Invoke( new object[] { PluginData.Identifier } );
+         }
       }
 
       public static void InstallOverrideTextHooks()

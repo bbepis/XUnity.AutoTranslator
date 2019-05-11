@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
+using XUnity.AutoTranslator.Plugin.Core.Hooks;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -44,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _hasCheckedTypeWriter = true;
 
-            if( Constants.ClrTypes.Typewriter != null )
+            if( ClrTypes.Typewriter != null )
             {
                var ui = graphic as Component;
                if( ui != null )
@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( _typewriter != null )
          {
-            AccessTools.Method( Constants.ClrTypes.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
+            AccessToolsShim.Method( ClrTypes.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
          }
       }
 

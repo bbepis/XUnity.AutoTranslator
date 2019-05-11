@@ -1,6 +1,6 @@
-﻿using Harmony;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Hooks;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -62,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             // lets attempt some reflection for several known types
             var type = ui.GetType();
 
-            AccessTools.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
+            AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
          }
       }
    }

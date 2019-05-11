@@ -1,4 +1,9 @@
-﻿### 3.4.0
+﻿### 3.5.0
+ * FEATURE - Harmony 2.0-prerelease support (in order to support BepInEx 5.0.0-RC1)
+ * BUG FIX - Fixed a bug where the plugin would sometimes dump textures if 'DetectDuplicateTextureNames' was turned on, even though 'EnableTextureDumping' was turned off
+ * BUG FIX - Correct whitespace handling of source languages requiring whitelines between words
+
+### 3.4.0
  * FEATURE - Added capability of plugin to detect textures that shares the same resource name and identify these resources in an alternative way
  * BUG FIX - Fixed an issue with TextMeshPro that could cause text to glitch in certain situations
 

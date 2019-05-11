@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.RuntimeHooker.Core;
 using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
@@ -34,15 +34,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    }
 
 
-   //[Harmony, HarmonyPriority( Priority.Last )]
+   //[HarmonyPriority( HookPriority.Last )]
    //internal static class GUIContent_text_Hook
    //{
-   //   static bool Prepare( HarmonyInstance instance )
+   //   static bool Prepare( object instance )
    //   {
    //      return ClrTypes.GUIContent != null;
    //   }
 
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   static MethodBase TargetMethod( object instance )
    //   {
    //      return AccessTools.Property( ClrTypes.GUIContent, "text" )?.GetSetMethod();
    //   }
@@ -56,15 +56,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    //   }
    //}
 
-   //[Harmony, HarmonyPriority( Priority.Last )]
+   //[HarmonyPriority( HookPriority.Last )]
    //internal static class GUIContent_Temp_Hook1
    //{
-   //   static bool Prepare( HarmonyInstance instance )
+   //   static bool Prepare( object instance )
    //   {
    //      return ClrTypes.GUIContent != null;
    //   }
 
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   static MethodBase TargetMethod( object instance )
    //   {
    //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ) } );
    //   }
@@ -78,15 +78,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    //   }
    //}
 
-   //[Harmony, HarmonyPriority( Priority.Last )]
+   //[HarmonyPriority( HookPriority.Last )]
    //internal static class GUIContent_Temp_Hook2
    //{
-   //   static bool Prepare( HarmonyInstance instance )
+   //   static bool Prepare( object instance )
    //   {
    //      return ClrTypes.GUIContent != null;
    //   }
 
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   static MethodBase TargetMethod( object instance )
    //   {
    //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ), typeof( string ) } );
    //   }
@@ -100,15 +100,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    //   }
    //}
 
-   //[Harmony, HarmonyPriority( Priority.Last )]
+   //[HarmonyPriority( HookPriority.Last )]
    //internal static class GUIContent_Temp_Hook3
    //{
-   //   static bool Prepare( HarmonyInstance instance )
+   //   static bool Prepare( object instance )
    //   {
    //      return ClrTypes.GUIContent != null;
    //   }
 
-   //   static MethodBase TargetMethod( HarmonyInstance instance )
+   //   static MethodBase TargetMethod( object instance )
    //   {
    //      return AccessTools.Method( ClrTypes.GUIContent, "Temp", new[] { typeof( string ), typeof( Texture ) } );
    //   }
@@ -133,17 +133,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
 
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_BeginGroup_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -155,17 +155,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_Box_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -178,17 +178,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoRepeatButton_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -200,17 +200,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoLabel_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -222,17 +222,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoButton_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -244,17 +244,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoModalWindow_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -266,17 +266,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoWindow_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
       }
 
       static void Prefix( GUIContent title )
@@ -288,17 +288,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoButtonGrid_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent[] contents )
@@ -313,17 +313,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoTextField_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoTextField", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( bool ), typeof( int ), typeof( GUIStyle ), typeof( string ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoTextField", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( bool ), typeof( int ), typeof( GUIStyle ), typeof( string ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -335,17 +335,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [Harmony, HarmonyPriority( Priority.Last )]
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class GUI_DoToggle_Hook
    {
-      static bool Prepare( HarmonyInstance instance )
+      static bool Prepare( object instance )
       {
          return Constants.ClrTypes.GUI != null;
       }
 
-      static MethodBase TargetMethod( HarmonyInstance instance )
+      static MethodBase TargetMethod( object instance )
       {
-         return AccessTools.Method( Constants.ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )

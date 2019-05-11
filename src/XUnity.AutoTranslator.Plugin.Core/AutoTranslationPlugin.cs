@@ -24,7 +24,6 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
-using Harmony;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using System.Diagnostics;
 using XUnity.AutoTranslator.Plugin.Core.UI;
@@ -90,6 +89,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          // Setup 'singleton'
          Current = this;
+
+         // because we only use harmony through reflection due to
+         // version compatibility issues, we call this method to
+         // ensure that harmony is loaded before we attempt to obtain
+         // various harmony classes through reflection
+         HarmonyLoader.Load();
 
          // Setup logger, if it was not already initialized by a plugin-version
          if( XuaLogger.Current == null )

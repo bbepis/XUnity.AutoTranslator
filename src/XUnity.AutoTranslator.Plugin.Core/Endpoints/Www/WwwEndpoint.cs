@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using Harmony;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
@@ -113,11 +113,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          yield return www;
 
          // extract error
-         string error = (string)AccessTools.Property( ClrTypes.WWW, "error" ).GetValue( www, null );
+         string error = (string)AccessToolsShim.Property( ClrTypes.WWW, "error" ).GetValue( www, null );
          if( error != null ) wwwContext.Fail( "Error occurred while retrieving translation. " + error );
 
          // extract text
-         var text = (string)AccessTools.Property( ClrTypes.WWW, "text" ).GetValue( www, null );
+         var text = (string)AccessToolsShim.Property( ClrTypes.WWW, "text" ).GetValue( www, null );
          if( text == null ) wwwContext.Fail( "Error occurred while extracting text from response." ); 
 
          wwwContext.ResponseData = text;

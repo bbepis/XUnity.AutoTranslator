@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Tests
@@ -19,12 +20,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\r\r\r\n \n　Hello  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
       public void Can_Trim_Surrounding_Whitespace( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
+         Settings.UsesWhitespaceBetweenWords = false;
+
          var untranslatedText = new UntranslatedText( input, false, false );
 
          Assert.Equal( input, untranslatedText.TranslatableText );
          Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
          Assert.Equal( expectedTrailingWhitespace, untranslatedText.TrailingWhitespace );
+      }
+
+      [Theory( DisplayName = "Can_Trim_Internal_Whitespace_English" )]
+      [InlineData( "What are you doing?", "What are you doing?" )]
+      [InlineData( "What are\nyou doing?", "What are you doing?" )]
+      [InlineData( "What are\n\nyou doing?", "What are\n\nyou doing?" )]
+      [InlineData( "What are\n\n \n\nyou doing?", "What are\n\n\n\nyou doing?" )]
+      [InlineData( "What are\n\n  \n\nyou doing?", "What are\n\n  \n\nyou doing?" )]
+      [InlineData( "What are\n  \nyou doing?", "What are  you doing?" )]
+      public void Can_Trim_Internal_Whitespace_English( string input, string expectedTrimmedText )
+      {
+         Settings.UsesWhitespaceBetweenWords = true;
+
+         var untranslatedText = new UntranslatedText( input, false, true );
+
+         Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
       }
 
       [Theory( DisplayName = "Can_Trim_Internal_Whitespace" )]
@@ -35,6 +54,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "Hello\n\nWhat\nYou", "Hello\n\nWhatYou" )]
       public void Can_Trim_Internal_Whitespace( string input, string expectedTrimmedText )
       {
+         Settings.UsesWhitespaceBetweenWords = false;
+
          var untranslatedText = new UntranslatedText( input, false, true );
          
          Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
@@ -53,6 +74,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\r\r\r\n \n　Hell\no  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
+         Settings.UsesWhitespaceBetweenWords = false;
+
          var untranslatedText = new UntranslatedText( input, false, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
@@ -69,6 +92,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\n \r\nFPS:\n  \n 60.53", "FPS:  {{A}}", "\r\n \r\n", null )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace_And_Template( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
+         Settings.UsesWhitespaceBetweenWords = false;
+
          var untranslatedText = new UntranslatedText( input, true, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TrimmedTranslatableText );
