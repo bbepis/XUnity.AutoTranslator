@@ -21,6 +21,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                text = TemplatedText.Template;
             }
          }
+         //else
+         //{
+         //   TemplatedText = text.TemplatizeByReplacements();
+         //   if( TemplatedText != null )
+         //   {
+         //      text = TemplatedText.Template;
+         //   }
+         //}
 
          int i = 0;
          int firstNonWhitespace = 0;

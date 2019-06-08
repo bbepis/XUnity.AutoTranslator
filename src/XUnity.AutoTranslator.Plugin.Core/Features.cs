@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -10,6 +11,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class Features
    {
+      internal static bool SupportsMouseScrollDelta { get; } = false;
+
       internal static bool SupportsClipboard { get; } = false;
 
       /// <summary>
@@ -59,6 +62,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             SupportsNet4x = ClrTypes.Task != null;
+         }
+         catch( Exception )
+         {
+
+         }
+
+         try
+         {
+            SupportsMouseScrollDelta = typeof( Input ).GetProperty( "mouseScrollDelta" ) != null;
          }
          catch( Exception )
          {

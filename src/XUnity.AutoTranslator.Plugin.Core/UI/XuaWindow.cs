@@ -36,13 +36,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          _windowRect = GUI.Window( WindowId, _windowRect, CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
 
-         if( GUIUtil.IsAnyMouseButtonOrScrollWheelDown )
+         if( GUIUtil.IsAnyMouseButtonOrScrollWheelDownSafe )
          {
             var point = new Vector2( Input.mousePosition.x, Screen.height - Input.mousePosition.y );
             _isMouseDownOnWindow = _windowRect.Contains( point );
          }
 
-         if( !_isMouseDownOnWindow || !GUIUtil.IsAnyMouseButtonOrScrollWheel )
+         if( !_isMouseDownOnWindow || !GUIUtil.IsAnyMouseButtonOrScrollWheelSafe )
             return;
 
          // make sure window is focused if scroll wheel is used to indicate we consumed that event

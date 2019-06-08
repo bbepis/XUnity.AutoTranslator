@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
+using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.RuntimeHooker.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextureComponentExtensions
    {
+      private static readonly string SetAllDirtyMethodName = "SetAllDirty";
       private static readonly string TexturePropertyName = "texture";
       private static readonly string MainTexturePropertyName = "mainTexture";
       private static readonly string CapitalMainTexturePropertyName = "MainTexture";
@@ -25,15 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return null;
 
-         if( ui is Image image )
-         {
-            return image.mainTexture as Texture2D;
-         }
-         else if( ui is RawImage rawImage )
-         {
-            return rawImage.mainTexture as Texture2D;
-         }
-         else if( ui is SpriteRenderer spriteRenderer )
+         if( ui is SpriteRenderer spriteRenderer )
          {
             return spriteRenderer.sprite?.texture;
          }
@@ -41,9 +35,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             // lets attempt some reflection for several known types
             var type = ui.GetType();
-            var texture = type.GetProperty( MainTexturePropertyName )?.GetValue( ui, null )
-               ?? type.GetProperty( TexturePropertyName )?.GetValue( ui, null )
-               ?? type.GetProperty( CapitalMainTexturePropertyName )?.GetValue( ui, null );
+            var texture = type.CachedProperty( MainTexturePropertyName )?.Get( ui )
+               ?? type.CachedProperty( TexturePropertyName )?.Get( ui )
+               ?? type.CachedProperty( CapitalMainTexturePropertyName )?.Get( ui );
 
             return texture as Texture2D;
          }
@@ -53,15 +47,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return;
 
-         if( ui is Graphic graphic )
+         var type = ui.GetType();
+
+         if( ClrTypes.Graphic != null && ClrTypes.Graphic.IsAssignableFrom( type ) )
          {
-            graphic.SetAllDirty();
+            ClrTypes.Graphic.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
          else
          {
-            // lets attempt some reflection for several known types
-            var type = ui.GetType();
-
             AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
          }
       }

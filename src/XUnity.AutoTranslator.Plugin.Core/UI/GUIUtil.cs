@@ -94,6 +94,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          return WindowBackgroundStyle;
       }
 
+      public static bool IsAnyMouseButtonOrScrollWheelDownSafe
+      {
+         get
+         {
+            return Features.SupportsMouseScrollDelta
+               ? IsAnyMouseButtonOrScrollWheelDown
+               : IsAnyMouseButtonOrScrollWheelDownLegacy;
+         }
+      }
+
+      public static bool IsAnyMouseButtonOrScrollWheelDownLegacy
+      {
+         get
+         {
+            return Input.GetMouseButtonDown( 0 )
+               || Input.GetMouseButtonDown( 1 )
+               || Input.GetMouseButtonDown( 2 );
+         }
+      }
+
       public static bool IsAnyMouseButtonOrScrollWheelDown
       {
          get
@@ -102,6 +122,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                || Input.GetMouseButtonDown( 0 )
                || Input.GetMouseButtonDown( 1 )
                || Input.GetMouseButtonDown( 2 );
+         }
+      }
+
+      public static bool IsAnyMouseButtonOrScrollWheelSafe
+      {
+         get
+         {
+            return Features.SupportsMouseScrollDelta
+               ? IsAnyMouseButtonOrScrollWheel
+               : IsAnyMouseButtonOrScrollWheelLegacy;
+         }
+      }
+
+      public static bool IsAnyMouseButtonOrScrollWheelLegacy
+      {
+         get
+         {
+            return Input.GetMouseButton( 0 )
+               || Input.GetMouseButton( 1 )
+               || Input.GetMouseButton( 2 );
          }
       }
 

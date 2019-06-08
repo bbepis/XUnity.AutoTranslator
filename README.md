@@ -173,6 +173,7 @@ The supported translators are:
  * LecPowerTranslator15, based on LEC's Power Translator. Does not require authentication, but does require the software installed.
    * No limitations.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
+   * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:
      * Endpoint=CustomTranslate
      * [Custom]

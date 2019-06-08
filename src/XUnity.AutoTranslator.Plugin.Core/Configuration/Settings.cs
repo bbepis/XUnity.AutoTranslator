@@ -102,6 +102,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static HashSet<string> DuplicateTextureNames;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
+      public static Dictionary<string, string> Replacements;
+
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
 

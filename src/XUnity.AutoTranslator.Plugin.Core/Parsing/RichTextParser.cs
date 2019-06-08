@@ -86,7 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
                if( !string.IsNullOrEmpty( text ) )
                {
-                  var argument = "{{" + ( arg++ ) + "}}";
+                  var argument = "[[" + ( arg++ ) + "]]";
                   args.Add( argument, text );
                   template.Append( argument );
                }
@@ -105,7 +105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          // catch any remaining text
          if( offset < input.Length )
          {
-            var argument = "{{" + ( arg++ ) + "}}";
+            var argument = "[[" + ( arg++ ) + "]]";
             var text = input.Substring( offset, input.Length - offset );
             args.Add( argument, text );
             template.Append( argument );
@@ -114,20 +114,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
          var templateString = template.ToString();
          int idx = -1;
-         while( ( idx = templateString.IndexOf( "}}{{" ) ) != -1 )
+         while( ( idx = templateString.IndexOf( "]][[" ) ) != -1 )
          {
             var arg1 = templateString[ idx - 1 ];
             var arg2 = templateString[ idx + 4 ];
 
-            var key1 = "{{" + arg1 + "}}";
-            var key2 = "{{" + arg2 + "}}";
+            var key1 = "[[" + arg1 + "]]";
+            var key2 = "[[" + arg2 + "]]";
 
             var text1 = args[ key1 ];
             var text2 = args[ key2 ];
 
             var fullText = text1 + text2;
             var fullKey = key1 + key2;
-            var newKey = "{{" + ( arg1 ) + "}}";
+            var newKey = "[[" + ( arg1 ) + "]]";
 
             args.Remove( key1 );
             args.Remove( key2 );

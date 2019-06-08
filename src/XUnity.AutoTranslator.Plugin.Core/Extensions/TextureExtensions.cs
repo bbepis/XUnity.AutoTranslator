@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 
@@ -25,7 +23,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          var type = ui.GetType();
 
-         return ( ui is Material || ui is UnityEngine.UI.Image || ui is RawImage || ui is SpriteRenderer )
+         return ( ui is Material || ui is SpriteRenderer )
+            || ( ClrTypes.Image != null && ClrTypes.Image.IsAssignableFrom( type ) )
+            || ( ClrTypes.RawImage != null && ClrTypes.RawImage.IsAssignableFrom( type ) )
             || ( ClrTypes.CubismRenderer != null && ClrTypes.CubismRenderer.IsAssignableFrom( type ) )
             || ( ClrTypes.UIWidget != null && type != ClrTypes.UILabel && ClrTypes.UIWidget.IsAssignableFrom( type ) )
             || ( ClrTypes.UIAtlas != null && ClrTypes.UIAtlas.IsAssignableFrom( type ) )

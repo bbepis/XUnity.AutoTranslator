@@ -1,4 +1,7 @@
-﻿### 3.5.0
+﻿### 3.6.0
+ * MISC - Removed hard dependency on UnityEngine.UI to support older versions of UnityEngine
+
+### 3.5.0
  * FEATURE - Harmony 2.0-prerelease support (in order to support BepInEx 5.0.0-RC1)
  * BUG FIX - Fixed a bug where the plugin would sometimes dump textures if 'DetectDuplicateTextureNames' was turned on, even though 'EnableTextureDumping' was turned off
  * BUG FIX - Correct whitespace handling of source languages requiring whitelines between words

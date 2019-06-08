@@ -45,7 +45,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                   }
                   else
                   {
-                     var key = "{{" + ( arg++ ) + "}}";
+                     var key = "[[" + ( arg++ ) + "]]";
                      template.Append( key ).Append( '\n' );
                      args.Add( key, line );
                      reverseArgs[ line ] = key;

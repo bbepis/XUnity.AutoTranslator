@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.RuntimeHooker.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -49,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var ui = graphic as Component;
                if( ui != null )
                {
-                  _typewriter = (MonoBehaviour)ui.GetComponent( Constants.ClrTypes.Typewriter );
+                  _typewriter = (MonoBehaviour)ui.GetComponent( ClrTypes.Typewriter );
                }
             }
          }
@@ -60,23 +60,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void ChangeFont( object graphic )
+      public void ChangeFont( object ui )
       {
-         if( graphic == null ) return;
+         if( ui == null ) return;
 
-         if( graphic is Text )
+         var type = ui.GetType();
+
+         if( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
          {
-            var ui = graphic as Text;
+            var fontProperty = ClrTypes.Text.CachedProperty( "font" );
+            var fontSizeProperty = ClrTypes.Text.CachedProperty( "fontSize" );
 
-            var previousFont = ui.font;
-            var newFont = FontCache.GetOrCreate( previousFont?.fontSize ?? ui.fontSize );
+            var previousFont = (Font)fontProperty.Get( ui );
+            var newFont = FontCache.GetOrCreate( previousFont?.fontSize ?? (int)fontSizeProperty.Get( ui ) );
 
             if( !ReferenceEquals( newFont, previousFont ) )
             {
-               ui.font = newFont;
+               fontProperty.Set( ui, newFont );
                _unfont = obj =>
                {
-                  ( (Text)obj ).font = previousFont;
+                  fontProperty.Set( obj, previousFont );
                };
             }
          }
@@ -90,48 +93,60 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _unfont = null;
       }
 
-      public void ResizeUI( object graphic )
+      public static float GetComponentWidth( Component component )
+      {
+         // this is in it's own function because if "Text" does not exist, RectTransform likely wont exist either
+         return ( (RectTransform)component.transform ).rect.width;
+      }
+
+      public void ResizeUI( object ui )
       {
          // do not resize if there is no object of ir it is already resized
-         if( graphic == null ) return;
+         if( ui == null ) return;
 
-         if( graphic is Text )
+         var type = ui.GetType();
+
+         if( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
          {
-            var ui = (Text)graphic;
+            var text = (Component)ui;
 
             // text is likely to be longer than there is space for, simply expand out anyway then
-            var componentWidth = ( (RectTransform)ui.transform ).rect.width;
+            var componentWidth = GetComponentWidth( text );
             var quarterScreenSize = Screen.width / 4;
             var isComponentWide = componentWidth > quarterScreenSize;
+
+            var horizontalOverflowProperty = ClrTypes.Text.CachedProperty( "horizontalOverflow" );
+            var verticalOverflowProperty = ClrTypes.Text.CachedProperty( "verticalOverflow" );
+            var lineSpacingProperty = ClrTypes.Text.CachedProperty( "lineSpacing" );
+            var resizeTextForBestFitProperty = ClrTypes.Text.CachedProperty( "resizeTextForBestFit" );
 
             // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
             // the idea is, if the UI element is larger than the width of half the screen, there is a larger
             // likelihood that it will go into multiple lines too.
-            var originalHorizontalOverflow = ui.horizontalOverflow;
-            var originalVerticalOverflow = ui.verticalOverflow;
-            var originalLineSpacing = ui.lineSpacing;
+            var originalHorizontalOverflow = horizontalOverflowProperty.Get( text );
+            var originalVerticalOverflow = verticalOverflowProperty.Get( text );
+            var originalLineSpacing = lineSpacingProperty.Get( text );
 
-            if( isComponentWide && !ui.resizeTextForBestFit )
+            if( isComponentWide && !(bool)resizeTextForBestFitProperty.Get( text ) )
             {
-               ui.horizontalOverflow = HorizontalWrapMode.Wrap;
-               ui.verticalOverflow = VerticalWrapMode.Overflow;
+               horizontalOverflowProperty.Set( text, 0 /* HorizontalWrapMode.Wrap */ );
+               verticalOverflowProperty.Set( text, 1 /* VerticalWrapMode.Overflow */ );
                if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalLineSpacing ) )
                {
-                  var alteredSpacing = originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
+                  var alteredSpacing = (float)originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
                   _alteredSpacing = alteredSpacing;
-                  ui.lineSpacing = alteredSpacing;
+                  lineSpacingProperty.Set( text, alteredSpacing );
                }
 
                if( _unresize == null )
                {
                   _unresize = g =>
                   {
-                     var gui = (Text)g;
-                     gui.horizontalOverflow = originalHorizontalOverflow;
-                     gui.verticalOverflow = originalVerticalOverflow;
+                     horizontalOverflowProperty.Set( g, originalHorizontalOverflow );
+                     verticalOverflowProperty.Set( g, originalVerticalOverflow );
                      if( Settings.ResizeUILineSpacingScale.HasValue )
                      {
-                        gui.lineSpacing = originalLineSpacing;
+                        lineSpacingProperty.Set( g, originalLineSpacing );
                      }
                   };
                }
@@ -139,17 +154,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else
          {
-            var type = graphic.GetType();
-
             // special handling for NGUI to better handle textbox sizing
             if( type == ClrTypes.UILabel )
             {
-               var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( graphic, null );
-               var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( graphic, null );
+               var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( ui, null );
+               var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( ui, null );
                //var originalSpacingY = graphic.GetSpacingY();
 
-               type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { true } );
-               type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( graphic, new object[] { 0 } );
+               type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( ui, new object[] { true } );
+               type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( ui, new object[] { 0 } );
                //if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalSpacingY ) )
                //{
                //   var alteredSpacing = originalSpacingY.Multiply( Settings.ResizeUILineSpacingScale.Value );
@@ -173,14 +186,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else if( type == ClrTypes.TextMeshPro || type == ClrTypes.TextMeshProUGUI )
             {
-               var originalOverflowMode = ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName )?.GetValue( graphic, null );
+               var originalOverflowMode = ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName )?.GetValue( ui, null );
 
                // ellipsis (1) works
                // masking (2) has a tendency to break in some versions of TMP
                // truncate (3) works
                if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
                {
-                  ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( graphic, 3, null );
+                  ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( ui, 3, null );
 
                   _unresize = g =>
                   {
@@ -195,7 +208,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void UnresizeUI( object graphic )
       {
          if( graphic == null ) return;
-         
+
          _unresize?.Invoke( graphic );
          _unresize = null;
       }

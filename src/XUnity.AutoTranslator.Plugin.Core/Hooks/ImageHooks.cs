@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
@@ -169,12 +168,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( typeof( MaskableGraphic ), "OnEnable" );
+         return AccessToolsShim.Method( ClrTypes.MaskableGraphic, "OnEnable" );
       }
 
       public static void Postfix( object __instance )
       {
-         if( __instance is Image || __instance is RawImage )
+         var type = __instance.GetType();
+         if( ( ClrTypes.Image != null && ClrTypes.Image.IsAssignableFrom( type ) )
+            || ( ClrTypes.RawImage != null && ClrTypes.RawImage.IsAssignableFrom( type ) ) )
          {
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
          }
@@ -190,7 +191,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( typeof( Image ), "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.Image, "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -208,7 +209,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( typeof( Image ), "overrideSprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.Image, "overrideSprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -226,7 +227,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( typeof( Image ), "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.Image, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -244,7 +245,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( typeof( RawImage ), "texture" )?.GetSetMethod();
+         return AccessToolsShim.Property( ClrTypes.RawImage, "texture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, Texture value )

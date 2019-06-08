@@ -10,10 +10,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using ExIni;
 using UnityEngine;
-using UnityEngine.UI;
 using System.Globalization;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using UnityEngine.EventSystems;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
@@ -236,21 +234,33 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          // check if font is supported
-         if( !string.IsNullOrEmpty( Settings.OverrideFont ) )
+         try
          {
-            var available = Font.GetOSInstalledFontNames();
-            if( !available.Contains( Settings.OverrideFont ) )
+            if( !string.IsNullOrEmpty( Settings.OverrideFont ) )
             {
-               XuaLogger.Current.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
-               Settings.OverrideFont = null;
-            }
-            else
-            {
-               _hasValidOverrideFont = true;
-            }
+               var available = GetSupportedFonts();
+               if( !available.Contains( Settings.OverrideFont ) )
+               {
+                  XuaLogger.Current.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
+                  Settings.OverrideFont = null;
+               }
+               else
+               {
+                  _hasValidOverrideFont = true;
+               }
 
-            _hasOverridenFont = _hasValidOverrideFont;
+               _hasOverridenFont = _hasValidOverrideFont;
+            }
          }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while checking supported fonts." );
+         }
+      }
+
+      internal static string[] GetSupportedFonts()
+      {
+         return Font.GetOSInstalledFontNames();
       }
 
       private void OnEndpointSelected( TranslationEndpointManager endpoint )
@@ -669,7 +679,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !ignoreComponentState )
             {
                var behaviour = component as Behaviour;
-               if( behaviour?.isActiveAndEnabled == false )
+               if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
                {
                   return false;
                }

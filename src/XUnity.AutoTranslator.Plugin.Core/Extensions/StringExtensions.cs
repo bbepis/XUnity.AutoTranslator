@@ -77,6 +77,42 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return builder.ToString();
       }
 
+      public static TemplatedString TemplatizeByReplacements( this string str )
+      {
+         if( Settings.Replacements == null || Settings.Replacements.Count == 0 ) return null;
+
+         var dict = new Dictionary<string, string>();
+         char arg = 'A';
+
+         foreach( var kvp in Settings.Replacements )
+         {
+            var original = kvp.Key;
+            var replacement = kvp.Value;
+
+            string key = null;
+            int idx = -1;
+            while( ( idx = str.IndexOf( original ) ) != -1 )
+            {
+               if( key == null )
+               {
+                  key = "{{" + arg++ + "}}";
+                  dict.Add( key, replacement );
+               }
+
+               str = str.Remove( idx, original.Length ).Insert( idx, key );
+            }
+         }
+
+         if( dict.Count > 0 )
+         {
+            return new TemplatedString( str, dict );
+         }
+         else
+         {
+            return null;
+         }
+      }
+
       public static TemplatedString TemplatizeByNumbers( this string str )
       {
          var dict = new Dictionary<string, string>();

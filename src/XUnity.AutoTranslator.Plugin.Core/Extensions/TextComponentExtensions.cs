@@ -6,23 +6,24 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.RuntimeHooker.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextComponentExtensions
    {
+      private static readonly string SupportRichTextPropertyName = "supportRichText";
+      private static readonly string RichTextPropertyName = "richText";
+      private static readonly string TextPropertyName = "text";
+
       //private static readonly GUIContent[] TemporaryGUIContents = ClrTypes.GUIContent
       //   .GetFields( BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic )
       //   .Where( x => x.DeclaringType == typeof( GUIContent ) && ( x.Name == "s_Text" || x.Name == "s_TextImage" ) )
       //   .Select( x => (GUIContent)x.GetValue( null ) )
       //   .ToArray();
-
-      private static readonly string RichTextPropertyName = "richText";
-      private static readonly string TextPropertyName = "text";
 
       public static bool IsKnownTextType( this object ui )
       {
@@ -30,8 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetType();
 
-         return ( Settings.EnableUGUI && ui is Text )
-            || ( Settings.EnableIMGUI && ui is GUIContent )
+         return ( Settings.EnableIMGUI && ui is GUIContent )
+            || ( Settings.EnableUGUI && ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
             || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
@@ -43,8 +44,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetType();
 
-         return ( ui as Text )?.supportRichText == true
-            || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.GetProperty( RichTextPropertyName )?.GetValue( ui, null ), true ) )
+         return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
             || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
       }
@@ -71,7 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetType();
 
-         return ui is Text
+         return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
             || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) );
       }
@@ -113,18 +114,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          string text = null;
          var type = ui.GetType();
 
-         if( ui is Text )
-         {
-            text = ( (Text)ui ).text;
-         }
-         else if( ui is GUIContent )
+         if( ui is GUIContent )
          {
             text = ( (GUIContent)ui ).text;
          }
          else
          {
             // fallback to reflective approach
-            text = (string)ui.GetType()?.GetProperty( TextPropertyName )?.GetValue( ui, null );
+            text = (string)type.CachedProperty( TextPropertyName )?.Get( ui );
          }
 
          return text ?? string.Empty;
@@ -147,10 +144,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                if( Equals( uguiNovelText, ui ) )
                {
                   string previousNameText = null;
-                  var nameText = (Text)uguiMessageWindow.GetType().GetField( "nameText", flags ).GetValue( uguiMessageWindow );
+                  var nameText = (UnityEngine.Object)uguiMessageWindow.GetType().GetField( "nameText", flags ).GetValue( uguiMessageWindow );
                   if( nameText )
                   {
-                     previousNameText = nameText.text;
+                     previousNameText = (string)ClrTypes.Text.CachedProperty( TextPropertyName ).Get( nameText );
                   }
 
                   var engine = uguiMessageWindow.GetType().GetProperty( "Engine", flags ).GetValue( uguiMessageWindow, null );
@@ -199,7 +196,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
                   if( nameText )
                   {
-                     nameText.text = previousNameText;
+                     ClrTypes.Text.CachedProperty( TextPropertyName ).Set( nameText, previousNameText );
                   }
 
                   return;
@@ -207,18 +204,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             }
          }
 
-         if( ui is Text )
-         {
-            ( (Text)ui ).text = text;
-         }
-         else if( ui is GUIContent )
+         if( ui is GUIContent )
          {
             ( (GUIContent)ui ).text = text;
          }
          else
          {
             // fallback to reflective approach
-            type.GetProperty( TextPropertyName )?.GetSetMethod()?.Invoke( ui, new[] { text } );
+            type.CachedProperty( TextPropertyName )?.Set( ui, text );
          }
       }
    }
