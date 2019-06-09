@@ -44,7 +44,7 @@ namespace Lec.ExtProtocol
                      if( message == null ) return;
 
                      var translatedTexts = new string[ message.UntranslatedTexts.Length ];
-                     for( int i = 0 ; i < message.UntranslatedTexts.Length ; i++ )
+                     for( int i = 0; i < message.UntranslatedTexts.Length; i++ )
                      {
                         var untranslatedText = message.UntranslatedTexts[ i ];
                         var translatedText = translator.Translate( untranslatedText );

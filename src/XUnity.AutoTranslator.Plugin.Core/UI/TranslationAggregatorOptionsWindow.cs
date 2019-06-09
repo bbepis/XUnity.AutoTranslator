@@ -90,12 +90,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          GUILayout.BeginHorizontal();
          GUILayout.Label( "Height" );
-         _viewModel.Height = GUILayout.HorizontalSlider( _viewModel.Height, 50, 300, GUILayout.MaxWidth( 250 ) );
+         _viewModel.Height = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Height, 50, 300, GUILayout.MaxWidth( 250 ) ) );
          GUILayout.EndHorizontal();
 
          GUILayout.BeginHorizontal();
          GUILayout.Label( "Width" );
-         _viewModel.Width = GUILayout.HorizontalSlider( _viewModel.Width, 200, 1000, GUILayout.MaxWidth( 250 ) );
+         _viewModel.Width = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Width, 200, 1000, GUILayout.MaxWidth( 250 ) ) );
          GUILayout.EndHorizontal();
 
          GUI.DragWindow();

@@ -30,6 +30,15 @@
       T GetOrCreateSetting<T>( string section, string key );
 
       /// <summary>
+      /// Sets the specified setting.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="section"></param>
+      /// <param name="key"></param>
+      /// <param name="value"></param>
+      void SetSetting<T>( string section, string key, T value );
+
+      /// <summary>
       /// Disables the certificate check for the specified hostnames.
       /// </summary>
       /// <param name="hosts"></param>

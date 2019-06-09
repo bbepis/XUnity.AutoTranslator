@@ -52,6 +52,7 @@ namespace XUnity.AutoTranslator.Setup
          AddFile( Path.Combine( translatorsPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
          AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.WatsonTranslate, true );
          AddFile( Path.Combine( translatorsPath, "YandexTranslate.dll" ), Resources.YandexTranslate, true );
+         AddFile( Path.Combine( translatorsPath, "PapagoTranslate.dll" ), Resources.PapagoTranslate, true );
 
          foreach( var launcher in launchers )
          {

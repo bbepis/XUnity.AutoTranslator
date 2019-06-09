@@ -49,5 +49,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       {
          return PluginEnvironment.Current.Preferences.GetOrDefault( section, key, default( T ) );
       }
+
+      public void SetSetting<T>( string section, string key, T value )
+      {
+         PluginEnvironment.Current.Preferences.Set( section, key, value );
+      }
    }
 }

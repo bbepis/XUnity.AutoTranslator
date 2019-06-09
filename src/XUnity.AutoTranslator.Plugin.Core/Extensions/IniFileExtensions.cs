@@ -8,6 +8,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class IniFileExtensions
    {
+      public static void Set<T>( this IniFile that, string section, string key, T value )
+      {
+         var typeOfT = typeof( T ).UnwrapNullable();
+         var iniSection = that[ section ];
+         var iniKey = iniSection[ key ];
+
+         if( value == null )
+         {
+            iniKey.Value = string.Empty;
+         }
+         else
+         {
+            if( typeOfT.IsEnum )
+            {
+               iniKey.Value = EnumHelper.GetNames( typeOfT, value );
+            }
+            else
+            {
+               iniKey.Value = Convert.ToString( value, CultureInfo.InvariantCulture );
+            }
+         }
+      }
+
       public static T GetOrDefault<T>( this IniFile that, string section, string key, T defaultValue )
       {
          var typeOfT = typeof( T ).UnwrapNullable();

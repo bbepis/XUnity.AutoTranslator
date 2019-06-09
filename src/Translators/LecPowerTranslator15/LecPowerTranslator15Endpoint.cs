@@ -21,7 +21,15 @@ namespace LecPowerTranslator15
 
       public override void Initialize( IInitializationContext context )
       {
-         var pathToLec = context.GetOrCreateSetting( "LecPowerTranslator15", "InstallationPath", "" );
+         var defaultPath = GetDefaultInstallationPath();
+         var pathToLec = context.GetOrCreateSetting( "LecPowerTranslator15", "InstallationPath", defaultPath );
+
+         if( string.IsNullOrEmpty( pathToLec ) && !string.IsNullOrEmpty( defaultPath ) )
+         {
+            context.SetSetting( "LecPowerTranslator15", "InstallationPath", defaultPath );
+            pathToLec = defaultPath;
+         }
+
          if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
 
          var exePath = Path.Combine( context.PluginDirectory, @"Translators\Lec.ExtProtocol.exe" );
@@ -34,6 +42,45 @@ namespace LecPowerTranslator15
 
          if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
          if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+      }
+
+      public static string GetDefaultInstallationPath()
+      {
+         try
+         {
+            var path = GetInstallationPathFromRegistry();
+
+            if( !string.IsNullOrEmpty( path ) )
+            {
+               var di = new DirectoryInfo( path );
+               path = di.Parent.FullName;
+            }
+
+            return path ?? string.Empty;
+         }
+         catch
+         {
+            return string.Empty;
+         }
+      }
+
+      public static string GetInstallationPathFromRegistry()
+      {
+         try
+         {
+            if( IntPtr.Size == 8 ) // 64-bit
+            {
+               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\LogoMedia\LEC Power Translator 15\Configuration", "ApplicationPath", null );
+            }
+            else // 32-bit
+            {
+               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_LOCAL_MACHINE\SOFTWARE\LogoMedia\LEC Power Translator 15\Configuration", "ApplicationPath", null );
+            }
+         }
+         catch
+         {
+            return null;
+         }
       }
    }
 }

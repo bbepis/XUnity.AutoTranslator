@@ -4,24 +4,29 @@ using System.Linq;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
    class TranslationAggregatorViewModel
    {
+      private DebounceFunction _saveHeightAndWidth;
       private LinkedList<AggregatedTranslationViewModel> _translations;
       private LinkedListNode<AggregatedTranslationViewModel> _current;
       private List<Translation> _translationsToAggregate = new List<Translation>();
       private HashSet<string> _textsToAggregate = new HashSet<string>();
       private float _lastUpdate = 0.0f;
+      private float _height;
+      private float _width;
 
       public TranslationAggregatorViewModel( TranslationManager translationManager )
       {
          _translations = new LinkedList<AggregatedTranslationViewModel>();
+         _saveHeightAndWidth = new DebounceFunction( 1, SaveHeightAndWidth );
 
          Manager = translationManager;
-         Height = 100; // TODO: Get from config
-         Width = 400; // TODO: Get from config
+         Height = Settings.Height;
+         Width = Settings.Width;
 
          AllTranslators = translationManager.AllEndpoints
             .Select( x => new TranslatorViewModel( x ) )
@@ -36,9 +41,31 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public bool IsShowingOptions { get; set; }
 
-      public float Height { get; set; }
+      public float Height
+      {
+         get { return _height; }
+         set
+         {
+            if( _height != value )
+            {
+               _height = value;
+               _saveHeightAndWidth.Execute();
+            }
+         }
+      }
 
-      public float Width { get; set; }
+      public float Width
+      {
+         get { return _width; }
+         set
+         {
+            if( _width != value )
+            {
+               _width = value;
+               _saveHeightAndWidth.Execute();
+            }
+         }
+      }
 
       public List<TranslatorViewModel> AvailableTranslators { get; }
 
@@ -47,6 +74,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public TranslationManager Manager { get; set; }
 
       public AggregatedTranslationViewModel Current => _current?.Value;
+
+      private void SaveHeightAndWidth()
+      {
+         Settings.SetTranslationAggregatorBounds( Width, Height );
+      }
 
       public void OnNewTranslationAdded( TextTranslationInfo info )
       {

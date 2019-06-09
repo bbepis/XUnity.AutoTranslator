@@ -213,6 +213,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] PapagoTranslate {
+            get {
+                object obj = ResourceManager.GetObject("PapagoTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] ReiPatcher {
             get {
                 object obj = ResourceManager.GetObject("ReiPatcher", resourceCulture);

@@ -1,5 +1,10 @@
 ﻿### 3.6.0
- * MISC - Removed hard dependency on UnityEngine.UI to support older versions of UnityEngine
+ * FEATURE - 'Translation Aggregator'-like view that enables viewing translations for displayed texts from multiple different translators (press ALT+1)
+ * FEATURE - Substitution support. Enable dictionary lookup for strings (usually proper nouns) embedded in text to replace them with a manual translation
+ * FEATURE - Papago translator support
+ * MISC - Removed hard dependency on UnityEngine.UI to support older versions of the Unity engine
+ * MISC - Automatically initialize LEC installation path if installed when creating configuration file
+ * BUG FIX - Fixed bug where LEC was not working when run in a .NET 4.x equivalent runtime
 
 ### 3.5.0
  * FEATURE - Harmony 2.0-prerelease support (in order to support BepInEx 5.0.0-RC1)

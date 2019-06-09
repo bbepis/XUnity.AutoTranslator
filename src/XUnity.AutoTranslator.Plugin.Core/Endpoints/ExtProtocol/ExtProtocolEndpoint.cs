@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -86,8 +87,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             if( _process == null )
             {
                _process = new Process();
-               _process.StartInfo.FileName = ExecutablePath;
+               _process.StartInfo.FileName = Path.Combine( Environment.CurrentDirectory, ExecutablePath );
                _process.StartInfo.Arguments = Arguments;
+               _process.StartInfo.WorkingDirectory = new FileInfo( ExecutablePath ).Directory.FullName;
                _process.EnableRaisingEvents = false;
                _process.StartInfo.UseShellExecute = false;
                _process.StartInfo.CreateNoWindow = true;

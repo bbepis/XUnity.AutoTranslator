@@ -21,14 +21,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
                text = TemplatedText.Template;
             }
          }
-         //else
-         //{
-         //   TemplatedText = text.TemplatizeByReplacements();
-         //   if( TemplatedText != null )
-         //   {
-         //      text = TemplatedText.Template;
-         //   }
-         //}
+         else
+         {
+            TemplatedText = text.TemplatizeByReplacements();
+            if( TemplatedText != null )
+            {
+               text = TemplatedText.Template;
+            }
+         }
+
+         TemplatedOriginalText = text;
 
          int i = 0;
          int firstNonWhitespace = 0;
@@ -204,6 +206,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string OriginalText { get; }
 
+      public string TemplatedOriginalText { get; }
+
       public TemplatedString TemplatedText { get; }
 
       public string Untemplate( string text )
@@ -216,11 +220,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return text;
       }
 
-      public string RepairTemplate( string text )
+      public string PrepareUntranslatedText( string text )
       {
          if( TemplatedText != null )
          {
-            return TemplatedText.RepairTemplate( text );
+            return TemplatedText.PrepareUntranslatedText( text );
+         }
+
+         return text;
+      }
+
+      public string FixTranslatedText( string text )
+      {
+         if( TemplatedText != null )
+         {
+            return TemplatedText.FixTranslatedText( text );
          }
 
          return text;

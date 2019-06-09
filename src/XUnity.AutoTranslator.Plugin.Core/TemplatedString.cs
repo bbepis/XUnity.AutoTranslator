@@ -23,70 +23,78 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return text;
       }
 
-      public string RepairTemplate( string translatedTemplate )
+      public string PrepareUntranslatedText( string untranslatedText )
       {
-         foreach( var argument in Arguments.Keys )
+         foreach( var kvp in Arguments )
          {
-            if( !translatedTemplate.Contains( argument ) )
+            var key = kvp.Key;
+            var translatorFriendlyKey = CreateTranslatorFriendlyKey( key );
+
+            untranslatedText = untranslatedText.Replace( key, translatorFriendlyKey );
+         }
+         return untranslatedText;
+      }
+
+      public string FixTranslatedText( string translatedText )
+      {
+         foreach( var kvp in Arguments )
+         {
+            var key = kvp.Key;
+            var translatorFriendlyKey = CreateTranslatorFriendlyKey( key );
+            translatedText = ReplaceApproximateMatches( translatedText, translatorFriendlyKey, key );
+         }
+         return translatedText;
+      }
+
+      public static string CreateTranslatorFriendlyKey( string key )
+      {
+         var c = key[ 2 ];
+         var translatorFriendlyKey = "ZM" + (char)( c + 2 ) + "Z";
+         return translatorFriendlyKey;
+      }
+
+      public static string ReplaceApproximateMatches( string translatedText, string translatorFriendlyKey, string key )
+      {
+         var cidx = 0;
+         var startIdx = 0;
+
+         for( int i = 0; i < translatedText.Length; i++ )
+         {
+            var c = translatedText[ i ];
+            if( c == ' ' || c == '　' ) continue;
+
+            if( c == translatorFriendlyKey[ cidx ] )
             {
-               var permutations = CreatePermutations( argument );
-               foreach( var permutation in permutations )
+               if( cidx == 0 )
                {
-                  if( translatedTemplate.Contains( permutation ) )
-                  {
-                     translatedTemplate = translatedTemplate.Replace( permutation, argument );
-                     break;
-                  }
+                  startIdx = i;
                }
+
+               cidx++;
+            }
+            else
+            {
+               cidx = 0;
+               startIdx = 0;
+            }
+
+            if( cidx == translatorFriendlyKey.Length )
+            {
+               int endIdx = i + 1;
+
+               var lengthOfKey = endIdx - startIdx;
+               var diff = lengthOfKey - key.Length;
+
+               translatedText = translatedText.Remove( startIdx, lengthOfKey ).Insert( startIdx, key );
+
+               i -= diff;
+
+               cidx = 0;
+               startIdx = 0;
             }
          }
 
-         return translatedTemplate;
-      }
-
-      public static string[] CreatePermutations( string argument )
-      {
-         var b0_1 = argument.Insert( 2, " " );   // {{ A}}
-         var b0_2 = argument.Insert( 3, " " );   // {{A }}
-
-         var b1 = argument.Substring( 1 ); // {A}}
-         var b1_1 = b1.Insert( 1, " " );   // { A}}
-         var b1_2 = b1.Insert( 2, " " );   // {A }}
-
-         var b2 = argument.Substring( 0, argument.Length - 1 ); // {{A}
-         var b2_1 = b2.Insert( 2, " " );   // {{ A}
-         var b2_2 = b2.Insert( 3, " " );   // {{A }
-
-         var b3 = argument.Substring( 1, argument.Length - 2 ); // {A}
-         var b3_1 = b3.Insert( 1, " " );   // { A}
-         var b3_2 = b3.Insert( 2, " " );   // {A }
-
-         return new string[]
-         {
-            b0_1,
-            b0_1,
-            b2,
-            b2_1,
-            b2_2,
-            b1,
-            b1_1,
-            b1_2,
-            b3,
-            b3_1,
-            b3_2,
-            b0_1.ToLower(),
-            b0_2.ToLower(),
-            argument.ToLower(),
-            b2.ToLower(),
-            b2_1.ToLower(),
-            b2_2.ToLower(),
-            b1.ToLower(),
-            b1_1.ToLower(),
-            b1_2.ToLower(),
-            b3.ToLower(),
-            b3_1.ToLower(),
-            b3_2.ToLower(),
-         };
+         return translatedText;
       }
    }
 }

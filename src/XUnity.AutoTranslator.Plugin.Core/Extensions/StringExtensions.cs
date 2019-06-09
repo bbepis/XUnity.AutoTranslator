@@ -79,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static TemplatedString TemplatizeByReplacements( this string str )
       {
-         if( Settings.Replacements == null || Settings.Replacements.Count == 0 ) return null;
+         if( Settings.Replacements.Count == 0 ) return null;
 
          var dict = new Dictionary<string, string>();
          char arg = 'A';
