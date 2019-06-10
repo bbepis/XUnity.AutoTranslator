@@ -4,6 +4,7 @@
  * FEATURE - Papago translator support
  * MISC - Removed hard dependency on UnityEngine.UI to support older versions of the Unity engine
  * MISC - Automatically initialize LEC installation path if installed when creating configuration file
+ * MISC - Automatically enable experimental hooks when installed in single mod scenario (ReiPatcher) and it is required by the runtime
  * BUG FIX - Fixed bug where LEC was not working when run in a .NET 4.x equivalent runtime
 
 ### 3.5.0

@@ -38,5 +38,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Saves the preferences file.
       /// </summary>
       void SaveConfig();
+
+      /// <summary>
+      /// Gets a bool indicating whether the plugin environment allows experimental hooks by default.
+      /// </summary>
+      bool AllowRuntimeHooksByDefault { get; }
    }
 }

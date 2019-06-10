@@ -41,6 +41,8 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
 
       public string TranslationPath { get; }
 
+      public bool AllowRuntimeHooksByDefault => false;
+
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )

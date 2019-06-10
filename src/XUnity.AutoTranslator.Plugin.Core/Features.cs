@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -14,6 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal static bool SupportsMouseScrollDelta { get; } = false;
 
       internal static bool SupportsClipboard { get; } = false;
+
+      internal static bool SupportsReflectionEmit { get; } = false;
 
       /// <summary>
       /// Gets a bool indicating if the class CustomYieldInstruction is available.
@@ -76,6 +79,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
 
          }
+
+         try
+         {
+            TestReflectionEmit();
+
+            SupportsReflectionEmit = true;
+         }
+         catch( Exception )
+         {
+            SupportsReflectionEmit = false;
+         }
+      }
+
+      private static void TestReflectionEmit()
+      {
+         MethodToken t1 = default( MethodToken );
+         MethodToken t2 = default( MethodToken );
+         var ok = t1 == t2;
       }
    }
 }

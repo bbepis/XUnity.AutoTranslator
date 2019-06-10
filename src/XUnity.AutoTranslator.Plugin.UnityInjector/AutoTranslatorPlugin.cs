@@ -20,6 +20,8 @@ namespace XUnity.AutoTranslator.Plugin.UnityInjector
 
       public string ConfigPath => DataPath;
 
+      public bool AllowRuntimeHooksByDefault => false;
+
       void IPluginEnvironment.SaveConfig()
       {
          SaveConfig();

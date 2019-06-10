@@ -38,6 +38,8 @@ namespace XUnity.AutoTranslator.Plugin.IPA
 
       public string ConfigPath => _dataPath;
 
+      public bool AllowRuntimeHooksByDefault => false;
+
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )
