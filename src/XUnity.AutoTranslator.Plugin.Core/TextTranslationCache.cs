@@ -268,8 +268,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal bool TryGetTranslation( UntranslatedText key, bool allowRegex, out string value )
       {
+         bool result;
+         if( key.IsTemplated && !key.IsFromSpammingComponent )
+         {
+            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
+            result = _translations.TryGetValue( templatedTranslatableText, out value );
+            if( result )
+            {
+               return result;
+            }
+
+            var templatedTrimmedTranslatableText = key.Untemplate( key.TrimmedTranslatableText );
+            if( templatedTrimmedTranslatableText != templatedTranslatableText )
+            {
+               result = _translations.TryGetValue( templatedTrimmedTranslatableText, out value );
+               if( result )
+               {
+                  // add an unmodifiedKey to the dictionary
+                  var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+
+                  XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
+                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+         }
+
          var translatableText = key.TranslatableText;
-         var result = _translations.TryGetValue( translatableText, out value );
+         result = _translations.TryGetValue( translatableText, out value );
          if( result )
          {
             return result;

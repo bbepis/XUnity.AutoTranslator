@@ -63,8 +63,35 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public bool TryGetTranslation( UntranslatedText key, out string value )
       {
+         bool result;
+         if( key.IsTemplated && !key.IsFromSpammingComponent )
+         {
+            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
+            result = _translations.TryGetValue( templatedTranslatableText, out value );
+            if( result )
+            {
+               return result;
+            }
+
+            var templatedTrimmedTranslatableText = key.Untemplate( key.TrimmedTranslatableText );
+            if( templatedTrimmedTranslatableText != templatedTranslatableText )
+            {
+               result = _translations.TryGetValue( templatedTrimmedTranslatableText, out value );
+               if( result )
+               {
+                  // add an unmodifiedKey to the dictionary
+                  var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  
+                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+         }
+
          var translatableText = key.TranslatableText;
-         var result = _translations.TryGetValue( translatableText, out value );
+         result = _translations.TryGetValue( translatableText, out value );
          if( result )
          {
             return result;
@@ -414,7 +441,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          var saveResultGlobally = checkOtherEndpoints;
          var newJob = new TranslationJob( this, key, saveResultGlobally );
-         newJob.Associate( ui, translationResult, context );
+         newJob.Associate( key, ui, translationResult, context );
 
          return AddUnstartedJob( key, newJob );
       }
@@ -423,13 +450,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       {
          if( _unstartedJobs.TryGetValue( key, out TranslationJob unstartedJob ) )
          {
-            unstartedJob.Associate( ui, translationResult, context );
+            unstartedJob.Associate( key, ui, translationResult, context );
             return true;
          }
 
          if( _ongoingJobs.TryGetValue( key, out TranslationJob ongoingJob ) )
          {
-            ongoingJob.Associate( ui, translationResult, context );
+            ongoingJob.Associate( key, ui, translationResult, context );
             return true;
          }
 

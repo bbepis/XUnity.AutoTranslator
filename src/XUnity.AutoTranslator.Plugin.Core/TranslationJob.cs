@@ -16,9 +16,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Key = key;
          SaveResultGlobally = saveResult;
 
-         Components = new List<object>();
+         Components = new List<KeyAnd<object>>();
          Contexts = new HashSet<ParserTranslationContext>();
-         TranslationResults = new HashSet<TranslationResult>();
+         TranslationResults = new HashSet<KeyAnd<TranslationResult>>();
       }
 
       public bool SaveResultGlobally { get; private set; }
@@ -27,9 +27,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public HashSet<ParserTranslationContext> Contexts { get; private set; }
 
-      public List<object> Components { get; private set; }
+      public List<KeyAnd<object>> Components { get; private set; }
 
-      public HashSet<TranslationResult> TranslationResults { get; private set; }
+      public HashSet<KeyAnd<TranslationResult>> TranslationResults { get; private set; }
 
       public UntranslatedText Key { get; private set; }
 
@@ -39,7 +39,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationJobState State { get; set; }
 
-      public void Associate( object ui, TranslationResult translationResult, ParserTranslationContext context )
+      public void Associate( UntranslatedText key, object ui, TranslationResult translationResult, ParserTranslationContext context )
       {
          if( context != null )
          {
@@ -50,14 +50,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( ui != null && !ui.IsSpammingComponent() )
             {
-               Components.Add( ui );
+               Components.Add( new KeyAnd<object>( key, ui ) );
             }
 
             if( translationResult != null )
             {
-               TranslationResults.Add( translationResult );
+               TranslationResults.Add( new KeyAnd<TranslationResult>( key, translationResult ) );
             }
          }
       }
+   }
+
+   internal class KeyAnd<T>
+   {
+      public KeyAnd( UntranslatedText key, T item )
+      {
+         Key = key;
+         Item = item;
+      }
+
+      public UntranslatedText Key { get; set; }
+
+      public T Item { get; set; }
    }
 }

@@ -94,6 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool ForceExperimentalHooks;
       public static bool CacheRegexLookups;
       public static bool CacheWhitespaceDifferences;
+      public static bool GenerateStaticSubstitutionTranslations;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -161,6 +162,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             ForceExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceExperimentalHooks", false );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", true );
+            GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );

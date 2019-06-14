@@ -80,13 +80,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          Settings.SetTranslationAggregatorBounds( Width, Height );
       }
 
-      public void OnNewTranslationAdded( TextTranslationInfo info )
+      public void OnNewTranslationAdded( string originalText, string defaultTranslation )
       {
-         if( !_textsToAggregate.Contains( info.OriginalText ) )
+         if( !_textsToAggregate.Contains( originalText ) )
          {
-            var vm = new Translation( info.OriginalText, info.TranslatedText );
+            var vm = new Translation( originalText, defaultTranslation );
 
-            _textsToAggregate.Add( info.OriginalText );
+            _textsToAggregate.Add( originalText );
             _translationsToAggregate.Add( vm );
 
             _lastUpdate = Time.realtimeSinceStartup;

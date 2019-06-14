@@ -266,6 +266,7 @@ RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates wh
 TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 EnableExperimentalHooks=False    ;Indicates whether to use experimental hooks to improve the hooking capability of the plugin (currently being tested)
 ForceExperimentalHooks=False     ;Indicates that the plugin must use experimental hooks instead of harmony hooks. Only used for debugging
+GenerateStaticSubstitutionTranslations=False ;Indicates that the plugin should generate translations without variables when using substitutions
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -428,7 +429,11 @@ When using substitutions, the found occurrences will be parameterized in the gen
 私は{{A}}=I am {{A}}
 ```
 
+Alternatively, if the configuration `GenerateStaticSubstitutionTranslations=True` is used the translations will not be parameterized.
+
 When creating manual translations, use this file as sparingly as you would use regexes, as it can have an effect on performance.
+
+*NOTE: If the text to be translated includes rich text, it cannot currently be parameterized.*
 
 ## Regarding Redistribution
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:

@@ -9,11 +9,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    class UntranslatedText
    {
-      public UntranslatedText( string text, bool templatizeByNumbers, bool removeInternalWhitespace )
+      public UntranslatedText( string text, bool isFromSpammingComponent, bool removeInternalWhitespace )
       {
+         IsFromSpammingComponent = isFromSpammingComponent;
          OriginalText = text;
 
-         if( templatizeByNumbers )
+         if( isFromSpammingComponent )
          {
             TemplatedText = text.TemplatizeByNumbers();
             if( TemplatedText != null )
@@ -196,6 +197,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      public bool IsFromSpammingComponent { get; set; }
+
       public string LeadingWhitespace { get; }
 
       public string TrailingWhitespace { get; }
@@ -209,6 +212,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public string TemplatedOriginalText { get; }
 
       public TemplatedString TemplatedText { get; }
+
+      public bool IsTemplated => TemplatedText != null;
 
       public string Untemplate( string text )
       {

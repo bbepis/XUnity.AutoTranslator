@@ -69,9 +69,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          _viewModel.Update();
       }
 
-      public void OnNewTranslationAdded( TextTranslationInfo info )
+      public void OnNewTranslationAdded( string originalText, string defaultTranslation )
       {
-         _viewModel.OnNewTranslationAdded( info );
+         _viewModel.OnNewTranslationAdded( originalText, defaultTranslation );
       }
 
       private void CreateWindowUI( int id )

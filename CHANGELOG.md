@@ -1,4 +1,9 @@
-﻿### 3.6.0
+﻿### 3.6.1
+ * BUG FIX - Substitution would sometimes causes some translations not to be shown the first time around
+ * BUG FIX - In the Translation Aggregator-view, sometimes texts would not be translated because the original text could not found
+ * MISC - Option to only let the plugin generate translations without variables (GenerateStaticSubstitutionTranslations)
+
+### 3.6.0
  * FEATURE - 'Translation Aggregator'-like view that enables viewing translations for displayed texts from multiple different translators (press ALT+1)
  * FEATURE - Substitution support. Enable dictionary lookup for strings (usually proper nouns) embedded in text to replace them with a manual translation
  * FEATURE - Papago translator support
