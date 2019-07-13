@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -20,6 +21,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Dictionary<string, string> _staticTranslations = new Dictionary<string, string>();
       private Dictionary<string, string> _translations = new Dictionary<string, string>();
       private Dictionary<string, string> _reverseTranslations = new Dictionary<string, string>();
+      private Dictionary<string, string> _tokenTranslations = new Dictionary<string, string>();
+      private Dictionary<string, string> _reverseTokenTranslations = new Dictionary<string, string>();
+      private HashSet<string> _partialTranslations = new HashSet<string>();
 
       private List<RegexTranslation> _defaultRegexes = new List<RegexTranslation>();
       private HashSet<string> _registeredRegexes = new HashSet<string>();
@@ -55,24 +59,158 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _defaultRegexes.Clear();
                _translations.Clear();
                _reverseTranslations.Clear();
+               _partialTranslations.Clear();
+               _tokenTranslations.Clear();
+               _reverseTokenTranslations.Clear();
                Settings.Replacements.Clear();
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
                var substitutionFile = Settings.SubstitutionFilePath;
                LoadTranslationsInFile( mainTranslationFile, false );
                LoadTranslationsInFile( substitutionFile, true );
-               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile } ) )
+               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile } ) )
                {
                   LoadTranslationsInFile( fullFileName, false );
                }
             }
             var endTime = Time.realtimeSinceStartup;
             XuaLogger.Current.Info( $"Loaded text files ({_translations.Count} translations and {_defaultRegexes.Count} regex translations) (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+
+            // generate token translations, which are online allowed when getting 'token' translations
+
+            if( Settings.GeneratePartialTranslations )
+            {
+               startTime = Time.realtimeSinceStartup;
+
+               foreach( var kvp in _translations.ToList() )
+               {
+                  if( !kvp.Key.StartsWith( "r:" ) )
+                  {
+                     CreatePartialTranslationsFor( kvp.Key, kvp.Value );
+                  }
+               }
+
+               XuaLogger.Current.Info( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               endTime = Time.realtimeSinceStartup;
+            }
+
+            var parser = new RichTextParser();
+            startTime = Time.realtimeSinceStartup;
+
+            foreach( var kvp in _translations.ToList() )
+            {
+               if( !kvp.Key.StartsWith( "r:" ) )
+               {
+                  var untranslatedResult = parser.Parse( kvp.Key );
+                  if( untranslatedResult.Succeeded )
+                  {
+                     var translatedResult = parser.Parse( kvp.Value );
+                     if( translatedResult.Succeeded && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                     {
+                        foreach( var ukvp in untranslatedResult.Arguments )
+                        {
+                           var untranslatedToken = ukvp.Value;
+                           if( translatedResult.Arguments.TryGetValue( ukvp.Key, out var translatedToken ) )
+                           {
+                              AddTokenTranslation( untranslatedToken, translatedToken );
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+
+            XuaLogger.Current.Info( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            endTime = Time.realtimeSinceStartup;
          }
          catch( Exception e )
          {
             XuaLogger.Current.Error( e, "An error occurred while loading translations." );
          }
+      }
+
+      private void CreatePartialTranslationsFor( string originalText, string translatedText )
+      {
+         // determine how many tokens in both strings
+         var originalTextTokens = Tokenify( originalText );
+         var translatedTextTokens = Tokenify( translatedText );
+
+         double rate = translatedTextTokens.Count / (double)originalTextTokens.Count;
+
+         int translatedTextCursor = 0;
+         string originalTextPartial = string.Empty;
+         string translatedTextPartial = string.Empty;
+
+         for( int i = 0; i < originalTextTokens.Count; i++ )
+         {
+            var originalTextToken = originalTextTokens[ i ];
+            if( originalTextToken.IsVariable )
+            {
+               originalTextPartial += "{{" + originalTextToken.Character + "}}";
+            }
+            else
+            {
+               originalTextPartial += originalTextToken.Character;
+            }
+
+            var length = (int)( Math.Round( ( i + 1 ) * rate, 0, MidpointRounding.AwayFromZero ) );
+            for( int j = translatedTextCursor; j < length; j++ )
+            {
+               var translatedTextToken = translatedTextTokens[ j ];
+               if( translatedTextToken.IsVariable )
+               {
+                  translatedTextPartial += "{{" + translatedTextToken.Character + "}}";
+               }
+               else
+               {
+                  translatedTextPartial += translatedTextToken.Character;
+               }
+            }
+
+            translatedTextCursor = length;
+
+            if( !HasTranslated( originalTextPartial ) )
+            {
+               AddTranslation( originalTextPartial, translatedTextPartial );
+               _partialTranslations.Add( originalTextPartial );
+            }
+         }
+      }
+
+      private static List<TranslationCharacterToken> Tokenify( string text )
+      {
+         var result = new List<TranslationCharacterToken>( text.Length );
+
+         for( int i = 0; i < text.Length; i++ )
+         {
+            var c = text[ i ];
+            if( c == '{' && text.Length > i + 4 && text[ i + 1 ] == '{' && text[ i + 3 ] == '}' && text[ i + 4 ] == '}' )
+            {
+               c = text[ i + 2 ];
+               result.Add( new TranslationCharacterToken( c, true ) );
+
+               i += 4;
+            }
+            else
+            {
+               result.Add( new TranslationCharacterToken( c, false ) );
+            }
+         }
+
+         return result;
+      }
+
+      private struct TranslationCharacterToken
+      {
+         public TranslationCharacterToken( char c, bool isVariable )
+         {
+            Character = c;
+            IsVariable = isVariable;
+         }
+
+         public char Character { get; set; }
+
+         public bool IsVariable { get; set; }
       }
 
       private void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile )
@@ -96,7 +234,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         string key = TextHelper.Decode( kvp[ 0 ] );
                         string value = TextHelper.Decode( kvp[ 1 ] );
 
-                        if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && IsTranslatable( key ) )
+                        if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
                         {
                            if( isSubstitutionFile )
                            {
@@ -228,12 +366,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _reverseTranslations.ContainsKey( translation );
       }
 
+      private bool IsTokenTranslation( string translation )
+      {
+         return _reverseTokenTranslations.ContainsKey( translation );
+      }
+
       private void AddTranslation( string key, string value )
       {
          if( key != null && value != null )
          {
             _translations[ key ] = value;
             _reverseTranslations[ value ] = key;
+         }
+      }
+
+      private void AddTokenTranslation( string key, string value )
+      {
+         if( key != null && value != null )
+         {
+            _tokenTranslations[ key ] = value;
+            _reverseTokenTranslations[ value ] = key;
          }
       }
 
@@ -245,30 +397,54 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal void AddTranslationToCache( string key, string value, bool persistToDisk = true )
+      internal void AddTranslationToCache( string key, string value, bool persistToDisk, TranslationType type )
       {
-         if( !HasTranslated( key ) )
+         if( ( type & TranslationType.Token ) == TranslationType.Token )
          {
-            AddTranslation( key, value );
+            AddTokenTranslation( key, value );
+         }
 
-            // also add a trimmed version of the translation
-            var ukey = new UntranslatedText( key, false, false );
-            var uvalue = new UntranslatedText( value, false, false );
-            if( ukey.TrimmedTranslatableText != key && !HasTranslated( ukey.TrimmedTranslatableText ) )
+         if( ( type & TranslationType.Full ) == TranslationType.Full )
+         {
+            if( !HasTranslated( key ) )
             {
-               AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
-            }
+               AddTranslation( key, value );
 
-            if( persistToDisk )
-            {
-               QueueNewTranslationForDisk( key, value );
+               // also add a trimmed version of the translation
+               var ukey = new UntranslatedText( key, false, false );
+               var uvalue = new UntranslatedText( value, false, false );
+               if( ukey.TrimmedTranslatableText != key && !HasTranslated( ukey.TrimmedTranslatableText ) )
+               {
+                  AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
+               }
+
+               if( persistToDisk )
+               {
+                  QueueNewTranslationForDisk( key, value );
+               }
             }
          }
       }
 
-      internal bool TryGetTranslation( UntranslatedText key, bool allowRegex, out string value )
+      internal bool TryGetTranslation( UntranslatedText key, bool allowRegex, bool allowToken, out string value )
       {
          bool result;
+         if( allowToken )
+         {
+            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
+            result = _tokenTranslations.TryGetValue( templatedTranslatableText, out value );
+            if( result )
+            {
+               return result;
+            }
+
+            result = _tokenTranslations.TryGetValue( key.TranslatableText, out value );
+            if( result )
+            {
+               return result;
+            }
+         }
+
          if( key.IsTemplated && !key.IsFromSpammingComponent )
          {
             var templatedTranslatableText = key.Untemplate( key.TranslatableText );
@@ -288,7 +464,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
                   XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
-                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences );
+                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
 
                   value = unmodifiedValue;
                   return result;
@@ -313,7 +489,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
                XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
-               AddTranslationToCache( translatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences );
+               AddTranslationToCache( translatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
 
                value = unmodifiedValue;
                return result;
@@ -334,7 +510,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   var translation = regex.CompiledRegex.Replace( translatableText, regex.Translation );
 
-                  AddTranslationToCache( translatableText, translation, Settings.CacheRegexLookups ); // Would store it to file... Should we????
+                  AddTranslationToCache( translatableText, translation, Settings.CacheRegexLookups, TranslationType.Full ); // Would store it to file... Should we????
 
                   value = translation;
                   found = true;
@@ -360,13 +536,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( _staticTranslations.TryGetValue( translatableText, out value ) )
             {
-               AddTranslationToCache( translatableText, value );
+               AddTranslationToCache( translatableText, value, true, TranslationType.Full );
                return true;
             }
             else if( _staticTranslations.TryGetValue( trimmedTranslatableText, out value ) )
             {
                var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
-               AddTranslationToCache( translatableText, unmodifiedValue );
+               AddTranslationToCache( translatableText, unmodifiedValue, true, TranslationType.Full );
 
                value = unmodifiedValue;
                return true;
@@ -381,9 +557,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _reverseTranslations.TryGetValue( value, out key );
       }
 
-      internal bool IsTranslatable( string text )
+      internal bool IsTranslatable( string text, bool isToken )
       {
-         return LanguageHelper.IsTranslatable( text ) && !IsTranslation( text );
+         var translatable = LanguageHelper.IsTranslatable( text ) && !IsTranslation( text );
+         if( isToken && translatable )
+         {
+            translatable = !IsTokenTranslation( text );
+         }
+         return translatable;
+      }
+
+      internal bool IsPartial( string text )
+      {
+         return _partialTranslations.Contains( text );
       }
    }
 }

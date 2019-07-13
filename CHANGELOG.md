@@ -1,4 +1,16 @@
-﻿### 3.6.1
+﻿### 3.6.2
+ * BUG FIX - Fixed a bug with escape/unescape logic in translation text files
+ * BUG FIX - Plugin now loads all translations provided in the translation text files - even if they are not considered a candidate for machine translation
+ * BUG FIX - Fixed a bug where reloading or toggling the translations would not always show the correct text
+ * BUG FIX - Fixed a bug where substitution file was being loaded twice - this should have no actual effect though
+ * MISC - Improved rich text handling logic
+ * MISC - Support generating partial translations through config option `GeneratePartialTranslations`
+ * MISC - Support for overriding TextMeshPro fonts through config options `OverrideFontTextMeshPro`, though this requires the game to be build with the specified resource
+ * MISC - Support for generating partial translations to better support text that is scrolling in
+ * MISC - Support for for older versions of the Unity engine (tested down to 4.5)
+ * MISC - Updated Bing API plugin to new API version
+
+### 3.6.1
  * BUG FIX - Substitution would sometimes causes some translations not to be shown the first time around
  * BUG FIX - In the Translation Aggregator-view, sometimes texts would not be translated because the original text could not found
  * MISC - Option to only let the plugin generate translations without variables (GenerateStaticSubstitutionTranslations)

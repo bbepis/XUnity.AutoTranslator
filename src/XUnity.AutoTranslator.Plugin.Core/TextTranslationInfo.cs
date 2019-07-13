@@ -25,6 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
       private object _alteredSpacing;
+      private int _translationFrame = -1;
 
       public TextTranslationInfo()
       {
@@ -68,11 +69,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
          {
-            var fontProperty = ClrTypes.Text.CachedProperty( "font" );
-            var fontSizeProperty = ClrTypes.Text.CachedProperty( "fontSize" );
+            if( string.IsNullOrEmpty( Settings.OverrideFont ) ) return;
 
-            var previousFont = (Font)fontProperty.Get( ui );
-            var newFont = FontCache.GetOrCreate( previousFont?.fontSize ?? (int)fontSizeProperty.Get( ui ) );
+            var Text_fontProperty = ClrTypes.Text.CachedProperty( "font" );
+            var Text_fontSizeProperty = ClrTypes.Text.CachedProperty( "fontSize" );
+
+            var previousFont = (Font)Text_fontProperty.Get( ui );
+            var Font_fontSizeProperty = previousFont.GetType().CachedProperty( "fontSize" );
+
+            var newFont = FontCache.GetOrCreate( (int?)Font_fontSizeProperty?.Get( previousFont ) ?? (int)Text_fontSizeProperty.Get( ui ) );
+            if( newFont == null || previousFont == null ) return;
+
+            if( !ReferenceEquals( newFont, previousFont ) )
+            {
+               Text_fontProperty.Set( ui, newFont );
+               _unfont = obj =>
+               {
+                  Text_fontProperty.Set( obj, previousFont );
+               };
+            }
+         }
+         else if( ( ClrTypes.TextMeshPro != null && ClrTypes.TextMeshPro.IsAssignableFrom( type ) )
+            || ( ClrTypes.TextMeshProUGUI != null && ClrTypes.TextMeshProUGUI.IsAssignableFrom( type ) ) )
+         {
+            if( string.IsNullOrEmpty( Settings.OverrideFontTextMeshPro ) ) return;
+
+            var fontProperty = ReflectionCache.CachedProperty( type, "font" );
+
+            var previousFont = fontProperty.Get( ui );
+            var newFont = FontCache.GetOrCreateTextMeshProFont();
+            if( newFont == null || previousFont == null ) return;
 
             if( !ReferenceEquals( newFont, previousFont ) )
             {
@@ -85,11 +111,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void UnchangeFont( object graphic )
+      public void UnchangeFont( object ui )
       {
-         if( graphic == null ) return;
+         if( ui == null ) return;
 
-         _unfont?.Invoke( graphic );
+         _unfont?.Invoke( ui );
          _unfont = null;
       }
 
@@ -186,7 +212,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else if( type == ClrTypes.TextMeshPro || type == ClrTypes.TextMeshProUGUI )
             {
-               var originalOverflowMode = ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName )?.GetValue( ui, null );
+               var originalOverflowMode = ClrTypes.TMP_Text?.GetProperty( OverflowModePropertyName )?.GetValue( ui, null );
 
                // ellipsis (1) works
                // masking (2) has a tendency to break in some versions of TMP
@@ -213,19 +239,40 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _unresize = null;
       }
 
-      public TextTranslationInfo Reset( string newText )
+      public void Reset( string newText )
       {
-         IsTranslated = false;
-         TranslatedText = null;
-         OriginalText = newText;
-
-         return this;
+         if( Settings.RequiresToggleFix )
+         {
+            var frame = Time.frameCount;
+            if( frame != _translationFrame )
+            {
+               IsTranslated = false;
+               TranslatedText = null;
+               OriginalText = newText;
+            }
+         }
+         else
+         {
+            IsTranslated = false;
+            TranslatedText = null;
+            OriginalText = newText;
+         }
       }
 
       public void SetTranslatedText( string translatedText )
       {
-         IsTranslated = true;
-         TranslatedText = translatedText;
+         if( Settings.RequiresToggleFix )
+         {
+            _translationFrame = Time.frameCount;
+
+            IsTranslated = true;
+            TranslatedText = translatedText;
+         }
+         else
+         {
+            IsTranslated = true;
+            TranslatedText = translatedText;
+         }
       }
    }
 }

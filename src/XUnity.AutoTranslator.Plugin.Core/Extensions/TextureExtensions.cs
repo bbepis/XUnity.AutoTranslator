@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 
@@ -49,11 +50,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             texture.LoadImageSafe( data, markNonReadable );
          }
+
+         // why.... ? WHY!!!
+         if( Settings.EnableLegacyTextureLoading )
+         {
+            if( LoadImage != null )
+            {
+               LoadImage.Invoke( null, new object[] { texture, data, markNonReadable } );
+            }
+            else
+            {
+               texture.LoadImageSafe( data, markNonReadable );
+            }
+         }
       }
 
       private static void LoadImageSafe( this Texture2D texture, byte[] data, bool markNonReadable )
       {
-         texture.LoadImage( data, markNonReadable );
+         texture.LoadImage( data/*, markNonReadable */ ); // markNonReadable always false in this plugin anyway; causes problems in old unity version
       }
 
       public static byte[] EncodeToPNGEx( this Texture2D texture )

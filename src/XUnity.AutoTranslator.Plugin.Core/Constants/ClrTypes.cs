@@ -78,6 +78,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type MethodBase = FindType( "System.Reflection.MethodBase" );
       public static readonly Type Task = FindType( "System.Threading.Tasks.Task" );
 
+      // Assets.System (what engine is this?)
+      public static readonly Type TextWindow = FindType( "Assets.System.Text.TextWindow" );
+
+
       private static Type FindType( string name )
       {
          return AppDomain.CurrentDomain.GetAssemblies()

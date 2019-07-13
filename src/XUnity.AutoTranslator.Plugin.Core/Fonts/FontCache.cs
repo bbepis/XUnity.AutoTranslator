@@ -10,6 +10,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
    internal static class FontCache
    {
       private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
+      private static UnityEngine.Object TextMeshProOverrideFont;
+      private static bool _hasReadTextMeshProFont = false;
 
       public static Font GetOrCreate( int size )
       {
@@ -20,6 +22,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
             CachedFonts.Add( size, font );
          }
          return font;
+      }
+
+      public static object GetOrCreateTextMeshProFont()
+      {
+         if( !_hasReadTextMeshProFont )
+         {
+            _hasReadTextMeshProFont = true;
+            TextMeshProOverrideFont = Resources.Load( Settings.OverrideFontTextMeshPro );
+
+            if( TextMeshProOverrideFont != null )
+            {
+               GameObject.DontDestroyOnLoad( TextMeshProOverrideFont );
+            }
+            else
+            {
+               XuaLogger.Current.Warn( "Could not find the TextMeshPro font resource: " + Settings.OverrideFontTextMeshPro );
+            }
+         }
+
+         return TextMeshProOverrideFont;
       }
    }
 }

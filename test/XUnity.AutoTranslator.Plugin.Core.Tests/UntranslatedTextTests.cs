@@ -11,6 +11,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
 {
    public class UntranslatedTextTests
    {
+      [Theory( DisplayName = "Can_Substitute" )]
+      [InlineData( "がんばれ、遥", "がんばれ、{{A}}" )]
+      [InlineData( "がんばれ、Haruka", "がんばれ、{{A}}" )]
+      public void Can_Substitute( string input, string expectedTemplate )
+      {
+         Settings.Replacements[ "Haruka" ] = "Haruka";
+         Settings.Replacements[ "遥" ] = "Haruka";
+
+         var untranslatedText = new UntranslatedText( input, false, true );
+
+         Assert.Equal( expectedTemplate, untranslatedText.TemplatedOriginalText );
+      }
+
       [Theory( DisplayName = "Can_Trim_Surrounding_Whitespace" )]
       [InlineData( "  Hello  ", "Hello", "  ", "  " )]
       [InlineData( " Hello", "Hello", " ", null )]

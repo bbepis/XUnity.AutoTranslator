@@ -39,12 +39,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationJobState State { get; set; }
 
+      public TranslationType TranslationType { get; set; }
+
+      public bool IsFullTranslation => ( TranslationType & TranslationType.Full ) == TranslationType.Full;
+
       public void Associate( UntranslatedText key, object ui, TranslationResult translationResult, ParserTranslationContext context )
       {
          if( context != null )
          {
             Contexts.Add( context );
             context.Jobs.Add( this );
+
+            TranslationType |= TranslationType.Token;
          }
          else
          {
@@ -57,6 +63,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                TranslationResults.Add( new KeyAnd<TranslationResult>( key, translationResult ) );
             }
+
+            TranslationType |= TranslationType.Full;
          }
       }
    }

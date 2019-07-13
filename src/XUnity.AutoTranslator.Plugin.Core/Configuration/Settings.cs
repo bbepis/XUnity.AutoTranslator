@@ -42,6 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       public static bool InvokeEvents = true;
       public static Action<object> RemakeTextData = null;
+      public static Action<object> SetCurText = null;
 
       public static bool IsShutdown = false;
       public static int TranslationCount = 0;
@@ -50,6 +51,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly float MaxTranslationsQueuedPerSecond = 5;
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
       public static readonly int TranslationQueueWatchWindow = 6;
+
+      public static bool RequiresToggleFix = false;
 
       // can be changed
       public static string ServiceEndpoint;
@@ -80,6 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUIResizing;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
+      public static string OverrideFontTextMeshPro;
       public static string UserAgent;
       public static bool DisableCertificateValidation;
       public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
@@ -95,6 +99,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool CacheRegexLookups;
       public static bool CacheWhitespaceDifferences;
       public static bool GenerateStaticSubstitutionTranslations;
+      public static bool GeneratePartialTranslations;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -104,6 +109,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableSpriteRendererHooking;
       public static bool LoadUnmodifiedTextures;
       public static bool DetectDuplicateTextureNames;
+      public static bool EnableLegacyTextureLoading;
       public static HashSet<string> DuplicateTextureNames;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
@@ -147,6 +153,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
             UseStaticTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "UseStaticTranslations", true );
             OverrideFont = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFont", string.Empty );
+            OverrideFontTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontTextMeshPro", string.Empty );
             ResizeUILineSpacingScale = PluginEnvironment.Current.Preferences.GetOrDefault<float?>( "Behaviour", "ResizeUILineSpacingScale", null );
             ForceUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceUIResizing", false );
             IgnoreTextStartingWith = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreTextStartingWith", "\\u180e;" )
@@ -163,6 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", true );
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
+            GeneratePartialTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GeneratePartialTranslations", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );
@@ -174,6 +182,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             DetectDuplicateTextureNames = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "DetectDuplicateTextureNames", false );
             DuplicateTextureNames = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "DuplicateTextureNames", string.Empty )
                ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
+            EnableLegacyTextureLoading = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableLegacyTextureLoading", false );
 
             TextureHashGenerationStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureHashGenerationStrategy", TextureHashGenerationStrategy.FromImageName );
 
@@ -204,8 +213,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             SubstitutionFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, SubstitutionFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
             UsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
 
-
-
+            //// workaround to handle text translation toggling in KK
+            //if( ApplicationName != null )
+            //{
+            //   var n = ApplicationName.ToLower();
+            //   if( n == "koikatu" || n == "koikatsu" )
+            //   {
+            //      RequiresToggleFix = true;
+            //   }
+            //}
 
             if( EnableMigrations )
             {
@@ -275,7 +291,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             XuaLogger.Current.Error( e, "An error occurred during while saving configuration." );
          }
       }
-      
+
       private static void Migrate()
       {
       }

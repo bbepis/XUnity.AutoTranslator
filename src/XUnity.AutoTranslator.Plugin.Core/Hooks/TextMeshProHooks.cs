@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.RuntimeHooker.Core;
 
@@ -14,8 +15,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       public static bool HooksOverriden = false;
 
       public static readonly Type[] All = new[] {
+         typeof( TextWindow_SetText_Hook ),
          typeof( TeshMeshProUGUI_OnEnable_Hook ),
+         typeof( TeshMeshProUGUI_text_Hook ),
          typeof( TeshMeshPro_OnEnable_Hook ),
+         typeof( TeshMeshPro_text_Hook ),
          typeof( TMP_Text_text_Hook ),
          typeof( TMP_Text_SetText_Hook1 ),
          typeof( TMP_Text_SetText_Hook2 ),
@@ -24,6 +28,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          typeof( TMP_Text_SetCharArray_Hook2 ),
          typeof( TMP_Text_SetCharArray_Hook3 ),
       };
+   }
+
+   [HarmonyPriorityShim( HookPriority.Last )]
+   internal static class TextWindow_SetText_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return ClrTypes.TextWindow != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( ClrTypes.TextWindow, "SetText", new Type[] { typeof( string ) } );
+      }
+
+      static void Postfix( object __instance )
+      {
+         Settings.SetCurText?.Invoke( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -50,6 +73,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
+   internal static class TeshMeshProUGUI_text_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return ClrTypes.TMP_Text == null && ClrTypes.TextMeshProUGUI != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( ClrTypes.TextMeshProUGUI, "text" ).GetSetMethod();
+      }
+
+      static void Postfix( object __instance )
+      {
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+   }
+
+   [HarmonyPriorityShim( HookPriority.Last )]
    internal static class TeshMeshPro_OnEnable_Hook
    {
       static bool Prepare( object instance )
@@ -60,6 +106,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static MethodBase TargetMethod( object instance )
       {
          return AccessToolsShim.Method( ClrTypes.TextMeshPro, "OnEnable" );
+      }
+
+      static void Postfix( object __instance )
+      {
+         if( !TextMeshProHooks.HooksOverriden )
+         {
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+         }
+         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+   }
+
+   [HarmonyPriorityShim( HookPriority.Last )]
+   internal static class TeshMeshPro_text_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return ClrTypes.TMP_Text == null && ClrTypes.TextMeshPro != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( ClrTypes.TextMeshPro, "text" ).GetSetMethod();
       }
 
       static void Postfix( object __instance )

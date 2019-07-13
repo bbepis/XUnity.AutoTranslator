@@ -34,8 +34,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ( Settings.EnableIMGUI && ui is GUIContent )
             || ( Settings.EnableUGUI && ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) )
+            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
+      }
+
+      public static bool IsKnownTextMeshProType( Type type )
+      {
+         if( ClrTypes.TMP_Text != null )
+         {
+            return ClrTypes.TMP_Text.IsAssignableFrom( type );
+         }
+         else
+         {
+            return ClrTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true
+            || ClrTypes.TextMeshPro?.IsAssignableFrom( type ) == true;
+         }
       }
 
       public static bool SupportsRichText( this object ui )
@@ -45,9 +58,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetType();
 
          return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
-            || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+            || DoesTextMeshProSupportRichText( ui, type )
             || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
+      }
+
+      public static bool DoesTextMeshProSupportRichText( object ui, Type type )
+      {
+         if( ClrTypes.TMP_Text != null )
+         {
+            return ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
+         }
+         else 
+         {
+            return ( ClrTypes.TextMeshPro?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+               || ( ClrTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
+         }
       }
 
       public static bool SupportsStabilization( this object ui )
@@ -74,7 +100,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
-            || ( ClrTypes.TMP_Text != null && ClrTypes.TMP_Text.IsAssignableFrom( type ) );
+            || DoesTextMeshProSupportStabilization( type );
+      }
+
+      public static bool DoesTextMeshProSupportStabilization( Type type )
+      {
+         return IsKnownTextMeshProType( type );
       }
 
       public static bool SupportsLineParser( this object ui )
@@ -133,7 +164,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetType();
 
-         if( ClrTypes.UguiNovelText?.IsAssignableFrom( type ) == true )
+         if( ClrTypes.AdvUguiMessageWindow != null && ClrTypes.UguiNovelText?.IsAssignableFrom( type ) == true )
          {
             var uguiMessageWindow = GameObject.FindObjectOfType( ClrTypes.AdvUguiMessageWindow );
             if( uguiMessageWindow != null )
@@ -204,6 +235,72 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             }
          }
 
+         if( ClrTypes.TextWindow != null && ClrTypes.TextMeshPro?.IsAssignableFrom( type ) == true )
+         {
+            var textWindow = GameObject.FindObjectOfType( ClrTypes.TextWindow );
+            if( textWindow != null )
+            {
+               var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+               var textMesh = textWindow.GetType().GetField( "TextMesh", flags )?.GetValue( textWindow );
+               if( textMesh != null )
+               {
+                  if( Equals( textMesh, ui ) )
+                  {
+                     var frames = new StackTrace().GetFrames();
+                     if( frames.Any( x => x.GetMethod().DeclaringType == ClrTypes.TextWindow ) )
+                     {
+                        // If inline (sync)
+
+                        var previousCurText = textWindow.GetType().GetField( "curText", flags ).GetValue( textWindow );
+                        textWindow.GetType().GetField( "curText", flags ).SetValue( textWindow, text );
+
+                        Settings.SetCurText = textWindowInner =>
+                        {
+                           var translatedText = textWindow.GetType().GetField( "curText", flags ).GetValue( textWindow );
+                           if( Equals( text, translatedText ) )
+                           {
+                              textWindowInner.GetType().GetMethod( "FinishTyping", flags ).Invoke( textWindowInner, null );
+
+                              textWindowInner.GetType().GetField( "curText", flags ).SetValue( textWindowInner, previousCurText );
+
+                              var textMeshInner = textWindowInner.GetType().GetField( "TextMesh", flags ).GetValue( textWindowInner );
+                              var keyword = textWindowInner.GetType().GetField( "Keyword", flags ).GetValue( textWindowInner );
+                              keyword.GetType().GetMethod( "UpdateTextMesh", flags ).Invoke( keyword, new object[] { textMeshInner, true } );
+                           }
+
+                           Settings.SetCurText = null;
+                        };
+                     }
+                     else
+                     {
+                        // If delayed by plugin (async)
+
+                        // update the actual text in the text box
+                        type.CachedProperty( TextPropertyName )?.Set( ui, text );
+
+                        // obtain the curText in the text window
+                        var previousCurText = textWindow.GetType().GetField( "curText", flags ).GetValue( textWindow );
+
+                        // set curText to OUR text
+                        textWindow.GetType().GetField( "curText", flags ).SetValue( textWindow, text );
+
+                        // call FinishTyping
+                        textWindow.GetType().GetMethod( "FinishTyping", flags ).Invoke( textWindow, null );
+
+                        // reset curText
+                        textWindow.GetType().GetField( "curText", flags ).SetValue( textWindow, previousCurText );
+
+                        var keyword = textWindow.GetType().GetField( "Keyword", flags ).GetValue( textWindow );
+                        keyword.GetType().GetMethod( "UpdateTextMesh", flags ).Invoke( keyword, new object[] { textMesh, true } );
+                     }
+
+                     return;
+                  }
+               }
+            }
+         }
+
+
          if( ui is GUIContent )
          {
             ( (GUIContent)ui ).text = text;
@@ -212,6 +309,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             // fallback to reflective approach
             type.CachedProperty( TextPropertyName )?.Set( ui, text );
+
+            // TMPro
+            var maxVisibleCharactersProperty = type.CachedProperty( "maxVisibleCharacters" );
+            if( maxVisibleCharactersProperty != null && maxVisibleCharactersProperty.PropertyType == typeof( int ) )
+            {
+               var value = (int)maxVisibleCharactersProperty.Get( ui );
+               if( 0 < value && value < 99999 )
+               {
+                  maxVisibleCharactersProperty.Set( ui, 99999 );
+               }
+            }
          }
       }
    }

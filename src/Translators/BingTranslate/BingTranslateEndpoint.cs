@@ -26,10 +26,10 @@ namespace BingTranslate
          "af","ar","bn","bs","bg","yue","ca","zh-Hans","zh-Hant","hr","cs","da","nl","en","et","fj","fil","fi","fr","de","el","ht","he","hi","mww","hu","is","id","it","ja","sw","tlh","tlh-Qaak","ko","lv","lt","mg","ms","mt","nb","fa","pl","pt","otq","ro","ru","sm","sr-Cyrl","sr-Latn","sk","sl","es","sv","ty","ta","te","th","to","tr","uk","ur","vi","cy","yua"
       };
 
-      private static readonly string HttpsServicePointTemplateUrl = "https://www.bing.com/ttranslate?&category=&IG={0}&IID={1}.{2}";
-      private static readonly string HttpsServicePointTemplateUrlWithoutIG = "https://www.bing.com/ttranslate?&category=";
+      private static readonly string HttpsServicePointTemplateUrl = "https://www.bing.com/ttranslatev3?isVertical=1&&IG={0}&IID={1}.{2}"; // "https://www.bing.com/ttranslate?&category=&IG={0}&IID={1}.{2}";
+      private static readonly string HttpsServicePointTemplateUrlWithoutIG = "https://www.bing.com/ttranslatev3?isVertical=1"; // "https://www.bing.com/ttranslate?&category="; // FIX THIS
       private static readonly string HttpsTranslateUserSite = "https://www.bing.com/translator";
-      private static readonly string RequestTemplate = "&text={0}&from={1}&to={2}";
+      private static readonly string RequestTemplate = "&fromLang={1}&text={0}&to={2}"; //"&text={0}&from={1}&to={2}";
       private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { "*/*" };
@@ -119,12 +119,14 @@ namespace BingTranslate
 
       public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
-         var obj = JSON.Parse( context.Response.Data );
+         var arr = JSON.Parse( context.Response.Data );
 
-         var code = obj[ "statusCode" ].AsInt;
-         if( code != 200 ) context.Fail( "Bad response code received from service: " + code );
+         var obj = arr.AsArray[ 0 ];
 
-         var token = obj[ "translationResponse" ].ToString();
+         var translations = obj[ "translations" ];
+         var translation = translations.AsArray[ 0 ];
+
+         var token = translation[ "text" ].ToString();
          var translatedText = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
 
          context.Complete( translatedText );
@@ -226,8 +228,8 @@ namespace BingTranslate
          {
             var html = response.Data;
 
-            _ig = Lookup( "ig\":\"", html );
-            _iid = Lookup( ".init(\"/feedback/submission?\",\"", html );
+            _ig = Lookup( "\",IG:\"", html );
+            _iid = Lookup( "data-iid=\"", html );
 
             if( _ig == null || _iid == null )
             {

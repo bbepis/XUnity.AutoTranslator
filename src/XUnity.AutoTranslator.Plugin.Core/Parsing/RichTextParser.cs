@@ -23,6 +23,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return ui.SupportsRichText();
       }
 
+      private static bool IsAllLatin( string value, int endIdx )
+      {
+         for( int j = 0; j < endIdx; j++ )
+         {
+            var c = value[ j ];
+            if( !( ( c >= '\u0041' && c <= '\u005a' ) || ( c >= '\u0061' && c <= '\u007a' ) || c == '-' || c == '_' ) )
+            {
+               return false;
+            }
+         }
+         return true;
+      }
+
+      private static bool StartsWithPound( string value, int endIdx )
+      {
+         return 0 < value.Length && value[ 0 ] == '#';
+      }
+
+
       public ParserResult Parse( string input )
       {
          var matches = TagRegex.Matches( input );
@@ -54,17 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             if( !isKnown )
             {
                var endIdx = value.Length;
-               bool allLatin = true;
-               for( int j = 0 ; j < endIdx ; j++ )
-               {
-                  var c = value[ j ];
-                  if( !( ( c >= '\u0041' && c <= '\u005a' ) || ( c >= '\u0061' && c <= '\u007a' ) || c == '-' || c == '_' ) )
-                  {
-                     allLatin = false;
-                     break;
-                  }
-               }
-               isKnown = allLatin;
+               isKnown = IsAllLatin( value, endIdx ) || StartsWithPound( value, endIdx );
             }
 
             // add normal text

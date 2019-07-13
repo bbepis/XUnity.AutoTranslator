@@ -164,7 +164,11 @@ namespace XUnity.RuntimeHooker.Core.Utilities
          {
             _set = ExpressionHelper.CreateFastInvoke( propertyInfo.GetSetMethod() );
          }
+
+         PropertyType = propertyInfo.PropertyType;
       }
+
+      public Type PropertyType { get; }
 
       public object Set( object instance, object[] arguments )
       {
