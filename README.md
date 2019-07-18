@@ -228,6 +228,7 @@ The following text frameworks are supported.
  * [NGUI](https://assetstore.unity.com/packages/tools/gui/ngui-next-gen-ui-2413)
  * [IMGUI](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) (disabled by default)
  * [TextMeshPro](http://digitalnativestudios.com/textmeshpro/docs/)
+ * [TextMesh](https://docs.unity3d.com/Manual/class-TextMesh.html) (disabled by default, often text float in 3D space)
  * [Utage (VN Game Engine)](http://madnesslabo.net/utage/?lang=en)
 
 ## Configuration
@@ -250,6 +251,7 @@ SubstitutionFile=Translation\_Substitutions.{lang}.txt         ;File that contai
 EnableUGUI=True                  ;Enable or disable UGUI translation
 EnableNGUI=True                  ;Enable or disable NGUI translation
 EnableTextMeshPro=True           ;Enable or disable TextMeshPro translation
+EnableTextMesh=False             ;Enable or disable TextMesh translation
 EnableIMGUI=False                ;Enable or disable IMGUI translation
 AllowPluginHookOverride=True     ;Allow other text translation plugins to override this plugin's hooks
 
