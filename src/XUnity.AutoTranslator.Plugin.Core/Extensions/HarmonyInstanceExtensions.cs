@@ -139,7 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                         }
                         else
                         {
-                           XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no MonoMod is not loaded. Failing hook: '{type.Name}'." );
+                           XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
                         }
                      }
                   }
