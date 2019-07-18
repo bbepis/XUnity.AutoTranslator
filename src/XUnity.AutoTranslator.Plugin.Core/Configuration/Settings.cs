@@ -72,6 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUGUI;
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
+      public static bool EnableTextMesh;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static bool IgnoreWhitespaceInNGUI;
@@ -94,8 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool TextGetterCompatibilityMode;
       public static TextPostProcessing RomajiPostProcessing;
       public static TextPostProcessing TranslationPostProcessing;
-      public static bool EnableExperimentalHooks;
-      public static bool ForceExperimentalHooks;
+      public static bool ForceMonoModHooks;
       public static bool CacheRegexLookups;
       public static bool CacheWhitespaceDifferences;
       public static bool GenerateStaticSubstitutionTranslations;
@@ -139,6 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableUGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableUGUI", true );
             EnableNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableNGUI", true );
             EnableTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMeshPro", true );
+            EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
             AllowPluginHookOverride = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "AllowPluginHookOverride", true );
 
             Delay = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "Delay", 0f );
@@ -165,8 +166,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             WhitespaceRemovalStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "WhitespaceRemovalStrategy", WhitespaceHandlingStrategy.TrimPerNewline );
             RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
             TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
-            EnableExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableExperimentalHooks", PluginEnvironment.Current.AllowRuntimeHooksByDefault && !Features.SupportsReflectionEmit );
-            ForceExperimentalHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceExperimentalHooks", false );
+            ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", true );
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );

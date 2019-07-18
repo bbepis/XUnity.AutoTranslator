@@ -53,6 +53,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             IMGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateIMGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
          }
+         if( Settings.EnableTextMesh )
+         {
+            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMesh, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
       }
 
       public static void InstallTextGetterCompatHooks()
@@ -143,6 +147,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          catch( Exception e )
          {
             XuaLogger.Current.Error( e, "An error occurred while setting up hooks for Utage." );
+         }
+
+         try
+         {
+            if( Settings.EnableTextMesh )
+            {
+               _harmony.PatchAll( TextMeshHooks.All );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while setting up hooks for TextMesh." );
          }
       }
 

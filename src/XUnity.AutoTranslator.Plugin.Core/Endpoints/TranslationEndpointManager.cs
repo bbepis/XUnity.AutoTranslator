@@ -141,7 +141,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private bool IsTranslation( string translation )
       {
-         return _reverseTranslations.ContainsKey( translation );
+         return !HasTranslated( translation ) && _reverseTranslations.ContainsKey( translation );
       }
 
       private bool HasTranslated( string key )
@@ -411,15 +411,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          XuaLogger.Current.Info( "Re-enabled batching." );
       }
 
-      public bool EnqueueTranslation( object ui, UntranslatedText key, TranslationResult translationResult, ParserTranslationContext context )
+      public bool EnqueueTranslation( object ui, UntranslatedText key, InternalTranslationResult translationResult, ParserTranslationContext context, bool checkOtherEndpoints, bool saveResultGlobally )
       {
-         var added = AssociateWithExistingJobIfPossible( ui, key, translationResult, context );
+         var added = AssociateWithExistingJobIfPossible( ui, key, translationResult, context, saveResultGlobally );
          if( added )
          {
             return false;
          }
 
-         var checkOtherEndpoints = translationResult == null;
          if( checkOtherEndpoints )
          {
             var endpoints = Manager.ConfiguredEndpoints;
@@ -429,7 +428,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                var endpoint = endpoints[ i ];
                if( endpoint == this ) continue;
 
-               added = endpoint.AssociateWithExistingJobIfPossible( ui, key, translationResult, context );
+               added = endpoint.AssociateWithExistingJobIfPossible( ui, key, translationResult, context, saveResultGlobally );
                if( added )
                {
                   return false;
@@ -439,24 +438,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          XuaLogger.Current.Debug( "Queued: '" + key.TrimmedTranslatableText + "'" );
 
-         var saveResultGlobally = checkOtherEndpoints;
          var newJob = new TranslationJob( this, key, saveResultGlobally );
-         newJob.Associate( key, ui, translationResult, context );
+         newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
 
          return AddUnstartedJob( key, newJob );
       }
 
-      private bool AssociateWithExistingJobIfPossible( object ui, UntranslatedText key, TranslationResult translationResult, ParserTranslationContext context )
+      private bool AssociateWithExistingJobIfPossible( object ui, UntranslatedText key, InternalTranslationResult translationResult, ParserTranslationContext context, bool saveResultGlobally )
       {
          if( _unstartedJobs.TryGetValue( key, out TranslationJob unstartedJob ) )
          {
-            unstartedJob.Associate( key, ui, translationResult, context );
+            unstartedJob.Associate( key, ui, translationResult, context, saveResultGlobally );
             return true;
          }
 
          if( _ongoingJobs.TryGetValue( key, out TranslationJob ongoingJob ) )
          {
-            ongoingJob.Associate( key, ui, translationResult, context );
+            ongoingJob.Associate( key, ui, translationResult, context, saveResultGlobally );
             return true;
          }
 

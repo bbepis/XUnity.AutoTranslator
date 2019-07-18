@@ -8,8 +8,6 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
-using XUnity.RuntimeHooker;
-using XUnity.RuntimeHooker.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -54,8 +52,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { instance } );
                if( original != null )
                {
-                  var requireRuntimeHooker = (bool?)type.GetProperty( "RequireRuntimeHooker", flags )?.GetValue( null, null ) == true;
-
                   var priority = type.GetCustomAttributes( typeof( HarmonyPriorityShimAttribute ), false )
                      .OfType<HarmonyPriorityShimAttribute>()
                      .FirstOrDefault()
@@ -69,20 +65,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
                   var harmonyTranspiler = transpiler != null ? CreateHarmonyMethod( transpiler, priority ) : null;
 
-                  if( requireRuntimeHooker || Settings.ForceExperimentalHooks )
+                  if( Settings.ForceMonoModHooks )
                   {
-                     if( Settings.EnableExperimentalHooks )
+                     if( ClrTypes.Detour == null || ClrTypes.NativeDetour == null )
                      {
-                        XuaLogger.Current.Info( $"Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
+                        throw new NotSupportedException( "This runtime does not have MonoMod loaded, so MonoMod hooks cannot be used." );
+                     }
 
-                        var hookPrefix = harmonyPrefix != null ? new HookMethod( prefix, priority ?? -1 ) : null;
-                        var hookPostfix = harmonyPostfix != null ? new HookMethod( postfix, priority ?? -1 ) : null;
+                     var mmdetour = type.GetMethod( "MM_Detour", flags );
+                     if( mmdetour != null )
+                     {
+                        object hook;
+                        try
+                        {
+                           hook = ClrTypes.Detour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                        }
+                        catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
+                        {
+                           hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                        }
 
-                        RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
+                        hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
+                        type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
                      }
                      else
                      {
-                        XuaLogger.Current.Info( $"Skipping hook on '{original.DeclaringType.FullName}.{original.Name}' because it requires 'EnableExperimentalHooks' enabled is config file." );
+                        XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}' because no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
                      }
                   }
                   else
@@ -98,20 +106,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                            PatchMethod20.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler, null } );
                         }
                      }
-                     catch( Exception e ) when( e.IsCausedBy<PlatformNotSupportedException>() )
+                     catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                      {
-                        if( Settings.EnableExperimentalHooks )
+                        if( ClrTypes.Detour != null && ClrTypes.NativeDetour != null )
                         {
-                           XuaLogger.Current.Info( $"Harmony is not supported in this runtime. Hooking '{original.DeclaringType.FullName}.{original.Name}' through experimental hooks." );
+                           var mmdetour = type.GetMethod( "MM_Detour", flags );
+                           if( mmdetour != null )
+                           {
+                              object hook;
+                              try
+                              {
+                                 hook = ClrTypes.Detour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                              }
+                              catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
+                              {
+                                 hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                              }
 
-                           var hookPrefix = harmonyPrefix != null ? new HookMethod( prefix, priority ?? -1 ) : null;
-                           var hookPostfix = harmonyPostfix != null ? new HookMethod( postfix, priority ?? -1 ) : null;
-
-                           RuntimeMethodPatcher.Patch( original, hookPrefix, hookPostfix );
+                              hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
+                              type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
+                           }
+                           else
+                           {
+                              XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
+                           }
                         }
                         else
                         {
-                           XuaLogger.Current.Error( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime. You can try to 'EnableExperimentalHooks' in the config file to enable support for this game." );
+                           XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no MonoMod is not loaded. Failing hook: '{type.Name}'." );
                         }
                      }
                   }
@@ -126,7 +148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             if( original != null )
             {
-               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method '{original.DeclaringType.FullName}.{original.Name}'." );
+               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method '{original.DeclaringType.FullName}.{original.Name}'. Failing hook: '{type.Name}'." );
             }
             else
             {

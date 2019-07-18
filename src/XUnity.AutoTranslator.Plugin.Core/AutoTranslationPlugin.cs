@@ -33,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// <summary>
    /// Main plugin class for the AutoTranslator.
    /// </summary>
-   public class AutoTranslationPlugin : MonoBehaviour, ITranslator
+   public class AutoTranslationPlugin : MonoBehaviour, IInternalTranslator
    {
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
@@ -88,10 +88,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Setup 'singleton'
          Current = this;
 
-         // because we only use harmony through reflection due to
+         // because we only use harmony/MonoMod through reflection due to
          // version compatibility issues, we call this method to
-         // ensure that harmony is loaded before we attempt to obtain
-         // various harmony classes through reflection
+         // ensure that it is loaded before we attempt to obtain
+         // various harmony/MonoMod classes through reflection
          HarmonyLoader.Load();
 
          // Setup logger, if it was not already initialized by a plugin-version
@@ -392,10 +392,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
          TextureCache.LoadTranslationFiles();
       }
 
-      private void CreateTranslationJobFor( TranslationEndpointManager endpoint, object ui, UntranslatedText key, TranslationResult translationResult, ParserTranslationContext context )
+      private void CreateTranslationJobFor(
+         TranslationEndpointManager endpoint,
+         object ui,
+         UntranslatedText key,
+         InternalTranslationResult translationResult,
+         ParserTranslationContext context,
+         bool checkOtherEndpoints,
+         bool checkSpam,
+         bool saveResultGlobally )
       {
-         var added = endpoint.EnqueueTranslation( ui, key, translationResult, context );
-         if( added && translationResult == null )
+         var added = endpoint.EnqueueTranslation( ui, key, translationResult, context, checkOtherEndpoints, saveResultGlobally );
+         if( added && checkSpam )
          {
             SpamChecker.PerformChecks( key.TrimmedTranslatableText );
          }
@@ -466,11 +474,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal string ExternalHook_TextChanged_WithResult( object ui, string text )
       {
-         if( !ui.IsKnownTextType() ) return null;
+         if( ui == null ) return null;
 
          try
          {
-            CallOrigin.ExpectsTextToBeReturned = true;
+            CallOrigin.ExpectsTextToBeReturned = ui.IsKnownTextType();
 
             if( _textHooksEnabled && !_temporarilyDisabled )
             {
@@ -632,7 +640,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                info?.ResetScrollIn( ui );
 
-               if( originalText != null && TranslationAggregatorWindow != null && info != null && !ui.IsSpammingComponent() )
+               if( originalText != null && TranslationAggregatorWindow != null && ui != null && !ui.IsSpammingComponent() && ui.IsKnownTextType() )
                {
                   TranslationAggregatorWindow.OnNewTranslationAdded( originalText, text );
                }
@@ -706,7 +714,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string TranslateOrQueueWebJob( object ui, string text, bool ignoreComponentState )
       {
          var info = ui.GetOrCreateTextTranslationInfo();
-         
+
          if( _ongoingOperations.Contains( ui ) )
          {
             return TranslateImmediate( ui, text, info, ignoreComponentState );
@@ -1045,132 +1053,313 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      // "public" endpoint to perform translations
-      TranslationResult ITranslator.Translate( TranslationEndpointManager endpoint, string untranslatedText )
+      #region IInternalTranslator
+
+      void IInternalTranslator.TranslateAsync( TranslationEndpointManager endpoint, string untranslatedText, Action<TranslationResult> onCompleted )
       {
-         return Translate( untranslatedText, endpoint, null );
+         Translate( untranslatedText, endpoint, null, onCompleted, false );
       }
 
-      private TranslationResult Translate( string text, TranslationEndpointManager endpoint, ParserTranslationContext context )
+      void ITranslator.TranslateAsync( string untranslatedText, Action<TranslationResult> onCompleted )
       {
-         var result = new TranslationResult();
+         Translate( untranslatedText, TranslationManager.CurrentEndpoint, null, onCompleted, true );
+      }
 
-         // Ensure that we actually want to translate this text and its owning UI element.
-         if( !string.IsNullOrEmpty( text ) && endpoint.IsTranslatable( text ) && IsBelowMaxLength( text ) )
+      bool ITranslator.TryTranslate( string text, out string translatedText )
+      {
+         var bestFrame = Time.frameCount;
+
+         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && IsBelowMaxLength( text ) )
          {
-            var textKey = GetCacheKey( null, text, false, context != null );
+            var textKey = GetCacheKey( null, text, false, false );
 
             // potentially shortcircuit if fully templated
-            if( text != textKey.TemplatedOriginalText && !endpoint.IsTranslatable( textKey.TemplatedOriginalText ) )
+            if( text != textKey.TemplatedOriginalText && !TextCache.IsTranslatable( textKey.TemplatedOriginalText, false ) )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginalText );
-               result.SetCompleted( untemplatedTranslation, true );
-               return result;
+               translatedText = untemplatedTranslation;
+               return true;
             }
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
-            if( endpoint.TryGetTranslation( textKey, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, true, false, out translation ) )
             {
                if( !string.IsNullOrEmpty( translation ) )
                {
-                  result.SetCompleted( textKey.Untemplate( translation ), true );
+                  translatedText = translation;
+                  return true;
                }
-               else
-               {
-                  result.SetEmptyResponse( true );
-               }
-               return result;
             }
             else
             {
-               if( context == null )
+               var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+               if( parserResult.Succeeded )
                {
-                  var parserResult = UnityTextParsers.RichTextParser.Parse( text );
-                  if( parserResult.Succeeded )
+                  translatedText = TranslateByParserResult( null, parserResult, null, false, true );
+                  return translatedText != null;
+               }
+            }
+         }
+
+         translatedText = null;
+         return false;
+      }
+
+      #endregion
+
+      private InternalTranslationResult Translate( string text, TranslationEndpointManager endpoint, ParserTranslationContext context, Action<TranslationResult> onCompleted, bool isGlobal )
+      {
+         var bestFrame = Time.frameCount;
+
+         var result = new InternalTranslationResult( isGlobal, onCompleted );
+         if( isGlobal )
+         {
+            if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && IsBelowMaxLength( text ) )
+            {
+               var textKey = GetCacheKey( null, text, false, context != null );
+
+               // potentially shortcircuit if fully templated
+               if( text != textKey.TemplatedOriginalText && !TextCache.IsTranslatable( textKey.TemplatedOriginalText, false ) )
+               {
+                  var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginalText );
+                  result.SetCompleted( untemplatedTranslation );
+                  return result;
+               }
+
+               // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+               string translation;
+               if( TextCache.TryGetTranslation( textKey, true, false, out translation ) )
+               {
+                  if( !string.IsNullOrEmpty( translation ) )
                   {
-                     translation = TranslateByParserResult( endpoint, parserResult, result, true );
-                     if( translation != null )
-                     {
-                        result.SetCompleted( translation, true );
-                     }
-
-                     // return because result will be completed later by recursive call
-
-                     return result;
+                     result.SetCompleted( textKey.Untemplate( translation ) );
                   }
-               }
-
-               if( Settings.IsShutdown )
-               {
-                  result.SetErrorWithMessage( "The plugin is shutdown.", true );
-               }
-               else if( endpoint.HasFailedDueToConsecutiveErrors )
-               {
-                  result.SetErrorWithMessage( "The translation endpoint is shutdown.", true );
+                  else
+                  {
+                     result.SetEmptyResponse();
+                  }
+                  return result;
                }
                else
                {
-                  CreateTranslationJobFor( endpoint, null, textKey, result, context );
-               }
+                  if( context == null )
+                  {
+                     var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+                     if( parserResult.Succeeded )
+                     {
+                        translation = TranslateByParserResult( endpoint, parserResult, result, true, result.IsGlobal );
+                        if( translation != null )
+                        {
+                           result.SetCompleted( translation );
+                        }
 
-               return result;
+                        // return because result will be completed later by recursive call
+
+                        return result;
+                     }
+                  }
+
+                  if( Settings.IsShutdown )
+                  {
+                     result.SetErrorWithMessage( "The plugin is shutdown." );
+                  }
+                  else if( endpoint == null )
+                  {
+                     result.SetErrorWithMessage( "No translator is selected." );
+                  }
+                  else if( endpoint.HasFailedDueToConsecutiveErrors )
+                  {
+                     result.SetErrorWithMessage( "The translation endpoint is shutdown." );
+                  }
+                  else
+                  {
+                     CreateTranslationJobFor( endpoint, null, textKey, result, context, true, true, true );
+                  }
+
+                  return result;
+               }
+            }
+            else
+            {
+               result.SetErrorWithMessage( $"The provided text ({text}) cannot be translated." );
             }
          }
          else
          {
-            result.SetErrorWithMessage( $"The provided text ({text}) cannot be translated.", true );
+            if( endpoint == null )
+            {
+               result.SetErrorWithMessage( "No translator is selected." );
+            }
+            else if( !string.IsNullOrEmpty( text ) && endpoint.IsTranslatable( text ) && IsBelowMaxLength( text ) )
+            {
+               var textKey = GetCacheKey( null, text, false, context != null );
 
-            return result;
+               // potentially shortcircuit if fully templated
+               if( text != textKey.TemplatedOriginalText && !endpoint.IsTranslatable( textKey.TemplatedOriginalText ) )
+               {
+                  var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginalText );
+                  result.SetCompleted( untemplatedTranslation );
+                  return result;
+               }
+
+               // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+               string translation;
+               if( endpoint.TryGetTranslation( textKey, out translation ) )
+               {
+                  if( !string.IsNullOrEmpty( translation ) )
+                  {
+                     result.SetCompleted( textKey.Untemplate( translation ) );
+                  }
+                  else
+                  {
+                     result.SetEmptyResponse();
+                  }
+                  return result;
+               }
+               else
+               {
+                  if( context == null )
+                  {
+                     var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+                     if( parserResult.Succeeded )
+                     {
+                        translation = TranslateByParserResult( endpoint, parserResult, result, true, result.IsGlobal );
+                        if( translation != null )
+                        {
+                           result.SetCompleted( translation );
+                        }
+
+                        // return because result will be completed later by recursive call
+
+                        return result;
+                     }
+                  }
+
+                  if( Settings.IsShutdown )
+                  {
+                     result.SetErrorWithMessage( "The plugin is shutdown." );
+                  }
+                  else if( endpoint.HasFailedDueToConsecutiveErrors )
+                  {
+                     result.SetErrorWithMessage( "The translation endpoint is shutdown." );
+                  }
+                  else
+                  {
+                     CreateTranslationJobFor( endpoint, null, textKey, result, context, false, false, false );
+                  }
+
+                  return result;
+               }
+            }
+            else
+            {
+               result.SetErrorWithMessage( $"The provided text ({text}) cannot be translated." );
+            }
          }
+
+         return result;
       }
 
-      private string TranslateByParserResult( TranslationEndpointManager endpoint, ParserResult result, TranslationResult translationResult, bool allowStartJob )
+      private string TranslateByParserResult( TranslationEndpointManager endpoint, ParserResult result, InternalTranslationResult translationResult, bool allowStartJob, bool isGlobal )
       {
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
-         // attempt to lookup ALL strings immediately; return result if possible; queue operations
-         foreach( var kvp in result.Arguments )
+         var context = new ParserTranslationContext( null, endpoint, translationResult, result );
+         if( isGlobal )
          {
-            var variableName = kvp.Key;
-            var untranslatedTextPart = kvp.Value;
-            if( !string.IsNullOrEmpty( untranslatedTextPart ) && endpoint.IsTranslatable( untranslatedTextPart ) && IsBelowMaxLength( untranslatedTextPart ) )
+            // attempt to lookup ALL strings immediately; return result if possible; queue operations
+            foreach( var kvp in result.Arguments )
             {
-               var textKey = new UntranslatedText( untranslatedTextPart, false, false );
-               if( endpoint.IsTranslatable( textKey.TemplatedOriginalText ) )
+               var variableName = kvp.Key;
+               var untranslatedTextPart = kvp.Value;
+               if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart, true ) && IsBelowMaxLength( untranslatedTextPart ) )
                {
-                  string partTranslation;
-                  if( endpoint.TryGetTranslation( textKey, out partTranslation ) )
+                  var textKey = new UntranslatedText( untranslatedTextPart, false, false );
+                  if( TextCache.IsTranslatable( textKey.TemplatedOriginalText, true ) )
                   {
-                     translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                     string partTranslation;
+                     if( TextCache.TryGetTranslation( textKey, false, true, out partTranslation ) )
+                     {
+                        translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                     }
+                     else if( allowStartJob )
+                     {
+                        // incomplete, must start job
+                        Translate( untranslatedTextPart, endpoint, context, null, isGlobal );
+                     }
                   }
-                  else if( allowStartJob )
+                  else
                   {
-                     // incomplete, must start job
-                     var context = new ParserTranslationContext( null, endpoint, translationResult, result );
-                     Translate( untranslatedTextPart, endpoint, context );
+                     // the template itself does not require a translation, which means the untranslated template equals the translated text
+                     translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginalText ) );
                   }
                }
                else
                {
-                  // the template itself does not require a translation, which means the untranslated template equals the translated text
-                  translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginalText ) );
+                  // the value will do
+                  translations.Add( variableName, untranslatedTextPart );
                }
+            }
+
+            if( result.Arguments.Count == translations.Count )
+            {
+               return result.Untemplate( translations );
             }
             else
             {
-               // the value will do
-               translations.Add( variableName, untranslatedTextPart );
+               return null; // could not perform complete translation
             }
-         }
-
-         if( result.Arguments.Count == translations.Count )
-         {
-            return result.Untemplate( translations );
          }
          else
          {
-            return null; // could not perform complete translation
+            // attempt to lookup ALL strings immediately; return result if possible; queue operations
+            foreach( var kvp in result.Arguments )
+            {
+               if( endpoint == null )
+               {
+                  return null;
+               }
+
+               var variableName = kvp.Key;
+               var untranslatedTextPart = kvp.Value;
+               if( !string.IsNullOrEmpty( untranslatedTextPart ) && endpoint.IsTranslatable( untranslatedTextPart ) && IsBelowMaxLength( untranslatedTextPart ) )
+               {
+                  var textKey = new UntranslatedText( untranslatedTextPart, false, false );
+                  if( endpoint.IsTranslatable( textKey.TemplatedOriginalText ) )
+                  {
+                     string partTranslation;
+                     if( endpoint.TryGetTranslation( textKey, out partTranslation ) )
+                     {
+                        translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                     }
+                     else if( allowStartJob )
+                     {
+                        // incomplete, must start job
+                        Translate( untranslatedTextPart, endpoint, context, null, isGlobal );
+                     }
+                  }
+                  else
+                  {
+                     // the template itself does not require a translation, which means the untranslated template equals the translated text
+                     translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginalText ) );
+                  }
+               }
+               else
+               {
+                  // the value will do
+                  translations.Add( variableName, untranslatedTextPart );
+               }
+            }
+
+            if( result.Arguments.Count == translations.Count )
+            {
+               return result.Untemplate( translations );
+            }
+            else
+            {
+               return null; // could not perform complete translation
+            }
          }
       }
 
@@ -1374,7 +1563,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                        {
                                           if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
                                           {
-                                             CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context );
+                                             CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context, true, true, true );
                                           }
                                        }
                                     }
@@ -1399,7 +1588,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
                         {
                            // once the text has stabilized, attempt to look it up
-                           CreateTranslationJobFor( endpoint, ui, textKey, null, context );
+                           CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true );
                         }
                      }
                   }
@@ -1420,7 +1609,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  {
                                     if( !TextCache.TryGetTranslation( textKey, true, false, out translation ) )
                                     {
-                                       CreateTranslationJobFor( endpoint, ui, textKey, null, context );
+                                       CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true );
                                     }
                                  }
                               }
@@ -1438,6 +1627,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
          // attempt to lookup ALL strings immediately; return result if possible; queue operations
+         var context = new ParserTranslationContext( ui, TranslationManager.CurrentEndpoint, null, result );
          foreach( var kvp in result.Arguments )
          {
             var variableName = kvp.Key;
@@ -1456,7 +1646,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   else if( allowStartJob )
                   {
                      // incomplete, must start job
-                     var context = new ParserTranslationContext( ui, TranslationManager.CurrentEndpoint, null, result );
                      TranslateOrQueueWebJobImmediate( ui, untranslatedTextPart, null, false, true, context );
                   }
                }
@@ -1771,7 +1960,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          foreach( var translationResult in job.TranslationResults )
          {
-            translationResult.Item.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error.", false );
+            translationResult.Item.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error." );
          }
 
          foreach( var context in job.Contexts )
@@ -1782,7 +1971,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // are all jobs within this context completed? If so, we can set the text
                if( context.Jobs.Any( x => x.State == TranslationJobState.Failed ) )
                {
-                  translationResult.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error.", false );
+                  translationResult.SetErrorWithMessage( job.ErrorMessage ?? "Unknown error." );
                }
             }
          }
@@ -1793,19 +1982,75 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var translationType = job.TranslationType;
          var isFull = job.IsFullTranslation;
 
-         if( job.Key.IsTemplated && Settings.GenerateStaticSubstitutionTranslations && !job.Key.IsFromSpammingComponent )
+         if( job.Key.IsTemplated && Settings.GenerateStaticSubstitutionTranslations )
          {
+            bool addedTemplatedTranslation = false;
+
+            // make sure case of spamming component is handled (templated numbers!)
+            if( job.Key.IsFromSpammingComponent )
+            {
+               addedTemplatedTranslation = true;
+
+               if( job.SaveResultGlobally )
+               {
+                  TextCache.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText, isFull, translationType );
+               }
+               job.Endpoint.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText );
+            }
+
             foreach( var keyAndComponent in job.Components )
             {
                var key = keyAndComponent.Key;
 
-               var untemplatedTranslatableText = key.Untemplate( key.TranslatableText );
-               var untemplatedTranslatedText = key.Untemplate( job.TranslatedText );
-               if( job.SaveResultGlobally )
+               if( key.IsFromSpammingComponent ) // not theoretically possible because spamming components are not added as a component
                {
-                  TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType );
+                  if( addedTemplatedTranslation ) continue; // no reason to do this more than once
+
+                  addedTemplatedTranslation = true;
+                  if( job.SaveResultGlobally )
+                  {
+                     TextCache.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText, isFull, translationType );
+                  }
+                  job.Endpoint.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText );
                }
-               job.Endpoint.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText );
+               else
+               {
+                  var untemplatedTranslatableText = key.Untemplate( key.TranslatableText );
+                  var untemplatedTranslatedText = key.Untemplate( job.TranslatedText );
+                  if( job.SaveResultGlobally )
+                  {
+                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType );
+                  }
+                  job.Endpoint.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText );
+               }
+            }
+
+            // also handle storing translations for 'TranslationResults'
+            foreach( var translationResult in job.TranslationResults )
+            {
+               var key = translationResult.Key;
+
+               if( key.IsFromSpammingComponent ) // not theoretically possible because translation results are never considered "spamming"
+               {
+                  if( addedTemplatedTranslation ) continue; // no reason to do this more than once
+
+                  addedTemplatedTranslation = true;
+                  if( job.SaveResultGlobally )
+                  {
+                     TextCache.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText, isFull, translationType );
+                  }
+                  job.Endpoint.AddTranslationToCache( job.Key.TranslatableText, job.TranslatedText );
+               }
+               else
+               {
+                  var untemplatedTranslatableText = key.Untemplate( key.TranslatableText );
+                  var untemplatedTranslatedText = key.Untemplate( job.TranslatedText );
+                  if( job.SaveResultGlobally )
+                  {
+                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType );
+                  }
+                  job.Endpoint.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText );
+               }
             }
          }
          else
@@ -1822,11 +2067,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( !string.IsNullOrEmpty( job.TranslatedText ) )
             {
-               translationResult.Item.SetCompleted( translationResult.Key.Untemplate( job.TranslatedText ), false );
+               translationResult.Item.SetCompleted( translationResult.Key.Untemplate( job.TranslatedText ) );
             }
             else
             {
-               translationResult.Item.SetEmptyResponse( false );
+               translationResult.Item.SetEmptyResponse();
             }
          }
 
@@ -1873,7 +2118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                   else
                   {
-                     translatedText = TranslateByParserResult( context.Endpoint, result, null, false );
+                     translatedText = TranslateByParserResult( context.Endpoint, result, null, false, context.TranslationResult.IsGlobal );
                   }
 
                   if( !string.IsNullOrEmpty( translatedText ) )
@@ -1895,14 +2140,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( context.TranslationResult != null )
                      {
-                        context.TranslationResult.SetCompleted( translatedText, false );
+                        context.TranslationResult.SetCompleted( translatedText );
                      }
                   }
                   else
                   {
                      if( context.TranslationResult != null )
                      {
-                        context.TranslationResult.SetEmptyResponse( false );
+                        context.TranslationResult.SetEmptyResponse();
                      }
                   }
                }
@@ -1925,12 +2170,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private static UntranslatedText GetCacheKey( object ui, string originalText, bool templatizeByNumbers, bool neverRemoveWhitespace )
+      private static UntranslatedText GetCacheKey( object ui, string originalText, bool isFromSpammingComponent, bool neverRemoveWhitespace )
       {
          var removeInternalWhitespace = !neverRemoveWhitespace
             && ( ( Settings.IgnoreWhitespaceInDialogue && originalText.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && ui.IsNGUI() ) );
 
-         return new UntranslatedText( originalText, templatizeByNumbers, removeInternalWhitespace );
+         return new UntranslatedText( originalText, isFromSpammingComponent, removeInternalWhitespace );
       }
 
       private void ReloadTranslations()

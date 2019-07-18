@@ -33,13 +33,13 @@ namespace GoogleTranslateLegitimate
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "GoogleLegitimate", "GoogleAPIKey", "" );
-         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided." );
+         if( string.IsNullOrEmpty( _key ) ) throw new EndpointInitializationException( "The GoogleTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
          context.DisableCertificateChecksFor( "translation.googleapis.com" );
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )

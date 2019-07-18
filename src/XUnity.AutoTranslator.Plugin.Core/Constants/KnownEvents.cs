@@ -11,5 +11,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static string OnUnableToTranslateTextMeshPro = "OnUnableToTranslateTextMeshPro";
       public static string OnUnableToTranslateNGUI = "OnUnableToTranslateNGUI";
       public static string OnUnableToTranslateIMGUI = "OnUnableToTranslateIMGUI";
+      public static string OnUnableToTranslateTextMesh = "OnUnableToTranslateTextMesh";
    }
 }

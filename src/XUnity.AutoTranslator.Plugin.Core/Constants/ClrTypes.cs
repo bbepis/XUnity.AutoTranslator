@@ -25,6 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type UIInput = FindType( "UIInput" );
 
       // Unity
+      public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );
       public static readonly Type Image = FindType( "UnityEngine.UI.Image" );
       public static readonly Type RawImage = FindType( "UnityEngine.UI.RawImage" );
@@ -69,10 +70,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       // Harmony
       public static readonly Type AccessTools = FindType( "Harmony.AccessTools" ) ?? FindType( "HarmonyLib.AccessTools" );
-
       public static readonly Type HarmonyInstance = FindType( "Harmony.HarmonyInstance" );
       public static readonly Type HarmonyMethod = FindType( "Harmony.HarmonyMethod" ) ?? FindType( "HarmonyLib.HarmonyMethod" );
       public static readonly Type Harmony = FindType( "HarmonyLib.Harmony" );
+
+      // MonoMod
+      public static readonly Type Detour = FindTypeStrict( "MonoMod.RuntimeDetour.Detour, MonoMod.RuntimeDetour" );
+      public static readonly Type NativeDetour = FindTypeStrict( "MonoMod.RuntimeDetour.NativeDetour, MonoMod.RuntimeDetour" );
 
       // Mono / .NET
       public static readonly Type MethodBase = FindType( "System.Reflection.MethodBase" );
@@ -88,6 +92,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
             .Select( x => x.GetType( name, false ) )
             .Where( x => x != null )
             .FirstOrDefault();
+      }
+
+      private static Type FindTypeStrict( string name )
+      {
+         return Type.GetType( name, false );
       }
    }
 }

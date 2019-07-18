@@ -32,9 +32,9 @@ namespace YandexTranslate
          context.DisableCertificateChecksFor( "translate.yandex.net" );
 
          // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
-         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The YandexTranslate endpoint requires an API key which has not been provided." );
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( string.IsNullOrEmpty( _key ) ) throw new EndpointInitializationException( "The YandexTranslate endpoint requires an API key which has not been provided." );
+         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )

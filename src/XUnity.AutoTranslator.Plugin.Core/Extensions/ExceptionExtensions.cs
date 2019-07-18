@@ -7,16 +7,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class ExceptionExtensions
    {
-      public static bool IsCausedBy<TException>( this Exception e )
+      public static TException FirstInnerExceptionOfType<TException>( this Exception e )
+         where TException : Exception
       {
          var current = e;
          while( current != null )
          {
-            if( current is TException ) return true;
+            if( current is TException ) return (TException)current;
             current = current.InnerException;
          }
 
-         return false;
+         return null;
       }
    }
 }

@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.RuntimeHooker.Core;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 {
@@ -47,6 +47,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          Settings.SetCurText?.Invoke( __instance );
       }
+
+      static Action<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string>>();
+      }
+
+      static void MM_Detour( object __instance, string value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -69,6 +83,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
       }
    }
 
@@ -93,6 +121,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      static Action<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string>>();
+      }
+
+      static void MM_Detour( object __instance, string value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -116,6 +158,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -138,6 +194,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+
+      static Action<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string>>();
+      }
+
+      static void MM_Detour( object __instance, string value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
 
@@ -163,18 +233,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
-      //static void Prefix( object __instance, ref string value )
-      //{
-      //   if( !TextMeshProHooks.HooksOverriden )
-      //   {
-      //      var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, value, false );
-      //      if( result != null )
-      //      {
-      //         value = result;
-      //      }
-      //   }
-      //   AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
-      //}
+      static Action<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string>>();
+      }
+
+      static void MM_Detour( object __instance, string value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -197,6 +268,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+
+      static Action<object, StringBuilder> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, StringBuilder>>();
+      }
+
+      static void MM_Detour( object __instance, StringBuilder value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
 
@@ -221,11 +306,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      static Action<object, string, bool> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string, bool>>();
+      }
+
+      static void MM_Detour( object __instance, string value, bool arg2 )
+      {
+         _original( __instance, value, arg2 );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook3
    {
+      delegate void OriginalMethod( object arg1, string arg2, float arg3, float arg4, float arg5 );
+
       static bool Prepare( object instance )
       {
          return ClrTypes.TMP_Text != null;
@@ -243,6 +344,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( object __instance, string value, float arg2, float arg3, float arg4 )
+      {
+         _original( __instance, value, arg2, arg3, arg4 );
+
+         Postfix( __instance );
       }
    }
 
@@ -267,6 +382,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      static Action<object, char[]> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, char[]>>();
+      }
+
+      static void MM_Detour( object __instance, char[] value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -290,6 +419,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
+
+      static Action<object, char[], int, int> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, char[], int, int>>();
+      }
+
+      static void MM_Detour( object __instance, char[] value, int arg2, int arg3 )
+      {
+         _original( __instance, value, arg2, arg3 );
+
+         Postfix( __instance );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -312,6 +455,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          }
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+      }
+
+      static Action<object, int[], int, int> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, int[], int, int>>();
+      }
+
+      static void MM_Detour( object __instance, int[] value, int arg2, int arg3 )
+      {
+         _original( __instance, value, arg2, arg3 );
+
+         Postfix( __instance );
       }
    }
 }

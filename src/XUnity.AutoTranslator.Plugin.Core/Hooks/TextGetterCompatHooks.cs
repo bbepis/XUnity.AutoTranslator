@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
@@ -29,6 +30,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
       {
          TextGetterCompatModeHelper.ReplaceTextWithOriginal( __instance, ref __result );
       }
+
+      static Func<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Func<object, string>>();
+      }
+
+      static string MM_Detour( object __instance )
+      {
+         var result = _original( __instance );
+
+         Postfix( __instance, ref result );
+
+         return result;
+      }
    }
    
    internal static class TMP_Text_text_Hook
@@ -46,6 +63,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
       static void Postfix( object __instance, ref string __result )
       {
          TextGetterCompatModeHelper.ReplaceTextWithOriginal( __instance, ref __result );
+      }
+
+      static Func<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Func<object, string>>();
+      }
+
+      static string MM_Detour( object __instance )
+      {
+         var result = _original( __instance );
+
+         Postfix( __instance, ref result );
+
+         return result;
       }
    }
 }

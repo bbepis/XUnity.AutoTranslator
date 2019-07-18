@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          Components = new List<KeyAnd<object>>();
          Contexts = new HashSet<ParserTranslationContext>();
-         TranslationResults = new HashSet<KeyAnd<TranslationResult>>();
+         TranslationResults = new HashSet<KeyAnd<InternalTranslationResult>>();
       }
 
       public bool SaveResultGlobally { get; private set; }
@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public List<KeyAnd<object>> Components { get; private set; }
 
-      public HashSet<KeyAnd<TranslationResult>> TranslationResults { get; private set; }
+      public HashSet<KeyAnd<InternalTranslationResult>> TranslationResults { get; private set; }
 
       public UntranslatedText Key { get; private set; }
 
@@ -43,8 +43,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool IsFullTranslation => ( TranslationType & TranslationType.Full ) == TranslationType.Full;
 
-      public void Associate( UntranslatedText key, object ui, TranslationResult translationResult, ParserTranslationContext context )
+      public void Associate( UntranslatedText key, object ui, InternalTranslationResult translationResult, ParserTranslationContext context, bool saveResultGlobally )
       {
+         // if just one of the things associated with this job, wants to save it, we shall!
+         SaveResultGlobally = SaveResultGlobally || saveResultGlobally;
+
          if( context != null )
          {
             Contexts.Add( context );
@@ -61,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( translationResult != null )
             {
-               TranslationResults.Add( new KeyAnd<TranslationResult>( key, translationResult ) );
+               TranslationResults.Add( new KeyAnd<InternalTranslationResult>( key, translationResult ) );
             }
 
             TranslationType |= TranslationType.Full;

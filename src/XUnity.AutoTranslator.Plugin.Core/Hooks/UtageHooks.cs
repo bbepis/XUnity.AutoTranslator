@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
@@ -12,35 +13,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    internal static class UtageHooks
    {
       public static readonly Type[] All = new[] {
-         //typeof( AdvCommand_ParseCellLocalizedText_Hook ),
          typeof( AdvEngine_JumpScenario_Hook ),
          typeof( UnityEventBase_Invoke_Hook ),
          typeof( UnityEventBase_PrepareInvoke_Hook ),
          typeof( AdvPage_RemakeTextData_Hook ),
       };
    }
-   
-   //internal static class AdvCommand_ParseCellLocalizedText_Hook
-   //{
-   //   static bool Prepare( object instance )
-   //   {
-   //      return ClrTypes.AdvCommand != null && AdvPage_RemakeTextData_Hook.TargetMethod( instance ) == null;
-   //   }
-
-   //   static MethodBase TargetMethod( object instance )
-   //   {
-   //      return AccessTools.Method( ClrTypes.AdvCommand, "ParseCellLocalizedText", new Type[] { } );
-   //   }
-
-   //   static void Postfix( object __instance, ref string __result )
-   //   {
-   //      var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, __result );
-   //      if( !string.IsNullOrEmpty( result ) )
-   //      {
-   //         __result = result;
-   //      }
-   //   }
-   //}
    
    internal static class AdvEngine_JumpScenario_Hook
    {
@@ -57,6 +35,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       static void Prefix( ref string label )
       {
          UtageHelper.FixLabel( ref label );
+      }
+
+      static Action<object, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, string>>();
+      }
+
+      static void MM_Detour( object __instance, string value )
+      {
+         Prefix( ref value );
+
+         _original( __instance, value );
       }
    }
    
@@ -75,6 +67,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       static bool Prefix()
       {
          return Settings.InvokeEvents;
+      }
+
+      static Action<object, object[]> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object[]>>();
+      }
+
+      static void MM_Detour( object __instance, object[] args )
+      {
+         var ok = Prefix();
+
+         if( ok )
+         {
+            _original( __instance, args );
+         }
       }
    }
    
@@ -112,6 +121,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             __result = DefaultResult;
          }
       }
+
+      static Func<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Func<object, object>>();
+      }
+
+      static object MM_Detour( object __instance )
+      {
+         var result = _original( __instance );
+
+         Postfix( ref result );
+
+         return result;
+      }
    }
    
    internal static class AdvPage_RemakeTextData_Hook
@@ -136,6 +161,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
 
          return true;
+      }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         var ok = Prefix( __instance );
+
+         if( ok )
+         {
+            _original( __instance );
+         }
       }
    }
 }

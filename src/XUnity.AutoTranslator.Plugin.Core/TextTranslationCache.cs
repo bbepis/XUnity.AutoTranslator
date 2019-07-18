@@ -363,7 +363,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool IsTranslation( string translation )
       {
-         return _reverseTranslations.ContainsKey( translation );
+         return !HasTranslated( translation ) && _reverseTranslations.ContainsKey( translation );
       }
 
       private bool IsTokenTranslation( string translation )

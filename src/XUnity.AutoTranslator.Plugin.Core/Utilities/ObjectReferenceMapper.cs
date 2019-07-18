@@ -16,22 +16,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
 
-      public static TextTranslationInfo GetOrCreateTextTranslationInfo( this object obj )
+      public static TextTranslationInfo GetOrCreateTextTranslationInfo( this object ui )
       {
-         if( !obj.SupportsStabilization() ) return null;
+         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
+         {
+            var info = ui.GetOrCreate<TextTranslationInfo>();
 
-         var info = obj.GetOrCreate<TextTranslationInfo>();
+            return info;
+         }
 
-         return info;
+         return null;
       }
 
-      public static TextTranslationInfo GetTextTranslationInfo( this object obj )
+      public static TextTranslationInfo GetTextTranslationInfo( this object ui )
       {
-         if( !obj.SupportsStabilization() ) return null;
+         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
+         {
+            var info = ui.Get<TextTranslationInfo>();
 
-         var info = obj.Get<TextTranslationInfo>();
+            return info;
+         }
 
-         return info;
+         return null;
       }
 
       public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj )

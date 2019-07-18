@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class ParserTranslationContext
    {
-      public ParserTranslationContext( object component, TranslationEndpointManager endpoint, TranslationResult translationResult, ParserResult result )
+      public ParserTranslationContext( object component, TranslationEndpointManager endpoint, InternalTranslationResult translationResult, ParserResult result )
       {
          Jobs = new HashSet<TranslationJob>();
          Component = component;
@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public HashSet<TranslationJob> Jobs { get; private set; }
 
-      public TranslationResult TranslationResult { get; private set; }
+      public InternalTranslationResult TranslationResult { get; private set; }
 
       public object Component { get; private set; }
 

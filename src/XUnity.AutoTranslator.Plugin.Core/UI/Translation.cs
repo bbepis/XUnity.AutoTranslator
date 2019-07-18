@@ -16,19 +16,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public void PerformTranslation( TranslationEndpointManager endpoint )
       {
-         var response = AutoTranslator.Default.Translate( endpoint, OriginalText );
-         response.Completed += Response_Completed;
-         response.Error += Response_Error;
+         AutoTranslator.Internal.TranslateAsync( endpoint, OriginalText, Response_Completed );
       }
 
-      private void Response_Error( string error )
+      private void Response_Completed( TranslationResult result )
       {
-         TranslatedText = error;
-      }
-
-      private void Response_Completed( string translatedText )
-      {
-         TranslatedText = translatedText;
+         if( result.Succeeded )
+         {
+            TranslatedText = result.TranslatedText;
+         }
+         else
+         {
+            TranslatedText = result.ErrorMessage;
+         }
       }
    }
 }

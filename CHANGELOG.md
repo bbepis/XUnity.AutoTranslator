@@ -1,4 +1,11 @@
-﻿### 3.6.2
+﻿### 3.7.0
+ * FEATURE - Support for hooking 3D TextMesh (disabled by default)
+ * FEATURE - Public API surface to query the plugin for translations
+ * CHANGE - Replaced 'Experimental' hooks with MonoMod hooks, which are now always enabled in supported environments
+ * MISC - Allow external plugins to pass in unknown components when overriding hooks
+ * BUG FIX - Fixed bug in relation to rich text handling in Translation Aggregator-view
+
+### 3.6.2
  * BUG FIX - Fixed a bug with escape/unescape logic in translation text files
  * BUG FIX - Plugin now loads all translations provided in the translation text files - even if they are not considered a candidate for machine translation
  * BUG FIX - Fixed a bug where reloading or toggling the translations would not always show the correct text

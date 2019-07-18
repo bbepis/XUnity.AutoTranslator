@@ -29,8 +29,8 @@ namespace BaiduTranslate
       {
          _appId = context.GetOrCreateSetting( "Baidu", "BaiduAppId", "" );
          _appSecret = context.GetOrCreateSetting( "Baidu", "BaiduAppSecret", "" );
-         if( string.IsNullOrEmpty( _appId ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
-         if( string.IsNullOrEmpty( _appSecret ) ) throw new ArgumentException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
+         if( string.IsNullOrEmpty( _appId ) ) throw new EndpointInitializationException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
+         if( string.IsNullOrEmpty( _appSecret ) ) throw new EndpointInitializationException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
          context.DisableCertificateChecksFor( "api.fanyi.baidu.com" );
 

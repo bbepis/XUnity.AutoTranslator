@@ -37,7 +37,7 @@ namespace PapagoTranslate
       {
          context.DisableCertificateChecksFor( "papago.naver.com" );
 
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )

@@ -67,8 +67,8 @@ namespace BingTranslate
          // Configure service points / service point manager
          context.DisableCertificateChecksFor( "www.bing.com" );
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )

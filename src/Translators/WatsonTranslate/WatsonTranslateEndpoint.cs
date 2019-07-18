@@ -33,13 +33,13 @@ namespace WatsonTranslate
       {
          _url = context.GetOrCreateSetting( "Watson", "Url", "" );
          _key = context.GetOrCreateSetting( "Watson", "Key", "" );
-         if( string.IsNullOrEmpty( _url ) ) throw new Exception( "The WatsonTranslate endpoint requires a url which has not been provided." );
-         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The WatsonTranslate endpoint requires a key which has not been provided." );
+         if( string.IsNullOrEmpty( _url ) ) throw new EndpointInitializationException( "The WatsonTranslate endpoint requires a url which has not been provided." );
+         if( string.IsNullOrEmpty( _key ) ) throw new EndpointInitializationException( "The WatsonTranslate endpoint requires a key which has not been provided." );
 
          _fullUrl = _url.TrimEnd( '/' ) + "/v3/translate?version=2018-05-01";
 
          var model = context.SourceLanguage + "-" + context.DestinationLanguage;
-         if( !SupportedLanguagePairs.Contains( model ) ) throw new Exception( $"The language model '{model}' is not supported." );
+         if( !SupportedLanguagePairs.Contains( model ) ) throw new EndpointInitializationException( $"The language model '{model}' is not supported." );
       }
 
       public override void OnCreateRequest( IWwwRequestCreationContext context )

@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( RawImage_texture_Hook ),
          typeof( Cursor_SetCursor_Hook ),
          typeof( SpriteRenderer_sprite_Hook ),
-         typeof( Sprite_texture_Hook ),
+         //typeof( Sprite_texture_Hook ),
 
          // fallback hooks on material (Prefix hooks)
          typeof( Material_mainTexture_Hook ),
@@ -62,6 +62,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChanged( __result, false );
       }
+
+      static Func<object, string, Texture2D> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Func<object, string, Texture2D>>();
+      }
+
+      static Texture2D MM_Detour( object __instance, string arg1 )
+      {
+         var result = _original( __instance, arg1 );
+
+         Postfix( __instance, result );
+
+         return result;
+      }
    }
    
    internal static class Sprite_texture_Hook
@@ -81,7 +97,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( __result, true );
       }
 
-      static bool RequireRuntimeHooker => true;
+      static Func<object, Texture2D> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Func<object, Texture2D>>();
+      }
+
+      static Texture2D MM_Detour( object __instance )
+      {
+         var result = _original( __instance );
+
+         Postfix( result );
+
+         return result;
+      }
    }
    
    internal static class SpriteRenderer_sprite_Hook
@@ -99,6 +129,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object sprite )
+      {
+         _original( __instance, sprite );
+
+         Postfix( __instance );
       }
    }
    
@@ -118,6 +162,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, value, true , false);
       }
+
+      static Action<object, Texture2D> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Texture2D>>();
+      }
+
+      static void MM_Detour( object __instance, Texture2D value )
+      {
+         Prefix( __instance, value );
+
+         _original( __instance, value );
+      }
    }
    
    internal static class CubismRenderer_TryInitialize_Hook
@@ -135,6 +193,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Prefix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, true, true );
+      }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         Prefix( __instance );
+
+         _original( __instance );
       }
    }
    
@@ -156,6 +228,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true, false );
          }
+      }
+
+      static Action<object, Texture> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Texture>>();
+      }
+
+      static void MM_Detour( object __instance, Texture value )
+      {
+         Prefix( __instance, value );
+
+         _original( __instance, value );
       }
    }
    
@@ -180,6 +266,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
          }
       }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class Image_sprite_Hook
@@ -197,6 +297,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, Sprite> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
+      }
+
+      static void MM_Detour( object __instance, Sprite value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -216,6 +330,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, Sprite> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
+      }
+
+      static void MM_Detour( object __instance, Sprite value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class Image_material_Hook
@@ -233,6 +361,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, Material> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Material>>();
+      }
+
+      static void MM_Detour( object __instance, Material value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -255,6 +397,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, texture2d, true, false );
          }
       }
+
+      static Action<object, Texture> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Texture>>();
+      }
+
+      static void MM_Detour( object __instance, Texture value )
+      {
+         Prefix( __instance, value );
+
+         _original( __instance, value );
+      }
    }
    
    internal static class Cursor_SetCursor_Hook
@@ -272,6 +428,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Prefix( Texture2D texture )
       {
          AutoTranslationPlugin.Current.Hook_ImageChanged( texture, true );
+      }
+
+      static Action<Texture2D, Vector2, CursorMode> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Texture2D, Vector2, CursorMode>>();
+      }
+
+      static void MM_Detour( Texture2D texture, Vector2 arg2, CursorMode arg3 )
+      {
+         Prefix( texture );
+
+         _original( texture, arg2, arg3 );
       }
    }
    
@@ -291,6 +461,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, Material> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Material>>();
+      }
+
+      static void MM_Detour( object __instance, Material value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UISprite_OnInit_Hook
@@ -308,6 +492,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
+      }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
       }
    }
    
@@ -327,6 +525,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, Material> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, Material>>();
+      }
+
+      static void MM_Detour( object __instance, Material value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UISprite_atlas_Hook
@@ -344,6 +556,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -363,6 +589,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UITexture_material_Hook
@@ -380,6 +620,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -399,6 +653,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, true );
       }
+
+      static Action<object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object>>();
+      }
+
+      static void MM_Detour( object __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UI2DSprite_sprite2D_Hook
@@ -416,6 +684,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -435,6 +717,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UIPanel_clipTexture_Hook
@@ -452,6 +748,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -471,6 +781,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UIFont_dynamicFont_Hook
@@ -488,6 +812,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
    
@@ -507,6 +845,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
       }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
    }
    
    internal static class UILabel_trueTypeFont_Hook
@@ -524,6 +876,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, null, false, false );
+      }
+
+      static Action<object, object> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+      }
+
+      static void MM_Detour( object __instance, object value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
       }
    }
 }

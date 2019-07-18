@@ -28,7 +28,7 @@ namespace CustomTranslate
       public override void Initialize( IInitializationContext context )
       {
          _endpoint = context.GetOrCreateSetting( "Custom", "Url", "" );
-         if( string.IsNullOrEmpty( _endpoint ) ) throw new ArgumentException( "The custom endpoint requires a url which has not been provided." );
+         if( string.IsNullOrEmpty( _endpoint ) ) throw new EndpointInitializationException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
          context.DisableCertificateChecksFor( uri.Host );

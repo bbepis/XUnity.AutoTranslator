@@ -9,7 +9,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
-using XUnity.RuntimeHooker.Core.Utilities;
+using XUnity.AutoTranslator.Plugins.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -34,6 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return ( Settings.EnableIMGUI && ui is GUIContent )
             || ( Settings.EnableUGUI && ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
+            || ( Settings.EnableTextMesh && ClrTypes.TextMesh != null && ClrTypes.TextMesh.IsAssignableFrom( type ) )
             || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
       }
@@ -58,6 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetType();
 
          return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            || ( ClrTypes.TextMesh != null && ClrTypes.TextMesh.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
             || DoesTextMeshProSupportRichText( ui, type )
             || ( ClrTypes.UguiNovelText != null && ClrTypes.UguiNovelText.IsAssignableFrom( type ) )
             /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
@@ -80,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return false;
 
-         // shortcircuit for spammy component, to avoid reflective calls
+         // black listing of components not supporting stabilization
          if( ui is GUIContent )
          {
             return false;
@@ -95,17 +97,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             //}
             //return true;
          }
-
-         var type = ui.GetType();
-
-         return ( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
-            || ( ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
-            || DoesTextMeshProSupportStabilization( type );
-      }
-
-      public static bool DoesTextMeshProSupportStabilization( Type type )
-      {
-         return IsKnownTextMeshProType( type );
+         
+         return true;
       }
 
       public static bool SupportsLineParser( this object ui )

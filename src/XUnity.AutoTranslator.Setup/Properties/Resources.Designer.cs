@@ -173,6 +173,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Mono_Cecil_0_10_4_0 {
+            get {
+                object obj = ResourceManager.GetObject("Mono_Cecil_0_10_4_0", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Mono_Cecil_Inject {
             get {
                 object obj = ResourceManager.GetObject("Mono_Cecil_Inject", resourceCulture);
@@ -206,6 +216,26 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         internal static byte[] Mono_Cecil_Rocks {
             get {
                 object obj = ResourceManager.GetObject("Mono_Cecil_Rocks", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] MonoMod_RuntimeDetour {
+            get {
+                object obj = ResourceManager.GetObject("MonoMod_RuntimeDetour", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] MonoMod_Utils {
+            get {
+                object obj = ResourceManager.GetObject("MonoMod_Utils", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -266,26 +296,6 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         internal static byte[] XUnity_AutoTranslator_Plugin_ExtProtocol {
             get {
                 object obj = ResourceManager.GetObject("XUnity_AutoTranslator_Plugin_ExtProtocol", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_RuntimeHooker {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_RuntimeHooker", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] XUnity_RuntimeHooker_Core {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_RuntimeHooker_Core", resourceCulture);
                 return ((byte[])(obj));
             }
         }

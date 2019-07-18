@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.RuntimeHooker.Core.Utilities;
+using XUnity.AutoTranslator.Plugins.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {

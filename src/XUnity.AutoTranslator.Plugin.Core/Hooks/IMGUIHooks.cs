@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.RuntimeHooker.Core;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
@@ -27,7 +27,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          typeof( GUI_DoButton_Hook ),
          typeof( GUI_DoModalWindow_Hook ),
          typeof( GUI_DoWindow_Hook ),
-         //typeof( GUI_DoTextField_Hook ), // Why did I think this was a good idea?
          typeof( GUI_DoButtonGrid_Hook ),
          typeof( GUI_DoToggle_Hook ),
       };
@@ -138,12 +137,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -152,6 +151,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
+      }
+
+      static Action<Rect, GUIContent, GUIStyle> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, GUIStyle>>();
+      }
+
+      static void MM_Detour( Rect arg1, GUIContent arg2, GUIStyle arg3 )
+      {
+         Prefix( arg2 );
+
+         _original( arg1, arg2, arg3 );
       }
    }
 
@@ -160,12 +173,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "Box", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -176,6 +189,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
+      static Action<Rect, GUIContent, GUIStyle> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, GUIStyle>>();
+      }
+
+      static void MM_Detour( Rect arg1, GUIContent arg2, GUIStyle arg3 )
+      {
+         Prefix( arg2 );
+
+         _original( arg1, arg2, arg3 );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -183,12 +209,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoRepeatButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( FocusType ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -197,6 +223,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
+      }
+
+      static Action<Rect, GUIContent, GUIStyle, FocusType> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, GUIStyle, FocusType>>();
+      }
+
+      static void MM_Detour( Rect arg1, GUIContent arg2, GUIStyle arg3, FocusType arg4 )
+      {
+         Prefix( arg2 );
+
+         _original( arg1, arg2, arg3, arg4 );
       }
    }
 
@@ -205,12 +245,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -219,6 +259,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
+      }
+
+      static Action<Rect, GUIContent, IntPtr> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, IntPtr>>();
+      }
+
+      static void MM_Detour( Rect arg1, GUIContent arg2, IntPtr arg3 )
+      {
+         Prefix( arg2 );
+
+         _original( arg1, arg2, arg3 );
       }
    }
 
@@ -227,12 +281,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -241,6 +295,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
+      }
+
+      static Action<Rect, GUIContent, IntPtr> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, IntPtr>>();
+      }
+
+      static void MM_Detour( Rect arg1, GUIContent arg2, IntPtr arg3 )
+      {
+         Prefix( arg2 );
+
+         _original( arg1, arg2, arg3 );
       }
    }
 
@@ -249,12 +317,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -264,6 +332,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
       }
+
+      delegate void OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 )
+      {
+         Prefix( arg4 );
+
+         _original( arg1, arg2, arg3, arg4, arg5, arg6 );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -271,12 +355,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
       }
 
       static void Prefix( GUIContent title )
@@ -286,6 +370,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
             AutoTranslationPlugin.Current.Hook_TextChanged( title, false );
          }
       }
+
+      delegate void OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 )
+      {
+         Prefix( arg4 );
+
+         _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
+      }
    }
 
    [HarmonyPriorityShim( HookPriority.Last )]
@@ -293,12 +393,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent[] contents )
@@ -311,27 +411,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
             }
          }
       }
-   }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
-   internal static class GUI_DoTextField_Hook
-   {
-      static bool Prepare( object instance )
+      delegate void OriginalMethod( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
       {
-         return Constants.ClrTypes.GUI != null;
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static MethodBase TargetMethod( object instance )
+      static void MM_Detour( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoTextField", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( bool ), typeof( int ), typeof( GUIStyle ), typeof( string ) } );
-      }
+         Prefix( arg3 );
 
-      static void Prefix( GUIContent content )
-      {
-         if( !IMGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
-         }
+         _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
       }
    }
 
@@ -340,12 +434,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return Constants.ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
+         return AccessToolsShim.Method( ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( IntPtr ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -354,6 +448,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
          }
+      }
+
+      delegate void OriginalMethod( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5);
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5 )
+      {
+         Prefix( arg4 );
+
+         _original( arg1, arg2, arg3, arg4, arg5 );
       }
    }
 }

@@ -45,13 +45,13 @@ namespace BingTranslateLegitimate
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "BingLegitimate", "OcpApimSubscriptionKey", "" );
-         if( string.IsNullOrEmpty( _key ) ) throw new Exception( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
+         if( string.IsNullOrEmpty( _key ) ) throw new EndpointInitializationException( "The BingTranslateLegitimate endpoint requires an API key which has not been provided." );
 
          // Configure service points / service point manager
          context.DisableCertificateChecksFor( "api.cognitive.microsofttranslator.com" );
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new Exception( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new Exception( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )

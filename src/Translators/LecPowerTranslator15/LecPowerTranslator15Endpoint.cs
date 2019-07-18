@@ -30,18 +30,18 @@ namespace LecPowerTranslator15
             pathToLec = defaultPath;
          }
 
-         if( string.IsNullOrEmpty( pathToLec ) ) throw new Exception( "The LecPowerTranslator15 requires the path to the installation folder." );
+         if( string.IsNullOrEmpty( pathToLec ) ) throw new EndpointInitializationException( "The LecPowerTranslator15 requires the path to the installation folder." );
 
          var exePath = Path.Combine( context.PluginDirectory, @"Translators\Lec.ExtProtocol.exe" );
 
          var fileExists = File.Exists( exePath );
-         if( !fileExists ) throw new Exception( $"Could not find any executable at '{exePath}'" );
+         if( !fileExists ) throw new EndpointInitializationException( $"Could not find any executable at '{exePath}'" );
 
          ExecutablePath = exePath;
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( pathToLec ) );
 
-         if( context.SourceLanguage != "ja" ) throw new Exception( "Current implementation only supports japanese-to-english." );
-         if( context.DestinationLanguage != "en" ) throw new Exception( "Current implementation only supports japanese-to-english." );
+         if( context.SourceLanguage != "ja" ) throw new EndpointInitializationException( "Current implementation only supports japanese-to-english." );
+         if( context.DestinationLanguage != "en" ) throw new EndpointInitializationException( "Current implementation only supports japanese-to-english." );
       }
 
       public static string GetDefaultInstallationPath()
