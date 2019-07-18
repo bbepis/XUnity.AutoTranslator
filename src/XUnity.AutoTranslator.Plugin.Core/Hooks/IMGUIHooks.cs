@@ -225,18 +225,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      static Action<Rect, GUIContent, GUIStyle, FocusType> _original;
+      static Func<Rect, GUIContent, GUIStyle, FocusType, bool> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, GUIStyle, FocusType>>();
+         _original = detour.GenerateTrampolineEx<Func<Rect, GUIContent, GUIStyle, FocusType, bool>>();
       }
 
-      static void MM_Detour( Rect arg1, GUIContent arg2, GUIStyle arg3, FocusType arg4 )
+      static bool MM_Detour( Rect arg1, GUIContent arg2, GUIStyle arg3, FocusType arg4 )
       {
          Prefix( arg2 );
 
-         _original( arg1, arg2, arg3, arg4 );
+         return _original( arg1, arg2, arg3, arg4 );
       }
    }
 
@@ -297,18 +297,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      static Action<Rect, GUIContent, IntPtr> _original;
+      static Func<Rect, GUIContent, IntPtr, bool> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<Rect, GUIContent, IntPtr>>();
+         _original = detour.GenerateTrampolineEx<Func<Rect, GUIContent, IntPtr, bool>>();
       }
 
-      static void MM_Detour( Rect arg1, GUIContent arg2, IntPtr arg3 )
+      static bool MM_Detour( Rect arg1, GUIContent arg2, IntPtr arg3 )
       {
          Prefix( arg2 );
 
-         _original( arg1, arg2, arg3 );
+         return _original( arg1, arg2, arg3 );
       }
    }
 
@@ -333,7 +333,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      delegate void OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 );
+      delegate Rect OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 );
 
       static OriginalMethod _original;
 
@@ -342,11 +342,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static void MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 )
+      static Rect MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 )
       {
          Prefix( arg4 );
 
-         _original( arg1, arg2, arg3, arg4, arg5, arg6 );
+         return _original( arg1, arg2, arg3, arg4, arg5, arg6 );
       }
    }
 
@@ -371,7 +371,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      delegate void OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 );
+      delegate Rect OriginalMethod( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 );
 
       static OriginalMethod _original;
 
@@ -380,11 +380,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static void MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 )
+      static Rect MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 )
       {
          Prefix( arg4 );
 
-         _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
+         return _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
       }
    }
 
@@ -412,7 +412,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      delegate void OriginalMethod( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 );
+      delegate int OriginalMethod( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 );
 
       static OriginalMethod _original;
 
@@ -421,11 +421,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static void MM_Detour( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 )
+      static int MM_Detour( Rect arg1, int arg2, GUIContent[] arg3, int arg4, GUIStyle arg5, GUIStyle arg6, GUIStyle arg7, GUIStyle arg8 )
       {
          Prefix( arg3 );
 
-         _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
+         return _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 );
       }
    }
 
@@ -450,7 +450,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          }
       }
 
-      delegate void OriginalMethod( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5);
+      delegate bool OriginalMethod( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5 );
 
       static OriginalMethod _original;
 
@@ -459,11 +459,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static void MM_Detour( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5 )
+      static bool MM_Detour( Rect arg1, int arg2, bool arg3, GUIContent arg4, IntPtr arg5 )
       {
          Prefix( arg4 );
 
-         _original( arg1, arg2, arg3, arg4, arg5 );
+         return _original( arg1, arg2, arg3, arg4, arg5 );
       }
    }
 }

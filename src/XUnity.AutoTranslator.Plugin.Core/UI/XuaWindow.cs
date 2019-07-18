@@ -57,100 +57,110 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private void CreateWindowUI( int id )
       {
-         float posx = GUIUtil.ComponentSpacing;
-         float posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
-         const float col2 = WindowWidth - GUIUtil.LabelWidth - ( 3 * GUIUtil.ComponentSpacing );
-         const float col1x = GUIUtil.ComponentSpacing;
-         const float col2x = GUIUtil.LabelWidth + ( GUIUtil.ComponentSpacing * 2 );
-         const float col12 = WindowWidth - ( 2 * GUIUtil.ComponentSpacing );
-
-         if( GUI.Button( GUIUtil.R( WindowWidth - 22, 2, 20, 16 ), "X" ) )
+         try
          {
-            IsShown = false;
-         }
+            AutoTranslationPlugin.Current.DisableAutoTranslator();
 
-         // GROUP
-         var toggles = _viewModel.Toggles;
-         var groupHeight = ( GUIUtil.RowHeight * toggles.Count ) + ( GUIUtil.ComponentSpacing * ( toggles.Count ) ) - GUIUtil.HalfComponentSpacing;
-         GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+            float posx = GUIUtil.ComponentSpacing;
+            float posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
+            const float col2 = WindowWidth - GUIUtil.LabelWidth - ( 3 * GUIUtil.ComponentSpacing );
+            const float col1x = GUIUtil.ComponentSpacing;
+            const float col2x = GUIUtil.LabelWidth + ( GUIUtil.ComponentSpacing * 2 );
+            const float col12 = WindowWidth - ( 2 * GUIUtil.ComponentSpacing );
 
-         foreach( var vm in toggles )
-         {
-            var previousValue = vm.IsToggled();
-            var newValue = GUI.Toggle( GUIUtil.R( col1x, posy + 3, col12, GUIUtil.RowHeight - 3 ), previousValue, vm.Text );
-            if( previousValue != newValue )
+            if( GUI.Button( GUIUtil.R( WindowWidth - 22, 2, 20, 16 ), "X" ) )
             {
-               vm.OnToggled();
+               IsShown = false;
             }
-            posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-         }
 
-         var commandButtons = _viewModel.CommandButtons;
-         const int buttonsPerRow = 3;
-         const float buttonWidth = ( col12 - ( GUIUtil.ComponentSpacing * ( buttonsPerRow - 1 ) ) ) / buttonsPerRow;
-         var rows = commandButtons.Count / buttonsPerRow;
-         if( commandButtons.Count % 3 != 0 ) rows++;
+            // GROUP
+            var toggles = _viewModel.Toggles;
+            var groupHeight = ( GUIUtil.RowHeight * toggles.Count ) + ( GUIUtil.ComponentSpacing * ( toggles.Count ) ) - GUIUtil.HalfComponentSpacing;
+            GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
-         // GROUP
-         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * rows ) + ( GUIUtil.ComponentSpacing * ( rows + 1 ) ) - GUIUtil.HalfComponentSpacing;
-         GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
-
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Command Panel ----", GUIUtil.LabelCenter );
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-
-         for( int row = 0; row < rows; row++ )
-         {
-            for( int col = 0; col < buttonsPerRow; col++ )
+            foreach( var vm in toggles )
             {
-               int idx = ( row * buttonsPerRow ) + col;
-               if( idx >= commandButtons.Count ) break;
-
-               var vm = commandButtons[ idx ];
-
-               GUI.enabled = vm.CanClick?.Invoke() != false;
-               if( GUI.Button( GUIUtil.R( posx, posy, buttonWidth, GUIUtil.RowHeight ), vm.Text ) )
+               var previousValue = vm.IsToggled();
+               var newValue = GUI.Toggle( GUIUtil.R( col1x, posy + 3, col12, GUIUtil.RowHeight - 3 ), previousValue, vm.Text );
+               if( previousValue != newValue )
                {
-                  vm.OnClicked?.Invoke();
+                  vm.OnToggled();
                }
-               GUI.enabled = true;
-
-               posx += GUIUtil.ComponentSpacing + buttonWidth;
+               posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
             }
+
+            var commandButtons = _viewModel.CommandButtons;
+            const int buttonsPerRow = 3;
+            const float buttonWidth = ( col12 - ( GUIUtil.ComponentSpacing * ( buttonsPerRow - 1 ) ) ) / buttonsPerRow;
+            var rows = commandButtons.Count / buttonsPerRow;
+            if( commandButtons.Count % 3 != 0 ) rows++;
+
+            // GROUP
+            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * rows ) + ( GUIUtil.ComponentSpacing * ( rows + 1 ) ) - GUIUtil.HalfComponentSpacing;
+            GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+
+            GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Command Panel ----", GUIUtil.LabelCenter );
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            for( int row = 0; row < rows; row++ )
+            {
+               for( int col = 0; col < buttonsPerRow; col++ )
+               {
+                  int idx = ( row * buttonsPerRow ) + col;
+                  if( idx >= commandButtons.Count ) break;
+
+                  var vm = commandButtons[ idx ];
+
+                  GUI.enabled = vm.CanClick?.Invoke() != false;
+                  if( GUI.Button( GUIUtil.R( posx, posy, buttonWidth, GUIUtil.RowHeight ), vm.Text ) )
+                  {
+                     vm.OnClicked?.Invoke();
+                  }
+                  GUI.enabled = true;
+
+                  posx += GUIUtil.ComponentSpacing + buttonWidth;
+               }
+               posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+            }
+
+            // GROUP
+            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 1 ) + ( GUIUtil.ComponentSpacing * ( 2 ) ) - GUIUtil.HalfComponentSpacing;
+            GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+
+            GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Select a Translator ----", GUIUtil.LabelCenter );
+            posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight ), "Translator: " );
+            float endpointDropdownPosy = posy;
+            posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            // GROUP
+            var labels = _viewModel.Labels;
+            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * labels.Count ) + ( GUIUtil.ComponentSpacing * ( labels.Count + 1 ) ) - GUIUtil.HalfComponentSpacing;
+            GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
+
+            GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Status ----", GUIUtil.LabelCenter );
+            posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            foreach( var label in labels )
+            {
+               GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), label.Title );
+               GUI.Label( GUIUtil.R( col2x, posy, col2, GUIUtil.LabelHeight ), label.GetValue(), GUIUtil.LabelRight );
+               posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+            }
+
+            var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.Dropdown ) );
+            endpointDropdown.OnGUI();
+
+            GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight * 5 ), GUI.tooltip, GUIUtil.LabelRich );
+
+            GUI.DragWindow();
          }
-
-         // GROUP
-         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 1 ) + ( GUIUtil.ComponentSpacing * ( 2 ) ) - GUIUtil.HalfComponentSpacing;
-         GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
-
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Select a Translator ----", GUIUtil.LabelCenter );
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-
-         GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight ), "Translator: " );
-         float endpointDropdownPosy = posy;
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-
-         // GROUP
-         var labels = _viewModel.Labels;
-         groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * labels.Count ) + ( GUIUtil.ComponentSpacing * ( labels.Count + 1 ) ) - GUIUtil.HalfComponentSpacing;
-         GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
-
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Status ----", GUIUtil.LabelCenter );
-         posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
-
-         foreach( var label in labels )
+         finally
          {
-            GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), label.Title );
-            GUI.Label( GUIUtil.R( col2x, posy, col2, GUIUtil.LabelHeight ), label.GetValue(), GUIUtil.LabelRight );
-            posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
+
+            AutoTranslationPlugin.Current.EnableAutoTranslator();
          }
-
-         var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.Dropdown ) );
-         endpointDropdown.OnGUI();
-
-         GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight * 5 ), GUI.tooltip, GUIUtil.LabelRich );
-
-         GUI.DragWindow();
       }
    }
 }

@@ -67,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
                   if( Settings.ForceMonoModHooks )
                   {
-                     if( ClrTypes.Detour == null || ClrTypes.NativeDetour == null )
+                     if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
                      {
                         throw new NotSupportedException( "This runtime does not have MonoMod loaded, so MonoMod hooks cannot be used." );
                      }
@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                         object hook;
                         try
                         {
-                           hook = ClrTypes.Detour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                           hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
                         }
                         catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
                         {
@@ -87,6 +87,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
                         hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
+
+                        XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks." );
                      }
                      else
                      {
@@ -105,10 +107,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                         {
                            PatchMethod20.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler, null } );
                         }
+
+                        XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
                      }
                      catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                      {
-                        if( ClrTypes.Detour != null && ClrTypes.NativeDetour != null )
+                        if( ClrTypes.Hook != null && ClrTypes.NativeDetour != null )
                         {
                            var mmdetour = type.GetMethod( "MM_Detour", flags );
                            if( mmdetour != null )
@@ -116,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                               object hook;
                               try
                               {
-                                 hook = ClrTypes.Detour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                                 hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
                               }
                               catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
                               {
@@ -125,6 +129,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
                               hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
+
+                              XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks." );
                            }
                            else
                            {
@@ -140,7 +146,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                }
                else
                {
-                  XuaLogger.Current.Warn( $"Could not enable hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
+                  XuaLogger.Current.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
                }
             }
          }

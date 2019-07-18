@@ -76,94 +76,104 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private void CreateWindowUI( int id )
       {
-         float posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
-
-         if( GUI.Button( GUIUtil.R( _viewModel.Width - 22, 2, 20, 16 ), "X" ) )
+         try
          {
-            IsShown = false;
-         }
+            AutoTranslationPlugin.Current.DisableAutoTranslator();
 
-         var current = _viewModel.Current;
-         if( current != null )
-         {
-            DrawTextArea( posy, _originalText, "Original Text", current.OriginalTexts );
-            posy += _viewModel.Height;
+            float posy = GUIUtil.WindowTitleClearance + GUIUtil.ComponentSpacing;
 
-            DrawTextArea( posy, _defaultTranslation, "Default Translation", current.DefaultTranslations );
-            posy += _viewModel.Height;
-
-            for( int i = 0; i < current.AggregatedTranslations.Count; i++ )
+            if( GUI.Button( GUIUtil.R( _viewModel.Width - 22, 2, 20, 16 ), "X" ) )
             {
-               var aggregatedTranslation = current.AggregatedTranslations[ i ];
-               if( aggregatedTranslation.Translator.IsEnabled )
-               {
-                  var scroller = _translationViews[ i ];
+               IsShown = false;
+            }
 
-                  DrawTextArea(
-                     posy,
-                     scroller,
-                     aggregatedTranslation.Translator.Endpoint.Endpoint.FriendlyName,
-                     aggregatedTranslation.Translation.Translations );
-                  posy += _viewModel.Height;
+            var current = _viewModel.Current;
+            if( current != null )
+            {
+               DrawTextArea( posy, _originalText, "Original Text", current.OriginalTexts );
+               posy += _viewModel.Height;
+
+               DrawTextArea( posy, _defaultTranslation, "Default Translation", current.DefaultTranslations );
+               posy += _viewModel.Height;
+
+               for( int i = 0; i < current.AggregatedTranslations.Count; i++ )
+               {
+                  var aggregatedTranslation = current.AggregatedTranslations[ i ];
+                  if( aggregatedTranslation.Translator.IsEnabled )
+                  {
+                     var scroller = _translationViews[ i ];
+
+                     DrawTextArea(
+                        posy,
+                        scroller,
+                        aggregatedTranslation.Translator.Endpoint.Endpoint.FriendlyName,
+                        aggregatedTranslation.Translation.Translations );
+                     posy += _viewModel.Height;
+                  }
                }
             }
-         }
-         else
-         {
-            DrawTextArea( posy, _originalText, "Original Text", Empty );
-            posy += _viewModel.Height;
-
-            DrawTextArea( posy, _defaultTranslation, "Default Translation", Empty );
-            posy += _viewModel.Height;
-
-            for( int i = 0; i < _viewModel.AvailableTranslators.Count; i++ )
+            else
             {
-               var translator = _viewModel.AvailableTranslators[ i ];
-               if( translator.IsEnabled )
-               {
-                  var scroller = _translationViews[ i ];
+               DrawTextArea( posy, _originalText, "Original Text", Empty );
+               posy += _viewModel.Height;
 
-                  DrawTextArea(
-                     posy,
-                     scroller,
-                     translator.Endpoint.Endpoint.FriendlyName,
-                     Empty );
-                  posy += _viewModel.Height;
+               DrawTextArea( posy, _defaultTranslation, "Default Translation", Empty );
+               posy += _viewModel.Height;
+
+               for( int i = 0; i < _viewModel.AvailableTranslators.Count; i++ )
+               {
+                  var translator = _viewModel.AvailableTranslators[ i ];
+                  if( translator.IsEnabled )
+                  {
+                     var scroller = _translationViews[ i ];
+
+                     DrawTextArea(
+                        posy,
+                        scroller,
+                        translator.Endpoint.Endpoint.FriendlyName,
+                        Empty );
+                     posy += _viewModel.Height;
+                  }
                }
             }
+
+            posy += GUIUtil.HalfComponentSpacing + GUIUtil.ComponentSpacing;
+
+            var previousEnabled = GUI.enabled;
+
+            GUI.enabled = _viewModel.HasPrevious();
+            if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, 75, GUIUtil.LabelHeight ), "Previous" ) )
+            {
+               _viewModel.MovePrevious();
+            }
+
+            GUI.enabled = _viewModel.HasNext();
+            if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing * 2 + 75 * 1, posy, 75, GUIUtil.LabelHeight ), "Next" ) )
+            {
+               _viewModel.MoveNext();
+            }
+
+            GUI.enabled = _viewModel.HasNext();
+            if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing * 3 + 75 * 2, posy, 75, GUIUtil.LabelHeight ), "Last" ) )
+            {
+               _viewModel.MoveLatest();
+            }
+
+            GUI.enabled = true;
+            if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 75, posy, 75, GUIUtil.LabelHeight ), "Options" ) )
+            {
+               _viewModel.IsShowingOptions = true;
+            }
+
+            GUI.enabled = previousEnabled;
+
+            GUI.DragWindow();
          }
-
-         posy += GUIUtil.HalfComponentSpacing + GUIUtil.ComponentSpacing;
-
-         var previousEnabled = GUI.enabled;
-
-         GUI.enabled = _viewModel.HasPrevious();
-         if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, 75, GUIUtil.LabelHeight ), "Previous" ) )
+         finally
          {
-            _viewModel.MovePrevious();
+
+            AutoTranslationPlugin.Current.EnableAutoTranslator();
          }
-
-         GUI.enabled = _viewModel.HasNext();
-         if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing * 2 + 75 * 1, posy, 75, GUIUtil.LabelHeight ), "Next" ) )
-         {
-            _viewModel.MoveNext();
-         }
-
-         GUI.enabled = _viewModel.HasNext();
-         if( GUI.Button( GUIUtil.R( GUIUtil.HalfComponentSpacing * 3 + 75 * 2, posy, 75, GUIUtil.LabelHeight ), "Last" ) )
-         {
-            _viewModel.MoveLatest();
-         }
-
-         GUI.enabled = true;
-         if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 75, posy, 75, GUIUtil.LabelHeight ), "Options" ) )
-         {
-            _viewModel.IsShowingOptions = true;
-         }
-
-         GUI.enabled = previousEnabled;
-
-         GUI.DragWindow();
       }
 
       private void DrawTextArea( float posy, ScrollPositioned positioned, string title, IEnumerable<string> texts )

@@ -61,44 +61,54 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       private void CreateWindowUI( int id )
       {
-         if( GUI.Button( GUIUtil.R( WindowWidth - 22, 2, 20, 16 ), "X" ) )
+         try
          {
-            IsShown = false;
-         }
+            AutoTranslationPlugin.Current.DisableAutoTranslator();
 
-         GUILayout.Label( "Available Translators" );
-
-         // GROUP
-         _scrollPosition = GUILayout.BeginScrollView( _scrollPosition, GUI.skin.box );
-         
-         foreach( var vm in _toggles )
-         {
-            var previousEnabled = GUI.enabled;
-
-            GUI.enabled = vm.Enabled;
-            var previousValue = vm.IsToggled();
-            var newValue = GUILayout.Toggle( previousValue, vm.Text );
-            if( previousValue != newValue )
+            if( GUI.Button( GUIUtil.R( WindowWidth - 22, 2, 20, 16 ), "X" ) )
             {
-               vm.OnToggled();
+               IsShown = false;
             }
 
-            GUI.enabled = previousEnabled;
+            GUILayout.Label( "Available Translators" );
+
+            // GROUP
+            _scrollPosition = GUILayout.BeginScrollView( _scrollPosition, GUI.skin.box );
+
+            foreach( var vm in _toggles )
+            {
+               var previousEnabled = GUI.enabled;
+
+               GUI.enabled = vm.Enabled;
+               var previousValue = vm.IsToggled();
+               var newValue = GUILayout.Toggle( previousValue, vm.Text );
+               if( previousValue != newValue )
+               {
+                  vm.OnToggled();
+               }
+
+               GUI.enabled = previousEnabled;
+            }
+
+            GUILayout.EndScrollView();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label( "Height" );
+            _viewModel.Height = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Height, 50, 300, GUILayout.MaxWidth( 250 ) ) );
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label( "Width" );
+            _viewModel.Width = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Width, 200, 1000, GUILayout.MaxWidth( 250 ) ) );
+            GUILayout.EndHorizontal();
+
+            GUI.DragWindow();
          }
+         finally
+         {
 
-         GUILayout.EndScrollView();
-
-         GUILayout.BeginHorizontal();
-         GUILayout.Label( "Height" );
-         _viewModel.Height = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Height, 50, 300, GUILayout.MaxWidth( 250 ) ) );
-         GUILayout.EndHorizontal();
-
-         GUILayout.BeginHorizontal();
-         GUILayout.Label( "Width" );
-         _viewModel.Width = Mathf.Round( GUILayout.HorizontalSlider( _viewModel.Width, 200, 1000, GUILayout.MaxWidth( 250 ) ) );
-         GUILayout.EndHorizontal();
-
-         GUI.DragWindow();
+            AutoTranslationPlugin.Current.EnableAutoTranslator();
+         }
       }
    }
 }
