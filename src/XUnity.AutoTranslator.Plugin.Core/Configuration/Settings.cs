@@ -31,7 +31,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int PreviousTextStaggerCount = 3;
       public static readonly int MaximumConsecutiveFramesTranslated = 90;
       public static readonly int MaximumConsecutiveSecondsTranslated = 60;
-      public static bool UsesWhitespaceBetweenWords = false;
+      public static bool FromLanguageUsesWhitespaceBetweenWords = false;
+      public static bool ToLanguageUsesWhitespaceBetweenWords = false;
       public static string ApplicationName;
       public static float Timeout = 150.0f;
 
@@ -87,7 +88,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string OverrideFontTextMeshPro;
       public static string UserAgent;
       public static bool DisableCertificateValidation;
-      public static WhitespaceHandlingStrategy WhitespaceRemovalStrategy;
       public static float? ResizeUILineSpacingScale;
       public static bool ForceUIResizing;
       public static string[] IgnoreTextStartingWith;
@@ -163,12 +163,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             GameLogTextPaths = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GameLogTextPaths", string.Empty )
                ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
             GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
-            WhitespaceRemovalStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "WhitespaceRemovalStrategy", WhitespaceHandlingStrategy.TrimPerNewline );
             RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
             TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
             ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
-            CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", true );
+            CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", false );
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
             GeneratePartialTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GeneratePartialTranslations", false );
 
@@ -211,7 +210,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             AutoTranslationsFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, OutputFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
             SubstitutionFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, SubstitutionFile.Replace( "{lang}", Language ) ).Replace( "/", "\\" ).Parameterize();
-            UsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
+
+            FromLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
+            ToLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( Language );
 
             //// workaround to handle text translation toggling in KK
             //if( ApplicationName != null )

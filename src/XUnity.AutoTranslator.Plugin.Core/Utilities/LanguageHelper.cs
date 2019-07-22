@@ -20,9 +20,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          { "en", ContainsStandardLatinSymbols },
       };
 
-      private static readonly HashSet<string> WhitespaceLanguages = new HashSet<string>
+      private static readonly HashSet<string> LanguagesNotUsingWhitespaceBetweenWords = new HashSet<string>
       {
-         "ru", "ko", "en"
+         "ja", "zh-CN", "zh-TW"
       };
 
       public static bool IsFromLanguageSupported( string code )
@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       public static bool RequiresWhitespaceUponLineMerging( string code )
       {
-         return WhitespaceLanguages.Contains( code );
+         return !LanguagesNotUsingWhitespaceBetweenWords.Contains( code );
       }
 
       public static Func<string, bool> GetSymbolCheck( string language )

@@ -1,4 +1,7 @@
-﻿### 3.7.0
+﻿### 3.8.0 - Proper manual translation support
+ * CHANGE - Completely reworked whitespace handling to better support manual translations
+
+### 3.7.0
  * FEATURE - Support for hooking 3D TextMesh (disabled by default)
  * FEATURE - Public API surface to query the plugin for translations
  * CHANGE - Replaced 'Experimental' hooks with MonoMod hooks, which are now always enabled in supported environments

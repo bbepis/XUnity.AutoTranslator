@@ -76,18 +76,39 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var endTime = Time.realtimeSinceStartup;
             XuaLogger.Current.Info( $"Loaded text files ({_translations.Count} translations and {_defaultRegexes.Count} regex translations) (took {Math.Round( endTime - startTime, 2 )} seconds)" );
 
-            // generate token translations, which are online allowed when getting 'token' translations
+            // generate variations of created translations
+            {
+               startTime = Time.realtimeSinceStartup;
 
+               foreach( var kvp in _translations.ToList() )
+               {
+                  // also add a modified version of the translation
+                  var ukey = new UntranslatedText( kvp.Key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
+                  var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+                  if( ukey.Original_Text_ExternallyTrimmed != kvp.Key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed ) )
+                  {
+                     AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed );
+                  }
+                  if( ukey.Original_Text_ExternallyTrimmed != ukey.Original_Text_FullyTrimmed && !HasTranslated( ukey.Original_Text_FullyTrimmed ) )
+                  {
+                     AddTranslation( ukey.Original_Text_FullyTrimmed, uvalue.Original_Text_FullyTrimmed );
+                  }
+               }
+
+               XuaLogger.Current.Info( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               endTime = Time.realtimeSinceStartup;
+            }
+
+
+
+            // generate token translations, which are online allowed when getting 'token' translations
             if( Settings.GeneratePartialTranslations )
             {
                startTime = Time.realtimeSinceStartup;
 
                foreach( var kvp in _translations.ToList() )
                {
-                  if( !kvp.Key.StartsWith( "r:" ) )
-                  {
-                     CreatePartialTranslationsFor( kvp.Key, kvp.Value );
-                  }
+                  CreatePartialTranslationsFor( kvp.Key, kvp.Value );
                }
 
                XuaLogger.Current.Info( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
@@ -99,21 +120,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             foreach( var kvp in _translations.ToList() )
             {
-               if( !kvp.Key.StartsWith( "r:" ) )
+               var untranslatedResult = parser.Parse( kvp.Key );
+               if( untranslatedResult.Succeeded )
                {
-                  var untranslatedResult = parser.Parse( kvp.Key );
-                  if( untranslatedResult.Succeeded )
+                  var translatedResult = parser.Parse( kvp.Value );
+                  if( translatedResult.Succeeded && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
                   {
-                     var translatedResult = parser.Parse( kvp.Value );
-                     if( translatedResult.Succeeded && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                     foreach( var ukvp in untranslatedResult.Arguments )
                      {
-                        foreach( var ukvp in untranslatedResult.Arguments )
+                        var untranslatedToken = ukvp.Value;
+                        if( translatedResult.Arguments.TryGetValue( ukvp.Key, out var translatedToken ) )
                         {
-                           var untranslatedToken = ukvp.Value;
-                           if( translatedResult.Arguments.TryGetValue( ukvp.Key, out var translatedToken ) )
-                           {
-                              AddTokenTranslation( untranslatedToken, translatedToken );
-                           }
+                           AddTokenTranslation( untranslatedToken, translatedToken );
                         }
                      }
                   }
@@ -261,14 +279,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                               else
                               {
                                  AddTranslation( key, value );
-
-                                 // also add a modified version of the translation
-                                 var ukey = new UntranslatedText( key, false, false );
-                                 var uvalue = new UntranslatedText( value, false, false );
-                                 if( ukey.TrimmedTranslatableText != key )
-                                 {
-                                    AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
-                                 }
                               }
                               break;
                            }
@@ -292,17 +302,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( Settings.UseStaticTranslations && Settings.FromLanguage == Settings.DefaultFromLanguage && Settings.Language == Settings.DefaultLanguage )
          {
-            var tab = new char[] { '\t' };
-            var equals = new char[] { '=' };
-            var splitters = new char[][] { tab, equals };
-
             // load static translations from previous titles
             string[] translations = Properties.Resources.StaticTranslations.Split( new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translation in translations )
             {
-               for( int i = 0; i < splitters.Length; i++ )
+               for( int i = 0; i < TranslationSplitters.Length; i++ )
                {
-                  var splitter = splitters[ i ];
+                  var splitter = TranslationSplitters[ i ];
                   string[] kvp = translation.Split( splitter, StringSplitOptions.None );
                   if( kvp.Length >= 2 )
                   {
@@ -410,12 +416,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                AddTranslation( key, value );
 
-               // also add a trimmed version of the translation
-               var ukey = new UntranslatedText( key, false, false );
-               var uvalue = new UntranslatedText( value, false, false );
-               if( ukey.TrimmedTranslatableText != key && !HasTranslated( ukey.TrimmedTranslatableText ) )
+               // also add a modified version of the translation
+               var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
+               var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+               if( ukey.Original_Text_ExternallyTrimmed != key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed ) )
                {
-                  AddTranslation( ukey.TrimmedTranslatableText, uvalue.TrimmedTranslatableText );
+                  AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed );
+               }
+               if( ukey.Original_Text_ExternallyTrimmed != ukey.Original_Text_FullyTrimmed && !HasTranslated( ukey.Original_Text_FullyTrimmed ) )
+               {
+                  AddTranslation( ukey.Original_Text_FullyTrimmed, uvalue.Original_Text_FullyTrimmed );
                }
 
                if( persistToDisk )
@@ -429,42 +439,137 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal bool TryGetTranslation( UntranslatedText key, bool allowRegex, bool allowToken, out string value )
       {
          bool result;
+         string untemplated;
+         string unmodifiedValue;
+         string unmodifiedKey;
+
+         // first lookup token, if we allow it! - ONLY ORIGINAL and INTERNALLY FIXED VARIATIONS
          if( allowToken )
          {
-            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
-            result = _tokenTranslations.TryGetValue( templatedTranslatableText, out value );
+            if( key.IsTemplated && !key.IsFromSpammingComponent )
+            {
+               // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+               // untemplated                = '   What are you \ndoing here, Sophie?'
+
+               // lookup original
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text );
+               result = _tokenTranslations.TryGetValue( untemplated, out value );
+               if( result )
+               {
+                  return result;
+               }
+
+               // lookup internally trimmed
+               if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+               {
+                  // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+                  // untemplated                                  = '   What are you doing here, Sophie?'
+
+                  untemplated = key.Untemplate( key.TemplatedOriginal_Text_InternallyTrimmed );
+                  result = _tokenTranslations.TryGetValue( untemplated, out value );
+                  if( result )
+                  {
+                     return result;
+                  }
+               }
+            }
+
+            // lookup original
+
+            // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+            result = _tokenTranslations.TryGetValue( key.TemplatedOriginal_Text, out value );
             if( result )
             {
                return result;
             }
 
-            result = _tokenTranslations.TryGetValue( key.TranslatableText, out value );
-            if( result )
+            // lookup internally trimmed
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
             {
-               return result;
+               // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+
+               result = _tokenTranslations.TryGetValue( key.TemplatedOriginal_Text_InternallyTrimmed, out value );
+               if( result )
+               {
+                  return result;
+               }
             }
          }
 
+         // lookup UNTEMPLATED translations - ALL VARIATIONS
          if( key.IsTemplated && !key.IsFromSpammingComponent )
          {
-            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
-            result = _translations.TryGetValue( templatedTranslatableText, out value );
+            // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+            // untemplated                = '   What are you \ndoing here, Sophie?'
+
+            // lookup original
+            untemplated = key.Untemplate( key.TemplatedOriginal_Text );
+            result = _translations.TryGetValue( untemplated, out value );
             if( result )
             {
                return result;
             }
 
-            var templatedTrimmedTranslatableText = key.Untemplate( key.TrimmedTranslatableText );
-            if( templatedTrimmedTranslatableText != templatedTranslatableText )
+            // lookup original minus external whitespace
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_ExternallyTrimmed ) )
             {
-               result = _translations.TryGetValue( templatedTrimmedTranslatableText, out value );
+               // key.TemplatedOriginal_Text_ExternallyTrimmed = 'What are you \ndoing here, {{A}}?'
+               // untemplated                                  = 'What are you \ndoing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_ExternallyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
                if( result )
                {
-                  // add an unmodifiedKey to the dictionary
-                  var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
 
-                  XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
-                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
+                  XuaLogger.Current.Info( $"Whitespace difference (c1): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+
+            // lookup internally trimmed
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+            {
+               // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+               // untemplated                                  = '   What are you doing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_InternallyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
+               if( result )
+               {
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = value;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
+
+                  XuaLogger.Current.Info( $"Whitespace difference (c2): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+
+            // lookup internally trimmed minus external whitespace
+            if( !ReferenceEquals( key.TemplatedOriginal_Text_InternallyTrimmed, key.TemplatedOriginal_Text_FullyTrimmed ) )
+            {
+               // key.TemplatedOriginal_Text_FullyTrimmed = 'What are you doing here, {{A}}?'
+               // untemplated                             = 'What are you doing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_FullyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
+               if( result )
+               {
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
+
+                  XuaLogger.Current.Info( $"Whitespace difference (c3): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
 
                   value = unmodifiedValue;
                   return result;
@@ -472,51 +577,86 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
 
-         var translatableText = key.TranslatableText;
-         result = _translations.TryGetValue( translatableText, out value );
+         // lookup original - ALL VARATIONS
+
+         // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+         result = _translations.TryGetValue( key.TemplatedOriginal_Text, out value );
          if( result )
          {
             return result;
          }
 
-         var trimmedTranslatableText = key.TrimmedTranslatableText;
-         if( trimmedTranslatableText != translatableText )
+         // lookup original minus external whitespace
+         if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_ExternallyTrimmed ) )
          {
-            result = _translations.TryGetValue( trimmedTranslatableText, out value );
+            // key.TemplatedOriginal_Text_ExternallyTrimmed = 'What are you \ndoing here, {{A}}?'
+
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_ExternallyTrimmed, out value );
             if( result )
             {
-               // add an unmodifiedKey to the dictionary
-               var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+               // WHITESPACE DIFFERENCE, Store new value
+               unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-               XuaLogger.Current.Info( $"Whitespace difference: '{key.TrimmedTranslatableText}' => '{value}'" );
-               AddTranslationToCache( translatableText, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
+               XuaLogger.Current.Info( $"Whitespace difference (c4): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+               AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
 
                value = unmodifiedValue;
                return result;
             }
          }
 
+         // lookup internally trimmed
+         if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+         {
+            // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_InternallyTrimmed, out value );
+            if( result )
+            {
+               // WHITESPACE DIFFERENCE, Store new value
+               XuaLogger.Current.Info( $"Whitespace difference (c5): '{key.TemplatedOriginal_Text}' => '{value}'" );
+               AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheWhitespaceDifferences, TranslationType.Full ); // FIXED: using templated original
+
+               return result;
+            }
+         }
+
+         // lookup internally trimmed minus external whitespace
+         if( !ReferenceEquals( key.TemplatedOriginal_Text_InternallyTrimmed, key.TemplatedOriginal_Text_FullyTrimmed ) )
+         {
+            // key.TemplatedOriginal_Text_FullyTrimmed = 'What are you doing here, {{A}}?'
+
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_FullyTrimmed, out value );
+            if( result )
+            {
+               // WHITESPACE DIFFERENCE, Store new value
+               unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+
+               XuaLogger.Current.Info( $"Whitespace difference (c6): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+               AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full );
+
+               value = unmodifiedValue;
+               return result;
+            }
+         }
+
+         // regex lookups - ONLY ORIGNAL VARIATION
          if( allowRegex )
          {
-            bool found = false;
-
             for( int i = _defaultRegexes.Count - 1; i > -1; i-- )
             {
                var regex = _defaultRegexes[ i ];
                try
                {
-                  var match = regex.CompiledRegex.Match( translatableText );
+                  var match = regex.CompiledRegex.Match( key.TemplatedOriginal_Text );
                   if( !match.Success ) continue;
 
-                  var translation = regex.CompiledRegex.Replace( translatableText, regex.Translation );
+                  value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
 
-                  AddTranslationToCache( translatableText, translation, Settings.CacheRegexLookups, TranslationType.Full ); // Would store it to file... Should we????
+                  XuaLogger.Current.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
+                  AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheRegexLookups, TranslationType.Full );
 
-                  value = translation;
-                  found = true;
-
-                  XuaLogger.Current.Info( $"Regex lookup: '{key.TrimmedTranslatableText}' => '{value}'" );
-                  break;
+                  return true;
                }
                catch( Exception e )
                {
@@ -525,27 +665,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   XuaLogger.Current.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
                }
             }
-
-            if( found )
-            {
-               return true;
-            }
          }
 
+         // static lookups - ALL VARIATIONS
          if( _staticTranslations.Count > 0 )
          {
-            if( _staticTranslations.TryGetValue( translatableText, out value ) )
-            {
-               AddTranslationToCache( translatableText, value, true, TranslationType.Full );
-               return true;
-            }
-            else if( _staticTranslations.TryGetValue( trimmedTranslatableText, out value ) )
-            {
-               var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
-               AddTranslationToCache( translatableText, unmodifiedValue, true, TranslationType.Full );
+            // lookup based on templated value alone, which may also be the original text
+            // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
 
-               value = unmodifiedValue;
-               return true;
+            // lookup original
+            result = _staticTranslations.TryGetValue( key.TemplatedOriginal_Text, out value );
+            if( result )
+            {
+               XuaLogger.Current.Info( $"Static lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
+               AddTranslationToCache( key.TemplatedOriginal_Text, value, true, TranslationType.Full );
+
+               return result;
+            }
+
+            // lookup internally trimmed
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+            {
+               // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+
+               result = _staticTranslations.TryGetValue( key.TemplatedOriginal_Text_InternallyTrimmed, out value );
+               if( result )
+               {
+                  XuaLogger.Current.Info( $"Static lookup: '{key.TemplatedOriginal_Text_InternallyTrimmed}' => '{value}'" );
+                  AddTranslationToCache( key.TemplatedOriginal_Text, value, true, TranslationType.Full );
+
+                  return result;
+               }
             }
          }
 

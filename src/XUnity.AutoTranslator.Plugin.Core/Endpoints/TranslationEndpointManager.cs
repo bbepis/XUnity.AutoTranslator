@@ -64,25 +64,82 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       public bool TryGetTranslation( UntranslatedText key, out string value )
       {
          bool result;
+         string untemplated;
+         string unmodifiedValue;
+         string unmodifiedKey;
+
+
+         // lookup UNTEMPLATED translations - ALL VARIATIONS
          if( key.IsTemplated && !key.IsFromSpammingComponent )
          {
-            var templatedTranslatableText = key.Untemplate( key.TranslatableText );
-            result = _translations.TryGetValue( templatedTranslatableText, out value );
+            // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+            // untemplated                = '   What are you \ndoing here, Sophie?'
+
+            // lookup original
+            untemplated = key.Untemplate( key.TemplatedOriginal_Text );
+            result = _translations.TryGetValue( untemplated, out value );
             if( result )
             {
                return result;
             }
 
-            var templatedTrimmedTranslatableText = key.Untemplate( key.TrimmedTranslatableText );
-            if( templatedTrimmedTranslatableText != templatedTranslatableText )
+            // lookup original minus external whitespace
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_ExternallyTrimmed ) )
             {
-               result = _translations.TryGetValue( templatedTrimmedTranslatableText, out value );
+               // key.TemplatedOriginal_Text_ExternallyTrimmed = 'What are you \ndoing here, {{A}}?'
+               // untemplated                                  = 'What are you \ndoing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_ExternallyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
                if( result )
                {
-                  // add an unmodifiedKey to the dictionary
-                  var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
                   
-                  AddTranslationToCache( templatedTranslatableText, unmodifiedValue );
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+
+            // lookup internally trimmed
+            if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+            {
+               // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+               // untemplated                                  = '   What are you doing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_InternallyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
+               if( result )
+               {
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = value;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
+                  
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue );
+
+                  value = unmodifiedValue;
+                  return result;
+               }
+            }
+
+            // lookup internally trimmed minus external whitespace
+            if( !ReferenceEquals( key.TemplatedOriginal_Text_InternallyTrimmed, key.TemplatedOriginal_Text_FullyTrimmed ) )
+            {
+               // key.TemplatedOriginal_Text_FullyTrimmed = 'What are you doing here, {{A}}?'
+               // untemplated                             = 'What are you doing here, Sophie?'
+
+               untemplated = key.Untemplate( key.TemplatedOriginal_Text_FullyTrimmed );
+               result = _translations.TryGetValue( untemplated, out value );
+               if( result )
+               {
+                  // WHITESPACE DIFFERENCE, Store new value
+                  unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+                  unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
+                  
+                  AddTranslationToCache( unmodifiedKey, unmodifiedValue );
 
                   value = unmodifiedValue;
                   return result;
@@ -90,23 +147,64 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
          }
 
-         var translatableText = key.TranslatableText;
-         result = _translations.TryGetValue( translatableText, out value );
+         // lookup original - ALL VARATIONS
+
+         // key.TemplatedOriginal_Text = '   What are you \ndoing here, {{A}}?'
+         result = _translations.TryGetValue( key.TemplatedOriginal_Text, out value );
          if( result )
          {
             return result;
          }
 
-         var trimmedTranslatableText = key.TrimmedTranslatableText;
-         result = _translations.TryGetValue( trimmedTranslatableText, out value );
-         if( result )
+         // lookup original minus external whitespace
+         if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_ExternallyTrimmed ) )
          {
-            // add an unmodifiedKey to the dictionary
-            var unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
-            AddTranslationToCache( translatableText, unmodifiedValue );
+            // key.TemplatedOriginal_Text_ExternallyTrimmed = 'What are you \ndoing here, {{A}}?'
 
-            value = unmodifiedValue;
-            return result;
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_ExternallyTrimmed, out value );
+            if( result )
+            {
+               // WHITESPACE DIFFERENCE, Store new value
+               unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+               
+               AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue );
+
+               value = unmodifiedValue;
+               return result;
+            }
+         }
+
+         // lookup internally trimmed
+         if( !ReferenceEquals( key.TemplatedOriginal_Text, key.TemplatedOriginal_Text_InternallyTrimmed ) )
+         {
+            // key.TemplatedOriginal_Text_InternallyTrimmed = '   What are you doing here, {{A}}?'
+
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_InternallyTrimmed, out value );
+            if( result )
+            {
+               // WHITESPACE DIFFERENCE, Store new value
+               AddTranslationToCache( key.TemplatedOriginal_Text, value ); // FIXED: using templated original
+
+               return result;
+            }
+         }
+
+         // lookup internally trimmed minus external whitespace
+         if( !ReferenceEquals( key.TemplatedOriginal_Text_InternallyTrimmed, key.TemplatedOriginal_Text_FullyTrimmed ) )
+         {
+            // key.TemplatedOriginal_Text_FullyTrimmed = 'What are you doing here, {{A}}?'
+
+            result = _translations.TryGetValue( key.TemplatedOriginal_Text_FullyTrimmed, out value );
+            if( result )
+            {
+               // WHITESPACE DIFFERENCE, Store new value
+               unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
+               
+               AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue );
+
+               value = unmodifiedValue;
+               return result;
+            }
          }
 
          return result;
@@ -130,6 +228,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          if( !HasTranslated( key ) )
          {
             AddTranslation( key, value );
+
+            // also add a modified version of the translation
+            var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
+            var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+            if( ukey.Original_Text_ExternallyTrimmed != key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed ) )
+            {
+               AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed );
+            }
+            if( ukey.Original_Text_ExternallyTrimmed != ukey.Original_Text_FullyTrimmed && !HasTranslated( ukey.Original_Text_FullyTrimmed ) )
+            {
+               AddTranslation( ukey.Original_Text_FullyTrimmed, uvalue.Original_Text_FullyTrimmed );
+            }
+
             QueueNewTranslationForDisk( key, value );
          }
       }
@@ -149,6 +260,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return _translations.ContainsKey( key );
       }
 
+      private string GetTextToTranslate( TranslationJob job )
+      {
+         var isNgui = job.Components.Any( x => x.Item.IsNGUI() )
+            || job.Contexts.Any( x => x.Component.IsNGUI() );
+
+         var removeInternalWhitespace = ( Settings.IgnoreWhitespaceInDialogue && job.Key.Original_Text.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && isNgui );
+
+         if( removeInternalWhitespace )
+         {
+            return job.Key.TemplatedOriginal_Text_FullyTrimmed;
+         }
+         else
+         {
+            return job.Key.TemplatedOriginal_Text_ExternallyTrimmed;
+         }
+      }
+
       public void HandleNextBatch()
       {
          try
@@ -164,7 +292,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                _unstartedJobs.Remove( key );
                Manager.UnstartedTranslations--;
 
-               var unpreparedUntranslatedText = job.Key.TrimmedTranslatableText;
+               var unpreparedUntranslatedText = GetTextToTranslate( job );
                var untranslatedText = job.Key.PrepareUntranslatedText( unpreparedUntranslatedText );
                if( CanTranslate( unpreparedUntranslatedText ) )
                {
@@ -220,7 +348,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             _unstartedJobs.Remove( key );
             Manager.UnstartedTranslations--;
 
-            var unpreparedUntranslatedText = job.Key.TrimmedTranslatableText;
+            var unpreparedUntranslatedText = GetTextToTranslate( job );
             var untranslatedText = job.Key.PrepareUntranslatedText( unpreparedUntranslatedText );
             if( CanTranslate( unpreparedUntranslatedText ) )
             {
@@ -271,7 +399,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( job.Key );
 
-               XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedTranslatableText}' => '{job.TranslatedText}'" );
+               XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
                Manager.InvokeJobCompleted( job );
             }
@@ -308,7 +436,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          RemoveOngoingTranslation( job.Key );
 
-         XuaLogger.Current.Info( $"Completed: '{job.Key.TrimmedTranslatableText}' => '{job.TranslatedText}'" );
+         XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
          Manager.InvokeJobCompleted( job );
       }
@@ -360,11 +488,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( key );
 
-               RegisterTranslationFailureFor( key.TrimmedTranslatableText );
+               RegisterTranslationFailureFor( key.TemplatedOriginal_Text );
 
                Manager.InvokeJobFailed( job );
 
-               XuaLogger.Current.Error( $"Failed: '{job.Key.TrimmedTranslatableText}'" );
+               XuaLogger.Current.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
             }
          }
          else
@@ -383,7 +511,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                AddUnstartedJob( key, job );
                RemoveOngoingTranslation( key );
 
-               XuaLogger.Current.Error( $"Failed: '{job.Key.TrimmedTranslatableText}'" );
+               XuaLogger.Current.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
             }
 
             XuaLogger.Current.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
@@ -436,7 +564,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
          }
 
-         XuaLogger.Current.Debug( "Queued: '" + key.TrimmedTranslatableText + "'" );
+         XuaLogger.Current.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
 
          var newJob = new TranslationJob( this, key, saveResultGlobally );
          newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
@@ -500,7 +628,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          foreach( var job in unstartedJobs )
          {
-            XuaLogger.Current.Warn( $"Dequeued: '{job.Key.TrimmedTranslatableText}'" );
+            XuaLogger.Current.Warn( $"Dequeued: '{job.Key.TemplatedOriginal_Text}'" );
             job.Value.State = TranslationJobState.Failed;
             job.Value.ErrorMessage = "Translation failed because all jobs on endpoint was cleared.";
 
