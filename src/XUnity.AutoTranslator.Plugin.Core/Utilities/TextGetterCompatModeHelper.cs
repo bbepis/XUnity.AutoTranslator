@@ -12,12 +12,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class TextGetterCompatModeHelper
    {
-      private static readonly Assembly XUnityAutoTranslatorAssembly = typeof( TextGetterCompatModeHelper ).Assembly;
+      public static bool IsGettingText = false;
 
       [MethodImpl( MethodImplOptions.NoInlining )]
       public static void ReplaceTextWithOriginal( object instance, ref string __result )
       {
-         if( !Settings.TextGetterCompatibilityMode ) return;
+         if( !Settings.TextGetterCompatibilityMode || IsGettingText ) return;
 
          var tti = instance.GetTextTranslationInfo();
          if( tti?.IsTranslated == true )
@@ -29,11 +29,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             var callingMethod = new StackFrame( 3 ).GetMethod();
 
             var callingAssembly = callingMethod.DeclaringType.Assembly;
-            if( callingAssembly == XUnityAutoTranslatorAssembly ) return;
 
             var originalAssembly = instance.GetType().Assembly;
-            if( callingAssembly != originalAssembly ) 
+            if( callingAssembly != originalAssembly )
             {
+               //XuaLogger.Current.Warn( "5: changing text: " + __result + " => " + tti.OriginalText );
+
                // if the assembly is not the same, it may be call from the game or another mod, so replace
                __result = tti.OriginalText;
             }
