@@ -1,5 +1,6 @@
-﻿### 3.8.0 - Proper manual translation support
- * CHANGE - Completely reworked whitespace handling to better support manual translations
+﻿### 3.8.0
+ * CHANGE - Completely reworked whitespace handling to better support manual translations (still backwards compatible)
+ * BUG FIX - Fixed bug in `TextGetterCompatibilityMode`
 
 ### 3.7.0
  * FEATURE - Support for hooking 3D TextMesh (disabled by default)

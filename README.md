@@ -482,9 +482,9 @@ However, this plugin is capable of providing a single translation that handles b
 Here's how (still simplified):
  1. When the plugin sees an untranslated text, it will actually make four lookups, not one. These are, in order:
    a. Based on the untouched original text
-   b. Based on the original text but without leading/trailing whitespace
+   b. Based on the original text but without leading/trailing whitespace. If found the leading/trailing whitespace is added to the resulting translation
    c. Based on the original text but without internal non-repeating whitespace surrounding a newline
-   d. Based on the original text but without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline
+   d. Based on the original text but without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline. If found the leading/trailing whitespace is added to the resulting translation
  2. When the plugin loads the (manual) translation it will not make one dictionary entry, but three. These are:
    a. Based on the untouched original text and original translation
    b. Based on the original text (without leading/trailing whitespace) and original translation (without leading/trailing whitespace)
