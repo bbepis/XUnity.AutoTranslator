@@ -138,14 +138,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          string text = null;
          var type = ui.GetType();
 
-         if( ui is GUIContent )
+         TextGetterCompatModeHelper.IsGettingText = true;
+         try
          {
-            text = ( (GUIContent)ui ).text;
+            if( ui is GUIContent )
+            {
+               text = ( (GUIContent)ui ).text;
+            }
+            else
+            {
+               // fallback to reflective approach
+               text = (string)type.CachedProperty( TextPropertyName )?.Get( ui );
+            }
          }
-         else
+         finally
          {
-            // fallback to reflective approach
-            text = (string)type.CachedProperty( TextPropertyName )?.Get( ui );
+            TextGetterCompatModeHelper.IsGettingText = false;
          }
 
          return text ?? string.Empty;
