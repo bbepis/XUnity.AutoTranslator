@@ -92,16 +92,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
                   if( ukey.Original_Text_ExternallyTrimmed != kvp.Key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed, TranslationScopes.None, false ) )
                   {
-                     XuaLogger.Current.Warn( "----" );
-                     XuaLogger.Current.Warn( ukey.Original_Text_ExternallyTrimmed );
-                     XuaLogger.Current.Warn( uvalue.Original_Text_ExternallyTrimmed );
                      AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed, TranslationScopes.None );
                   }
                   if( ukey.Original_Text_ExternallyTrimmed != ukey.Original_Text_FullyTrimmed && !HasTranslated( ukey.Original_Text_FullyTrimmed, TranslationScopes.None, false ) )
                   {
-                     XuaLogger.Current.Warn( "----" );
-                     XuaLogger.Current.Warn( ukey.Original_Text_FullyTrimmed );
-                     XuaLogger.Current.Warn( uvalue.Original_Text_FullyTrimmed );
                      AddTranslation( ukey.Original_Text_FullyTrimmed, uvalue.Original_Text_FullyTrimmed, TranslationScopes.None );
                   }
                }

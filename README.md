@@ -490,8 +490,6 @@ SubstitutionFile=Translation\{GameExeName}\_Substitutions.{lang}.txt
 ```
 
 ### Text Lookup and Whitespace Handling
-If you're going to provide a manual translation for a game based on this plugin, you should read and understand this section to in order to avoid potential headaches.
-
 This section is provided to give the translator an understanding of how this plugin looks up texts and provides translations.
 
 In the simplest form, the way the plugin works is as a dictionary of untranslated text strings. When plugin sees a text that it considers untranslated, it will attempt to look up the text string in the dictionary and if it finds a result, it will display the found translation instead.
