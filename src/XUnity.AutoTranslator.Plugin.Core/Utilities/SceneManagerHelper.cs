@@ -8,9 +8,11 @@ using XUnity.AutoTranslator.Plugin.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Utilities
 {
+#pragma warning disable CS0618 // Type or member is obsolete
+
    internal static class SceneManagerHelper
    {
-      public static string GetActiveSceneId()
+      public static int GetActiveSceneId()
       {
          if( Features.SupportsSceneManager )
          {
@@ -19,16 +21,69 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
          return GetActiveSceneIdByApplication();
       }
 
-      private static string GetActiveSceneIdBySceneManager()
+      private static int GetActiveSceneIdBySceneManager()
       {
-         return SceneManager.GetActiveScene().ToString();
+         return SceneManager.GetActiveScene().buildIndex;
       }
 
-      private static string GetActiveSceneIdByApplication()
+      private static int GetActiveSceneIdByApplication()
       {
-#pragma warning disable CS0618 // Type or member is obsolete
-         return Application.loadedLevel.ToString();
-#pragma warning restore CS0618 // Type or member is obsolete
+         return Application.loadedLevel;
       }
+   }
+
+   internal class SceneLoadInformation
+   {
+      public SceneLoadInformation()
+      {
+         LoadedScenes = new List<SceneInformation>();
+
+         if( Features.SupportsSceneManager )
+         {
+            LoadBySceneManager();
+         }
+         else
+         {
+            LoadByApplication();
+         }
+      }
+
+      public SceneInformation ActiveScene { get; set; }
+
+      public List<SceneInformation> LoadedScenes { get; set; }
+
+      public void LoadBySceneManager()
+      {
+         var activeScene = SceneManager.GetActiveScene();
+
+         ActiveScene = new SceneInformation( activeScene.buildIndex, activeScene.name );
+
+         for( int i = 0; i < SceneManager.sceneCount; i++ )
+         {
+            var scene = SceneManager.GetSceneAt( i );
+
+            LoadedScenes.Add( new SceneInformation( scene.buildIndex, scene.name ) );
+         }
+      }
+
+      public void LoadByApplication()
+      {
+         ActiveScene = new SceneInformation( Application.loadedLevel, Application.loadedLevelName );
+
+         LoadedScenes.Add( new SceneInformation( Application.loadedLevel, Application.loadedLevelName ) );
+      }
+   }
+
+   internal class SceneInformation
+   {
+      public SceneInformation( int id, string name )
+      {
+         Id = id;
+         Name = name;
+      }
+
+      public int Id { get; set; }
+
+      public string Name { get; set; }
    }
 }

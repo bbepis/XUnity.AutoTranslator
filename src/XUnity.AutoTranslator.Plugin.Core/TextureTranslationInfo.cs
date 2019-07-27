@@ -146,7 +146,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var name = texture.name; // name may be duplicate, WILL be duplicate!
                if( string.IsNullOrEmpty( name ) ) return;
 
-               name += "|" + SceneManagerHelper.GetActiveSceneId();
+               name += "|" + SceneManagerHelper.GetActiveSceneId().ToString();
 
                var result = SetupKeyForNameWithFallback( name, texture );
 

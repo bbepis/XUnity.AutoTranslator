@@ -7,6 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {

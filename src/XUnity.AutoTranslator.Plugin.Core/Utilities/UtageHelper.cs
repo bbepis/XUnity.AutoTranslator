@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -62,7 +63,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
          if( !Labels.Contains( label ) )
          {
-            if( AutoTranslationPlugin.Current.TextCache.TryGetReverseTranslation( label, out string key ) )
+            var scope = TranslationScopeProvider.GetScope( null );
+            if( AutoTranslationPlugin.Current.TextCache.TryGetReverseTranslation( label, scope, out string key ) )
             {
                label = key;
             }

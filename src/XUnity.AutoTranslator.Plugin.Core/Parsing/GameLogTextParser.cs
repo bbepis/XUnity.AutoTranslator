@@ -8,9 +8,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    internal class GameLogTextParser : ITextParser
    {
-      private Func<string, bool> _isTranslatable;
+      private Func<string, int, bool> _isTranslatable;
 
-      public GameLogTextParser( Func<string, bool> isTranslatable )
+      public GameLogTextParser( Func<string, int, bool> isTranslatable )
       {
          _isTranslatable = isTranslatable;
       }
@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return ui.SupportsLineParser();
       }
 
-      public ParserResult Parse( string input )
+      public ParserResult Parse( string input, int scope )
       {
          var reader = new StringReader( input );
          bool containsTranslatable = false;
@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          {
             if( !string.IsNullOrEmpty( line ) )
             {
-               if( _isTranslatable( line ) )
+               if( _isTranslatable( line, scope ) )
                {
                   // template it!
                   containsTranslatable = true;

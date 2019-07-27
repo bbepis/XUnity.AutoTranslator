@@ -27,6 +27,7 @@ using System.Diagnostics;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
+using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -120,7 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          SpamChecker = new SpamChecker( TranslationManager );
 
          // WORKAROUND: Initialize text parsers with delegate indicating if text should be translated
-         UnityTextParsers.Initialize( text => TextCache.IsTranslatable( text, true ) && IsBelowMaxLength( text ) );
+         UnityTextParsers.Initialize( ( text, scope ) => TextCache.IsTranslatable( text, true, scope ) && IsBelowMaxLength( text ) );
 
          // validate configuration
          ValidateConfiguration();
@@ -722,20 +723,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          var supportsStabilization = ui.SupportsStabilization();
-         if( Settings.Delay == 0 || !supportsStabilization )
-         {
-            return TranslateOrQueueWebJobImmediate( ui, text, info, supportsStabilization, ignoreComponentState );
-         }
-         else
-         {
-            StartCoroutine(
-               DelayForSeconds( Settings.Delay, () =>
-               {
-                  TranslateOrQueueWebJobImmediate( ui, text, info, supportsStabilization, ignoreComponentState );
-               } ) );
-         }
 
-         return null;
+         return TranslateOrQueueWebJobImmediate( ui, text, TranslationScopes.None, info, supportsStabilization, ignoreComponentState );
       }
 
       private static bool IsCurrentlySetting( TextTranslationInfo info )
@@ -1007,14 +996,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          //XuaLogger.Current.Warn( "3: " + originalText + " - " + ui.GetHashCode() );
 
-         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         var scope = TranslationScopeProvider.GetScope( ui );
+         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false, scope ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = GetCacheKey( ui, text, isSpammer );
 
             // potentially shortcircuit if fully templated
-            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false ) )
+            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                return untemplatedTranslation;
@@ -1022,12 +1012,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             // if we already have translation loaded in our cache, simply load it and set text
             string translation;
-            if( TextCache.TryGetTranslation( textKey, false, false, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, false, false, scope, out translation ) )
             {
                if( !string.IsNullOrEmpty( translation ) )
                {
                   var untemplatedTranslation = textKey.Untemplate( translation );
-                  var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text );
+                  var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text, scope );
                   SetTranslatedText( ui, untemplatedTranslation, !isPartial ? originalText : null, info );
                   return untemplatedTranslation;
                }
@@ -1036,13 +1026,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                {
-                  var result = UnityTextParsers.GameLogTextParser.Parse( text );
+                  var result = UnityTextParsers.GameLogTextParser.Parse( text, scope );
                   if( result.Succeeded )
                   {
-                     translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                     translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                      if( translation != null )
                      {
-                        var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text );
+                        var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text, scope );
                         SetTranslatedText( ui, translation, null, info );
                         return translation;
                      }
@@ -1058,24 +1048,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       void IInternalTranslator.TranslateAsync( TranslationEndpointManager endpoint, string untranslatedText, Action<TranslationResult> onCompleted )
       {
-         Translate( untranslatedText, endpoint, null, onCompleted, false );
+         Translate( untranslatedText, TranslationScopes.None, endpoint, null, onCompleted, false );
       }
 
       void ITranslator.TranslateAsync( string untranslatedText, Action<TranslationResult> onCompleted )
       {
-         Translate( untranslatedText, TranslationManager.CurrentEndpoint, null, onCompleted, true );
+         Translate( untranslatedText, TranslationScopes.None, TranslationManager.CurrentEndpoint, null, onCompleted, true );
       }
 
       bool ITranslator.TryTranslate( string text, out string translatedText )
       {
          var bestFrame = Time.frameCount;
 
-         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && IsBelowMaxLength( text ) )
+         var scope = TranslationScopeProvider.GetScope( null );
+         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
          {
             var textKey = GetCacheKey( null, text, false );
 
             // potentially shortcircuit if fully templated
-            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false ) )
+            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                translatedText = untemplatedTranslation;
@@ -1084,7 +1075,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
-            if( TextCache.TryGetTranslation( textKey, true, false, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, true, false, scope, out translation ) )
             {
                if( !string.IsNullOrEmpty( translation ) )
                {
@@ -1094,10 +1085,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+               var parserResult = UnityTextParsers.RichTextParser.Parse( text, scope );
                if( parserResult.Succeeded )
                {
-                  translatedText = TranslateByParserResult( null, parserResult, null, false, true );
+                  translatedText = TranslateByParserResult( null, parserResult, scope, null, false, true );
                   return translatedText != null;
                }
             }
@@ -1109,19 +1100,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       #endregion
 
-      private InternalTranslationResult Translate( string text, TranslationEndpointManager endpoint, ParserTranslationContext context, Action<TranslationResult> onCompleted, bool isGlobal )
+      private InternalTranslationResult Translate( string text, int scope, TranslationEndpointManager endpoint, ParserTranslationContext context, Action<TranslationResult> onCompleted, bool isGlobal )
       {
          var bestFrame = Time.frameCount;
 
          var result = new InternalTranslationResult( isGlobal, onCompleted );
          if( isGlobal )
          {
-            if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && IsBelowMaxLength( text ) )
+            if( scope == TranslationScopes.None && context == null )
+            {
+               scope = TranslationScopeProvider.GetScope( null );
+            }
+
+            if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
             {
                var textKey = GetCacheKey( null, text, false );
 
                // potentially shortcircuit if fully templated
-               if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false ) )
+               if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
                {
                   var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                   result.SetCompleted( untemplatedTranslation );
@@ -1130,7 +1126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                // if we already have translation loaded in our _translatios dictionary, simply load it and set text
                string translation;
-               if( TextCache.TryGetTranslation( textKey, true, false, out translation ) )
+               if( TextCache.TryGetTranslation( textKey, true, false, scope, out translation ) )
                {
                   if( !string.IsNullOrEmpty( translation ) )
                   {
@@ -1146,10 +1142,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( context == null )
                   {
-                     var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+                     var parserResult = UnityTextParsers.RichTextParser.Parse( text, scope );
                      if( parserResult.Succeeded )
                      {
-                        translation = TranslateByParserResult( endpoint, parserResult, result, true, result.IsGlobal );
+                        translation = TranslateByParserResult( endpoint, parserResult, scope, result, true, result.IsGlobal );
                         if( translation != null )
                         {
                            result.SetCompleted( translation );
@@ -1222,10 +1218,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( context == null )
                   {
-                     var parserResult = UnityTextParsers.RichTextParser.Parse( text );
+                     var parserResult = UnityTextParsers.RichTextParser.Parse( text, TranslationScopes.None );
                      if( parserResult.Succeeded )
                      {
-                        translation = TranslateByParserResult( endpoint, parserResult, result, true, result.IsGlobal );
+                        translation = TranslateByParserResult( endpoint, parserResult, TranslationScopes.None, result, true, result.IsGlobal );
                         if( translation != null )
                         {
                            result.SetCompleted( translation );
@@ -1262,7 +1258,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return result;
       }
 
-      private string TranslateByParserResult( TranslationEndpointManager endpoint, ParserResult result, InternalTranslationResult translationResult, bool allowStartJob, bool isGlobal )
+      private string TranslateByParserResult( TranslationEndpointManager endpoint, ParserResult result, int scope, InternalTranslationResult translationResult, bool allowStartJob, bool isGlobal )
       {
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
@@ -1274,20 +1270,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                var variableName = kvp.Key;
                var untranslatedTextPart = kvp.Value;
-               if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart, true ) && IsBelowMaxLength( untranslatedTextPart ) )
+               if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart, true, scope ) && IsBelowMaxLength( untranslatedTextPart ) )
                {
                   var textKey = new UntranslatedText( untranslatedTextPart, false, false, Settings.FromLanguageUsesWhitespaceBetweenWords );
-                  if( TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, true ) )
+                  if( TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, true, scope ) )
                   {
                      string partTranslation;
-                     if( TextCache.TryGetTranslation( textKey, false, true, out partTranslation ) )
+                     if( TextCache.TryGetTranslation( textKey, false, true, scope, out partTranslation ) )
                      {
                         translations.Add( variableName, textKey.Untemplate( partTranslation ) );
                      }
                      else if( allowStartJob )
                      {
                         // incomplete, must start job
-                        Translate( untranslatedTextPart, endpoint, context, null, isGlobal );
+                        Translate( untranslatedTextPart, scope, endpoint, context, null, isGlobal );
                      }
                   }
                   else
@@ -1337,7 +1333,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      else if( allowStartJob )
                      {
                         // incomplete, must start job
-                        Translate( untranslatedTextPart, endpoint, context, null, isGlobal );
+                        Translate( untranslatedTextPart, scope, endpoint, context, null, isGlobal );
                      }
                   }
                   else
@@ -1368,7 +1364,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Translates the string of a UI  text or queues it up to be translated
       /// by the HTTP translation service.
       /// </summary>
-      private string TranslateOrQueueWebJobImmediate( object ui, string text, TextTranslationInfo info, bool supportsStabilization, bool ignoreComponentState, ParserTranslationContext context = null )
+      private string TranslateOrQueueWebJobImmediate( object ui, string text, int scope, TextTranslationInfo info, bool supportsStabilization, bool ignoreComponentState, ParserTranslationContext context = null )
       {
          text = text ?? ui.GetText();
 
@@ -1383,10 +1379,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          info?.Reset( originalText );
 
+         if( scope == TranslationScopes.None && context == null )
+         {
+            scope = TranslationScopeProvider.GetScope( ui );
+         }
+
          //XuaLogger.Current.Warn( "1: " + originalText + " - " + ui.GetHashCode() );
 
          // Ensure that we actually want to translate this text and its owning UI element. 
-         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         if( !string.IsNullOrEmpty( text ) && TextCache.IsTranslatable( text, false, scope ) && ShouldTranslateTextComponent( ui, ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
             var isSpammer = ui.IsSpammingComponent();
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
@@ -1394,7 +1395,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var textKey = GetCacheKey( ui, text, isSpammer );
 
             // potentially shortcircuit if fully templated
-            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false ) )
+            if( !ReferenceEquals( text, textKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                if( context == null )
@@ -1406,7 +1407,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             // if we already have translation loaded in our _translatios dictionary, simply load it and set text
             string translation;
-            if( TextCache.TryGetTranslation( textKey, !isSpammer, false, out translation ) )
+            if( TextCache.TryGetTranslation( textKey, !isSpammer, false, scope, out translation ) )
             {
                if( context == null && !isSpammer )
                {
@@ -1418,7 +1419,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var untemplatedTranslation = textKey.Untemplate( translation );
                   if( context == null ) // never set text if operation is contextualized (only a part translation)
                   {
-                     var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text );
+                     var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text, scope );
                      SetTranslatedText( ui, untemplatedTranslation, !isPartial ? originalText : null, info );
                   }
                   return untemplatedTranslation;
@@ -1430,10 +1431,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                   {
-                     var result = UnityTextParsers.GameLogTextParser.Parse( text );
+                     var result = UnityTextParsers.GameLogTextParser.Parse( text, scope );
                      if( result.Succeeded )
                      {
-                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                         if( translation != null )
                         {
                            SetTranslatedText( ui, translation, null, info );
@@ -1443,12 +1444,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                   else if( UnityTextParsers.RichTextParser.CanApply( ui ) && IsBelowMaxLength( text ) )
                   {
-                     var result = UnityTextParsers.RichTextParser.Parse( text );
+                     var result = UnityTextParsers.RichTextParser.Parse( text, scope );
                      if( result.Succeeded )
                      {
                         //var isWhitelisted = ui.IsWhitelistedForImmediateRichTextTranslation();
 
-                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                        translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                         if( translation != null )
                         {
                            SetTranslatedText( ui, translation, originalText, info );
@@ -1501,12 +1502,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               //XuaLogger.Current.Warn( "2: " + originalText + " - " + ui.GetHashCode() );
 
-                              if( !string.IsNullOrEmpty( stabilizedText ) && TextCache.IsTranslatable( stabilizedText, false ) )
+                              if( !string.IsNullOrEmpty( stabilizedText ) && TextCache.IsTranslatable( stabilizedText, false, scope ) )
                               {
                                  var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
 
                                  // potentially shortcircuit if fully templated
-                                 if( !ReferenceEquals( stabilizedText, stabilizedTextKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false ) )
+                                 if( !ReferenceEquals( stabilizedText, stabilizedTextKey.TemplatedOriginal_Text ) && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) )
                                  {
                                     var untemplatedTranslation = stabilizedTextKey.Untemplate( stabilizedTextKey.TemplatedOriginal_Text );
                                     SetTranslatedText( ui, untemplatedTranslation, originalText, info );
@@ -1516,11 +1517,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
                                  // once the text has stabilized, attempt to look it up
-                                 if( TextCache.TryGetTranslation( stabilizedTextKey, true, false, out translation ) )
+                                 if( TextCache.TryGetTranslation( stabilizedTextKey, true, false, scope, out translation ) )
                                  {
                                     if( !string.IsNullOrEmpty( translation ) )
                                     {
-                                       var isPartial = TextCache.IsPartial( stabilizedTextKey.TemplatedOriginal_Text );
+                                       var isPartial = TextCache.IsPartial( stabilizedTextKey.TemplatedOriginal_Text, scope );
                                        SetTranslatedText( ui, stabilizedTextKey.Untemplate( translation ), !isPartial ? originalText : null, info );
                                     }
                                  }
@@ -1530,10 +1531,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     {
                                        if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                                        {
-                                          var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText );
+                                          var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText, scope );
                                           if( result.Succeeded )
                                           {
-                                             var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, true );
+                                             var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true );
                                              if( translatedText != null )
                                              {
                                                 SetTranslatedText( ui, translatedText, null, info );
@@ -1543,10 +1544,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                        }
                                        else if( UnityTextParsers.RichTextParser.CanApply( ui ) && IsBelowMaxLength( stabilizedText ) )
                                        {
-                                          var result = UnityTextParsers.RichTextParser.Parse( stabilizedText );
+                                          var result = UnityTextParsers.RichTextParser.Parse( stabilizedText, scope );
                                           if( result.Succeeded )
                                           {
-                                             var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, true );
+                                             var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true );
                                              if( translatedText != null )
                                              {
                                                 SetTranslatedText( ui, translatedText, originalText, info );
@@ -1608,7 +1609,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  // once the text has stabilized, attempt to look it up
                                  if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
                                  {
-                                    if( !TextCache.TryGetTranslation( textKey, true, false, out translation ) )
+                                    if( !TextCache.TryGetTranslation( textKey, true, false, scope, out translation ) )
                                     {
                                        CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true );
                                     }
@@ -1623,7 +1624,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      private string TranslateOrQueueWebJobImmediateByParserResult( object ui, ParserResult result, bool allowStartJob )
+      private string TranslateOrQueueWebJobImmediateByParserResult( object ui, ParserResult result, int scope, bool allowStartJob )
       {
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
@@ -1634,20 +1635,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var variableName = kvp.Key;
             var untranslatedTextPart = kvp.Value;
 
-            if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart, true ) && IsBelowMaxLength( untranslatedTextPart ) )
+            if( !string.IsNullOrEmpty( untranslatedTextPart ) && TextCache.IsTranslatable( untranslatedTextPart, true, scope ) && IsBelowMaxLength( untranslatedTextPart ) )
             {
                var textKey = new UntranslatedText( untranslatedTextPart, false, false, Settings.FromLanguageUsesWhitespaceBetweenWords );
-               if( TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, true ) )
+               if( TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, true, scope ) )
                {
                   string partTranslation;
-                  if( TextCache.TryGetTranslation( textKey, false, true, out partTranslation ) )
+                  if( TextCache.TryGetTranslation( textKey, false, true, scope, out partTranslation ) )
                   {
                      translations.Add( variableName, textKey.Untemplate( partTranslation ) );
                   }
                   else if( allowStartJob )
                   {
                      // incomplete, must start job
-                     TranslateOrQueueWebJobImmediate( ui, untranslatedTextPart, null, false, true, context );
+                     TranslateOrQueueWebJobImmediate( ui, untranslatedTextPart, scope, null, false, true, context );
                   }
                }
                else
@@ -1825,11 +1826,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
 
-                  if( Settings.EnablePrintHierarchy && Input.GetKeyDown( KeyCode.Y ) )
-                  {
-                     PrintObjects();
-                  }
-                  else if( Input.GetKeyDown( KeyCode.T ) )
+                  if( Input.GetKeyDown( KeyCode.T ) )
                   {
                      ToggleTranslation();
                   }
@@ -1877,6 +1874,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
                      }
+                     else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
+                     {
+                        PrintSceneInformation();
+                     }
+                     else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
+                     {
+                        PrintObjects();
+                     }
                   }
                }
             }
@@ -1884,6 +1889,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception e )
          {
             XuaLogger.Current.Error( e, "An error occurred in Update callback. " );
+         }
+      }
+
+      private void PrintSceneInformation()
+      {
+         var sli = new SceneLoadInformation();
+
+         XuaLogger.Current.Info( "Active Scene: " + sli.ActiveScene.Name + " (" + sli.ActiveScene.Id + ")" );
+
+         XuaLogger.Current.Info( "Loaded Scenes:" );
+         for( int i = 0; i < sli.LoadedScenes.Count; i++ )
+         {
+            var si = sli.LoadedScenes[ i ];
+            XuaLogger.Current.Info( i + ": " + si.Name + " (" + si.Id + ")" );
          }
       }
 
@@ -1994,7 +2013,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( job.SaveResultGlobally )
                {
-                  TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType );
+                  TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType, TranslationScopes.None );
                }
                job.Endpoint.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText );
             }
@@ -2010,7 +2029,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   addedTemplatedTranslation = true;
                   if( job.SaveResultGlobally )
                   {
-                     TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType );
+                     TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType, TranslationScopes.None );
                   }
                   job.Endpoint.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText );
                }
@@ -2020,7 +2039,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var untemplatedTranslatedText = key.Untemplate( job.TranslatedText );
                   if( job.SaveResultGlobally )
                   {
-                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType );
+                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType, TranslationScopes.None );
                   }
                   job.Endpoint.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText );
                }
@@ -2038,7 +2057,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   addedTemplatedTranslation = true;
                   if( job.SaveResultGlobally )
                   {
-                     TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType );
+                     TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType, TranslationScopes.None );
                   }
                   job.Endpoint.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText );
                }
@@ -2048,7 +2067,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var untemplatedTranslatedText = key.Untemplate( job.TranslatedText );
                   if( job.SaveResultGlobally )
                   {
-                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType );
+                     TextCache.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText, isFull, translationType, TranslationScopes.None );
                   }
                   job.Endpoint.AddTranslationToCache( untemplatedTranslatableText, untemplatedTranslatedText );
                }
@@ -2058,7 +2077,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( job.SaveResultGlobally )
             {
-               TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType );
+               TextCache.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText, isFull, translationType, TranslationScopes.None );
             }
             job.Endpoint.AddTranslationToCache( job.Key.TemplatedOriginal_Text, job.TranslatedText );
          }
@@ -2115,11 +2134,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   string translatedText;
                   if( context.TranslationResult == null )
                   {
-                     translatedText = TranslateOrQueueWebJobImmediateByParserResult( context.Component, result, false );
+                     translatedText = TranslateOrQueueWebJobImmediateByParserResult( context.Component, result, TranslationScopes.None, false );
                   }
                   else
                   {
-                     translatedText = TranslateByParserResult( context.Endpoint, result, null, false, context.TranslationResult.IsGlobal );
+                     translatedText = TranslateByParserResult( context.Endpoint, result, TranslationScopes.None, null, false, context.TranslationResult.IsGlobal );
                   }
 
                   if( !string.IsNullOrEmpty( translatedText ) )
@@ -2128,7 +2147,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( job.SaveResultGlobally )
                         {
-                           TextCache.AddTranslationToCache( context.Result.OriginalText, translatedText, true, TranslationType.Full );
+                           TextCache.AddTranslationToCache( context.Result.OriginalText, translatedText, true, TranslationType.Full, TranslationScopes.None );
                         }
                         job.Endpoint.AddTranslationToCache( context.Result.OriginalText, translatedText );
                      }
@@ -2190,21 +2209,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( component.gameObject?.activeSelf ?? false )
                   {
+                     var scope = TranslationScopeProvider.GetScope( component );
+
                      var tti = kvp.Value as TextTranslationInfo;
                      var originalText = tti.OriginalText;
                      if( tti != null && !string.IsNullOrEmpty( originalText ) )
                      {
                         var key = GetCacheKey( kvp.Key, originalText, false );
-                        if( TextCache.TryGetTranslation( key, true, false, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
+                        if( TextCache.TryGetTranslation( key, true, false, scope, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                         {
                            SetTranslatedText( kvp.Key, key.Untemplate( translatedText ), null, tti ); // no need to untemplatize the translated text
                         }
                         else if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                         {
-                           var result = UnityTextParsers.GameLogTextParser.Parse( originalText );
+                           var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope );
                            if( result.Succeeded )
                            {
-                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                               if( translation != null )
                               {
                                  SetTranslatedText( ui, translation, null, tti );
@@ -2213,10 +2234,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         else if( UnityTextParsers.RichTextParser.CanApply( ui ) && IsBelowMaxLength( originalText ) )
                         {
-                           var result = UnityTextParsers.RichTextParser.Parse( originalText );
+                           var result = UnityTextParsers.RichTextParser.Parse( originalText, scope );
                            if( result.Succeeded )
                            {
-                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, false );
+                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                               if( translation != null )
                               {
                                  SetTranslatedText( ui, translation, null, tti );

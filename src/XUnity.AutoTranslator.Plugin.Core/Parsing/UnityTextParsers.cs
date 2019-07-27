@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       public static RichTextParser RichTextParser;
       public static GameLogTextParser GameLogTextParser;
 
-      public static void Initialize( Func<string, bool> isTranslatable )
+      public static void Initialize( Func<string, int, bool> isTranslatable )
       {
          RichTextParser = new RichTextParser();
          GameLogTextParser = new GameLogTextParser( isTranslatable );

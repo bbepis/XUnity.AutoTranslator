@@ -62,9 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string OutputFile;
       public static string SubstitutionFile;
       public static string TranslationDirectory;
-      public static float Delay;
       public static int MaxCharactersPerTranslation;
-      public static bool EnablePrintHierarchy;
       public static bool EnableConsole;
       public static bool EnableDebugLogs;
       public static string AutoTranslationsFilePath;
@@ -100,6 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool CacheWhitespaceDifferences;
       public static bool GenerateStaticSubstitutionTranslations;
       public static bool GeneratePartialTranslations;
+      public static bool EnableTranslationScoping;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -142,7 +141,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
             AllowPluginHookOverride = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "AllowPluginHookOverride", true );
 
-            Delay = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "Delay", 0f );
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
             IgnoreWhitespaceInDialogue = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInDialogue", true );
             IgnoreWhitespaceInNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInNGUI", true );
@@ -170,6 +168,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", false );
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
             GeneratePartialTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GeneratePartialTranslations", false );
+            EnableTranslationScoping = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationScoping", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );
@@ -200,8 +199,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnabledTranslators = PluginEnvironment.Current.Preferences.GetOrDefault( "TranslationAggregator", "EnabledTranslators", string.Empty )
                ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
 
-
-            EnablePrintHierarchy = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnablePrintHierarchy", false );
+            
             EnableConsole = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableConsole", false );
             EnableDebugLogs = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableLog", false );
 
@@ -213,6 +211,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             FromLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
             ToLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( Language );
+
+            if( EnableTranslationScoping && !Features.SupportsSceneManager )
+            {
+               EnableTranslationScoping = false;
+
+               XuaLogger.Current.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
+            }
 
             //// workaround to handle text translation toggling in KK
             //if( ApplicationName != null )

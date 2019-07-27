@@ -23,7 +23,7 @@ It does (obviously) go to the internet, in order to provide the translation, so 
 
 Oh, and it is also capable of doing some basic image loading/dumping. Go to the [Texture Translation](#texture-translation) section to find out more.
 
-If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution).
+If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution) and the section regarding [manual translations](#manual-translations) so you understand how the plugin operates.
 
 From version 3.0.0 it is possible to implement custom translators. See [this section](#implementing-a-translator) for more info.
 
@@ -165,6 +165,12 @@ The following key inputs are mapped:
  * ALT + F: If OverrideFont is configured, will toggle between overridden and default font.
  * ALT + Q: Reboot the plugin if it was shutdown. This will only work if the plugin was shut down due to consecutive errors towards the translation endpoint. Should only be used if you have reason to believe you have remedied the problem (such as changed VPN endpoint etc.) otherwise it will just shut down again.
 
+ Debugging-only keys:
+  * CTRL + ALT + NP9: Simulate synchronous errors
+  * CTRL + ALT + NP8: Simulate asynchronous errors delayed by one second
+  * CTRL + ALT + NP7: Print out loaded scene names and ids to console
+  * CTRL + ALT + NP6: Print out entire GameObject hierarchy to file `hierarchy.txt`
+
 ## Translators
 The supported translators are:
  * [GoogleTranslate](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
@@ -205,7 +211,7 @@ Also, make sure you monitor the service's request usage/quotas, especially when 
 
 ### Spam Prevention
 The plugin employs the following spam prevention mechanisms:
- 1. When it sees a new text, it will always wait one second before it queues a translation request, to check if that same text changes. It will not send out any request until the text has not changed for 1 second. (Utage (VN Game Engine) is an exception here, as those texts may come from a resource lookup)
+ 1. When it sees a new text, it will always wait one second before it queues a translation request, to check if that same text changes. It will not send out any request until the text has not changed for 1 second.
  2. It will never send out more than 8000 requests (max 200 characters each (configurable)) during a single game session.
  3. It will never send out more than 1 request at a time (no concurrency!).
  4. If it detects an increasing number of queued translations (4000), the plugin will shutdown.
@@ -256,7 +262,6 @@ EnableIMGUI=False                ;Enable or disable IMGUI translation
 AllowPluginHookOverride=True     ;Allow other text translation plugins to override this plugin's hooks
 
 [Behaviour]
-Delay=0                          ;Delay to wait before attempting to translate a text in seconds
 MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 500.
 IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
 IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
@@ -269,7 +274,6 @@ EnableBatching=True              ;Indicates whether batching of translations sho
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
 OverrideFontTextMeshPro=         ;Overrides the fonts used for texts when updating text components. NOTE: Only works for TextMeshPro
-WhitespaceRemovalStrategy=TrimPerNewline ;Indicates how whitespace/newline removal should be handled before attempting translation. Can be ["TrimPerNewline", "None"]
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
@@ -278,8 +282,11 @@ GameLogTextPaths=                ;Indicates specific paths for game objects that
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
+CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
+CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
 GenerateStaticSubstitutionTranslations=False ;Indicates that the plugin should generate translations without variables when using substitutions
 GeneratePartialTranslations=False ;Indicates that the plugin should generate partial translations to support text translations as it is "scrolling in"
+EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' directives and scope translations based on these
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -327,7 +334,6 @@ Url=                             ;Optional, needed if CustomTranslated is config
 InstallationPath=                ;Optional, needed if LecPowerTranslator15 is configured
 
 [Debug]
-EnablePrintHierarchy=False       ;Used for debugging
 EnableConsole=False              ;Enables the console. Do not enable if other plugins (managers) handles this
 EnableLog=False                  ;Enables extra logging for debugging purposes
 
@@ -339,22 +345,17 @@ Tag=2.9.0                        ;Tag representing the last version this plugin 
 ### Behaviour Configuration Explanation
 
 #### Whitespace Handling
+This section describes configuration parameters that has an effect on whitespace handling before and after performing a translation. **None of these settings have an impact on the 'untranslated texts' that are placed in the auto generated translations file.**
+
 When it comes to automated translations, proper whitespace handling can really make or break the translation. The parameters that control whitespace handling are:
  * `IgnoreWhitespaceInDialogue`
  * `IgnoreWhitespaceInNGUI`
  * `MinDialogueChars`
  * `ForceSplitTextAfterCharacters`
- * `WhitespaceRemovalStrategy`
 
-The plugin first determines whether or not it should perform a special whitespace removal operation. How it removes the whitespace is based on the parameter `WhitespaceRemomvalStrategy`. The default value of this parameter is recommended. The other option 'None' may cause poor translations.
-
-It determines whether or not to perform this operation based on the parameters `IgnoreWhitespaceInDialogue`, `IgnoreWhitespaceInNGUI` and `MinDialogueChars`:
+The plugin first determines whether or not it should perform a special whitespace removal operation. It determines whether or not to perform this operation based on the parameters `IgnoreWhitespaceInDialogue`, `IgnoreWhitespaceInNGUI` and `MinDialogueChars`:
  * `IgnoreWhitespaceInDialogue`: If the text is longer than `MinDialogueChars`, whitespace is removed.
  * `IgnoreWhitespaceInNGUI`: If the text comes from an NGUI component, whitespace is removed.
-
-It is worth mentioning if the same whitespace character is repeating in the untranslated text, it will not be removed because it is likely used for formatting.
-
-All leading and trailing whitespace before the actual text is preserved in the translation as well. But the plugin will still be capable of reading a translation from the translation file, even if the leading/trailing whitespace does not match up exactly.
 
 After the text has been translated by the configured service, `ForceSplitTextAfterCharacters` is used to determine if the plugin should force the result into multiple lines after a certain number of characters.
 
@@ -411,7 +412,6 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
  * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
- * `Delay`: Required delay from a text appears until a translation request is queued in seconds. IMGUI not supported.
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
@@ -460,7 +460,36 @@ When creating manual translations, use this file as sparingly as you would use r
 
 *NOTE: If the text to be translated includes rich text, it cannot currently be parameterized.*
 
-### Manual Translation Guidance
+### Translation Scoping
+The following two options are available when it comes to scoping translations to only part of the game:
+
+The translation files support the following directives:
+ * `#set level 1,2,3` tells the plugin that translations following this line in this file may only be applied in scenes with ID 1, 2 or 3.
+ * `#unset level 1,2,3` tells the plugin that translations following this line in this file should not be applied in scenes with ID 1, 2 or 3. If no levels are set, all specified translations are global.
+ * `#set exe game1,game2` tells the plugin that translations following this line in this file may only be applied when the game is run through an executable with the name game1 or game2.
+ * `#unset exe game1,game2` tells the plugin that translations following this line in this file should not be applied when the game is run through an executable with the name game1 or game2. If no exes are set, all specified translations are global.
+
+For this to work, the following configuration option must be changed, as it defaults to `False`:
+
+```
+[Behaviour]
+EnableTranslationScoping=True
+```
+
+You can always see which levels are loaded by using the hotkey CTRL+ALT+NP7.
+
+Another way of scoping translations are through file names. It is possible to tell the plugin where to look for translation files. It is possible to parameterize these paths with the variable {GameExeName}.
+
+Example configuration that seperates translations for each executable:
+
+```
+[Files]
+Directory=Translation\{GameExeName}
+OutputFile=Translation\{GameExeName}\_AutoGeneratedTranslations.{lang}.txt
+SubstitutionFile=Translation\{GameExeName}\_Substitutions.{lang}.txt
+```
+
+### Text Lookup and Whitespace Handling
 If you're going to provide a manual translation for a game based on this plugin, you should read and understand this section to in order to avoid potential headaches.
 
 This section is provided to give the translator an understanding of how this plugin looks up texts and provides translations.
@@ -475,26 +504,42 @@ The world, however, is not always that simple. Depending on the engine/text fram
 「こう見えて怒っているんですよ？\n ……失礼しますね」
 ```
 
-These text strings are not the same and it would be annoying having to translate the same text multiple times because of something like this.
+These text strings are not the same and it would be annoying having to translate the same text multiple times if the final translation is supposed to be the same. 
 
-However, this plugin is capable of providing a single translation that handles both of these cases, if the final translation is supposed to be the same.
-
-Here's how (still simplified):
+In fact, only one of these translations are needed. Here's why: (still very much simplified):
  1. When the plugin sees an untranslated text, it will actually make four lookups, not one. These are, in order:
-   a. Based on the untouched original text
-   b. Based on the original text but without leading/trailing whitespace. If found the leading/trailing whitespace is added to the resulting translation
-   c. Based on the original text but without internal non-repeating whitespace surrounding a newline
-   d. Based on the original text but without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline. If found the leading/trailing whitespace is added to the resulting translation
- 2. When the plugin loads the (manual) translation it will not make one dictionary entry, but three. These are:
-   a. Based on the untouched original text and original translation
-   b. Based on the original text (without leading/trailing whitespace) and original translation (without leading/trailing whitespace)
-   c. Based on the original text (without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline) and original translation (without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline)
+    * Based on the untouched original text
+    * Based on the original text but without leading/trailing whitespace. If found the leading/trailing whitespace is added to the resulting translation
+    * Based on the original text but without internal non-repeating whitespace surrounding a newline
+    * Based on the original text but without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline. If found the leading/trailing whitespace is added to the resulting translation
+
+This means that for the following string `\n 「こう見えて怒っているんですよ？\n ……失礼しますね」` the plugin will make the following lookups:
+```
+\n 「こう見えて怒っているんですよ？\n ……失礼しますね」
+「こう見えて怒っているんですよ？\n ……失礼しますね」
+\n 「こう見えて怒っているんですよ？……失礼しますね」
+「こう見えて怒っているんですよ？……失礼しますね」
+```
+
+ 2. When the plugin loads the (manual/automatic) translation it will not make one dictionary entry, but three. These are:
+    * Based on the untouched original text and original translation
+    * Based on the original text (without leading/trailing whitespace) and original translation (without leading/trailing whitespace)
+    * Based on the original text (without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline) and original translation (without leading/trailing whitespace and internal non-repeating whitespace surrounding a newline)
+   
+This means that for the following string `\n 「こう見えて怒っているんですよ？\n ……失礼しますね」` the plugin will make the following entries:
+```
+\n 「こう見えて怒っているんですよ？\n ……失礼しますね」
+「こう見えて怒っているんですよ？\n ……失礼しますね」
+「こう見えて怒っているんですよ？……失礼しますね」
+```
 
 This means you can get away with providing a single translation for both of these cases. Which you think is better is up to you.
 
 Another thing to note is that the plugin will always output the original text without modifications in the translation file. But if it sees another text afterwards that is "compatible" with that text-string (due to the above mentioned text modifications) it will not output this new text by default.
 
-This is controlled by the configuration option `CacheWhitespaceDifferences=False`. You can change this to true, and it will output a new entry for each unique text, even if the only differences are whitespace. Obviously, translations-pairs actually appearing in the translation file will always that precendent over translations-pairs that are based on modifying an exinsting translation-pair.
+This is controlled by the configuration option `CacheWhitespaceDifferences=False`. You can change this to true, and it will output a new entry for each unique text, even if the only differences are whitespace. Obviously, translations-pairs actually appearing in the translation file will always that precendent over translations-pairs that are generated based on an exinsting translation-pair.
+
+*NOTE: Whitespace differences in relation to level-scoped translations will never be output regardless of this setting.*
 
 ## Regarding Redistribution
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:

@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       }
 
 
-      public ParserResult Parse( string input )
+      public ParserResult Parse( string input, int scope )
       {
          var matches = TagRegex.Matches( input );
 

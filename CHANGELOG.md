@@ -1,6 +1,11 @@
 ﻿### 3.8.0
+ * FEATURE - Support 'TARC' directives '#set exe', '#unset exe', '#set level' and '#unset level'. Must be explicitly enabled through config option 'EnableTranslationScoping=True'
  * CHANGE - Completely reworked whitespace handling to better support manual translations (still backwards compatible)
- * BUG FIX - Fixed bug in `TextGetterCompatibilityMode`
+ * BUG FIX - Fixed bug in 'TextGetterCompatibilityMode'
+ * BUG FIX - Corrected whitespace handling when constructing alternate translation-pairs for languages requiring whitespace
+ * MISC - Removed 'Delay' config option due to feature bloat
+ * MISC - Removed 'WhitespaceRemovalStrategy' config option due to feature bloat
+ * MISC - Changed default value of 'CacheWhitespaceDifferences' from True to False
 
 ### 3.7.0
  * FEATURE - Support for hooking 3D TextMesh (disabled by default)

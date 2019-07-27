@@ -23,6 +23,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       /// <summary>
       /// Gets the version of the plugin.
       /// </summary>
-      public const string Version = "3.7.0";
+      public const string Version = "3.8.0";
    }
 }

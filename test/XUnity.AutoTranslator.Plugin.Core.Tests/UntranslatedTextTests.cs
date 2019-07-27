@@ -104,11 +104,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          Assert.Equal( expectedTrailingWhitespace, untranslatedText.TrailingWhitespace );
       }
 
-      [Theory( DisplayName = "Can_Trim_Surrounding_Whitespace" )]
+      [Theory( DisplayName = "Are_References_The_Same" )]
       [InlineData( "Hello" )]
-      public void Are_References_Correct( string input )
+      [InlineData( "He  llo" )]
+      [InlineData( "He  \n\nllo" )]
+      public void Are_References_The_Same( string input )
       {
-         var untranslatedText = new UntranslatedText( input, false, false, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false );
 
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
@@ -121,8 +123,46 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          Assert.True( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_FullyTrimmed ) );
       }
 
+      [Theory( DisplayName = "Are_References_The_Correct_With_Internal_Whitespace" )]
+      [InlineData( "He \nllo" )]
+      [InlineData( "He  \r\t\t\nllo" )]
+      public void Are_References_The_Correct_With_Internal_Whitespace( string input )
+      {
+         var untranslatedText = new UntranslatedText( input, false, true, false );
+
+         Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
+         Assert.True( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.Original_Text_InternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.Original_Text_FullyTrimmed ) );
+
+         Assert.True( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text ) );
+         Assert.True( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_ExternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_InternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_FullyTrimmed ) );
+      }
+
+      [Theory( DisplayName = "Are_References_The_Correct_With_External_Whitespace" )]
+      [InlineData( "   Hello   " )]
+      [InlineData( "   \r\t\t\n\nHello   " )]
+      public void Are_References_The_Correct_With_External_Whitespace( string input )
+      {
+         var untranslatedText = new UntranslatedText( input, false, true, false );
+
+         Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
+         Assert.True( ReferenceEquals( input, untranslatedText.Original_Text_InternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.Original_Text_FullyTrimmed ) );
+
+         Assert.True( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_ExternallyTrimmed ) );
+         Assert.True( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_InternallyTrimmed ) );
+         Assert.False( ReferenceEquals( input, untranslatedText.TemplatedOriginal_Text_FullyTrimmed ) );
+      }
+
       [Theory( DisplayName = "All_Expectations" )]
-      [InlineData( "  私は遥\nあんたがだれ？   ", "  私は{{A}}\nあんたがだれ？   ", "私は{{A}}\nあんたがだれ？", "  私は{{A}}あんたがだれ？   ", "私は{{A}}あんたがだれ？", "  私は遥\nあんたがだれ？   ", "私は遥\nあんたがだれ？", "  私は遥あんたがだれ？   ", "私は遥あんたがだれ？", "  ", "   " )]
+      [InlineData( "  私は遥\nあんたがだれ？   ", "  私は{{A}}\nあんたがだれ？   ", "私は{{A}}\nあんたがだれ？", "  私は{{A}}あんたがだれ？   ", "私は{{A}}あんたがだれ？", "  私は遥\nあんたがだれ？   ", "私は遥\nあんたがだれ？", "  私は遥あんたがだれ？   ", "私は遥あんたがだれ？", "  ", "   ", false )]
+      [InlineData( "He  \r\t\t\nllo", "He  \r\t\t\nllo", "He  \r\t\t\nllo", "He  \t\tllo", "He  \t\tllo", "He  \r\t\t\nllo", "He  \r\t\t\nllo", "He  \t\tllo", "He  \t\tllo", null, null, true )]
+      [InlineData( "Who\nare you?", "Who\nare you?", "Who\nare you?", "Who are you?", "Who are you?", "Who\nare you?", "Who\nare you?", "Who are you?", "Who are you?", null, null, true )]
       public void All_Expectations(
          string input,
          string TemplatedOriginal_Text,
@@ -134,11 +174,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          string Original_Text_InternallyTrimmed,
          string Original_Text_FullyTrimmed,
          string leading,
-         string trailing )
+         string trailing,
+         bool whitespaceBetweenWords )
       {
          Settings.Replacements[ "遥" ] = "Haruka";
 
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, whitespaceBetweenWords );
 
          Assert.Equal( TemplatedOriginal_Text, untranslatedText.TemplatedOriginal_Text );
          Assert.Equal( TemplatedOriginal_Text_ExternallyTrimmed, untranslatedText.TemplatedOriginal_Text_ExternallyTrimmed );

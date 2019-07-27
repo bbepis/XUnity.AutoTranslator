@@ -251,7 +251,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( removeInternalWhitespace )
          {
             Original_Text_FullyTrimmed = PerformInternalTrimming( Original_Text_ExternallyTrimmed, whitespaceBetweenWords, ref trailingBuilder );
-            Original_Text_InternallyTrimmed = SurroundWithWhitespace( Original_Text_FullyTrimmed, LeadingWhitespace, TrailingWhitespace, ref trailingBuilder );
+
+            var internalTrimmingHadNoImpact = ReferenceEquals( Original_Text_FullyTrimmed, Original_Text_ExternallyTrimmed );
+            Original_Text_InternallyTrimmed = internalTrimmingHadNoImpact
+               ? Original_Text
+               : SurroundWithWhitespace( Original_Text_FullyTrimmed, LeadingWhitespace, TrailingWhitespace, ref trailingBuilder );
          }
          else
          {
@@ -264,7 +268,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( removeInternalWhitespace )
             {
                TemplatedOriginal_Text_FullyTrimmed = PerformInternalTrimming( TemplatedOriginal_Text_ExternallyTrimmed, whitespaceBetweenWords, ref trailingBuilder );
-               TemplatedOriginal_Text_InternallyTrimmed = SurroundWithWhitespace( TemplatedOriginal_Text_FullyTrimmed, LeadingWhitespace, TrailingWhitespace, ref trailingBuilder );
+
+               var internalTrimmingHadNoImpact = ReferenceEquals( TemplatedOriginal_Text_FullyTrimmed, TemplatedOriginal_Text_ExternallyTrimmed );
+               TemplatedOriginal_Text_InternallyTrimmed = internalTrimmingHadNoImpact
+                  ? TemplatedOriginal_Text
+                  : SurroundWithWhitespace( TemplatedOriginal_Text_FullyTrimmed, LeadingWhitespace, TrailingWhitespace, ref trailingBuilder );
             }
             else
             {
