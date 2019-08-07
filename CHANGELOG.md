@@ -1,4 +1,8 @@
-﻿### 3.8.0
+﻿### 3.8.1
+ * BUG FIX - Minor bug in relation to harmony initialization
+ * MISC - Option to enable/disable logs primarily targeted and translators
+
+### 3.8.0
  * FEATURE - Support 'TARC' directives '#set exe', '#unset exe', '#set level' and '#unset level'. Must be explicitly enabled through config option 'EnableTranslationScoping=True'
  * CHANGE - Completely reworked whitespace handling to better support manual translations (still backwards compatible)
  * BUG FIX - Fixed bug in 'TextGetterCompatibilityMode'

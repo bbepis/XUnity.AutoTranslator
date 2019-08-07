@@ -9,6 +9,13 @@ using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   internal class TexturePair
+   {
+      public Texture2D Original { get; set; }
+
+      public Texture2D Translated { get; set; }
+   }
+
    internal class TextureTranslationInfo
    {
       private static Dictionary<string, string> NameToHash = new Dictionary<string, string>();

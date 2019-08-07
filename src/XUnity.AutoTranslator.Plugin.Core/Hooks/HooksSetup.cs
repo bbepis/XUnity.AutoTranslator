@@ -21,17 +21,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       private static object _harmony;
 
-      static HooksSetup()
+      public static void InitializeHarmony()
       {
-         if( ClrTypes.HarmonyInstance != null )
+         try
          {
-            _harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
-               .Invoke( null, new object[] { PluginData.Identifier } );
+            if( ClrTypes.HarmonyInstance != null )
+            {
+               _harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
+                  .Invoke( null, new object[] { PluginData.Identifier } );
+            }
+            else if( ClrTypes.Harmony != null )
+            {
+               _harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
+                  .Invoke( new object[] { PluginData.Identifier } );
+            }
+            else
+            {
+               XuaLogger.Current.Error( "An unexpected exception occurred during harmony initialization, likely caused by unknown Harmony version. Harmony hooks will be unavailable!" );
+            }
          }
-         else if( ClrTypes.Harmony != null )
+         catch( Exception e )
          {
-            _harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
-               .Invoke( new object[] { PluginData.Identifier } );
+            XuaLogger.Current.Error( e, "An unexpected exception occurred during harmony initialization. Harmony hooks will be unavailable!" );
          }
       }
 

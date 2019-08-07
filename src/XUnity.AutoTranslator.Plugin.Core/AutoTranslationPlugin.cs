@@ -108,6 +108,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          DebugConsole.Enable();
 
          // Setup hooks
+         HooksSetup.InitializeHarmony();
          HooksSetup.InstallTextHooks();
          HooksSetup.InstallImageHooks();
          HooksSetup.InstallTextGetterCompatHooks();
@@ -177,7 +178,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   " Translated",
                   "<b>TRANSLATED</b>\nThe plugin currently displays translated texts. Disabling this does not mean the plugin will no longer perform translations, just that they will not be displayed.",
                   "<b>NOT TRANSLATED</b>\nThe plugin currently displays untranslated texts.",
-                  ToggleTranslation, () => _isInTranslatedMode )
+                  ToggleTranslation, () => _isInTranslatedMode ),
+               new ToggleViewModel(
+                  " Silent Logging",
+                  "<b>SILENT</b>\nThe plugin will not print out success messages to the log in relation to translations.",
+                  "<b>VERBOSE</b>\nThe plugin will print out success messages to the log in relation to translations.",
+                  () => Settings.EnableSilentMode = !Settings.EnableSilentMode, () => Settings.EnableSilentMode ),
             },
             new DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager>(
                TranslationManager.AllEndpoints.Select( x => new TranslatorDropdownOptionViewModel( () => x == TranslationManager.CurrentEndpoint, x ) ).ToList(),
@@ -793,7 +799,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                forceReload = context.RegisterTextureInContextAndDetermineWhetherToReload( texture );
             }
-
+            
             if( TextureCache.TryGetTranslatedImage( key, out var newData ) )
             {
                if( _isInTranslatedMode )

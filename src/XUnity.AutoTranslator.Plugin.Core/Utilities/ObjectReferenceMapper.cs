@@ -50,6 +50,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return texture.GetOrCreate<TextureTranslationInfo>();
       }
 
+      public static TexturePair GetOrCreateTextureTranslationPair( this Texture2D texture )
+      {
+         var pair = texture.GetOrCreate<TexturePair>();
+         if( pair.Original == null ) pair.Original = texture;
+
+         return pair;
+      }
+
+      public static void RegisterTranslatedTexture( TexturePair pair, Texture2D translated )
+      {
+
+      }
+
       public static T GetOrCreate<T>( this object obj )
          where T : new()
       {

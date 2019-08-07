@@ -99,6 +99,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool GenerateStaticSubstitutionTranslations;
       public static bool GeneratePartialTranslations;
       public static bool EnableTranslationScoping;
+      public static bool EnableSilentMode;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -169,6 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
             GeneratePartialTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GeneratePartialTranslations", false );
             EnableTranslationScoping = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationScoping", false );
+            EnableSilentMode = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableSilentMode", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );
@@ -199,7 +201,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnabledTranslators = PluginEnvironment.Current.Preferences.GetOrDefault( "TranslationAggregator", "EnabledTranslators", string.Empty )
                ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
 
-            
+
             EnableConsole = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableConsole", false );
             EnableDebugLogs = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableLog", false );
 

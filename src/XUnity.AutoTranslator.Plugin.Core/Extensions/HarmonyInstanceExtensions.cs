@@ -52,20 +52,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { instance } );
                if( original != null )
                {
-                  var priority = type.GetCustomAttributes( typeof( HarmonyPriorityShimAttribute ), false )
-                     .OfType<HarmonyPriorityShimAttribute>()
-                     .FirstOrDefault()
-                     ?.priority;
+                  if( instance == null )
+                  {
+                     XuaLogger.Current.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
+                  }
 
-                  var prefix = type.GetMethod( "Prefix", flags );
-                  var postfix = type.GetMethod( "Postfix", flags );
-                  var transpiler = type.GetMethod( "Transpiler", flags );
-
-                  var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
-                  var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
-                  var harmonyTranspiler = transpiler != null ? CreateHarmonyMethod( transpiler, priority ) : null;
-
-                  if( Settings.ForceMonoModHooks )
+                  if( Settings.ForceMonoModHooks || instance == null )
                   {
                      if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
                      {
@@ -99,6 +91,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   {
                      try
                      {
+                        var priority = type.GetCustomAttributes( typeof( HarmonyPriorityShimAttribute ), false )
+                           .OfType<HarmonyPriorityShimAttribute>()
+                           .FirstOrDefault()
+                           ?.priority;
+
+                        var prefix = type.GetMethod( "Prefix", flags );
+                        var postfix = type.GetMethod( "Postfix", flags );
+                        var transpiler = type.GetMethod( "Transpiler", flags );
+
+                        var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
+                        var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
+                        var harmonyTranspiler = transpiler != null ? CreateHarmonyMethod( transpiler, priority ) : null;
+
                         if( PatchMethod12 != null )
                         {
                            PatchMethod12.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, harmonyTranspiler } );

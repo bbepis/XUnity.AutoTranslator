@@ -89,10 +89,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
 
       private static Type FindType( string name )
       {
-         return AppDomain.CurrentDomain.GetAssemblies()
-            .Select( x => x.GetType( name, false ) )
-            .Where( x => x != null )
-            .FirstOrDefault();
+         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+         foreach( var assembly in assemblies )
+         {
+            try
+            {
+               var type = assembly.GetType( name, false );
+               if(type != null)
+               {
+                  return type;
+               }
+            }
+            catch
+            {
+               // don't care!
+            }
+         }
+
+         return null;
       }
 
       private static Type FindTypeStrict( string name )

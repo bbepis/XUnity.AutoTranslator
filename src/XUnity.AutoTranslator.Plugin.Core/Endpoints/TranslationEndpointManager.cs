@@ -97,7 +97,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   // WHITESPACE DIFFERENCE, Store new value
                   unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                   unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
-                  
+
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue );
 
                   value = unmodifiedValue;
@@ -118,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   // WHITESPACE DIFFERENCE, Store new value
                   unmodifiedValue = value;
                   unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
-                  
+
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue );
 
                   value = unmodifiedValue;
@@ -139,7 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   // WHITESPACE DIFFERENCE, Store new value
                   unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                   unmodifiedKey = key.Untemplate( key.TemplatedOriginal_Text );
-                  
+
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue );
 
                   value = unmodifiedValue;
@@ -167,7 +167,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                // WHITESPACE DIFFERENCE, Store new value
                unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
-               
+
                AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue );
 
                value = unmodifiedValue;
@@ -200,7 +200,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             {
                // WHITESPACE DIFFERENCE, Store new value
                unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
-               
+
                AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue );
 
                value = unmodifiedValue;
@@ -302,7 +302,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   _ongoingJobs[ key ] = job;
                   Manager.OngoingTranslations++;
 
-                  XuaLogger.Current.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.Current.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
                }
                else
                {
@@ -356,7 +356,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                _ongoingJobs[ key ] = job;
                Manager.OngoingTranslations++;
 
-               XuaLogger.Current.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.Current.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
                CoroutineHelper.Start(
                   Translate(
                      new[] { untranslatedText },
@@ -400,7 +400,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( job.Key );
 
-               XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
                Manager.InvokeJobCompleted( job );
             }
@@ -437,7 +437,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          RemoveOngoingTranslation( job.Key );
 
-         XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
+         if( !Settings.EnableSilentMode ) XuaLogger.Current.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
          Manager.InvokeJobCompleted( job );
       }
@@ -565,7 +565,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
          }
 
-         XuaLogger.Current.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
+         if( !Settings.EnableSilentMode ) XuaLogger.Current.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
 
          var newJob = new TranslationJob( this, key, saveResultGlobally );
          newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
