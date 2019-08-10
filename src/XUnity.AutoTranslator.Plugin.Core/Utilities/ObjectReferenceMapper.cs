@@ -45,22 +45,38 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return obj.GetOrCreate<ImageTranslationInfo>();
       }
 
-      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture texture )
+      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )
       {
-         return texture.GetOrCreate<TextureTranslationInfo>();
+         var tti = texture.GetOrCreate<TextureTranslationInfo>();
+         if( tti.Original == null ) tti.SetOriginal( texture );
+
+         return tti;
       }
 
-      public static TexturePair GetOrCreateTextureTranslationPair( this Texture2D texture )
+      public static void Set<T>( this object obj, T t )
+         where T : new()
       {
-         var pair = texture.GetOrCreate<TexturePair>();
-         if( pair.Original == null ) pair.Original = texture;
-
-         return pair;
-      }
-
-      public static void RegisterTranslatedTexture( TexturePair pair, Texture2D translated )
-      {
-
+         lock( Sync )
+         {
+            if( DynamicFields.TryGetValue( obj, out object value ) )
+            {
+               if( value is Dictionary<Type, object> existingDictionary )
+               {
+                  existingDictionary[ typeof( T ) ] = t;
+               }
+               else
+               {
+                  var newDictionary = new Dictionary<Type, object>();
+                  newDictionary.Add( value.GetType(), value );
+                  newDictionary[ typeof( T ) ] = t;
+                  DynamicFields[ obj ] = newDictionary;
+               }
+            }
+            else
+            {
+               DynamicFields[ obj ] = t;
+            }
+         }
       }
 
       public static T GetOrCreate<T>( this object obj )

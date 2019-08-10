@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
    internal static class HooksSetup
    {
-      private static object _harmony;
+      internal static object Harmony;
 
       public static void InitializeHarmony()
       {
@@ -27,12 +27,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( ClrTypes.HarmonyInstance != null )
             {
-               _harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
+               Harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
                   .Invoke( null, new object[] { PluginData.Identifier } );
             }
             else if( ClrTypes.Harmony != null )
             {
-               _harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
+               Harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
                   .Invoke( new object[] { PluginData.Identifier } );
             }
             else
@@ -76,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.TextGetterCompatibilityMode )
             {
-               _harmony.PatchAll( TextGetterCompatHooks.All );
+               Harmony.PatchAll( TextGetterCompatHooks.All );
             }
          }
          catch( Exception e )
@@ -91,7 +91,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
-               _harmony.PatchAll( ImageHooks.All );
+               Harmony.PatchAll( ImageHooks.All );
+
+               if( Settings.EnableLegacyTextureLoading )
+               {
+                  Harmony.PatchAll( ImageHooks.Sprite );
+               }
             }
          }
          catch( Exception e )
@@ -107,7 +112,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUGUI )
             {
-               _harmony.PatchAll( UGUIHooks.All );
+               Harmony.PatchAll( UGUIHooks.All );
             }
          }
          catch( Exception e )
@@ -119,7 +124,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMeshPro )
             {
-               _harmony.PatchAll( TextMeshProHooks.All );
+               Harmony.PatchAll( TextMeshProHooks.All );
             }
          }
          catch( Exception e )
@@ -131,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableNGUI )
             {
-               _harmony.PatchAll( NGUIHooks.All );
+               Harmony.PatchAll( NGUIHooks.All );
             }
          }
          catch( Exception e )
@@ -143,7 +148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               _harmony.PatchAll( IMGUIHooks.All );
+               Harmony.PatchAll( IMGUIHooks.All );
             }
          }
          catch( Exception e )
@@ -153,7 +158,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          try
          {
-            _harmony.PatchAll( UtageHooks.All );
+            Harmony.PatchAll( UtageHooks.All );
          }
          catch( Exception e )
          {
@@ -164,7 +169,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMesh )
             {
-               _harmony.PatchAll( TextMeshHooks.All );
+               Harmony.PatchAll( TextMeshHooks.All );
             }
          }
          catch( Exception e )

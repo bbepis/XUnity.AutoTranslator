@@ -100,6 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool GeneratePartialTranslations;
       public static bool EnableTranslationScoping;
       public static bool EnableSilentMode;
+      public static HashSet<string> BlacklistedIMGUIPlugins;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -171,6 +172,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             GeneratePartialTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GeneratePartialTranslations", false );
             EnableTranslationScoping = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationScoping", false );
             EnableSilentMode = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableSilentMode", false );
+            BlacklistedIMGUIPlugins = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BlacklistedIMGUIPlugins", string.Empty )
+               ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries )
+               .Select( x => x.Trim() )
+               .Where( x => !string.IsNullOrEmpty( x ) )
+               .ToHashSet( StringComparer.OrdinalIgnoreCase ) ?? new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );
@@ -262,6 +268,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
          ServiceEndpoint = id;
          PluginEnvironment.Current.Preferences[ "Service" ][ "Endpoint" ].Value = id;
+         Save();
+      }
+
+      public static void SetSlientMode( bool enabled )
+      {
+         EnableSilentMode = enabled;
+         PluginEnvironment.Current.Preferences[ "Behaviour" ][ "EnableSilentMode" ].Value = enabled.ToString( CultureInfo.InvariantCulture );
          Save();
       }
 

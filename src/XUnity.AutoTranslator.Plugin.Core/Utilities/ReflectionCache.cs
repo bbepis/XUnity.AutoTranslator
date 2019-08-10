@@ -170,17 +170,21 @@ namespace XUnity.AutoTranslator.Plugins.Core.Utilities
 
       public Type PropertyType { get; }
 
-      public object Set( object instance, object[] arguments )
+      public void Set( object instance, object[] arguments )
       {
-         return _set( instance, arguments );
+         if( _set == null ) return;
+
+         _set( instance, arguments );
       }
 
-      public object Set( object instance, object arg1 )
+      public void Set( object instance, object arg1 )
       {
+         if( _set == null ) return;
+
          try
          {
             Args1[ 0 ] = arg1;
-            return _set( instance, Args1 );
+            _set( instance, Args1 );
          }
          finally
          {
@@ -190,11 +194,15 @@ namespace XUnity.AutoTranslator.Plugins.Core.Utilities
 
       public object Get( object instance, object[] arguments )
       {
+         if( _get == null ) return null;
+
          return _get( instance, arguments );
       }
 
       public object Get( object instance )
       {
+         if( _get == null ) return null;
+
          return _get( instance, Args0 );
       }
    }

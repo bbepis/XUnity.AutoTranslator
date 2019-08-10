@@ -30,14 +30,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          try
          {
             var assembly = LoadAssembly( file );
-            var types = GetAllTypesOf<TService>( assembly );
-
-            foreach( var type in types )
+            if( assembly != null )
             {
-               allTypes.Add( type );
-            }
+               var types = GetAllTypesOf<TService>( assembly );
 
-            return true;
+               foreach( var type in types )
+               {
+                  allTypes.Add( type );
+               }
+
+               return true;
+            }
          }
          catch( Exception e )
          {
@@ -55,20 +58,40 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             var assembly = Assembly.Load( assemblyName );
             return assembly;
          }
+         catch( BadImageFormatException )
+         {
+            // unmanaged
+         }
          catch
          {
             // fallback to legacy API
-            var assembly = Assembly.LoadFrom( file );
-            return assembly;
+            try
+            {
+               var assembly = Assembly.LoadFrom( file );
+               return assembly;
+            }
+            catch( BadImageFormatException )
+            {
+               // unmanaged
+            }
          }
+
+         return null;
       }
 
       internal static List<Type> GetAllTypesOf<TService>( Assembly assembly )
       {
-         return assembly
-            .GetTypes()
-            .Where( x => typeof( TService ).IsAssignableFrom( x ) && !x.IsAbstract && !x.IsInterface )
-            .ToList();
+         try
+         {
+            return assembly
+               .GetTypes()
+               .Where( x => typeof( TService ).IsAssignableFrom( x ) && !x.IsAbstract && !x.IsInterface )
+               .ToList();
+         }
+         catch( ReflectionTypeLoadException )
+         {
+            return new List<Type>();
+         }
       }
    }
 }

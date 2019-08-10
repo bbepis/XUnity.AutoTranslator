@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using static UnityEngine.GUI;
@@ -325,8 +326,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          return AccessToolsShim.Method( ClrTypes.GUI, "DoModalWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ) } );
       }
 
-      static void Prefix( GUIContent content )
+      static void Prefix( int id, WindowFunction func, GUIContent content )
       {
+         if( Settings.BlacklistedIMGUIPlugins.Count > 0 )
+         {
+            IMGUIBlocker.BlockIfConfigured( func.Method, id );
+         }
+
          if( !IMGUIHooks.HooksOverriden )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( content, false );
@@ -344,7 +350,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
       static Rect MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6 )
       {
-         Prefix( arg4 );
+         Prefix( arg1, arg3, arg4 );
 
          return _original( arg1, arg2, arg3, arg4, arg5, arg6 );
       }
@@ -363,8 +369,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          return AccessToolsShim.Method( ClrTypes.GUI, "DoWindow", new[] { typeof( int ), typeof( Rect ), typeof( WindowFunction ), typeof( GUIContent ), typeof( GUIStyle ), typeof( GUISkin ), typeof( bool ) } );
       }
 
-      static void Prefix( GUIContent title )
+      static void Prefix( int id, WindowFunction func, GUIContent title )
       {
+         if( Settings.BlacklistedIMGUIPlugins.Count > 0 )
+         {
+            IMGUIBlocker.BlockIfConfigured( func.Method, id );
+         }
+
          if( !IMGUIHooks.HooksOverriden )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( title, false );
@@ -382,7 +393,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
       static Rect MM_Detour( int arg1, Rect arg2, WindowFunction arg3, GUIContent arg4, GUIStyle arg5, GUISkin arg6, bool arg7 )
       {
-         Prefix( arg4 );
+         Prefix( arg1, arg3, arg4 );
 
          return _original( arg1, arg2, arg3, arg4, arg5, arg6, arg7 );
       }

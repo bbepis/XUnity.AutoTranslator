@@ -285,6 +285,8 @@ CacheWhitespaceDifferences=False ;Indicates whether or not whitespace difference
 GenerateStaticSubstitutionTranslations=False ;Indicates that the plugin should generate translations without variables when using substitutions
 GeneratePartialTranslations=False ;Indicates that the plugin should generate partial translations to support text translations as it is "scrolling in"
 EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' directives and scope translations based on these
+EnableSilentMode=False           ;Indicates the plugin should not print out success messages in relation to translations
+BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -410,6 +412,8 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
  * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
+ * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations
+ * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
@@ -473,6 +477,8 @@ For this to work, the following configuration option must be changed, as it defa
 [Behaviour]
 EnableTranslationScoping=True
 ```
+
+Also, this behaviour is not available in the `OutputFile`.
 
 You can always see which levels are loaded by using the hotkey CTRL+ALT+NP7.
 
@@ -584,7 +590,7 @@ EnableLegacyTextureLoading=False
 
 `DetectDuplicateTextureNames` specifies that the plugin should identify which image names are duplicated and update the configuration with these names automatically. **Never redistribute the mod with this enabled.**
 
-`EnableLegacyTextureLoading` specifies that the plugin should use attempt to load images differently, which may be relevant if the unity engine is old. This should be used unless the images that are loaded are not the ones that you expected.
+`EnableLegacyTextureLoading` specifies that the plugin should use attempt to load images differently, which may be relevant if the unity engine is old (verified with versions less than 5.3). This should be used unless the images that are loaded are not the ones that you expected.
 
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:

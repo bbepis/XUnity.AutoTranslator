@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -40,34 +41,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return "Unnamed";
       }
 
-      public static void LoadImageEx( this Texture2D texture, byte[] data, bool markNonReadable )
+      public static void LoadImageEx( this Texture2D texture, byte[] data )
       {
          if( LoadImage != null )
          {
-            LoadImage.Invoke( null, new object[] { texture, data, markNonReadable } );
+            LoadImage.Invoke( null, new object[] { texture, data, false } );
          }
          else
          {
-            texture.LoadImageSafe( data, markNonReadable );
-         }
-
-         // why.... ? WHY!!!
-         if( Settings.EnableLegacyTextureLoading )
-         {
-            if( LoadImage != null )
-            {
-               LoadImage.Invoke( null, new object[] { texture, data, markNonReadable } );
-            }
-            else
-            {
-               texture.LoadImageSafe( data, markNonReadable );
-            }
+            texture.LoadImageSafe( data );
          }
       }
 
-      private static void LoadImageSafe( this Texture2D texture, byte[] data, bool markNonReadable )
+      private static void LoadImageSafe( this Texture2D texture, byte[] data )
       {
-         texture.LoadImage( data/*, markNonReadable */ ); // markNonReadable always false in this plugin anyway; causes problems in old unity version
+         texture.LoadImage( data ); // markNonReadable always false in this plugin anyway; causes problems in old unity version
       }
 
       public static byte[] EncodeToPNGEx( this Texture2D texture )

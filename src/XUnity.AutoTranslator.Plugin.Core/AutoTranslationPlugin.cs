@@ -183,7 +183,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   " Silent Logging",
                   "<b>SILENT</b>\nThe plugin will not print out success messages to the log in relation to translations.",
                   "<b>VERBOSE</b>\nThe plugin will print out success messages to the log in relation to translations.",
-                  () => Settings.EnableSilentMode = !Settings.EnableSilentMode, () => Settings.EnableSilentMode ),
+                  ToggleSilentMode, () => Settings.EnableSilentMode ),
             },
             new DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager>(
                TranslationManager.AllEndpoints.Select( x => new TranslatorDropdownOptionViewModel( () => x == TranslationManager.CurrentEndpoint, x ) ).ToList(),
@@ -205,6 +205,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                new LabelViewModel( "Queued translations: ", () => $"{(TranslationManager.UnstartedTranslations)} / {Settings.MaxUnstartedJobs}" ),
                new LabelViewModel( "Error'ed translations: ", () => $"{TranslationManager.CurrentEndpoint?.ConsecutiveErrors ?? 0} / {Settings.MaxErrors}"  ),
             } );
+      }
+
+      private void ToggleSilentMode()
+      {
+         Settings.SetSlientMode( !Settings.EnableSilentMode );
       }
 
       private string GetCurrentEndpointStatus()
@@ -449,7 +454,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   foreach( var sr in spriteRenderers )
                   {
                      // simulate a hook
-                     Hook_ImageChangedOnComponent( sr, null, false, false );
+                     Texture2D _ = null;
+                     Hook_ImageChangedOnComponent( sr, ref _, false, false );
                   }
 
                   var end = Time.realtimeSinceStartup;
@@ -537,12 +543,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal void Hook_ImageChangedOnComponent( object source, Texture2D texture, bool isPrefixHooked, bool onEnable )
+      internal void Hook_ImageChangedOnComponent( object source, ref Texture2D texture, bool isPrefixHooked, bool onEnable )
       {
          if( !_imageHooksEnabled ) return;
          if( !source.IsKnownImageType() ) return;
 
-         HandleImage( source, texture, isPrefixHooked );
+         HandleImage( source, ref texture, isPrefixHooked );
 
          if( onEnable )
          {
@@ -550,12 +556,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal void Hook_ImageChanged( Texture2D texture, bool isPrefixHooked )
+      internal void Hook_ImageChanged( ref Texture2D texture, bool isPrefixHooked )
       {
          if( !_imageHooksEnabled ) return;
          if( texture == null ) return;
 
-         HandleImage( null, texture, isPrefixHooked );
+         HandleImage( null, ref texture, isPrefixHooked );
       }
 
       internal void Hook_HandleComponent( object ui )
@@ -740,7 +746,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return info.IsCurrentlySettingText;
       }
 
-      private void HandleImage( object source, Texture2D texture, bool isPrefixHooked )
+      private void HandleImage( object source, ref Texture2D texture, bool isPrefixHooked )
       {
          if( Settings.EnableTextureDumping )
          {
@@ -758,7 +764,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               TranslateTexture( source, texture, isPrefixHooked, null );
+               TranslateTexture( source, ref texture, isPrefixHooked, null );
             }
             catch( Exception e )
             {
@@ -771,26 +777,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( ui is Texture2D texture2d )
          {
-            TranslateTexture( null, texture2d, false, context );
+            TranslateTexture( null, ref texture2d, false, context );
          }
          else
          {
-            TranslateTexture( ui, null, false, context );
+            Texture2D _ = null;
+            TranslateTexture( ui, ref _, false, context );
          }
       }
 
-      private void TranslateTexture( object source, Texture2D texture, bool isPrefixHooked, TextureReloadContext context )
+      private void TranslateTexture( object source, ref Texture2D texture, bool isPrefixHooked, TextureReloadContext context )
       {
          try
          {
             _imageHooksEnabled = false;
 
+            var previousTextureValue = texture;
             texture = texture ?? source.GetTexture();
             if( texture == null ) return;
 
             var tti = texture.GetOrCreateTextureTranslationInfo();
             var iti = source.GetOrCreateImageTranslationInfo();
-            var key = tti.GetKey( texture );
+            var key = tti.GetKey();
             if( string.IsNullOrEmpty( key ) ) return;
 
             bool hasContext = context != null;
@@ -799,7 +807,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                forceReload = context.RegisterTextureInContextAndDetermineWhetherToReload( texture );
             }
-            
+
             if( TextureCache.TryGetTranslatedImage( key, out var newData ) )
             {
                if( _isInTranslatedMode )
@@ -809,7 +817,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      try
                      {
-                        texture.LoadImageEx( newData, tti.IsNonReadable( texture ) );
+                        if( !Settings.EnableLegacyTextureLoading )
+                        {
+                           texture.LoadImageEx( newData );
+                        }
+                        else
+                        {
+                           tti.CreateTranslatedTexture( newData );
+                        }
                      }
                      finally
                      {
@@ -824,6 +839,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
+                           if( Settings.EnableLegacyTextureLoading )
+                           {
+                              source.SetTexture( tti.Translated );
+                           }
+
                            if( !isPrefixHooked )
                            {
                               source.SetAllDirtyEx();
@@ -842,14 +862,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // if we cannot find the texture, and the texture is considered translated... hmmm someone has removed a file
 
                // handle texture
-               var originalData = tti.GetOriginalData( texture );
+               var originalData = tti.GetOriginalData();
                if( originalData != null )
                {
                   if( tti.IsTranslated )
                   {
                      try
                      {
-                        texture.LoadImageEx( originalData, tti.IsNonReadable( texture ) );
+                        if( !Settings.EnableLegacyTextureLoading )
+                        {
+                           texture.LoadImageEx( originalData );
+                        }
+                        else
+                        {
+                           // we just need to ensure we set/change the reference
+                           tti.CreateOriginalTexture();
+                        }
                      }
                      finally
                      {
@@ -864,6 +892,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
+                           if( Settings.EnableLegacyTextureLoading && tti.Original.IsAlive )
+                           {
+                              source.SetTexture( tti.Original.Target );
+                           }
+
                            if( !isPrefixHooked )
                            {
                               source.SetAllDirtyEx();
@@ -880,7 +913,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !_isInTranslatedMode )
             {
-               var originalData = tti.GetOriginalData( texture );
+               var originalData = tti.GetOriginalData();
                if( originalData != null )
                {
                   // handle texture
@@ -888,7 +921,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      try
                      {
-                        texture.LoadImageEx( originalData, tti.IsNonReadable( texture ) );
+                        if( !Settings.EnableLegacyTextureLoading )
+                        {
+                           texture.LoadImageEx( originalData );
+                        }
+                        else
+                        {
+                           // we just need to ensure we set/change the reference
+                           tti.CreateOriginalTexture();
+                        }
                      }
                      finally
                      {
@@ -903,6 +944,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
+                           if( Settings.EnableLegacyTextureLoading && tti.Original.IsAlive )
+                           {
+                              source.SetTexture( tti.Original.Target );
+                           }
+
                            if( !isPrefixHooked )
                            {
                               source.SetAllDirtyEx();
@@ -915,6 +961,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
                }
+            }
+
+            if( previousTextureValue == null )
+            {
+               texture = null;
+            }
+            else if( Settings.EnableLegacyTextureLoading )
+            {
+               if( tti.IsTranslated )
+               {
+                  if( tti.Translated != null )
+                  {
+                     texture = tti.Translated;
+                  }
+               }
+               else
+               {
+                  if( tti.Original.IsAlive )
+                  {
+                     texture = tti.Original.Target;
+                  }
+               }
+            }
+            else
+            {
+               texture = previousTextureValue;
             }
 
             if( forceReload )
@@ -938,27 +1010,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( texture == null ) return;
 
             var info = texture.GetOrCreateTextureTranslationInfo();
-            if( info.HasDumpedAlternativeTexture ) return;
+            if( info.IsDumped ) return;
 
             try
             {
                if( ShouldTranslate( texture ) )
                {
-                  var key = info.GetKey( texture );
+                  var key = info.GetKey();
                   if( string.IsNullOrEmpty( key ) ) return;
 
                   if( !TextureCache.IsImageRegistered( key ) )
                   {
                      var name = texture.GetTextureName();
 
-                     var originalData = info.GetOrCreateOriginalData( texture );
+                     var originalData = info.GetOrCreateOriginalData();
                      TextureCache.RegisterImageFromData( name, key, originalData );
                   }
                }
             }
             finally
             {
-               info.HasDumpedAlternativeTexture = true;
+               info.IsDumped = true;
             }
          }
          finally
@@ -1807,6 +1879,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !Settings.IsShutdown )
             {
+               EnableAutoTranslator();
                SpamChecker.Update();
 
                UpdateSpriteRenderers();
@@ -2468,7 +2541,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
             foreach( var texture in textures )
             {
-               Hook_ImageChanged( texture, false );
+               Texture2D t = texture;
+               Hook_ImageChanged( ref t, false );
             }
 
             //// scan all components and set dirty
@@ -2547,7 +2621,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( component.IsKnownImageType() )
                   {
-                     Hook_ImageChangedOnComponent( component, null, false, false );
+                     Texture2D _ = null;
+                     Hook_ImageChangedOnComponent( component, ref _, false, false );
                   }
                }
             }
@@ -2578,6 +2653,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public void EnableAutoTranslator()
       {
          _temporarilyDisabled = false;
+      }
+
+      internal bool IsTemporarilyDisabled()
+      {
+         return _temporarilyDisabled;
       }
 
       void OnApplicationQuit()

@@ -16,5 +16,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          return hashSet;
       }
+
+      public static HashSet<T> ToHashSet<T>( this IEnumerable<T> ts, IEqualityComparer<T> equalityComparer )
+      {
+         var hashSet = new HashSet<T>( equalityComparer );
+         foreach( var t in ts )
+         {
+            hashSet.Add( t );
+         }
+         return hashSet;
+      }
    }
 }

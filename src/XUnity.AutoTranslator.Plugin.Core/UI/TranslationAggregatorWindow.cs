@@ -171,7 +171,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
          finally
          {
-
             AutoTranslationPlugin.Current.EnableAutoTranslator();
          }
       }

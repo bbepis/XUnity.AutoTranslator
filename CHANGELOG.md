@@ -1,6 +1,9 @@
 ﻿### 3.8.1
  * BUG FIX - Minor bug in relation to harmony initialization
- * MISC - Option to enable/disable logs primarily targeted and translators
+ * BUG FIX - Fixed bug in MonoMod hooking that would cause it to always use native hooks over managed hooks
+ * BUG FIX - Fixed bug in 'EnableLegacyTextureLoading' which should now work consistently
+ * MISC - Option to enable/disable success translation logs through option 'EnableSilentMode'
+ * MISC - IMGUI window black listing option
 
 ### 3.8.0
  * FEATURE - Support 'TARC' directives '#set exe', '#unset exe', '#set level' and '#unset level'. Must be explicitly enabled through config option 'EnableTranslationScoping=True'

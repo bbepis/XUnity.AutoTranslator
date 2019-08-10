@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -9,13 +11,6 @@ using XUnity.AutoTranslator.Plugin.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   internal class TexturePair
-   {
-      public Texture2D Original { get; set; }
-
-      public Texture2D Translated { get; set; }
-   }
-
    internal class TextureTranslationInfo
    {
       private static Dictionary<string, string> NameToHash = new Dictionary<string, string>();
@@ -23,42 +18,76 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private string _key;
       private byte[] _originalData;
-      private bool? _nonReadable;
+
+      public WeakReference<Texture2D> Original { get; private set; }
+
+      public Texture2D Translated { get; private set; }
 
       public bool IsTranslated { get; set; }
 
-      public bool HasDumpedAlternativeTexture { get; set; }
+      public bool IsDumped { get; set; }
 
-      public bool IsNonReadable( Texture2D texture )
+      public void SetOriginal( Texture2D texture )
       {
-         if( !_nonReadable.HasValue )
-         {
-            _nonReadable = false;
-         }
-
-         return _nonReadable.Value;
+         Original = WeakReference<Texture2D>.Create( texture );
       }
 
-      public string GetKey( Texture2D texture )
+      private void SetTranslated( Texture2D texture )
       {
-         SetupHashAndData( texture );
+         Translated = texture;
+      }
+
+      public void CreateTranslatedTexture( byte[] newData )
+      {
+         if( Translated == null )
+         {
+            var orig = Original.Target;
+
+            var texture = new Texture2D( 2, 2, TextureFormat.ARGB32, false );
+            texture.LoadImageEx( newData );
+
+            texture.name = orig.name;
+            texture.anisoLevel = orig.anisoLevel;
+            texture.filterMode = orig.filterMode;
+            texture.mipMapBias = orig.mipMapBias;
+            texture.wrapMode = orig.wrapMode;
+
+            SetTranslated( texture );
+
+            ObjectReferenceMapper.Set<TextureTranslationInfo>( texture, this );
+         }
+      }
+
+      public void CreateOriginalTexture()
+      {
+         if( !Original.IsAlive && _originalData != null )
+         {
+            var texture = new Texture2D( 2, 2, TextureFormat.ARGB32, false );
+            texture.LoadImageEx( _originalData );
+            SetOriginal( texture );
+         }
+      }
+
+      public string GetKey()
+      {
+         SetupHashAndData( Original.Target );
          return _key;
       }
 
-      public byte[] GetOriginalData( Texture2D texture )
+      public byte[] GetOriginalData()
       {
-         SetupHashAndData( texture );
+         SetupHashAndData( Original.Target );
          return _originalData;
       }
 
-      public byte[] GetOrCreateOriginalData( Texture2D texture )
+      public byte[] GetOrCreateOriginalData()
       {
          // special handling if SetupHashAndData is changed to not support originalData
          // which frankly, is a memory drain
 
-         SetupHashAndData( texture );
+         SetupHashAndData( Original.Target );
          if( _originalData != null ) return _originalData;
-         return TextureHelper.GetData( texture ).Data;
+         return TextureHelper.GetData( Original.Target ).Data;
       }
 
       private TextureDataResult SetupKeyForNameWithFallback( string name, Texture2D texture )
@@ -127,7 +156,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var result = TextureHelper.GetData( texture );
 
                _originalData = result.Data;
-               _nonReadable = result.NonReadable;
                _key = HashHelper.Compute( _originalData );
             }
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageName )
@@ -145,7 +173,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
 
                   _originalData = result.Data;
-                  _nonReadable = result.NonReadable;
                }
             }
             else if( Settings.TextureHashGenerationStrategy == TextureHashGenerationStrategy.FromImageNameAndScene )
@@ -165,7 +192,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
 
                   _originalData = result.Data;
-                  _nonReadable = result.NonReadable;
                }
             }
          }

@@ -54,7 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          Input.ResetInputAxes();
       }
-
+      
       private void CreateWindowUI( int id )
       {
          try
@@ -159,7 +159,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
          finally
          {
-
             AutoTranslationPlugin.Current.EnableAutoTranslator();
          }
       }

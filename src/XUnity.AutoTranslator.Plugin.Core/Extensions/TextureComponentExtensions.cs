@@ -43,6 +43,36 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
+      public static void SetTexture( this object ui, Texture2D texture )
+      {
+         if( ui == null ) return;
+
+         var currentTexture = ui.GetTexture();
+
+         if( currentTexture != texture )
+         {
+            // This logic is only used in legacy mode and is not verified with NGUI
+
+            var type = ui.GetType();
+            type.CachedProperty( MainTexturePropertyName )?.Set( ui, texture );
+            type.CachedProperty( TexturePropertyName )?.Set( ui, texture );
+            type.CachedProperty( CapitalMainTexturePropertyName )?.Set( ui, texture );
+
+            // special handling for UnityEngine.UI.Image
+            var material = type.CachedProperty( "material" )?.Get( ui );
+            if( material != null )
+            {
+               var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
+               var materialTexture = mainTextureProperty?.Get( material );
+               if( ReferenceEquals( materialTexture, currentTexture ) )
+               {
+                  mainTextureProperty?.Set( material, texture );
+               }
+            }
+         }
+
+      }
+
       public static void SetAllDirtyEx( this object ui )
       {
          if( ui == null ) return;
