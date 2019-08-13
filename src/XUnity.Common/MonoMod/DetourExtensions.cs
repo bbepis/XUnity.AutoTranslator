@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Extensions
+namespace XUnity.Common.MonoMod
 {
-   internal static class DetourExtensions
+   public static class DetourExtensions
    {
       public static T GenerateTrampolineEx<T>( this object detour )
       {

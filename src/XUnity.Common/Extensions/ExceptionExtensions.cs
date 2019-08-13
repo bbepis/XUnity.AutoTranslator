@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Extensions
+namespace XUnity.Common.Extensions
 {
-   internal static class ExceptionExtensions
+   public static class ExceptionExtensions
    {
       public static TException FirstInnerExceptionOfType<TException>( this Exception e )
          where TException : Exception

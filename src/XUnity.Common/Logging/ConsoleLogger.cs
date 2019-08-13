@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XUnity.AutoTranslator.Plugin.Core
+namespace XUnity.Common.Logging
 {
    internal class ConsoleLogger : XuaLogger
    {

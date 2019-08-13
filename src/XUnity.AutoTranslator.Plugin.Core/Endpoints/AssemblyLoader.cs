@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {

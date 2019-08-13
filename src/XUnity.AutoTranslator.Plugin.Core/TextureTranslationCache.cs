@@ -7,6 +7,8 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Extensions;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

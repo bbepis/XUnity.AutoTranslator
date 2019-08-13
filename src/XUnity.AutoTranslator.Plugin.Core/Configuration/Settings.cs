@@ -9,6 +9,8 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Extensions;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 {
@@ -65,7 +67,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string TranslationDirectory;
       public static int MaxCharactersPerTranslation;
       public static bool EnableConsole;
-      public static bool EnableDebugLogs;
       public static string AutoTranslationsFilePath;
       public static string SubstitutionFilePath;
       public static bool EnableIMGUI;
@@ -118,6 +119,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string PreferredStoragePath;
       public static bool EnableDumping;
       public static bool EnableTextAssetResourceRedirector;
+      public static bool EnableLoggingUnhandledResources;
       public static HashSet<string> RedirectedFiles;
 
 
@@ -200,6 +202,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             PreferredStoragePath = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "PreferredStoragePath", @"RedirectedResources" );
             EnableTextAssetResourceRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetResourceRedirector", false );
+            EnableLoggingUnhandledResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableLoggingUnhandledResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
 
             RedirectedResourcesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, PreferredStoragePath ).Replace( "/", "\\" ).Parameterize();
@@ -221,7 +224,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
 
             EnableConsole = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableConsole", false );
-            EnableDebugLogs = PluginEnvironment.Current.Preferences.GetOrDefault( "Debug", "EnableLog", false );
 
             EnableMigrations = PluginEnvironment.Current.Preferences.GetOrDefault( "Migrations", "Enable", true );
             MigrationsTag = PluginEnvironment.Current.Preferences.GetOrDefault( "Migrations", "Tag", string.Empty );
@@ -243,8 +245,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             {
                Directory.CreateDirectory( RedirectedResourcesPath );
 
+               var lowerCurrent = Environment.CurrentDirectory.ToLowerInvariant();
                RedirectedFiles = Directory.GetFiles( RedirectedResourcesPath, "*", SearchOption.AllDirectories )
-                  .Select( x => x.MakeRelativePath( Environment.CurrentDirectory ) )
+                  .Select( x => x.ToLowerInvariant().MakeRelativePath( lowerCurrent ) )
                   .ToHashSet( StringComparer.OrdinalIgnoreCase );
             }
             catch( Exception e )

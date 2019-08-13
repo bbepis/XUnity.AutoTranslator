@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {

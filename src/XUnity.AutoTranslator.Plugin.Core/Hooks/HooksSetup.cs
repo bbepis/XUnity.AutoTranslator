@@ -13,39 +13,14 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
+using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
 
    internal static class HooksSetup
    {
-      internal static object Harmony;
-
-      public static void InitializeHarmony()
-      {
-         try
-         {
-            if( ClrTypes.HarmonyInstance != null )
-            {
-               Harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
-                  .Invoke( null, new object[] { PluginData.Identifier } );
-            }
-            else if( ClrTypes.Harmony != null )
-            {
-               Harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
-                  .Invoke( new object[] { PluginData.Identifier } );
-            }
-            else
-            {
-               XuaLogger.Current.Error( "An unexpected exception occurred during harmony initialization, likely caused by unknown Harmony version. Harmony hooks will be unavailable!" );
-            }
-         }
-         catch( Exception e )
-         {
-            XuaLogger.Current.Error( e, "An unexpected exception occurred during harmony initialization. Harmony hooks will be unavailable!" );
-         }
-      }
-
       public static void InstallOverrideTextHooks()
       {
          if( Settings.EnableUGUI )
@@ -76,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.TextGetterCompatibilityMode )
             {
-               Harmony.PatchAll( TextGetterCompatHooks.All );
+               HookingHelper.PatchAll( TextGetterCompatHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )
@@ -91,11 +66,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
-               Harmony.PatchAll( ImageHooks.All );
+               HookingHelper.PatchAll( ImageHooks.All, Settings.ForceMonoModHooks );
 
                if( Settings.EnableLegacyTextureLoading )
                {
-                  Harmony.PatchAll( ImageHooks.Sprite );
+                  HookingHelper.PatchAll( ImageHooks.Sprite, Settings.ForceMonoModHooks );
                }
             }
          }
@@ -105,15 +80,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
-      public static void InstallResourceAndAssetHooks()
+      public static void InstallTextAssetHooks()
       {
          try
          {
-            Harmony.PatchAll( ResourceAndAssetHooks.All );
+            HookingHelper.PatchAll( TextAssetHooks.All, Settings.ForceMonoModHooks );
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while setting up image hooks." );
+            XuaLogger.Current.Error( e, "An error occurred while setting up text asset hooks." );
          }
       }
 
@@ -124,7 +99,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUGUI )
             {
-               Harmony.PatchAll( UGUIHooks.All );
+               HookingHelper.PatchAll( UGUIHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )
@@ -136,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMeshPro )
             {
-               Harmony.PatchAll( TextMeshProHooks.All );
+               HookingHelper.PatchAll( TextMeshProHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )
@@ -148,7 +123,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableNGUI )
             {
-               Harmony.PatchAll( NGUIHooks.All );
+               HookingHelper.PatchAll( NGUIHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )
@@ -160,7 +135,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableIMGUI )
             {
-               Harmony.PatchAll( IMGUIHooks.All );
+               HookingHelper.PatchAll( IMGUIHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )
@@ -170,7 +145,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          try
          {
-            Harmony.PatchAll( UtageHooks.All );
+            HookingHelper.PatchAll( UtageHooks.All, Settings.ForceMonoModHooks );
          }
          catch( Exception e )
          {
@@ -181,7 +156,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMesh )
             {
-               Harmony.PatchAll( TextMeshHooks.All );
+               HookingHelper.PatchAll( TextMeshHooks.All, Settings.ForceMonoModHooks );
             }
          }
          catch( Exception e )

@@ -8,6 +8,8 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.UI;
+using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -30,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   XuaLogger.Current.Info( "Attempting to hook " + method.DeclaringType.FullName.ToString() + "." + method.Name + " to disable translation in window." );
 
                   IMGUIWindow_Function_Hook.Register( method );
-                  HooksSetup.Harmony.PatchType( typeof( IMGUIWindow_Function_Hook ) );
+                  HookingHelper.PatchType( typeof( IMGUIWindow_Function_Hook ), Settings.ForceMonoModHooks );
                   IMGUIWindow_Function_Hook.Clean();
                }
             }

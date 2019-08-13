@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Utilities
+namespace XUnity.Common.Utilities
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -12,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    // the Create factory method is used in place of a constructor
    // to handle the case where target is null, but we want the 
    // reference to still appear to be alive.
-   internal class WeakReference<T> : WeakReference where T : class
+   public class WeakReference<T> : WeakReference where T : class
    {
       public static WeakReference<T> Create( T target )
       {

@@ -2,6 +2,8 @@
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Utilities;
+using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
 {

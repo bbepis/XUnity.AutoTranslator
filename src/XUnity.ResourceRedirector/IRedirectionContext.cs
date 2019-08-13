@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+namespace XUnity.ResourceRedirector
 {
    /// <summary>
    /// Information related to the OnAssetLoading event.

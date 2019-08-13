@@ -7,6 +7,10 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
@@ -20,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       };
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class UILabel_text_Hook
    {
       static bool Prepare( object instance )
@@ -57,7 +61,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class UILabel_OnEnable_Hook
    {
       static bool Prepare( object instance )

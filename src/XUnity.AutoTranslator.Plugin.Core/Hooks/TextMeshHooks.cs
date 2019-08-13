@@ -3,6 +3,10 @@ using System.Reflection;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
@@ -17,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       };
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TextMesh_text_Hook
    {
       static bool Prepare( object instance )
@@ -53,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GameObject_active_Hook
    {
       static bool Prepare( object instance )
@@ -102,7 +106,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GameObject_SetActive_Hook
    {
       static bool Prepare( object instance )

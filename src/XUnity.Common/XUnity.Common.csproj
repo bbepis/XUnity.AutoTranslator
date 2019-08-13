@@ -4,4 +4,8 @@
     <TargetFramework>net35</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
+  </PropertyGroup>
+
 </Project>

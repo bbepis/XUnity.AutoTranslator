@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

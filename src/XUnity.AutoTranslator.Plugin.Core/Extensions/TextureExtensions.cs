@@ -8,6 +8,8 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {

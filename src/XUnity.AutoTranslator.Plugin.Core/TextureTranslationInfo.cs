@@ -8,6 +8,8 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -54,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             SetTranslated( texture );
 
-            ObjectReferenceMapper.Set<TextureTranslationInfo>( texture, this );
+            texture.SetExtensionData( this );
          }
       }
 

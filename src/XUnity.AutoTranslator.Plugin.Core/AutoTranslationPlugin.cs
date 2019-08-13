@@ -29,6 +29,11 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.ResourceRedirection;
+using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
+using XUnity.Common.Constants;
+using XUnity.ResourceRedirector;
+using XUnity.Common.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -101,12 +106,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // various harmony/MonoMod classes through reflection
          HarmonyLoader.Load();
 
-         // Setup logger, if it was not already initialized by a plugin-version
-         if( XuaLogger.Current == null )
-         {
-            XuaLogger.Current = new ConsoleLogger();
-         }
-
          // Setup configuration
          Settings.Configure();
 
@@ -114,7 +113,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          DebugConsole.Enable();
 
          // Setup hooks
-         HooksSetup.InitializeHarmony();
          HooksSetup.InstallTextHooks();
          HooksSetup.InstallImageHooks();
          HooksSetup.InstallTextGetterCompatHooks();
@@ -142,11 +140,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // load all translations from files
          LoadTranslations();
 
-         // start maintenance thread
-         StartMaintenance();
-
          // initialize ui
          InitializeGUI();
+
+         // start function to write translations to file
+         MaintenanceHelper.AddMaintenanceFunction( TextCache.SaveNewTranslationsToDisk, 1 );
 
          XuaLogger.Current.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
@@ -155,8 +153,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            if( Settings.EnableLoggingUnhandledResources )
+            {
+               ResourceRedirectionManager.LogUnhandledResources( true );
+            }
+
             if( Settings.EnableTextAssetResourceRedirector )
             {
+               HooksSetup.InstallTextAssetHooks();
                new TextAssetResourceRedirectHandler();
             }
          }
@@ -250,14 +254,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return "Running";
       }
 
-      private void StartMaintenance()
-      {
-         // start a thread that will periodically removed unused references
-         var t1 = new Thread( MaintenanceLoop );
-         t1.IsBackground = true;
-         t1.Start();
-      }
-
       private void ValidateConfiguration()
       {
          // check if language is supported
@@ -326,40 +322,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             Settings.SetEndpoint( TranslationManager.CurrentEndpoint?.Endpoint.Id );
 
             XuaLogger.Current.Info( $"Set translator endpoint to '{TranslationManager.CurrentEndpoint?.Endpoint.Id}'." );
-         }
-      }
-
-      private void MaintenanceLoop( object state )
-      {
-         int i = 0;
-
-         while( true )
-         {
-            // run every 1 minutes
-            if( i++ % 12 == 0 )
-            {
-               try
-               {
-                  ObjectReferenceMapper.Cull();
-                  ResourceRedirector.Cull();
-               }
-               catch( Exception e )
-               {
-                  XuaLogger.Current.Error( e, "An unexpected error occurred while removing GC'ed resources." );
-               }
-            }
-
-            // run every 5 seconds
-            try
-            {
-               TextCache.SaveNewTranslationsToDisk();
-            }
-            catch( Exception e )
-            {
-               XuaLogger.Current.Error( e, "An error occurred while saving translations to disk." );
-            }
-
-            Thread.Sleep( 1000 * 5 );
          }
       }
 

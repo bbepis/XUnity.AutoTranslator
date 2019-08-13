@@ -7,6 +7,9 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
@@ -499,7 +502,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( Constants.ClrTypes.UISprite, "OnInit" );
+         return AccessToolsShim.Method( ClrTypes.UISprite, "OnInit" );
       }
 
       public static void Postfix( object __instance )

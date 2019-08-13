@@ -10,6 +10,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {

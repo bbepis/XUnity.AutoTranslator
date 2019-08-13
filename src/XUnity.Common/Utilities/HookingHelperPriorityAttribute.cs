@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks
+namespace XUnity.Common.Utilities
 {
-   internal class HarmonyPriorityShimAttribute : Attribute
+   public class HookingHelperPriorityAttribute : Attribute
    {
       public int priority;
 
-      public HarmonyPriorityShimAttribute( int priority )
+      public HookingHelperPriorityAttribute( int priority )
       {
          this.priority = priority;
       }

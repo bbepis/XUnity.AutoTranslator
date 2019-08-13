@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
 
-namespace XUnity.AutoTranslator.Plugin.Core
+namespace XUnity.Common.Logging
 {
    /// <summary>
    /// Use this class to send log messaages to the console with.
@@ -16,24 +15,40 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public abstract class XuaLogger
    {
+      private static XuaLogger _instance;
+
       /// <summary>
       /// Gets the current XuaLogger.
       /// </summary>
-      public static XuaLogger Current;
+      public static XuaLogger Current
+      {
+         get
+         {
+            if( _instance == null )
+            {
+               try
+               {
+                  _instance = new BepInExLogger();
+               }
+               catch( Exception )
+               {
+                  _instance = new ConsoleLogger();
+               }
+            }
+            return _instance;
+         }
+         set
+         {
+            _instance = value ?? throw new ArgumentNullException( "value" );
+         }
+      }
 
       /// <summary>
       /// Default constructor.
       /// </summary>
       public XuaLogger()
       {
-         RespectSettings = true;
       }
-
-      /// <summary>
-      /// Gets a bool whether or not the settings supplied in the
-      /// configuration file for auto translator should be honored.
-      /// </summary>
-      protected internal bool RespectSettings { get; protected set; }
 
       /// <summary>
       /// Logs a message and exception at error level.
@@ -99,10 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <param name="message"></param>
       public void Debug( Exception e, string message )
       {
-         if( Settings.EnableDebugLogs || !RespectSettings )
-         {
-            Log( LogLevel.Debug, message + Environment.NewLine + e );
-         }
+         Log( LogLevel.Debug, message + Environment.NewLine + e );
       }
 
       /// <summary>
@@ -111,10 +123,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <param name="message">The message to log.</param>
       public void Debug( string message )
       {
-         if( Settings.EnableDebugLogs || !RespectSettings )
-         {
-            Log( LogLevel.Debug, message );
-         }
+         Log( LogLevel.Debug, message );
       }
 
       /// <summary>
@@ -134,15 +143,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          switch( level )
          {
             case LogLevel.Debug:
-               return "[DEBUG][XUnity.AutoTranslator " + PluginData.Version + "]: ";
+               return "[DEBUG][XUnity]: ";
             case LogLevel.Info:
-               return "[INFO][XUnity.AutoTranslator " + PluginData.Version + "]: ";
+               return "[INFO][XUnity]: ";
             case LogLevel.Warn:
-               return "[WARN][XUnity.AutoTranslator " + PluginData.Version + "]: ";
+               return "[WARN][XUnity]: ";
             case LogLevel.Error:
-               return "[ERROR][XUnity.AutoTranslator " + PluginData.Version + "]: ";
+               return "[ERROR][XUnity]: ";
             default:
-               return "[UNKNOW][XUnity.AutoTranslator " + PluginData.Version + "]: ";
+               return "[UNKNOW][XUnity]: ";
          }
       }
    }

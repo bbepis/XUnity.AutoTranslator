@@ -10,6 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugins.Core.Utilities;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {

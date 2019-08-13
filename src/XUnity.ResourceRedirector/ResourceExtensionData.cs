@@ -1,4 +1,4 @@
-﻿namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+﻿namespace XUnity.ResourceRedirector
 {
    internal class ResourceExtensionData
    {

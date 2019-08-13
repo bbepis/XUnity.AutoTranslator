@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -20,13 +22,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          {
             try
             {
-               AdvManager = GameObject.FindObjectOfType( Constants.ClrTypes.AdvDataManager );
-               var ScenarioDataTblProperty = Constants.ClrTypes.AdvDataManager.GetProperty( "ScenarioDataTbl" );
+               AdvManager = GameObject.FindObjectOfType( ClrTypes.AdvDataManager );
+               var ScenarioDataTblProperty = ClrTypes.AdvDataManager.GetProperty( "ScenarioDataTbl" );
                var ScenarioDataTbl = ScenarioDataTblProperty.GetValue( AdvManager, empty );
                foreach( object labelToAdvScenarioDataKeyValuePair in (IEnumerable)ScenarioDataTbl )
                {
                   var labelToAdvScenarioDataKeyValuePairType = typeof( KeyValuePair<,> )
-                     .MakeGenericType( new Type[] { typeof( string ), Constants.ClrTypes.AdvScenarioData } );
+                     .MakeGenericType( new Type[] { typeof( string ), ClrTypes.AdvScenarioData } );
 
                   var AdvScenarioDataKey = (string)labelToAdvScenarioDataKeyValuePairType.GetProperty( "Key" )
                      .GetValue( labelToAdvScenarioDataKeyValuePair, empty );
@@ -45,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                      foreach( object labelToAdvScenarioLabelDataKeyValuePair in (IEnumerable)labelToAdvScenarioLabelData )
                      {
                         var labelToAdvScenarioLabelDataKeyValuePairType = typeof( KeyValuePair<,> )
-                           .MakeGenericType( new Type[] { typeof( string ), Constants.ClrTypes.AdvScenarioLabelData } );
+                           .MakeGenericType( new Type[] { typeof( string ), ClrTypes.AdvScenarioLabelData } );
 
                         var AdvScenarioLabelDataKey = (string)labelToAdvScenarioLabelDataKeyValuePairType.GetProperty( "Key" )
                            .GetValue( labelToAdvScenarioLabelDataKeyValuePair, empty );

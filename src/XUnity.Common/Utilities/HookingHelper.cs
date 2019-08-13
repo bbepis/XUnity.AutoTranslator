@@ -3,63 +3,71 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Hooks;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Constants;
+using XUnity.Common.Extensions;
+using XUnity.Common.Logging;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Extensions
+namespace XUnity.Common.Utilities
 {
-   internal static class HarmonyInstanceExtensions
+   public static class HookingHelper
    {
-      public static readonly MethodInfo PatchMethod12 = ClrTypes.HarmonyInstance?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
-      public static readonly MethodInfo PatchMethod20 = ClrTypes.Harmony?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
+      private static readonly MethodInfo PatchMethod12 = ClrTypes.HarmonyInstance?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
+      private static readonly MethodInfo PatchMethod20 = ClrTypes.Harmony?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
+      private static readonly object Harmony;
 
-      public static void PatchAll( this object instance, IEnumerable<Type> types )
+      static HookingHelper()
+      {
+         try
+         {
+            if( ClrTypes.HarmonyInstance != null )
+            {
+               Harmony = ClrTypes.HarmonyInstance.GetMethod( "Create", BindingFlags.Static | BindingFlags.Public )
+                  .Invoke( null, new object[] { "xunity.common.hookinghelper" } );
+            }
+            else if( ClrTypes.Harmony != null )
+            {
+               Harmony = ClrTypes.Harmony.GetConstructor( new Type[] { typeof( string ) } )
+                  .Invoke( new object[] { "xunity.common.hookinghelper" } );
+            }
+            else
+            {
+               XuaLogger.Current.Error( "An unexpected exception occurred during harmony initialization, likely caused by unknown Harmony version. Harmony hooks will be unavailable!" );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An unexpected exception occurred during harmony initialization. Harmony hooks will be unavailable!" );
+         }
+      }
+
+      public static void PatchAll( IEnumerable<Type> types, bool forceMonoModHooks )
       {
          foreach( var type in types )
          {
-            instance.PatchType( type );
+            PatchType( type, forceMonoModHooks );
          }
       }
 
-      private static object CreateHarmonyMethod( MethodInfo method, int? priority )
-      {
-         var harmonyMethod = ClrTypes.HarmonyMethod.GetConstructor( new Type[] { typeof( MethodInfo ) } )
-            .Invoke( new object[] { method } );
-
-         if( priority.HasValue )
-         {
-            var field = ClrTypes.HarmonyMethod.GetField( "priority", BindingFlags.Public | BindingFlags.Instance )
-               ?? ClrTypes.HarmonyMethod.GetField( "prioritiy", BindingFlags.Public | BindingFlags.Instance );
-
-            field.SetValue( harmonyMethod, priority.Value );
-         }
-
-         return harmonyMethod;
-      }
-
-      public static void PatchType( this object instance, Type type )
+      public static void PatchType( Type type, bool forceMonoModHooks )
       {
          MethodBase original = null;
          try
          {
             var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             var prepare = type.GetMethod( "Prepare", flags );
-            if( prepare == null || (bool)prepare.Invoke( null, new object[] { instance } ) )
+            if( prepare == null || (bool)prepare.Invoke( null, new object[] { Harmony } ) )
             {
-               original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { instance } );
+               original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { Harmony } );
                if( original != null )
                {
                   var prefix = type.GetMethod( "Prefix", flags );
                   var postfix = type.GetMethod( "Postfix", flags );
-                  if( instance == null )
+                  if( Harmony == null )
                   {
                      XuaLogger.Current.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
                   }
 
-                  if( Settings.ForceMonoModHooks || instance == null || ( prefix == null && postfix == null ) )
+                  if( forceMonoModHooks || Harmony == null || ( prefix == null && postfix == null ) )
                   {
                      if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
                      {
@@ -95,8 +103,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   {
                      try
                      {
-                        var priority = type.GetCustomAttributes( typeof( HarmonyPriorityShimAttribute ), false )
-                           .OfType<HarmonyPriorityShimAttribute>()
+                        var priority = type.GetCustomAttributes( typeof( HookingHelperPriorityAttribute ), false )
+                           .OfType<HookingHelperPriorityAttribute>()
                            .FirstOrDefault()
                            ?.priority;
 
@@ -105,11 +113,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
                         if( PatchMethod12 != null )
                         {
-                           PatchMethod12.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, null } );
+                           PatchMethod12.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null } );
                         }
                         else
                         {
-                           PatchMethod20.Invoke( instance, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
+                           PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
                         }
 
                         XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
@@ -167,6 +175,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                XuaLogger.Current.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
             }
          }
+      }
+
+      private static object CreateHarmonyMethod( MethodInfo method, int? priority )
+      {
+         var harmonyMethod = ClrTypes.HarmonyMethod.GetConstructor( new Type[] { typeof( MethodInfo ) } )
+            .Invoke( new object[] { method } );
+
+         if( priority.HasValue )
+         {
+            var field = ClrTypes.HarmonyMethod.GetField( "priority", BindingFlags.Public | BindingFlags.Instance )
+               ?? ClrTypes.HarmonyMethod.GetField( "prioritiy", BindingFlags.Public | BindingFlags.Instance );
+
+            field.SetValue( harmonyMethod, priority.Value );
+         }
+
+         return harmonyMethod;
       }
    }
 }

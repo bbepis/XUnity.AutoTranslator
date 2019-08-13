@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.Common.Logging;
+using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
 {
@@ -14,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
    {
       public ResourceRedirectHandlerBase()
       {
-         ResourceRedirector<TAsset>.AssetLoading += Handle;
+         ResourceRedirectionManager<TAsset>.AssetLoading += Handle;
       }
 
       /// <summary>

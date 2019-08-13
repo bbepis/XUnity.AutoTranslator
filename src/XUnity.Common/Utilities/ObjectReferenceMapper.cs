@@ -1,59 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
-using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Utilities
+namespace XUnity.Common.Utilities
 {
-   internal static class ObjectReferenceMapper
+   public static class ObjectReferenceMapper
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
 
-      public static TextTranslationInfo GetOrCreateTextTranslationInfo( this object ui )
+      static ObjectReferenceMapper()
       {
-         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
-         {
-            var info = ui.GetOrCreateExtensionData<TextTranslationInfo>();
-
-            return info;
-         }
-
-         return null;
+         MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
       }
 
-      public static TextTranslationInfo GetTextTranslationInfo( this object ui )
-      {
-         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
-         {
-            var info = ui.GetExtensionData<TextTranslationInfo>();
-
-            return info;
-         }
-
-         return null;
-      }
-
-      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj )
-      {
-         return obj.GetOrCreateExtensionData<ImageTranslationInfo>();
-      }
-
-      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )
-      {
-         var tti = texture.GetOrCreateExtensionData<TextureTranslationInfo>();
-         if( tti.Original == null ) tti.SetOriginal( texture );
-
-         return tti;
-      }
-
-      public static void Set<T>( this object obj, T t )
+      public static void SetExtensionData<T>( this object obj, T t )
          where T : new()
       {
          lock( Sync )

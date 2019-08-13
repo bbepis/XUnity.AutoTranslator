@@ -10,6 +10,7 @@ using System.Net.Cache;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
 {

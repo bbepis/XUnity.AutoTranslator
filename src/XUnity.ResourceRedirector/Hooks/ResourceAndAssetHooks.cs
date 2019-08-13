@@ -5,19 +5,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.ResourceRedirection;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks
+namespace XUnity.ResourceRedirector.Hooks
 {
    internal static class ResourceAndAssetHooks
    {
       public static readonly Type[] All = new[]
       {
-         typeof( TextAsset_bytes_Hook ),
-         typeof( TextAsset_text_Hook ),
-
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
          typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
@@ -40,76 +37,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( Resources_GetBuiltinResource_Hook ),
          //typeof( Resources_FindObjectsOfTypeAll_Hook ), // impossible
       };
-   }
-
-   internal static class TextAsset_bytes_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return true;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Property( typeof( TextAsset ), "bytes" ).GetGetMethod();
-      }
-
-      delegate byte[] OriginalMethod( TextAsset self );
-
-      static OriginalMethod _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<OriginalMethod>();
-      }
-
-      static byte[] MM_Detour( TextAsset self )
-      {
-         var result = _original( self );
-
-         var ext = self.GetExtensionData<TextAssetExtensionData>();
-         if( ext != null )
-         {
-            return ext.Data;
-         }
-
-         return result;
-      }
-   }
-
-   internal static class TextAsset_text_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return true;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Property( typeof( TextAsset ), "text" ).GetGetMethod();
-      }
-
-      delegate string OriginalMethod( TextAsset self );
-
-      static OriginalMethod _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<OriginalMethod>();
-      }
-
-      static string MM_Detour( TextAsset self )
-      {
-         var result = _original( self );
-
-         var ext = self.GetExtensionData<TextAssetExtensionData>();
-         if( ext != null )
-         {
-            return ext.Text;
-         }
-
-         return result;
-      }
    }
 
    internal static class AssetBundle_LoadFromFileAsync_Hook
@@ -137,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( path, crc, offset );
 
-         ResourceRedirector.Hook_AssetBundleLoading( path, result );
+         ResourceRedirectionManager.Hook_AssetBundleLoading( path, result );
 
          return result;
       }
@@ -168,7 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( path, crc, offset );
 
-         ResourceRedirector.Hook_AssetBundleLoaded( path, result, null );
+         ResourceRedirectionManager.Hook_AssetBundleLoaded( path, result, null );
 
          return result;
       }
@@ -199,7 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( null, crc );
 
-         ResourceRedirector.Hook_AssetBundleLoading( null, result );
+         ResourceRedirectionManager.Hook_AssetBundleLoading( null, result );
 
          return result;
       }
@@ -230,7 +157,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    //   {
    //      var result = _original( binary, crc );
 
-   //      ResourceRedirector.Hook_AssetBundleLoaded( null, result, null );
+   //      ResourceRedirectionManager.Hook_AssetBundleLoaded( null, result, null );
 
    //      return result;
    //   }
@@ -262,7 +189,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirector.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
 
          return result;
       }
@@ -293,7 +220,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirector.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
 
          return result;
       }
@@ -324,7 +251,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirector.Hook_AssetLoading( self, result );
+         ResourceRedirectionManager.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -359,7 +286,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirector.Hook_AssetLoaded( self, null, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result[ i ] );
             }
          }
 
@@ -392,7 +319,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirector.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
 
          return result;
       }
@@ -423,7 +350,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirector.Hook_AssetLoading( self, result );
+         ResourceRedirectionManager.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -458,7 +385,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirector.Hook_AssetLoaded( self, null, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result[ i ] );
             }
          }
 
@@ -491,7 +418,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirector.Hook_AssetLoading( self, result );
+         ResourceRedirectionManager.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -522,7 +449,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirector.Hook_AssetBundleLoaded( null, result, self );
+         ResourceRedirectionManager.Hook_AssetBundleLoaded( null, result, self );
 
          return result;
       }
@@ -553,7 +480,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirector.Hook_AssetLoaded( null, self, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded( null, self, ref result );
 
          return result;
       }
@@ -588,7 +515,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirector.Hook_AssetLoaded( null, self, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded( null, self, ref result[ i ] );
             }
          }
 
@@ -621,7 +548,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirector.Hook_ResourceLoaded( path, ref result );
+         ResourceRedirectionManager.Hook_ResourceLoaded( path, ref result );
 
          return result;
       }
@@ -656,7 +583,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirector.Hook_ResourceLoaded( path + '\\' + result[ i ].name, ref result[ i ] );
+               ResourceRedirectionManager.Hook_ResourceLoaded( path + '\\' + result[ i ].name, ref result[ i ] );
             }
          }
 
@@ -689,7 +616,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirector.Hook_ResourceLoaded( path, ref result );
+         ResourceRedirectionManager.Hook_ResourceLoaded( path, ref result );
 
          return result;
       }
@@ -727,7 +654,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    //         foreach( UnityEngine.Object item in result )
    //         {
    //            var obj = item;
-   //            ResourceRedirector.Hook_ResourceLoaded( null, null, ref obj );
+   //            ResourceRedirectionManager.Hook_ResourceLoaded( null, null, ref obj );
    //            actualResult.Add( obj );
    //         }
    //      }

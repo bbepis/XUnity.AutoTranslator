@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
-namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+namespace XUnity.ResourceRedirector
 {
    internal class RedirectionContext<TAsset> : IRedirectionContext<TAsset>
       where TAsset : UnityEngine.Object

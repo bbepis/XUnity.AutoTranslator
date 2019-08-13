@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
 {

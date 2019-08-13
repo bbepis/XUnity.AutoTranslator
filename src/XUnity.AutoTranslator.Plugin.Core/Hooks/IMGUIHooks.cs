@@ -7,6 +7,10 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
@@ -133,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
 
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_BeginGroup_Hook
    {
       static bool Prepare( object instance )
@@ -169,7 +173,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_Box_Hook
    {
       static bool Prepare( object instance )
@@ -205,7 +209,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoRepeatButton_Hook
    {
       static bool Prepare( object instance )
@@ -241,7 +245,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoLabel_Hook
    {
       static bool Prepare( object instance )
@@ -277,7 +281,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoButton_Hook
    {
       static bool Prepare( object instance )
@@ -313,7 +317,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoModalWindow_Hook
    {
       static bool Prepare( object instance )
@@ -356,7 +360,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoWindow_Hook
    {
       static bool Prepare( object instance )
@@ -399,7 +403,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoButtonGrid_Hook
    {
       static bool Prepare( object instance )
@@ -440,7 +444,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GUI_DoToggle_Hook
    {
       static bool Prepare( object instance )

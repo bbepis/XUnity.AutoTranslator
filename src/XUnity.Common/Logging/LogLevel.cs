@@ -1,4 +1,4 @@
-﻿namespace XUnity.AutoTranslator.Plugin.Core
+﻿namespace XUnity.Common.Logging
 {
    /// <summary>
    /// Enum representing available log levels.

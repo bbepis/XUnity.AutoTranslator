@@ -5,6 +5,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {

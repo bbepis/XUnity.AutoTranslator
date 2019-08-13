@@ -3,6 +3,9 @@ using System.Reflection;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 {

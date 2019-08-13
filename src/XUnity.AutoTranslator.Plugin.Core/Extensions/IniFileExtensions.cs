@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using ExIni;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {

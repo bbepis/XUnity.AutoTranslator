@@ -9,6 +9,8 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugins.Core.Utilities;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

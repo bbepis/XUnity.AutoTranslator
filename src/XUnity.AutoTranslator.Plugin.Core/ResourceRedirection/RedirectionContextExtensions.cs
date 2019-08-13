@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
 {

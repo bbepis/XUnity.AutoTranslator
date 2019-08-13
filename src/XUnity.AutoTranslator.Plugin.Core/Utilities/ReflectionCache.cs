@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugins.Core.Utilities
 {

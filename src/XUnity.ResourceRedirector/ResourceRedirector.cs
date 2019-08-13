@@ -5,23 +5,24 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Endpoints;
-using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.Hooks;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Extensions;
+using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
+using XUnity.ResourceRedirector.Hooks;
 
-namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+namespace XUnity.ResourceRedirector
 {
-   public class ResourceRedirector
+   public class ResourceRedirectionManager
    {
       private static readonly string CurrentDirectoryLowered = Environment.CurrentDirectory.ToLowerInvariant();
       private static readonly object Sync = new object();
-      private static readonly MethodInfo CallHandleAssetOrResource_Method = typeof( ResourceRedirector ).GetMethod( "CallHandleAssetOrResource", BindingFlags.Static | BindingFlags.NonPublic );
+      private static readonly MethodInfo CallHandleAssetOrResource_Method = typeof( ResourceRedirectionManager ).GetMethod( "CallHandleAssetOrResource", BindingFlags.Static | BindingFlags.NonPublic );
       private static readonly WeakDictionary<AssetBundleCreateRequest, string> AssetBundleCreateRequestToPath = new WeakDictionary<AssetBundleCreateRequest, string>();
       private static readonly WeakDictionary<AssetBundle, string> AssetBundleToPath = new WeakDictionary<AssetBundle, string>();
       private static readonly WeakDictionary<AssetBundleRequest, string> AssetBundleRequestToPath = new WeakDictionary<AssetBundleRequest, string>();
+
       private static bool _initialized = false;
+      private static bool _logUnhandledResources = false;
 
       internal static void Initialize()
       {
@@ -29,33 +30,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
          {
             _initialized = true;
 
-            HooksSetup.InstallResourceAndAssetHooks();
-            StartMaintenance();
-         }
-      }
+            HookingHelper.PatchAll( ResourceAndAssetHooks.All, false );
 
-      private static void StartMaintenance()
-      {
-         // start a thread that will periodically removed unused references
-         var t1 = new Thread( MaintenanceLoop );
-         t1.IsBackground = true;
-         t1.Start();
-      }
-
-      private static void MaintenanceLoop( object state )
-      {
-         while( true )
-         {
-            try
-            {
-               Cull();
-            }
-            catch( Exception e )
-            {
-               XuaLogger.Current.Error( e, "An unexpected error occurred while removing GC'ed resources." );
-            }
-
-            Thread.Sleep( 1000 * 60 * 3 );
+            MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
          }
       }
 
@@ -206,11 +183,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       {
          var context = new RedirectionContext<TAsset>( path, asset );
 
-         ResourceRedirector<TAsset>.Invoke( context );
+         ResourceRedirectionManager<TAsset>.Invoke( context );
 
-         if( !context.Handled && Settings.EnableDumping )
+         // FIXME: This log could get out of hand...
+         if( !context.Handled && _logUnhandledResources ) // ...
          {
-            XuaLogger.Current.Info( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({path})." );
+            XuaLogger.Current.Debug( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({path})." );
          }
 
          asset = context.Asset;
@@ -220,13 +198,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       public static void AddRedirection<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
          where TAsset : UnityEngine.Object
       {
-         ResourceRedirector<TAsset>.AddRedirection( action, ignoredHandled );
+         ResourceRedirectionManager<TAsset>.AddRedirection( action, ignoredHandled );
       }
 
       public static void RemoveRedirection<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
          where TAsset : UnityEngine.Object
       {
-         ResourceRedirector<TAsset>.RemoveRedirection( action, ignoredHandled );
+         ResourceRedirectionManager<TAsset>.RemoveRedirection( action, ignoredHandled );
+      }
+
+      public static void LogUnhandledResources( bool value )
+      {
+         Initialize();
+
+         _logUnhandledResources = value;
       }
    }
 
@@ -235,7 +220,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
    /// for specific types of resources.
    /// </summary>
    /// <typeparam name="TAsset"></typeparam>
-   public class ResourceRedirector<TAsset> : ResourceRedirector
+   public class ResourceRedirectionManager<TAsset> : ResourceRedirectionManager
       where TAsset : UnityEngine.Object
    {
       private static List<ResourceRedirectionCallback> _redirections = new List<ResourceRedirectionCallback>();

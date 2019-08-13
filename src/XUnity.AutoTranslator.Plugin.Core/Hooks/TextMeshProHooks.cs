@@ -7,6 +7,10 @@ using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Constants;
+using XUnity.Common.Harmony;
+using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 {
@@ -30,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       };
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TextWindow_SetText_Hook
    {
       static bool Prepare( object instance )
@@ -63,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshProUGUI_OnEnable_Hook
    {
       static bool Prepare( object instance )
@@ -100,7 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshProUGUI_text_Hook
    {
       static bool Prepare( object instance )
@@ -137,7 +141,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshPro_OnEnable_Hook
    {
       static bool Prepare( object instance )
@@ -174,7 +178,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshPro_text_Hook
    {
       static bool Prepare( object instance )
@@ -211,7 +215,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_text_Hook
    {
       static bool Prepare( object instance )
@@ -248,7 +252,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook1
    {
       static bool Prepare( object instance )
@@ -285,7 +289,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook2
    {
       static bool Prepare( object instance )
@@ -322,7 +326,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook3
    {
       delegate void OriginalMethod( object arg1, string arg2, float arg3, float arg4, float arg5 );
@@ -361,7 +365,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetCharArray_Hook1
    {
       static bool Prepare( object instance )
@@ -398,7 +402,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetCharArray_Hook2
    {
       static bool Prepare( object instance )
@@ -435,7 +439,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
-   [HarmonyPriorityShim( HookPriority.Last )]
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetCharArray_Hook3
    {
       static bool Prepare( object instance )

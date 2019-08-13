@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reflection;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Constants
+namespace XUnity.Common.Constants
 {
-   internal static class ClrTypes
+   public static class ClrTypes
    {
       // TextMeshPro
       public static readonly Type TMP_InputField = FindType( "TMPro.TMP_InputField" );
@@ -69,10 +69,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );
 
       // Harmony
-      public static readonly Type AccessTools = FindType( "Harmony.AccessTools" ) ?? FindType( "HarmonyLib.AccessTools" );
-      public static readonly Type HarmonyInstance = FindType( "Harmony.HarmonyInstance" );
-      public static readonly Type HarmonyMethod = FindType( "Harmony.HarmonyMethod" ) ?? FindType( "HarmonyLib.HarmonyMethod" );
-      public static readonly Type Harmony = FindType( "HarmonyLib.Harmony" );
+      public static readonly Type AccessTools = FindTypeStrict( "Harmony.AccessTools, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.AccessTools, 0Harmony" );
+      public static readonly Type HarmonyInstance = FindTypeStrict( "Harmony.HarmonyInstance, 0Harmony" );
+      public static readonly Type HarmonyMethod = FindTypeStrict( "Harmony.HarmonyMethod, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.HarmonyMethod, 0Harmony" );
+      public static readonly Type Harmony = FindTypeStrict( "HarmonyLib.Harmony, 0Harmony" );
 
       // MonoMod
       public static readonly Type Hook = FindTypeStrict( "MonoMod.RuntimeDetour.Hook, MonoMod.RuntimeDetour" );

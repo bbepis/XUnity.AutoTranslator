@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugins.Core.Utilities;
+using XUnity.Common.Constants;
+using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks
+namespace XUnity.Common.Harmony
 {
-   internal static class AccessToolsShim
+   public static class AccessToolsShim
    {
       private static readonly BindingFlags All = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 

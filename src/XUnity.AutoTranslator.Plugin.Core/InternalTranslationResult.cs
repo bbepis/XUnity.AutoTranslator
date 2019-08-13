@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
