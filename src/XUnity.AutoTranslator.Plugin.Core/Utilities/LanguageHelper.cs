@@ -7,7 +7,10 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
-   internal static class LanguageHelper
+   /// <summary>
+   /// Class containing methods related to the loaded languages.
+   /// </summary>
+   public static class LanguageHelper
    {
       private static Func<string, bool> DefaultSymbolCheck;
       private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
@@ -25,17 +28,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          "ja", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant"
       };
 
-      public static bool IsFromLanguageSupported( string code )
+      internal static bool IsFromLanguageSupported( string code )
       {
          return LanguageSymbolChecks.ContainsKey( code );
       }
 
-      public static bool RequiresWhitespaceUponLineMerging( string code )
+      internal static bool RequiresWhitespaceUponLineMerging( string code )
       {
          return !LanguagesNotUsingWhitespaceBetweenWords.Contains( code );
       }
 
-      public static Func<string, bool> GetSymbolCheck( string language )
+      internal static Func<string, bool> GetSymbolCheck( string language )
       {
          if( LanguageSymbolChecks.TryGetValue( language, out Func<string, bool> check ) )
          {
@@ -44,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return text => true;
       }
 
-      public static bool ContainsLanguageSymbolsForSourceLanguage( string text )
+      internal static bool ContainsLanguageSymbolsForSourceLanguage( string text )
       {
          if( DefaultSymbolCheck == null )
          {
@@ -54,6 +57,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return DefaultSymbolCheck( text );
       }
 
+      /// <summary>
+      /// Gets a bool indicating if the given string is translatable based on whether or not it
+      /// contains symbols of the source language.
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
       public static bool IsTranslatable( string text )
       {
          return ContainsLanguageSymbolsForSourceLanguage( text )
@@ -61,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             && !Settings.IgnoreTextStartingWith.Any( x => text.StartsWithStrict( x ) );
       }
 
-      public static bool ContainsJapaneseSymbols( string text )
+      internal static bool ContainsJapaneseSymbols( string text )
       {
          // Unicode Kanji Table:
          // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
@@ -82,7 +91,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
-      public static bool ContainsKoreanSymbols( string text )
+      internal static bool ContainsKoreanSymbols( string text )
       {
          foreach( var c in text )
          {
@@ -94,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
-      public static bool ContainsChineseSymbols( string text )
+      internal static bool ContainsChineseSymbols( string text )
       {
          foreach( var c in text )
          {
@@ -108,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
-      public static bool ContainsRussianSymbols( string text )
+      internal static bool ContainsRussianSymbols( string text )
       {
          foreach( var c in text )
          {
@@ -126,7 +135,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
-      public static bool ContainsStandardLatinSymbols( string text )
+      internal static bool ContainsStandardLatinSymbols( string text )
       {
          foreach( var c in text )
          {

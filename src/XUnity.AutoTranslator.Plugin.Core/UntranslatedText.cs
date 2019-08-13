@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   class UntranslatedText
+   internal class UntranslatedText
    {
       private static string PerformInternalTrimming( string text, bool whitespaceBetweenWords, ref StringBuilder builder )
       {
@@ -161,28 +161,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return text;
       }
 
-      public UntranslatedText( string originalText, bool isFromSpammingComponent, bool removeInternalWhitespace, bool whitespaceBetweenWords )
+      public UntranslatedText( string originalText, bool isFromSpammingComponent, bool removeInternalWhitespace, bool whitespaceBetweenWords, bool enableTemplating = true )
       {
          IsFromSpammingComponent = isFromSpammingComponent;
 
          // Calculate the original and original templated texts
          Original_Text = originalText;
-         if( isFromSpammingComponent )
+         if( enableTemplating )
          {
-            TemplatedText = originalText.TemplatizeByNumbers();
-            if( TemplatedText != null )
+            if( isFromSpammingComponent )
             {
-               originalText = TemplatedText.Template;
+               TemplatedText = originalText.TemplatizeByNumbers();
+               if( TemplatedText != null )
+               {
+                  originalText = TemplatedText.Template;
+               }
+            }
+            else
+            {
+               TemplatedText = originalText.TemplatizeByReplacements();
+               if( TemplatedText != null )
+               {
+                  originalText = TemplatedText.Template;
+               }
             }
          }
-         else
-         {
-            TemplatedText = originalText.TemplatizeByReplacements();
-            if( TemplatedText != null )
-            {
-               originalText = TemplatedText.Template;
-            }
-         }
+
          TemplatedOriginal_Text = originalText;
 
          var isTemplated = IsTemplated;

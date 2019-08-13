@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class TextHelper
    {
-      internal static string Decode( string text )
+      public static string Decode( string text )
       {
          var commentIndex = text.IndexOf( "//" );
          if( commentIndex > -1 )
@@ -21,14 +21,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             .Replace( "%2F%2F", "//" );
       }
 
-      internal static string Encode( string text )
+      public static string Encode( string text )
       {
          return EscapeNewlines( text )
             .Replace( "=", "%3D" )
             .Replace( "//", "%2F%2F" );
       }
 
-      public static string UnescapeNewlines( string str )
+      internal static string UnescapeNewlines( string str )
       {
          if( str == null ) return null;
 
@@ -77,7 +77,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return builder.ToString();
       }
 
-      public static string EscapeNewlines( string str )
+      internal static string EscapeNewlines( string str )
       {
          if( str == null || str.Length == 0 )
          {

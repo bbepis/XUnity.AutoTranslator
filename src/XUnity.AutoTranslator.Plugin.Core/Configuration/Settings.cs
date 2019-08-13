@@ -35,6 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool ToLanguageUsesWhitespaceBetweenWords = false;
       public static string ApplicationName;
       public static float Timeout = 150.0f;
+      public static string RedirectedResourcesPath;
 
       public static Dictionary<string, string> Replacements = new Dictionary<string, string>();
 
@@ -114,6 +115,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static HashSet<string> DuplicateTextureNames;
       public static TextureHashGenerationStrategy TextureHashGenerationStrategy;
 
+      public static string PreferredStoragePath;
+      public static bool EnableDumping;
+      public static bool EnableTextAssetResourceRedirector;
+      public static HashSet<string> RedirectedFiles;
+
+
       public static float Height;
       public static float Width;
       public static HashSet<string> EnabledTranslators;
@@ -189,8 +196,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             DuplicateTextureNames = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "DuplicateTextureNames", string.Empty )
                ?.Split( new[] { ';' }, StringSplitOptions.RemoveEmptyEntries ).ToHashSet() ?? new HashSet<string>();
             EnableLegacyTextureLoading = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableLegacyTextureLoading", false );
-
             TextureHashGenerationStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureHashGenerationStrategy", TextureHashGenerationStrategy.FromImageName );
+
+            PreferredStoragePath = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "PreferredStoragePath", @"RedirectedResources" );
+            EnableTextAssetResourceRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetResourceRedirector", false );
+            EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
+
+            RedirectedResourcesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, PreferredStoragePath ).Replace( "/", "\\" ).Parameterize();
 
             if( MaxCharactersPerTranslation > MaxMaxCharactersPerTranslation )
             {
@@ -225,6 +237,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                EnableTranslationScoping = false;
 
                XuaLogger.Current.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
+            }
+
+            try
+            {
+               Directory.CreateDirectory( RedirectedResourcesPath );
+
+               RedirectedFiles = Directory.GetFiles( RedirectedResourcesPath, "*", SearchOption.AllDirectories )
+                  .Select( x => x.MakeRelativePath( Environment.CurrentDirectory ) )
+                  .ToHashSet( StringComparer.OrdinalIgnoreCase );
+            }
+            catch( Exception e )
+            {
+               RedirectedFiles = new HashSet<string>();
+               EnableDumping = false;
+               EnableTextAssetResourceRedirector = false;
+               XuaLogger.Current.Warn( e, "Could not determine determine which files has been redirected. Disabling redirection!" );
             }
 
             //// workaround to handle text translation toggling in KK

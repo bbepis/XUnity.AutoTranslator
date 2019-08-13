@@ -28,6 +28,7 @@ using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.AutoTranslator.Plugin.Core.ResourceRedirection;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -36,6 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public class AutoTranslationPlugin : MonoBehaviour, IInternalTranslator
    {
+
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
       /// </summary>
@@ -48,6 +50,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TextTranslationCache TextCache;
       internal TextureTranslationCache TextureCache;
       internal SpamChecker SpamChecker;
+
+      /// <summary>
+      /// Resource redirection state
+      /// </summary>
 
       /// <summary>
       /// Keeps track of things to copy to clipboard.
@@ -124,6 +130,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // WORKAROUND: Initialize text parsers with delegate indicating if text should be translated
          UnityTextParsers.Initialize( ( text, scope ) => TextCache.IsTranslatable( text, true, scope ) && IsBelowMaxLength( text ) );
 
+         // resource redirectors
+         InitializeResourceRedirector();
+
          // validate configuration
          ValidateConfiguration();
 
@@ -140,6 +149,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          InitializeGUI();
 
          XuaLogger.Current.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
+      }
+
+      private void InitializeResourceRedirector()
+      {
+         try
+         {
+            if( Settings.EnableTextAssetResourceRedirector )
+            {
+               new TextAssetResourceRedirectHandler();
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while initializing resource redirectors." );
+         }
       }
 
       private void InitializeGUI()
@@ -317,6 +341,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                try
                {
                   ObjectReferenceMapper.Cull();
+                  ResourceRedirector.Cull();
                }
                catch( Exception e )
                {

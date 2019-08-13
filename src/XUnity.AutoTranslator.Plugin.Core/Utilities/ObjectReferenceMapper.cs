@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          if( ui.SupportsStabilization() && ui.IsKnownTextType() )
          {
-            var info = ui.GetOrCreate<TextTranslationInfo>();
+            var info = ui.GetOrCreateExtensionData<TextTranslationInfo>();
 
             return info;
          }
@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          if( ui.SupportsStabilization() && ui.IsKnownTextType() )
          {
-            var info = ui.Get<TextTranslationInfo>();
+            var info = ui.GetExtensionData<TextTranslationInfo>();
 
             return info;
          }
@@ -42,12 +42,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj )
       {
-         return obj.GetOrCreate<ImageTranslationInfo>();
+         return obj.GetOrCreateExtensionData<ImageTranslationInfo>();
       }
 
       public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )
       {
-         var tti = texture.GetOrCreate<TextureTranslationInfo>();
+         var tti = texture.GetOrCreateExtensionData<TextureTranslationInfo>();
          if( tti.Original == null ) tti.SetOriginal( texture );
 
          return tti;
@@ -79,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          }
       }
 
-      public static T GetOrCreate<T>( this object obj )
+      public static T GetOrCreateExtensionData<T>( this object obj )
          where T : new()
       {
          if( obj == null ) return default( T );
@@ -124,7 +124,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          }
       }
 
-      public static T Get<T>( this object obj )
+      public static T GetExtensionData<T>( this object obj )
          where T : new()
       {
          if( obj == null ) return default( T );

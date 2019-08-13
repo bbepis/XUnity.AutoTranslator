@@ -105,6 +105,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
+      public static void InstallResourceAndAssetHooks()
+      {
+         try
+         {
+            Harmony.PatchAll( ResourceAndAssetHooks.All );
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Current.Error( e, "An error occurred while setting up image hooks." );
+         }
+      }
+
       public static void InstallTextHooks()
       {
 

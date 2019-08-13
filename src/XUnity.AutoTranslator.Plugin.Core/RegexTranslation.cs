@@ -7,6 +7,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public RegexTranslation( string key, string value )
       {
+         Key = key;
+         Value = value;
+
          // remove r:
          if( key.StartsWith( "r:" ) )
          {
@@ -57,5 +60,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public string Original { get; set; }
 
       public string Translation { get; set; }
+
+      public string Key { get; set; }
+
+      public string Value { get; set; }
    }
 }

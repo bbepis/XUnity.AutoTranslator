@@ -64,6 +64,76 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
       private static readonly char[] Spaces = new char[] { ' ', '　' };
 
+      public static string MakeRelativePath( this string fullPath, string basePath )
+      {
+         var builder = new StringBuilder();
+         int offset;
+
+         // this is the easy case.  The file is inside of the working directory.
+         if( fullPath.StartsWith( basePath ) )
+         {
+            return fullPath.Substring( basePath.Length + 1 );
+         }
+
+         // the hard case has to back out of the working directory
+         string[] baseDirs = basePath.Split( new char[] { ':', '\\', '/' } );
+         var fileDirs = fullPath.Split( new char[] { ':', '\\', '/' } ).ToList();
+
+         // if we failed to split (empty strings?) or the drive letter does not match
+         if( baseDirs.Length <= 0 || fileDirs.Count <= 0 || baseDirs[ 0 ] != fileDirs[ 0 ] )
+         {
+            // can't create a relative path between separate harddrives/partitions.
+            return fullPath.Replace( '/', '\\' );
+         }
+
+         // skip all leading directories that match
+         for( offset = 1; offset < baseDirs.Length; offset++ )
+         {
+            if( baseDirs[ offset ] != fileDirs[ offset ] )
+               break;
+         }
+
+         // back out of the working directory
+         for( int i = 0; i < ( baseDirs.Length - offset ); i++ )
+         {
+            builder.Append( "..\\" );
+         }
+
+         for( int i = offset; i < fileDirs.Count; i++ )
+         {
+            if( fileDirs[ i ] == ".." )
+            {
+               var previousIndex = i - 1;
+               if( previousIndex > offset )
+               {
+                  fileDirs.RemoveAt( i );
+                  fileDirs.RemoveAt( previousIndex );
+                  i = previousIndex;
+               }
+            }
+         }
+
+         // step into the file path
+         for( int i = offset; i < fileDirs.Count - 1; i++ )
+         {
+            var dir = fileDirs[ i ];
+            if( dir != null )
+            {
+               builder.Append( dir )
+                  .Append( '\\' );
+            }
+         }
+
+         var lastIndex = fileDirs.Count - 1;
+         var lastDir = fileDirs[ lastIndex ];
+         if( lastDir != null )
+         {
+            builder.Append( lastDir );
+         }
+
+         return builder.ToString();
+      }
+
       public static string SanitizeForFileSystem( this string path )
       {
          var builder = new StringBuilder( path.Length );

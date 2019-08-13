@@ -3,6 +3,7 @@
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
       <Version>3.8.1</Version>
+     <LangVersion>latest</LangVersion>
    </PropertyGroup>
 
    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

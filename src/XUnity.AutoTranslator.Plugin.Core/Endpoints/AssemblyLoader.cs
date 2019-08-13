@@ -11,7 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
    {
       internal static List<Type> GetAllTypesOf<TService>( string directory )
       {
-         if( !Directory.Exists( directory ) ) return new List<Type>();
+         Directory.CreateDirectory( directory );
 
          var files = Directory.GetFiles( directory, "*.dll" );
          var allTypes = new HashSet<Type>();
