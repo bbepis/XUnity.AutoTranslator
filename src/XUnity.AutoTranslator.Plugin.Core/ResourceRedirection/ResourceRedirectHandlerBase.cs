@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       /// <param name="context">A context containing all relevant information of the resource redirection.</param>
       public void Handle( IRedirectionContext<TAsset> context )
       {
-         if( context.HasBeenRedirectedBefore )
+         if( context.HasReferenceBeenRedirectedBefore )
          {
             context.Handled = true;
             return;

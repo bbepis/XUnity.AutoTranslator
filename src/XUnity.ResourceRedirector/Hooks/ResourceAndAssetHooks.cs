@@ -549,7 +549,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirectionManager.Hook_ResourceLoaded( path, ref result );
+         ResourceRedirectionManager.Hook_ResourceLoaded( path, true, ref result );
 
          return result;
       }
@@ -584,7 +584,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_ResourceLoaded( Path.Combine( path, result[ i ].name ), ref result[ i ] );
+               ResourceRedirectionManager.Hook_ResourceLoaded( path, false, ref result[ i ] );
             }
          }
 
@@ -617,7 +617,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirectionManager.Hook_ResourceLoaded( path, ref result );
+         ResourceRedirectionManager.Hook_ResourceLoaded( path, true, ref result );
 
          return result;
       }

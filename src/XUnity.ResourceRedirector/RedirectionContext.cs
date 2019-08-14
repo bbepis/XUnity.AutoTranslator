@@ -9,26 +9,40 @@ namespace XUnity.ResourceRedirector
    {
       private string _globallyUniqueAssetPath;
 
-      public RedirectionContext( AssetSource source, string assetPath, TAsset asset, bool hasBeenRedirectedBefore )
+      public RedirectionContext( AssetSource source, string assetPath, AssetBundle bundle, TAsset asset, bool hasBeenRedirectedBefore )
       {
          Source = source;
          AssetPath = assetPath;
+         Bundle = bundle;
          Asset = asset;
-         HasBeenRedirectedBefore = hasBeenRedirectedBefore;
+         HasReferenceBeenRedirectedBefore = hasBeenRedirectedBefore;
          Handled = false;
       }
 
       public string AssetPath { get; }
 
-      public string GloballyUniqueAssetPath
+      public AssetBundle Bundle { get; }
+
+      public string UniqueFileSystemAssetPath
       {
          get
          {
             if( _globallyUniqueAssetPath == null )
             {
-               _globallyUniqueAssetPath = Path.Combine(
+               var path = Path.Combine(
                   Source == AssetSource.AssetBundle ? "assets" : "resources",
                   AssetPath );
+
+               if( string.IsNullOrEmpty( Asset.name ) )
+               {
+                  _globallyUniqueAssetPath = path;
+               }
+               else
+               {
+                  _globallyUniqueAssetPath = Path.Combine( path, Asset.name ).ToLowerInvariant();
+               }
+
+               _globallyUniqueAssetPath = _globallyUniqueAssetPath.Replace( '/', '\\' );
             }
             return _globallyUniqueAssetPath;
          }
@@ -38,7 +52,7 @@ namespace XUnity.ResourceRedirector
 
       public TAsset Asset { get; set; }
 
-      public bool HasBeenRedirectedBefore { get; }
+      public bool HasReferenceBeenRedirectedBefore { get; }
 
       public bool Handled { get; set; }
 

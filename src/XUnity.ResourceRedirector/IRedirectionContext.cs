@@ -1,18 +1,24 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace XUnity.ResourceRedirector
 {
    public interface IRedirectionContext
    {
       /// <summary>
-      /// Gets a globally unique path for the resource being loaded, combined of the source and the path.
+      /// Gets a globally unique path for the resource being loaded, combined of the source and the path. Uses '\' for seperators.
       /// </summary>
-      string GloballyUniqueAssetPath { get; }
+      string UniqueFileSystemAssetPath { get; }
 
       /// <summary>
-      /// Gets a unique path of the resource being loaded.
+      /// Gets a unique path of the resource being loaded. Uses '/' for seperators.
       /// </summary>
       string AssetPath { get; }
+
+      /// <summary>
+      /// Gets the bundle this asset is associated with. May be null if loaded through Resources API.
+      /// </summary>
+      AssetBundle Bundle { get; }
 
       /// <summary>
       /// Gets or sets a bool indicating if this event has been handled. Setting
@@ -34,7 +40,7 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets a bool indicating if this resource has been redirected before.
       /// </summary>
-      bool HasBeenRedirectedBefore { get; }
+      bool HasReferenceBeenRedirectedBefore { get; }
    }
 
    /// <summary>

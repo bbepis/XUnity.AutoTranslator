@@ -14,12 +14,11 @@ namespace XUnity.ResourceRedirector
 {
    public class ResourceRedirectionManager
    {
-      private static readonly string CurrentDirectoryLowered = Environment.CurrentDirectory.ToLowerInvariant();
       private static readonly object Sync = new object();
       private static readonly MethodInfo CallHandleAssetOrResource_Method = typeof( ResourceRedirectionManager ).GetMethod( "CallHandleAssetOrResource", BindingFlags.Static | BindingFlags.NonPublic );
-      private static readonly WeakDictionary<AssetBundleCreateRequest, string> AssetBundleCreateRequestToPath = new WeakDictionary<AssetBundleCreateRequest, string>();
-      private static readonly WeakDictionary<AssetBundle, string> AssetBundleToPath = new WeakDictionary<AssetBundle, string>();
-      private static readonly WeakDictionary<AssetBundleRequest, string> AssetBundleRequestToPath = new WeakDictionary<AssetBundleRequest, string>();
+      //private static readonly WeakDictionary<AssetBundleCreateRequest, string> AssetBundleCreateRequestToPath = new WeakDictionary<AssetBundleCreateRequest, string>();
+      //private static readonly WeakDictionary<AssetBundle, string> AssetBundleToPath = new WeakDictionary<AssetBundle, string>();
+      private static readonly WeakDictionary<AssetBundleRequest, AssetBundle> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AssetBundle>();
 
       private protected static readonly List<ResourceRedirectionCallback> RedirectionsForAll = new List<ResourceRedirectionCallback>();
       private static bool _initialized = false;
@@ -58,84 +57,46 @@ namespace XUnity.ResourceRedirector
       {
          lock( Sync )
          {
-            AssetBundleCreateRequestToPath.RemoveCollectedEntries();
-            AssetBundleRequestToPath.RemoveCollectedEntries();
-            AssetBundleToPath.RemoveCollectedEntries();
+            //AssetBundleCreateRequestToPath.RemoveCollectedEntries();
+            AssetBundleRequestToAssetBundle.RemoveCollectedEntries();
+            //AssetBundleToPath.RemoveCollectedEntries();
          }
       }
 
       internal static void Hook_AssetBundleLoaded_Postfix( string path, AssetBundle bundle, AssetBundleCreateRequest request )
       {
-         // path may be null! Should be obtained from request object in that case
-         if( path == null )
-         {
-            lock( Sync )
-            {
-               AssetBundleCreateRequestToPath.TryGetValue( request, out path );
-            }
-         }
-
-         if( bundle != null && path != null )
-         {
-            lock( Sync )
-            {
-               AssetBundleToPath[ bundle ] = path;
-            }
-         }
       }
 
       internal static void Hook_AssetBundleLoading_Postfix( string path, AssetBundleCreateRequest request )
       {
-         // create assocation from request to path
-         if( request != null && path != null )
-         {
-            lock( Sync )
-            {
-               AssetBundleCreateRequestToPath[ request ] = path;
-            }
-         }
       }
 
       internal static void Hook_AssetLoaded_Postfix( AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
       {
          if( asset == null ) return;
 
-
-         // parentBundle may be null, obtain from request
-         string path = null;
-         if( parentBundle != null )
+         lock( Sync )
          {
-            lock( Sync )
+            if( parentBundle == null )
             {
-               AssetBundleToPath.TryGetValue( parentBundle, out path );
-            }
-         }
-         else if( request != null )
-         {
-            lock( Sync )
-            {
-               AssetBundleRequestToPath.TryGetValue( request, out path );
+               if( !AssetBundleRequestToAssetBundle.TryGetValue( request, out parentBundle ) )
+               {
+                  XuaLogger.ResourceRedirector.Error( "Could not find asset bundle from request object!" );
+                  return;
+               }
             }
          }
 
+         var path = parentBundle.name;
+
+         // Is this a problem???
          if( path == null )
          {
             XuaLogger.ResourceRedirector.Error( "Could not obtain path for asset bundle!" );
             return;
          }
 
-         if( !string.IsNullOrEmpty( asset.name ) )
-         {
-            path = Path.Combine( path, asset.name );
-         }
-         else
-         {
-            XuaLogger.ResourceRedirector.Error( "ASSET HAS A NAME:" );
-            XuaLogger.ResourceRedirector.Error( "Path: " + path );
-            XuaLogger.ResourceRedirector.Error( "Name: " + asset.name );
-         }
-
-         HandleAssetOrResource( path, AssetSource.AssetBundle, ref asset );
+         HandleAssetOrResource( path, parentBundle, AssetSource.AssetBundle, ref asset );
       }
 
       internal static void Hook_AssetLoading( AssetBundle parentBundle, AssetBundleRequest request )
@@ -143,21 +104,33 @@ namespace XUnity.ResourceRedirector
          // create ref from request to parentBundle?
          lock( Sync )
          {
-            if( parentBundle != null && AssetBundleToPath.TryGetValue( parentBundle, out var path ) && request != null && path != null )
+            if( parentBundle != null && request != null )
             {
-               AssetBundleRequestToPath[ request ] = path;
+               AssetBundleRequestToAssetBundle[ request ] = parentBundle;
             }
          }
       }
 
-      internal static void Hook_ResourceLoaded( string path, ref UnityEngine.Object asset )
+      internal static void Hook_ResourceLoaded( string path, bool pathIncludesAssetName, ref UnityEngine.Object asset )
       {
          if( asset == null ) return;
 
-         HandleAssetOrResource( path, AssetSource.Resources, ref asset );
+         if( pathIncludesAssetName )
+         {
+            // remove asset name
+            path = path.ToLowerInvariant();
+            var loweredAssetName = asset.name.ToLowerInvariant();
+
+            if( path.EndsWith( loweredAssetName ) )
+            {
+               path = path.Remove( path.Length - loweredAssetName.Length ).TrimEnd( '\\', '/' );
+            }
+         }
+
+         HandleAssetOrResource( path, null, AssetSource.Resources, ref asset );
       }
 
-      internal static void HandleAssetOrResource( string path, AssetSource source, ref UnityEngine.Object asset )
+      internal static void HandleAssetOrResource( string path, AssetBundle assetBundle, AssetSource source, ref UnityEngine.Object asset )
       {
          try
          {
@@ -166,9 +139,9 @@ namespace XUnity.ResourceRedirector
             try
             {
                // make relative and normalize
-               path = path.ToLowerInvariant().MakeRelativePath( CurrentDirectoryLowered );
+               path = path.ToLowerInvariant();
 
-               var args = new object[] { asset, path, source };
+               var args = new object[] { asset, path, assetBundle, source };
                CallHandleAssetOrResource_Method
                   .MakeGenericMethod( type )
                   .Invoke( null, args );
@@ -187,19 +160,19 @@ namespace XUnity.ResourceRedirector
       }
 
 
-      internal static void CallHandleAssetOrResource<TAsset>( ref TAsset asset, string path, AssetSource source )
+      internal static void CallHandleAssetOrResource<TAsset>( ref TAsset asset, string path, AssetBundle assetBundle, AssetSource source )
          where TAsset : UnityEngine.Object
       {
          var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
          try
          {
-            var context = new RedirectionContext<TAsset>( source, path, asset, ext.HasBeenRedirected );
+            var context = new RedirectionContext<TAsset>( source, path, assetBundle, asset, ext.HasBeenRedirected );
 
             ResourceRedirectionManager<TAsset>.Invoke( context );
 
             if( !context.Handled && _logUnhandledResources )
             {
-               XuaLogger.ResourceRedirector.Debug( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({path})." );
+               XuaLogger.ResourceRedirector.Debug( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({context.UniqueFileSystemAssetPath})." );
             }
 
             asset = context.Asset;
