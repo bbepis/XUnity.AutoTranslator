@@ -100,6 +100,7 @@ namespace XUnity.ResourceRedirector
       {
          if( asset == null ) return;
 
+
          // parentBundle may be null, obtain from request
          string path = null;
          if( parentBundle != null )
@@ -123,15 +124,16 @@ namespace XUnity.ResourceRedirector
             return;
          }
 
-
-         // FIXME: Does assets loaded from this API ever have a name?????
-         if( string.IsNullOrEmpty( asset.name ) )
+         if( !string.IsNullOrEmpty( asset.name ) )
+         {
+            path = Path.Combine( path, asset.name );
+         }
+         else
          {
             XuaLogger.ResourceRedirector.Error( "ASSET HAS A NAME:" );
             XuaLogger.ResourceRedirector.Error( "Path: " + path );
             XuaLogger.ResourceRedirector.Error( "Name: " + asset.name );
          }
-
 
          HandleAssetOrResource( path, AssetSource.AssetBundle, ref asset );
       }
