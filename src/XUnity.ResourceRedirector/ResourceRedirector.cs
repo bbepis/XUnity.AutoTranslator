@@ -96,7 +96,7 @@ namespace XUnity.ResourceRedirector
             return;
          }
 
-         HandleAssetOrResource( path, parentBundle, AssetSource.AssetBundle, ref asset );
+         FireAssetOrResourceLoadedEvent( path, parentBundle, AssetSource.AssetBundle, ref asset );
       }
 
       internal static void Hook_AssetLoading( AssetBundle parentBundle, AssetBundleRequest request )
@@ -127,17 +127,22 @@ namespace XUnity.ResourceRedirector
             }
          }
 
-         HandleAssetOrResource( path, null, AssetSource.Resources, ref asset );
+         FireAssetOrResourceLoadedEvent( path, null, AssetSource.Resources, ref asset );
       }
 
-      internal static void HandleAssetOrResource( string path, AssetBundle assetBundle, AssetSource source, ref UnityEngine.Object asset )
-      {
-         try
-         {
-            var type = asset.GetType();
+      private static bool _isFiringAssetOrResourceLoadedEvent = false;
 
+      internal static void FireAssetOrResourceLoadedEvent( string path, AssetBundle assetBundle, AssetSource source, ref UnityEngine.Object asset )
+      {
+         // prevent recursion from plugins
+
+         if( !_isFiringAssetOrResourceLoadedEvent )
+         {
+            _isFiringAssetOrResourceLoadedEvent = true;
             try
             {
+               var type = asset.GetType();
+
                // make relative and normalize
                path = path.ToLowerInvariant();
 
@@ -152,10 +157,10 @@ namespace XUnity.ResourceRedirector
             {
                XuaLogger.ResourceRedirector.Error( e, "An error occurred while redirecting resource." );
             }
-         }
-         catch( Exception e )
-         {
-            XuaLogger.ResourceRedirector.Error( e, "An error occurred while handling potentially redirected resource." );
+            finally
+            {
+               _isFiringAssetOrResourceLoadedEvent = false;
+            }
          }
       }
 

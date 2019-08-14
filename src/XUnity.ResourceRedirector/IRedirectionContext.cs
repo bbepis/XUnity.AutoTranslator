@@ -6,7 +6,7 @@ namespace XUnity.ResourceRedirector
    public interface IRedirectionContext
    {
       /// <summary>
-      /// Gets a globally unique path for the resource being loaded, combined of the source and the path. Uses '\' for seperators.
+      /// Gets a globally unique path for the resource being loaded, combined of the source, path and asset name. Uses '\' for seperators.
       /// </summary>
       string UniqueFileSystemAssetPath { get; }
 
@@ -53,11 +53,5 @@ namespace XUnity.ResourceRedirector
       /// Gets or sets (to be overriden) the asset being loaded.
       /// </summary>
       new TAsset Asset { get; set; }
-   }
-
-   public enum AssetSource
-   {
-      AssetBundle = 1,
-      Resources = 2
    }
 }

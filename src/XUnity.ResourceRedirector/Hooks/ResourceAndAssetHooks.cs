@@ -18,7 +18,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
-         typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
+         //typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
          //typeof( AssetBundle_LoadFromMemory_Hook ), // Cannot be hooked! Missing path
          typeof( AssetBundle_mainAsset_Hook ),
          typeof( AssetBundle_Load_Hook ),
@@ -102,36 +102,36 @@ namespace XUnity.ResourceRedirector.Hooks
       }
    }
 
-   internal static class AssetBundle_LoadFromMemoryAsync_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return true;
-      }
+   //internal static class AssetBundle_LoadFromMemoryAsync_Hook
+   //{
+   //   static bool Prepare( object instance )
+   //   {
+   //      return true;
+   //   }
 
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
-      }
+   //   static MethodBase TargetMethod( object instance )
+   //   {
+   //      return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
+   //   }
 
-      delegate AssetBundleCreateRequest OriginalMethod( string path, uint crc );
+   //   delegate AssetBundleCreateRequest OriginalMethod( string path, uint crc );
 
-      static OriginalMethod _original;
+   //   static OriginalMethod _original;
 
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<OriginalMethod>();
-      }
+   //   static void MM_Init( object detour )
+   //   {
+   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
+   //   }
 
-      static AssetBundleCreateRequest MM_Detour( byte[] binary, uint crc )
-      {
-         var result = _original( null, crc );
+   //   static AssetBundleCreateRequest MM_Detour( byte[] binary, uint crc )
+   //   {
+   //      var result = _original( null, crc );
 
-         ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( null, result );
+   //      ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( null, result );
 
-         return result;
-      }
-   }
+   //      return result;
+   //   }
+   //}
 
    //internal static class AssetBundle_LoadFromMemory_Hook
    //{
@@ -158,7 +158,7 @@ namespace XUnity.ResourceRedirector.Hooks
    //   {
    //      var result = _original( binary, crc );
 
-   //      ResourceRedirectionManager.Hook_AssetBundleLoaded( null, result, null );
+   //      ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( null, result, null );
 
    //      return result;
    //   }
