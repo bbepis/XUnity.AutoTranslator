@@ -12,7 +12,8 @@ namespace XUnity.Common.Logging
       private readonly object _logObject;
       private Func<object, object[], object> _logMethod;
 
-      public BepInExLogger()
+      public BepInExLogger( string source )
+         : base( source )
       {
          var staticFlags = BindingFlags.Static | BindingFlags.Public;
          var instanceFlags = BindingFlags.Instance | BindingFlags.Public;
@@ -25,7 +26,7 @@ namespace XUnity.Common.Logging
          {
             var loggerType = Type.GetType( "BepInEx.Logging.Logger, BepInEx", false );
             var createLogSourceMethod = loggerType.GetMethod( "CreateLogSource", staticFlags, null, new[] { typeof( string ) }, null );
-            _logObject = createLogSourceMethod.Invoke( null, new object[] { "XUnity" } );
+            _logObject = createLogSourceMethod.Invoke( null, new object[] { Source } );
             var logMethod = _logObject.GetType().GetMethod( "Log", instanceFlags, null, new[] { logLevelType, typeof( object ) }, null );
             _logMethod = ExpressionHelper.CreateFastInvoke( logMethod );
          }

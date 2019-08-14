@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -64,7 +65,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, crc, offset );
 
-         ResourceRedirectionManager.Hook_AssetBundleLoading( path, result );
+         ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( path, result );
 
          return result;
       }
@@ -95,7 +96,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, crc, offset );
 
-         ResourceRedirectionManager.Hook_AssetBundleLoaded( path, result, null );
+         ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( path, result, null );
 
          return result;
       }
@@ -126,7 +127,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( null, crc );
 
-         ResourceRedirectionManager.Hook_AssetBundleLoading( null, result );
+         ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( null, result );
 
          return result;
       }
@@ -189,7 +190,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -220,7 +221,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -286,7 +287,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
             }
          }
 
@@ -319,7 +320,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -385,7 +386,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded( self, null, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
             }
          }
 
@@ -449,7 +450,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirectionManager.Hook_AssetBundleLoaded( null, result, self );
+         ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( null, result, self );
 
          return result;
       }
@@ -480,7 +481,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirectionManager.Hook_AssetLoaded( null, self, ref result );
+         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( null, self, ref result );
 
          return result;
       }
@@ -515,7 +516,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded( null, self, ref result[ i ] );
+               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( null, self, ref result[ i ] );
             }
          }
 
@@ -583,7 +584,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_ResourceLoaded( path + '\\' + result[ i ].name, ref result[ i ] );
+               ResourceRedirectionManager.Hook_ResourceLoaded( Path.Combine( path, result[ i ].name ), ref result[ i ] );
             }
          }
 

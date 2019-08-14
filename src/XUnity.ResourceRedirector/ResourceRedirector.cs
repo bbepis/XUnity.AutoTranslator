@@ -21,8 +21,26 @@ namespace XUnity.ResourceRedirector
       private static readonly WeakDictionary<AssetBundle, string> AssetBundleToPath = new WeakDictionary<AssetBundle, string>();
       private static readonly WeakDictionary<AssetBundleRequest, string> AssetBundleRequestToPath = new WeakDictionary<AssetBundleRequest, string>();
 
+      private protected static readonly List<ResourceRedirectionCallback> RedirectionsForAll = new List<ResourceRedirectionCallback>();
       private static bool _initialized = false;
       private static bool _logUnhandledResources = false;
+
+      public static bool LogUnhandledResources
+      {
+         get
+         {
+            return _logUnhandledResources;
+         }
+         set
+         {
+            if( value )
+            {
+               Initialize();
+            }
+
+            _logUnhandledResources = value;
+         }
+      }
 
       internal static void Initialize()
       {
@@ -46,7 +64,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetBundleLoaded( string path, AssetBundle bundle, AssetBundleCreateRequest request )
+      internal static void Hook_AssetBundleLoaded_Postfix( string path, AssetBundle bundle, AssetBundleCreateRequest request )
       {
          // path may be null! Should be obtained from request object in that case
          if( path == null )
@@ -66,7 +84,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetBundleLoading( string path, AssetBundleCreateRequest request )
+      internal static void Hook_AssetBundleLoading_Postfix( string path, AssetBundleCreateRequest request )
       {
          // create assocation from request to path
          if( request != null && path != null )
@@ -78,7 +96,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetLoaded( AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
+      internal static void Hook_AssetLoaded_Postfix( AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
       {
          if( asset == null ) return;
 
@@ -101,22 +119,21 @@ namespace XUnity.ResourceRedirector
 
          if( path == null )
          {
-            XuaLogger.Current.Error( "Could not obtain path for asset bundle!" );
+            XuaLogger.ResourceRedirector.Error( "Could not obtain path for asset bundle!" );
             return;
          }
 
-         string fullPath;
+
+         // FIXME: Does assets loaded from this API ever have a name?????
          if( string.IsNullOrEmpty( asset.name ) )
          {
-            fullPath = Path.Combine( "Assets", path );
-         }
-         else
-         {
-            fullPath = Path.Combine( Path.Combine( "Assets", path ), asset.name );
+            XuaLogger.ResourceRedirector.Error( "ASSET HAS A NAME:" );
+            XuaLogger.ResourceRedirector.Error( "Path: " + path );
+            XuaLogger.ResourceRedirector.Error( "Name: " + asset.name );
          }
 
 
-         HandleAssetOrResource( fullPath, ref asset );
+         HandleAssetOrResource( path, AssetSource.AssetBundle, ref asset );
       }
 
       internal static void Hook_AssetLoading( AssetBundle parentBundle, AssetBundleRequest request )
@@ -135,83 +152,123 @@ namespace XUnity.ResourceRedirector
       {
          if( asset == null ) return;
 
-         var fullPath = Path.Combine( "Resources", path );
-
-         HandleAssetOrResource( fullPath, ref asset );
+         HandleAssetOrResource( path, AssetSource.Resources, ref asset );
       }
 
-      internal static void HandleAssetOrResource( string path, ref UnityEngine.Object asset )
+      internal static void HandleAssetOrResource( string path, AssetSource source, ref UnityEngine.Object asset )
       {
          try
          {
             var type = asset.GetType();
 
-            var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
-            if( !ext.HasBeenRedirected )
+            try
             {
-               try
-               {
-                  // make relative and normalize
-                  path = path.ToLowerInvariant().MakeRelativePath( CurrentDirectoryLowered );
+               // make relative and normalize
+               path = path.ToLowerInvariant().MakeRelativePath( CurrentDirectoryLowered );
 
-                  var args = new object[] { path, asset };
-                  CallHandleAssetOrResource_Method
-                     .MakeGenericMethod( type )
-                     .Invoke( null, args );
+               var args = new object[] { asset, path, source };
+               CallHandleAssetOrResource_Method
+                  .MakeGenericMethod( type )
+                  .Invoke( null, args );
 
-                  asset = (UnityEngine.Object)args[ 1 ];
-               }
-               catch( Exception e )
-               {
-                  XuaLogger.Current.Error( e, "An error occurred while redirecting resource." );
-               }
-               finally
-               {
-                  ext.HasBeenRedirected = true;
-               }
+               asset = (UnityEngine.Object)args[ 0 ];
+            }
+            catch( Exception e )
+            {
+               XuaLogger.ResourceRedirector.Error( e, "An error occurred while redirecting resource." );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while handling potentially redirected resource." );
+            XuaLogger.ResourceRedirector.Error( e, "An error occurred while handling potentially redirected resource." );
          }
       }
 
 
-      internal static void CallHandleAssetOrResource<TAsset>( string path, ref TAsset asset )
+      internal static void CallHandleAssetOrResource<TAsset>( ref TAsset asset, string path, AssetSource source )
          where TAsset : UnityEngine.Object
       {
-         var context = new RedirectionContext<TAsset>( path, asset );
-
-         ResourceRedirectionManager<TAsset>.Invoke( context );
-
-         // FIXME: This log could get out of hand...
-         if( !context.Handled && _logUnhandledResources ) // ...
+         var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+         try
          {
-            XuaLogger.Current.Debug( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({path})." );
-         }
+            var context = new RedirectionContext<TAsset>( source, path, asset, ext.HasBeenRedirected );
 
-         asset = context.Asset;
+            ResourceRedirectionManager<TAsset>.Invoke( context );
+
+            if( !context.Handled && _logUnhandledResources )
+            {
+               XuaLogger.ResourceRedirector.Debug( $"Found resource that no resource redirection handler can handle '{typeof( TAsset ).FullName}' ({path})." );
+            }
+
+            asset = context.Asset;
+         }
+         finally
+         {
+            ext.HasBeenRedirected = true;
+         }
       }
 
 
-      public static void AddRedirection<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
+      public static void AddRedirectionFor<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
          where TAsset : UnityEngine.Object
       {
          ResourceRedirectionManager<TAsset>.AddRedirection( action, ignoredHandled );
       }
 
-      public static void RemoveRedirection<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
+      public static void RemoveRedirectionFor<TAsset>( Action<IRedirectionContext<TAsset>> action, bool ignoredHandled )
          where TAsset : UnityEngine.Object
       {
          ResourceRedirectionManager<TAsset>.RemoveRedirection( action, ignoredHandled );
       }
 
-      public static void LogUnhandledResources( bool value )
+      public static void AddRedirectionForAll( Action<IRedirectionContext> action, bool ignoredHandled )
       {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
          Initialize();
 
-         _logUnhandledResources = value;
+         RedirectionsForAll.Add( new ResourceRedirectionCallback( action, ignoredHandled ) );
+      }
+
+      public static void RemoveRedirectionForAll( Action<IRedirectionContext> action, bool ignoredHandled )
+      {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         var redirection = new ResourceRedirectionCallback( action, ignoredHandled );
+         RedirectionsForAll.Remove( redirection );
+      }
+
+      private protected class ResourceRedirectionCallback : IEquatable<ResourceRedirectionCallback>
+      {
+         public ResourceRedirectionCallback( Action<IRedirectionContext> action, bool ignoreHandled )
+         {
+            Action = action;
+            IgnoreHandled = ignoreHandled;
+         }
+
+         public Action<IRedirectionContext> Action { get; }
+
+         public bool IgnoreHandled { get; set; }
+
+         public override bool Equals( object obj )
+         {
+            return Equals( obj as ResourceRedirectionCallback );
+         }
+
+         public bool Equals( ResourceRedirectionCallback other )
+         {
+            return other != null &&
+                    EqualityComparer<Action<IRedirectionContext>>.Default.Equals( Action, other.Action ) &&
+                     IgnoreHandled == other.IgnoreHandled;
+         }
+
+         public override int GetHashCode()
+         {
+            var hashCode = 1426693738;
+            hashCode = hashCode * -1521134295 + EqualityComparer<Action<IRedirectionContext>>.Default.GetHashCode( Action );
+            hashCode = hashCode * -1521134295 + IgnoreHandled.GetHashCode();
+            return hashCode;
+         }
       }
    }
 
@@ -223,7 +280,7 @@ namespace XUnity.ResourceRedirector
    public class ResourceRedirectionManager<TAsset> : ResourceRedirectionManager
       where TAsset : UnityEngine.Object
    {
-      private static List<ResourceRedirectionCallback> _redirections = new List<ResourceRedirectionCallback>();
+      private static readonly List<GenericResourceRedirectionCallback> RedirectionsForSpecificType = new List<GenericResourceRedirectionCallback>();
 
       /// <summary>
       /// Event that is invoked when an asset is loading.
@@ -251,7 +308,7 @@ namespace XUnity.ResourceRedirector
 
          Initialize();
 
-         _redirections.Add( new ResourceRedirectionCallback( action, ignoredHandled ) );
+         RedirectionsForSpecificType.Add( new GenericResourceRedirectionCallback( action, ignoredHandled ) );
       }
 
       /// <summary>
@@ -263,19 +320,19 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         var redirection = new ResourceRedirectionCallback( action, ignoredHandled );
-         _redirections.Remove( redirection );
+         var redirection = new GenericResourceRedirectionCallback( action, ignoredHandled );
+         RedirectionsForSpecificType.Remove( redirection );
       }
 
       internal static void Invoke( IRedirectionContext<TAsset> context )
       {
-         var list = _redirections;
-         var len = list.Count;
-         for( int i = 0; i < len; i++ )
+         var list1 = RedirectionsForSpecificType;
+         var len1 = list1.Count;
+         for( int i = 0; i < len1; i++ )
          {
             try
             {
-               var redirection = list[ i ];
+               var redirection = list1[ i ];
 
                if( !context.Handled || redirection.IgnoreHandled )
                {
@@ -284,14 +341,33 @@ namespace XUnity.ResourceRedirector
             }
             catch( Exception ex )
             {
-               XuaLogger.Current.Error( ex, "An error occurred while invoking OnAssetLoading event." );
+               XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking OnAssetLoading event." );
+            }
+         }
+
+         var list2 = RedirectionsForAll;
+         var len2 = list2.Count;
+         for( int i = 0; i < len2; i++ )
+         {
+            try
+            {
+               var redirection = list2[ i ];
+
+               if( !context.Handled || redirection.IgnoreHandled )
+               {
+                  redirection.Action( context );
+               }
+            }
+            catch( Exception ex )
+            {
+               XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking OnAssetLoading event." );
             }
          }
       }
 
-      private class ResourceRedirectionCallback : IEquatable<ResourceRedirectionCallback>
+      private class GenericResourceRedirectionCallback : IEquatable<GenericResourceRedirectionCallback>
       {
-         public ResourceRedirectionCallback( Action<IRedirectionContext<TAsset>> action, bool ignoreHandled )
+         public GenericResourceRedirectionCallback( Action<IRedirectionContext<TAsset>> action, bool ignoreHandled )
          {
             Action = action;
             IgnoreHandled = ignoreHandled;
@@ -303,10 +379,10 @@ namespace XUnity.ResourceRedirector
 
          public override bool Equals( object obj )
          {
-            return Equals( obj as ResourceRedirectionCallback );
+            return Equals( obj as GenericResourceRedirectionCallback );
          }
 
-         public bool Equals( ResourceRedirectionCallback other )
+         public bool Equals( GenericResourceRedirectionCallback other )
          {
             return other != null &&
                     EqualityComparer<Action<IRedirectionContext<TAsset>>>.Default.Equals( Action, other.Action ) &&

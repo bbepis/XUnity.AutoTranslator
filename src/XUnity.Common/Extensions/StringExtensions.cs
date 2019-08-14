@@ -15,7 +15,7 @@ namespace XUnity.Common.Extensions
       private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
       private static readonly char[] Spaces = new char[] { ' ', '　' };
 
-      public static string MakeRelativePath( this string fullPath, string basePath )
+      public static string MakeRelativePath( this string fullOrRelativePath, string basePath )
       {
          var builder = new StringBuilder();
          int offset = 0;
@@ -29,7 +29,7 @@ namespace XUnity.Common.Extensions
 
          // the hard case has to back out of the working directory
          string[] baseDirs = basePath.Split( new char[] { ':', '\\', '/' } );
-         var fileDirs = fullPath.Split( new char[] { ':', '\\', '/' } ).ToList();
+         var fileDirs = fullOrRelativePath.Split( new char[] { ':', '\\', '/' } ).ToList();
 
          // if we failed to split (empty strings?) or the drive letter does not match
          if( baseDirs.Length <= 0 || fileDirs.Count <= 0 || baseDirs[ 0 ] != fileDirs[ 0 ] )

@@ -31,12 +31,12 @@ namespace XUnity.Common.Utilities
             }
             else
             {
-               XuaLogger.Current.Error( "An unexpected exception occurred during harmony initialization, likely caused by unknown Harmony version. Harmony hooks will be unavailable!" );
+               XuaLogger.Common.Error( "An unexpected exception occurred during harmony initialization, likely caused by unknown Harmony version. Harmony hooks will be unavailable!" );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An unexpected exception occurred during harmony initialization. Harmony hooks will be unavailable!" );
+            XuaLogger.Common.Error( e, "An unexpected exception occurred during harmony initialization. Harmony hooks will be unavailable!" );
          }
       }
 
@@ -64,7 +64,7 @@ namespace XUnity.Common.Utilities
                   var postfix = type.GetMethod( "Postfix", flags );
                   if( Harmony == null )
                   {
-                     XuaLogger.Current.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
+                     XuaLogger.Common.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
                   }
 
                   if( forceMonoModHooks || Harmony == null || ( prefix == null && postfix == null ) )
@@ -92,11 +92,11 @@ namespace XUnity.Common.Utilities
                         hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
-                        XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
+                        XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
                      }
                      else
                      {
-                        XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}' because no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
+                        XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}' because no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
                      }
                   }
                   else
@@ -120,7 +120,7 @@ namespace XUnity.Common.Utilities
                            PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
                         }
 
-                        XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+                        XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
                      }
                      catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                      {
@@ -144,23 +144,23 @@ namespace XUnity.Common.Utilities
                               hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
-                              XuaLogger.Current.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
+                              XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
                            }
                            else
                            {
-                              XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
+                              XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
                            }
                         }
                         else
                         {
-                           XuaLogger.Current.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. MonoMod hooks is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
+                           XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. MonoMod hooks is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
                         }
                      }
                   }
                }
                else
                {
-                  XuaLogger.Current.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
+                  XuaLogger.Common.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
                }
             }
          }
@@ -168,11 +168,11 @@ namespace XUnity.Common.Utilities
          {
             if( original != null )
             {
-               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method '{original.DeclaringType.FullName}.{original.Name}'. Failing hook: '{type.Name}'." );
+               XuaLogger.Common.Warn( e, $"An error occurred while patching property/method '{original.DeclaringType.FullName}.{original.Name}'. Failing hook: '{type.Name}'." );
             }
             else
             {
-               XuaLogger.Current.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
+               XuaLogger.Common.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
             }
          }
       }

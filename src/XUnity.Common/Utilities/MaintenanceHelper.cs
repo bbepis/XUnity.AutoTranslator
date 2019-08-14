@@ -54,7 +54,7 @@ namespace XUnity.Common.Utilities
                      }
                      catch( Exception e )
                      {
-                        XuaLogger.Current.Error( e, "An unexpected error occurred during maintenance." );
+                        XuaLogger.Common.Error( e, "An unexpected error occurred during maintenance." );
                      }
                   }
                }

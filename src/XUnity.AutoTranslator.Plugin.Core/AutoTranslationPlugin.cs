@@ -146,7 +146,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // start function to write translations to file
          MaintenanceHelper.AddMaintenanceFunction( TextCache.SaveNewTranslationsToDisk, 1 );
 
-         XuaLogger.Current.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
+         XuaLogger.Default.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
       private void InitializeResourceRedirector()
@@ -155,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( Settings.EnableLoggingUnhandledResources )
             {
-               ResourceRedirectionManager.LogUnhandledResources( true );
+               ResourceRedirectionManager.LogUnhandledResources = true;
             }
 
             if( Settings.EnableTextAssetResourceRedirector )
@@ -166,7 +166,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while initializing resource redirectors." );
+            XuaLogger.Default.Error( e, "An error occurred while initializing resource redirectors." );
          }
       }
 
@@ -184,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while setting up UI." );
+            XuaLogger.Default.Error( e, "An error occurred while setting up UI." );
          }
          finally
          {
@@ -259,7 +259,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // check if language is supported
          if( !LanguageHelper.IsFromLanguageSupported( Settings.FromLanguage ) )
          {
-            XuaLogger.Current.Error( $"The plugin has been configured to use the 'FromLanguage={Settings.FromLanguage}'. This language is not supported. Shutting plugin down." );
+            XuaLogger.Default.Error( $"The plugin has been configured to use the 'FromLanguage={Settings.FromLanguage}'. This language is not supported. Shutting plugin down." );
 
             Settings.IsShutdown = true;
          }
@@ -272,7 +272,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var available = GetSupportedFonts();
                if( !available.Contains( Settings.OverrideFont ) )
                {
-                  XuaLogger.Current.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
+                  XuaLogger.Default.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
                   Settings.OverrideFont = null;
                }
                else
@@ -292,7 +292,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while checking supported fonts." );
+            XuaLogger.Default.Error( e, "An error occurred while checking supported fonts." );
          }
       }
 
@@ -321,7 +321,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             Settings.SetEndpoint( TranslationManager.CurrentEndpoint?.Endpoint.Id );
 
-            XuaLogger.Current.Info( $"Set translator endpoint to '{TranslationManager.CurrentEndpoint?.Endpoint.Id}'." );
+            XuaLogger.Default.Info( $"Set translator endpoint to '{TranslationManager.CurrentEndpoint?.Endpoint.Id}'." );
          }
       }
 
@@ -329,20 +329,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            XuaLogger.Current.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
+            XuaLogger.Default.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
             if( Features.SupportsSceneManager )
             {
                EnableSceneLoadScanInternal();
-               XuaLogger.Current.Info( "SceneManager is supported in this version of Unity." );
+               XuaLogger.Default.Info( "SceneManager is supported in this version of Unity." );
             }
             else
             {
-               XuaLogger.Current.Info( "SceneManager is not supported in this version of Unity. Falling back to OnLevelWasLoaded and Application level API." );
+               XuaLogger.Default.Info( "SceneManager is not supported in this version of Unity. Falling back to OnLevelWasLoaded and Application level API." );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while settings up scene-load scans." );
+            XuaLogger.Default.Error( e, "An error occurred while settings up scene-load scans." );
          }
       }
 
@@ -371,13 +371,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
             {
-               XuaLogger.Current.Info( "Performing texture lookup during scene load..." );
+               XuaLogger.Default.Info( "Performing texture lookup during scene load..." );
                var startTime = Time.realtimeSinceStartup;
 
                ManualHookForTextures();
 
                var endTime = Time.realtimeSinceStartup;
-               XuaLogger.Current.Info( $"Finished texture lookup (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.Default.Info( $"Finished texture lookup (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             }
          }
       }
@@ -448,7 +448,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var end = Time.realtimeSinceStartup;
                   var delta = Math.Round( end - start, 2 );
 
-                  XuaLogger.Current.Debug( $"Update SpriteRenderers caused by {_requireSpriteRendererCheckCausedBy} component (took " + delta + " seconds)" );
+                  XuaLogger.Default.Debug( $"Update SpriteRenderers caused by {_requireSpriteRendererCheckCausedBy} component (took " + delta + " seconds)" );
                }
                finally
                {
@@ -656,7 +656,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An error occurred while setting text on a component." );
+               XuaLogger.Default.Error( e, "An error occurred while setting text on a component." );
             }
             finally
             {
@@ -743,7 +743,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An error occurred while dumping texture." );
+               XuaLogger.Default.Error( e, "An error occurred while dumping texture." );
             }
          }
 
@@ -755,7 +755,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An error occurred while translating texture." );
+               XuaLogger.Default.Error( e, "An error occurred while translating texture." );
             }
          }
       }
@@ -978,7 +978,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( forceReload )
             {
-               XuaLogger.Current.Info( $"Reloaded texture: {texture.name} ({key})." );
+               XuaLogger.Default.Info( $"Reloaded texture: {texture.name} ({key})." );
             }
          }
          finally
@@ -1837,7 +1837,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An unexpected error occurred during plugin initialization." );
+               XuaLogger.Default.Error( e, "An unexpected error occurred during plugin initialization." );
             }
          }
       }
@@ -1851,7 +1851,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An unexpected error occurred during plugin start." );
+            XuaLogger.Default.Error( e, "An unexpected error occurred during plugin start." );
          }
       }
 
@@ -1954,7 +1954,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred in Update callback. " );
+            XuaLogger.Default.Error( e, "An error occurred in Update callback. " );
          }
       }
 
@@ -1962,13 +1962,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          var sli = new SceneLoadInformation();
 
-         XuaLogger.Current.Info( "Active Scene: " + sli.ActiveScene.Name + " (" + sli.ActiveScene.Id + ")" );
+         XuaLogger.Default.Info( "Active Scene: " + sli.ActiveScene.Name + " (" + sli.ActiveScene.Id + ")" );
 
-         XuaLogger.Current.Info( "Loaded Scenes:" );
+         XuaLogger.Default.Info( "Loaded Scenes:" );
          for( int i = 0; i < sli.LoadedScenes.Count; i++ )
          {
             var si = sli.LoadedScenes[ i ];
-            XuaLogger.Current.Info( i + ": " + si.Name + " (" + si.Id + ")" );
+            XuaLogger.Default.Info( i + ": " + si.Name + " (" + si.Id + ")" );
          }
       }
 
@@ -1986,7 +1986,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                catch( Exception e )
                {
-                  XuaLogger.Current.Error( e, "An error occurred in XUnity.AutoTranslator UI. Disabling the UI." );
+                  XuaLogger.Default.Error( e, "An error occurred in XUnity.AutoTranslator UI. Disabling the UI." );
 
                   MainWindow = null;
                }
@@ -2000,7 +2000,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                catch( Exception e )
                {
-                  XuaLogger.Current.Error( e, "An error occurred in Translation Aggregator UI. Disabling the UI." );
+                  XuaLogger.Default.Error( e, "An error occurred in Translation Aggregator UI. Disabling the UI." );
 
                   TranslationAggregatorWindow = null;
                }
@@ -2014,7 +2014,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                catch( Exception e )
                {
-                  XuaLogger.Current.Error( e, "An error occurred in Translation Aggregator Options UI. Disabling the UI." );
+                  XuaLogger.Default.Error( e, "An error occurred in Translation Aggregator Options UI. Disabling the UI." );
 
                   TranslationAggregatorOptionsWindow = null;
                }
@@ -2034,7 +2034,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             endpoint.ConsecutiveErrors = 0;
          }
 
-         XuaLogger.Current.Info( "Rebooted Auto Translator." );
+         XuaLogger.Default.Info( "Rebooted Auto Translator." );
       }
 
       private void KickoffTranslations()
@@ -2249,7 +2249,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( Settings.TranslationCount > Settings.MaxTranslationsBeforeShutdown )
             {
                Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
+               XuaLogger.Default.Error( $"Maximum translations ({Settings.MaxTranslationsBeforeShutdown}) per session reached. Shutting plugin down." );
 
                TranslationManager.ClearAllJobs();
             }
@@ -2334,7 +2334,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _hasOverridenFont = !_hasOverridenFont;
 
             var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
-            XuaLogger.Current.Info( $"Toggling fonts of {objects.Count} objects." );
+            XuaLogger.Default.Info( $"Toggling fonts of {objects.Count} objects." );
 
             if( _hasOverridenFont )
             {
@@ -2389,7 +2389,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _isInTranslatedMode = !_isInTranslatedMode;
          var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
 
-         XuaLogger.Current.Info( $"Toggling translations of {objects.Count} objects." );
+         XuaLogger.Default.Info( $"Toggling translations of {objects.Count} objects." );
 
          if( _isInTranslatedMode )
          {
@@ -2481,7 +2481,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An error while copying text to clipboard." );
+               XuaLogger.Default.Error( e, "An error while copying text to clipboard." );
             }
             finally
             {
@@ -2657,7 +2657,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, "An error occurred while disposing endpoint." );
+               XuaLogger.Default.Error( e, "An error occurred while disposing endpoint." );
             }
          }
       }

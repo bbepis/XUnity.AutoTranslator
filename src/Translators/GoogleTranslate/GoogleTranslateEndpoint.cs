@@ -242,7 +242,7 @@ namespace GoogleTranslate
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Default.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
@@ -252,21 +252,21 @@ namespace GoogleTranslate
 
          if( response.IsTimedOut )
          {
-            XuaLogger.Current.Warn( "A timeout error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Default.Warn( "A timeout error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
          // failure
          if( response.Error != null )
          {
-            XuaLogger.Current.Warn( response.Error, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Default.Warn( response.Error, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
          // failure
          if( response.Data == null )
          {
-            XuaLogger.Current.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Default.Warn( null, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
             yield break;
          }
 
@@ -300,12 +300,12 @@ namespace GoogleTranslate
 
             if( !found )
             {
-               XuaLogger.Current.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
+               XuaLogger.Default.Warn( "An error occurred while setting up GoogleTranslate TKK. Could not locate TKK value. Using fallback TKK values instead." );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
+            XuaLogger.Default.Warn( e, "An error occurred while setting up GoogleTranslate TKK. Using fallback TKK values instead." );
          }
       }
 

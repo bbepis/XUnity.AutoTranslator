@@ -121,7 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             _failed = true;
             _initializing = false;
 
-            XuaLogger.Current.Error( e, "Error occurred while reading standard output from external process." );
+            XuaLogger.Default.Error( e, "Error occurred while reading standard output from external process." );
          }
       }
 

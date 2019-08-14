@@ -19,6 +19,19 @@ namespace XUnity.Common.Tests
          Assert.Equal( expectedPath, actualPath );
       }
 
+      //[Theory( DisplayName = "Can_Make_Path_Relative_If_Not_Full_Path2" )]
+      //[InlineData(
+      //   @"..\..\games\bestGame\data\levels\scene1.dat",
+      //   @"c:\games\bestGame",
+      //   @"data\levels\scene1.dat"
+      //   )]
+      //public void Can_Make_Path_Relative_If_Not_Full_Path2( string path, string basePath, string expectedPath )
+      //{
+      //   var actualPath = path.MakeRelativePath( basePath );
+
+      //   Assert.Equal( expectedPath, actualPath );
+      //}
+
       [Theory( DisplayName = "Can_Make_Path_Relative1" )]
       [InlineData(
          @"c:\games\bestGame\managed\..\data\levels\scene1.dat",

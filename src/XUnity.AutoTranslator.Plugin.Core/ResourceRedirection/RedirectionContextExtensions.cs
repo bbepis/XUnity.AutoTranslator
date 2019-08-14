@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       public static string GetPreferredFilePath<TAsset>( this IRedirectionContext<TAsset> context, string extension )
          where TAsset : UnityEngine.Object
       {
-         return Path.Combine( Settings.RedirectedResourcesPath, context.UniqueAssetId ) + extension;
+         return Path.Combine( Settings.RedirectedResourcesPath, context.GloballyUniqueAssetPath ) + extension;
       }
 
       /// <summary>
@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       public static string GetPreferredFilePathWithCustomFileName<TAsset>( this IRedirectionContext<TAsset> context, string fileName )
          where TAsset : UnityEngine.Object
       {
-         return Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, context.UniqueAssetId ), fileName );
+         return Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, context.GloballyUniqueAssetPath ), fileName );
       }
    }
 }

@@ -57,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while loading translations." );
+            XuaLogger.Default.Error( e, "An error occurred while loading translations." );
          }
       }
 
@@ -89,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            }
                            catch( Exception e )
                            {
-                              XuaLogger.Current.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
+                              XuaLogger.Default.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
                            }
                         }
                         else
@@ -388,7 +388,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      _defaultRegexes.RemoveAt( i );
 
-                     XuaLogger.Current.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
+                     XuaLogger.Default.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
                   }
                }
             }

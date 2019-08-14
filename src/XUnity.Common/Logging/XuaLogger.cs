@@ -15,40 +15,82 @@ namespace XUnity.Common.Logging
    /// </summary>
    public abstract class XuaLogger
    {
-      private static XuaLogger _instance;
+      private static XuaLogger _default;
+      private static XuaLogger _common;
+      private static XuaLogger _resourceRedirector;
 
       /// <summary>
       /// Gets the current XuaLogger.
       /// </summary>
-      public static XuaLogger Current
+      public static XuaLogger Default
       {
          get
          {
-            if( _instance == null )
+            if( _default == null )
             {
-               try
-               {
-                  _instance = new BepInExLogger();
-               }
-               catch( Exception )
-               {
-                  _instance = new ConsoleLogger();
-               }
+               _default = CreateLogger( "XUnity.AutoTranslator" );
             }
-            return _instance;
+            return _default;
          }
          set
          {
-            _instance = value ?? throw new ArgumentNullException( "value" );
+            _default = value ?? throw new ArgumentNullException( "value" );
+         }
+      }
+
+      public static XuaLogger Common
+      {
+         get
+         {
+            if( _common == null )
+            {
+               _common = CreateLogger( "XUnity.Common" );
+            }
+            return _common;
+         }
+         set
+         {
+            _common = value ?? throw new ArgumentNullException( "value" );
+         }
+      }
+
+      public static XuaLogger ResourceRedirector
+      {
+         get
+         {
+            if( _resourceRedirector == null )
+            {
+               _resourceRedirector = CreateLogger( "XUnity.ResourceRedirector" );
+            }
+            return _resourceRedirector;
+         }
+         set
+         {
+            _resourceRedirector = value ?? throw new ArgumentNullException( "value" );
+         }
+      }
+
+      internal static XuaLogger CreateLogger( string source )
+      {
+         try
+         {
+            return new BepInExLogger( source );
+         }
+         catch( Exception )
+         {
+            return new ConsoleLogger( source );
          }
       }
 
       /// <summary>
       /// Default constructor.
       /// </summary>
-      public XuaLogger()
+      public XuaLogger( string source )
       {
+         Source = source;
       }
+
+      public string Source { get; set; }
 
       /// <summary>
       /// Logs a message and exception at error level.
@@ -143,15 +185,15 @@ namespace XUnity.Common.Logging
          switch( level )
          {
             case LogLevel.Debug:
-               return "[DEBUG][XUnity]: ";
+               return "[DEBUG][" + Source + "]: ";
             case LogLevel.Info:
-               return "[INFO][XUnity]: ";
+               return "[INFO][" + Source + "]: ";
             case LogLevel.Warn:
-               return "[WARN][XUnity]: ";
+               return "[WARN][" + Source + "]: ";
             case LogLevel.Error:
-               return "[ERROR][XUnity]: ";
+               return "[ERROR][" + Source + "]: ";
             default:
-               return "[UNKNOW][XUnity]: ";
+               return "[UNKNOW][" + Source + "]: ";
          }
       }
    }

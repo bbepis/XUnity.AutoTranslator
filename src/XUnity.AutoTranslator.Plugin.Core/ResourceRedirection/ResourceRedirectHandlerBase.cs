@@ -25,6 +25,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       /// <param name="context">A context containing all relevant information of the resource redirection.</param>
       public void Handle( IRedirectionContext<TAsset> context )
       {
+         if( context.HasBeenRedirectedBefore )
+         {
+            context.Handled = true;
+            return;
+         }
+
          var modificationFilePath = CalculateModificationFilePath( context );
          if( Settings.RedirectedFiles.Contains( modificationFilePath ) )
          {
@@ -33,16 +39,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
                context.Handled = ReplaceOrUpdateAsset( modificationFilePath, context );
                if( context.Handled )
                {
-                  XuaLogger.Current.Debug( $"Replaced resource file: '{modificationFilePath}'." );
+                  XuaLogger.Default.Debug( $"Replaced resource file: '{modificationFilePath}'." );
                }
                else
                {
-                  XuaLogger.Current.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
+                  XuaLogger.Default.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
                }
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, $"An error occurred while loading resource file: '{modificationFilePath}'." );
+               XuaLogger.Default.Error( e, $"An error occurred while loading resource file: '{modificationFilePath}'." );
             }
          }
          else if( Settings.EnableDumping )
@@ -52,16 +58,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
                context.Handled = DumpAsset( modificationFilePath, context );
                if( context.Handled )
                {
-                  XuaLogger.Current.Debug( $"Dumped resource file: '{modificationFilePath}'." );
+                  XuaLogger.Default.Debug( $"Dumped resource file: '{modificationFilePath}'." );
                }
                else
                {
-                  XuaLogger.Current.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
+                  XuaLogger.Default.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
                }
             }
             catch( Exception e )
             {
-               XuaLogger.Current.Error( e, $"An error occurred while dumping resource file: '{modificationFilePath}'." );
+               XuaLogger.Default.Error( e, $"An error occurred while dumping resource file: '{modificationFilePath}'." );
             }
          }
       }

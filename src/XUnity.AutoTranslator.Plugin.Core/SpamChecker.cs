@@ -64,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _translationManager.ClearAllJobs();
 
                Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: Translations were queued every second for more than {Settings.MaximumConsecutiveSecondsTranslated} consecutive seconds. Shutting down plugin." );
+               XuaLogger.Default.Error( $"SPAM DETECTED: Translations were queued every second for more than {Settings.MaximumConsecutiveSecondsTranslated} consecutive seconds. Shutting down plugin." );
             }
 
          }
@@ -97,7 +97,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _translationManager.ClearAllJobs();
 
                Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConsecutiveFramesTranslated} consecutive frames. Shutting down plugin." );
+               XuaLogger.Default.Error( $"SPAM DETECTED: Translations were queued every frame for more than {Settings.MaximumConsecutiveFramesTranslated} consecutive frames. Shutting down plugin." );
             }
 
          }
@@ -155,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   _translationManager.ClearAllJobs();
 
                   Settings.IsShutdown = true;
-                  XuaLogger.Current.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
+                  XuaLogger.Default.Error( $"SPAM DETECTED: Text that is 'scrolling in' is being translated. Disable that feature. Shutting down plugin." );
                }
             }
             else
@@ -175,7 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _translationManager.ClearAllJobs();
 
             Settings.IsShutdown = true;
-            XuaLogger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
+            XuaLogger.Default.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
          }
 
          var previousIdx = ( (int)( Time.time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
@@ -200,7 +200,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _translationManager.ClearAllJobs();
 
                Settings.IsShutdown = true;
-               XuaLogger.Current.Error( $"SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
+               XuaLogger.Default.Error( $"SPAM DETECTED: More than {Settings.MaxTranslationsQueuedPerSecond} translations per seconds queued for a {Settings.MaxSecondsAboveTranslationThreshold} second period. Shutting down plugin." );
             }
          }
          else

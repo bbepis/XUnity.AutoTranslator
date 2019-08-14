@@ -63,6 +63,8 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "Mono.Cecil.dll" ), Resources.Mono_Cecil_0_10_4_0 );
             AddFile( Path.Combine( managedDir, "MonoMod.RuntimeDetour.dll" ), Resources.MonoMod_RuntimeDetour );
             AddFile( Path.Combine( managedDir, "MonoMod.Utils.dll" ), Resources.MonoMod_Utils );
+            AddFile( Path.Combine( managedDir, "XUnity.Common.dll" ), Resources.XUnity_Common, true );
+            AddFile( Path.Combine( managedDir, "XUnity.ResourceRedirector.dll" ), Resources.XUnity_ResourceRedirector, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
 

@@ -238,7 +238,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             {
                EnableTranslationScoping = false;
 
-               XuaLogger.Current.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
+               XuaLogger.Default.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
             }
 
             try
@@ -255,7 +255,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                RedirectedFiles = new HashSet<string>();
                EnableDumping = false;
                EnableTextAssetResourceRedirector = false;
-               XuaLogger.Current.Warn( e, "Could not determine determine which files has been redirected. Disabling redirection!" );
+               XuaLogger.Default.Warn( e, "Could not determine determine which files has been redirected. Disabling redirection!" );
             }
 
             //// workaround to handle text translation toggling in KK
@@ -280,7 +280,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred during configuration. Shutting plugin down." );
+            XuaLogger.Default.Error( e, "An error occurred during configuration. Shutting plugin down." );
 
             IsShutdown = true;
          }
@@ -340,7 +340,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred during while saving configuration." );
+            XuaLogger.Default.Error( e, "An error occurred during while saving configuration." );
          }
       }
 

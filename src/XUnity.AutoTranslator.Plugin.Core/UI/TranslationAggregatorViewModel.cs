@@ -137,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error while copying text to clipboard." );
+            XuaLogger.Default.Error( e, "An error while copying text to clipboard." );
          }
          finally
          {

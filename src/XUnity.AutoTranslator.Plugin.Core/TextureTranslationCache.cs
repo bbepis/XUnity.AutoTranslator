@@ -48,12 +48,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                var endTime = Time.realtimeSinceStartup;
-               XuaLogger.Current.Info( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.Default.Info( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while loading translations." );
+            XuaLogger.Default.Error( e, "An error occurred while loading translations." );
          }
       }
 
@@ -85,7 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  XuaLogger.Current.Warn( $"Image not loaded (unknown hash): {fullFileName}." );
+                  XuaLogger.Default.Warn( $"Image not loaded (unknown hash): {fullFileName}." );
                   return;
                }
 
@@ -99,22 +99,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( Settings.LoadUnmodifiedTextures || isModified )
                {
                   RegisterTranslatedImage( key, data );
-                  XuaLogger.Current.Debug( $"Image loaded: {fullFileName}." );
+                  XuaLogger.Default.Debug( $"Image loaded: {fullFileName}." );
                }
                else
                {
                   RegisterUntranslatedImage( key );
-                  XuaLogger.Current.Warn( $"Image not loaded (unmodified): {fullFileName}." );
+                  XuaLogger.Default.Warn( $"Image not loaded (unmodified): {fullFileName}." );
                }
             }
             else
             {
-               XuaLogger.Current.Warn( $"Image not loaded (no hash): {fullFileName}." );
+               XuaLogger.Default.Warn( $"Image not loaded (no hash): {fullFileName}." );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, "An error occurred while loading texture file: " + fullFileName );
+            XuaLogger.Default.Error( e, "An error occurred while loading texture file: " + fullFileName );
          }
       }
 
@@ -133,13 +133,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   RegisterImageFromData( name, newKey, data );
                   File.Delete( currentFileName );
 
-                  XuaLogger.Current.Warn( $"Replaced old file with name '{name}' registered with key old '{key}'." );
+                  XuaLogger.Default.Warn( $"Replaced old file with name '{name}' registered with key old '{key}'." );
                }
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Current.Error( e, $"An error occurred while trying to rename file with key '{key}'." );
+            XuaLogger.Default.Error( e, $"An error occurred while trying to rename file with key '{key}'." );
          }
       }
 
@@ -162,7 +162,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var fullName = Path.Combine( root, fileName );
          File.WriteAllBytes( fullName, data );
-         XuaLogger.Current.Info( "Dumped texture file: " + fileName );
+         XuaLogger.Default.Info( "Dumped texture file: " + fileName );
 
          _keyToFileName[ key ] = fullName;
 
