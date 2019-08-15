@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Debugging
             }
             catch( Exception e )
             {
-               XuaLogger.Default.Error( e, "An error occurred during while enabling console." );
+               XuaLogger.AutoTranslator.Error( e, "An error occurred during while enabling console." );
             }
          }
       }

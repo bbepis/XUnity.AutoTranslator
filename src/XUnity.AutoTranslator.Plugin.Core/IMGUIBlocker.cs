@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( IsBlackslisted( method ) )
                {
-                  XuaLogger.Default.Info( "Attempting to hook " + method.DeclaringType.FullName.ToString() + "." + method.Name + " to disable translation in window." );
+                  XuaLogger.AutoTranslator.Info( "Attempting to hook " + method.DeclaringType.FullName.ToString() + "." + method.Name + " to disable translation in window." );
 
                   IMGUIWindow_Function_Hook.Register( method );
                   HookingHelper.PatchType( typeof( IMGUIWindow_Function_Hook ), Settings.ForceMonoModHooks );
@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             catch( Exception e )
             {
-               XuaLogger.Default.Error( e, "An error occurred while attempting to hook " + method.DeclaringType.FullName.ToString() + " to disable translation in window." );
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while attempting to hook " + method.DeclaringType.FullName.ToString() + " to disable translation in window." );
             }
          }
       }

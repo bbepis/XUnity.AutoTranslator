@@ -120,7 +120,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableDumping;
       public static bool EnableTextAssetResourceRedirector;
       public static bool EnableLoggingUnhandledResources;
-      public static HashSet<string> RedirectedFiles;
 
 
       public static float Height;
@@ -238,24 +237,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             {
                EnableTranslationScoping = false;
 
-               XuaLogger.Default.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
-            }
-
-            try
-            {
-               Directory.CreateDirectory( RedirectedResourcesPath );
-
-               var lowerCurrent = Environment.CurrentDirectory.ToLowerInvariant();
-               RedirectedFiles = Directory.GetFiles( RedirectedResourcesPath, "*", SearchOption.AllDirectories )
-                  .Select( x => x.ToLowerInvariant().MakeRelativePath( lowerCurrent ) )
-                  .ToHashSet( StringComparer.OrdinalIgnoreCase );
-            }
-            catch( Exception e )
-            {
-               RedirectedFiles = new HashSet<string>();
-               EnableDumping = false;
-               EnableTextAssetResourceRedirector = false;
-               XuaLogger.Default.Warn( e, "Could not determine determine which files has been redirected. Disabling redirection!" );
+               XuaLogger.AutoTranslator.Warn( "Disabling translation scoping because the SceneManager API is not supported in this version of Unity." );
             }
 
             //// workaround to handle text translation toggling in KK
@@ -280,7 +262,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred during configuration. Shutting plugin down." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred during configuration. Shutting plugin down." );
 
             IsShutdown = true;
          }
@@ -340,7 +322,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred during while saving configuration." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred during while saving configuration." );
          }
       }
 

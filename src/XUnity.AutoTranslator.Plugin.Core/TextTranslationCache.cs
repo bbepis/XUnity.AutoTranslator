@@ -80,7 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
             var endTime = Time.realtimeSinceStartup;
-            XuaLogger.Default.Info( $"Loaded translation text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            XuaLogger.AutoTranslator.Info( $"Loaded translation text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
 
             // generate variations of created translations
             {
@@ -122,7 +122,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               XuaLogger.Default.Info( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.AutoTranslator.Info( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
                endTime = Time.realtimeSinceStartup;
             }
 
@@ -137,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
 
-               XuaLogger.Default.Info( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.AutoTranslator.Info( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
                endTime = Time.realtimeSinceStartup;
             }
 
@@ -189,29 +189,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            XuaLogger.Default.Info( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            XuaLogger.AutoTranslator.Info( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             endTime = Time.realtimeSinceStartup;
 
-            XuaLogger.Default.Info( $"Global translations generated: {_translations.Count}" );
-            XuaLogger.Default.Info( $"Global regex translations generated: {_defaultRegexes.Count}" );
-            XuaLogger.Default.Info( $"Global token translations generated: {_tokenTranslations.Count}" );
+            XuaLogger.AutoTranslator.Info( $"Global translations generated: {_translations.Count}" );
+            XuaLogger.AutoTranslator.Info( $"Global regex translations generated: {_defaultRegexes.Count}" );
+            XuaLogger.AutoTranslator.Info( $"Global token translations generated: {_tokenTranslations.Count}" );
             if( Settings.GeneratePartialTranslations )
             {
-               XuaLogger.Default.Info( $"Global partial translations generated: {_partialTranslations.Count}" );
+               XuaLogger.AutoTranslator.Info( $"Global partial translations generated: {_partialTranslations.Count}" );
             }
             foreach( var kvp in _scopedTranslations.OrderBy( x => x.Key ) )
             {
                var scope = kvp.Key;
                var dicts = kvp.Value;
 
-               XuaLogger.Default.Info( $"Scene {scope} translations generated: {dicts.Translations.Count}" );
-               XuaLogger.Default.Info( $"Scene {scope} regex translations generated: {dicts.DefaultRegexes.Count}" );
-               XuaLogger.Default.Info( $"Scene {scope} token translations generated: {dicts.TokenTranslations.Count}" );
+               XuaLogger.AutoTranslator.Info( $"Scene {scope} translations generated: {dicts.Translations.Count}" );
+               XuaLogger.AutoTranslator.Info( $"Scene {scope} regex translations generated: {dicts.DefaultRegexes.Count}" );
+               XuaLogger.AutoTranslator.Info( $"Scene {scope} token translations generated: {dicts.TokenTranslations.Count}" );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while loading translations." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while loading translations." );
          }
       }
 
@@ -306,7 +306,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( fileExists )
             {
-               XuaLogger.Default.Debug( $"Loading texts: {fullFileName}." );
+               XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
 
                var context = new TranslationFileLoadingContext();
 
@@ -320,7 +320,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         context.Apply( directive );
 
-                        XuaLogger.Default.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
+                        XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
                         continue;
                      }
                   }
@@ -366,7 +366,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  }
                                  catch( Exception e )
                                  {
-                                    XuaLogger.Default.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
+                                    XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
                                  }
                               }
                               else
@@ -603,7 +603,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( scope != TranslationScopes.None )
                   {
-                     XuaLogger.Default.Error( "Stored scoped translation to cache, even though this is not supported!" );
+                     XuaLogger.AutoTranslator.Error( "Stored scoped translation to cache, even though this is not supported!" );
                   }
 
                   QueueNewTranslationForDisk( key, value );
@@ -714,7 +714,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                         unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                        if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c1): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                        if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c1): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                         AddTranslationToCache( unmodifiedKey, unmodifiedValue, false, TranslationType.Full, scope );
 
                         value = unmodifiedValue;
@@ -736,7 +736,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         unmodifiedValue = value;
                         unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                        if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c2): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                        if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c2): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                         AddTranslationToCache( unmodifiedKey, unmodifiedValue, false, TranslationType.Full, scope );
 
                         value = unmodifiedValue;
@@ -758,7 +758,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                         unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                        if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c3): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                        if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c3): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                         AddTranslationToCache( unmodifiedKey, unmodifiedValue, false, TranslationType.Full, scope );
 
                         value = unmodifiedValue;
@@ -790,7 +790,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      // WHITESPACE DIFFERENCE, Store new value
                      unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-                     if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c7): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c7): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, false, TranslationType.Full, scope );
 
                      value = unmodifiedValue;
@@ -807,7 +807,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( result )
                   {
                      // WHITESPACE DIFFERENCE, Store new value
-                     if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c8): '{key.TemplatedOriginal_Text}' => '{value}'" );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c8): '{key.TemplatedOriginal_Text}' => '{value}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, value, false, TranslationType.Full, scope ); // FIXED: using templated original
 
                      return result;
@@ -825,7 +825,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      // WHITESPACE DIFFERENCE, Store new value
                      unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-                     if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c9): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c9): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, false, TranslationType.Full, scope );
 
                      value = unmodifiedValue;
@@ -927,7 +927,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                   unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c4): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c4): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None );
 
                   value = unmodifiedValue;
@@ -949,7 +949,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   unmodifiedValue = value;
                   unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c5): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c5): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None );
 
                   value = unmodifiedValue;
@@ -971,7 +971,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
                   unmodifiedKey = untemplated_TemplatedOriginal_Text ?? ( untemplated_TemplatedOriginal_Text = key.Untemplate( key.TemplatedOriginal_Text ) );
 
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c6): '{unmodifiedKey}' => '{unmodifiedValue}'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c6): '{unmodifiedKey}' => '{unmodifiedValue}'" );
                   AddTranslationToCache( unmodifiedKey, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None );
 
                   value = unmodifiedValue;
@@ -999,7 +999,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // WHITESPACE DIFFERENCE, Store new value
                unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c10): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c10): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
                AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None );
 
                value = unmodifiedValue;
@@ -1016,7 +1016,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( result )
             {
                // WHITESPACE DIFFERENCE, Store new value
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c11): '{key.TemplatedOriginal_Text}' => '{value}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c11): '{key.TemplatedOriginal_Text}' => '{value}'" );
                AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None ); // FIXED: using templated original
 
                return result;
@@ -1034,7 +1034,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // WHITESPACE DIFFERENCE, Store new value
                unmodifiedValue = key.LeadingWhitespace + value + key.TrailingWhitespace;
 
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Whitespace difference (c12): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Whitespace difference (c12): '{key.TemplatedOriginal_Text}' => '{unmodifiedValue}'" );
                AddTranslationToCache( key.TemplatedOriginal_Text, unmodifiedValue, Settings.CacheWhitespaceDifferences, TranslationType.Full, TranslationScopes.None );
 
                value = unmodifiedValue;
@@ -1057,7 +1057,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
 
-                     if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, value, false, TranslationType.Full, scope );
 
                      return true;
@@ -1066,7 +1066,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      dicts.DefaultRegexes.RemoveAt( i );
 
-                     XuaLogger.Default.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
+                     XuaLogger.AutoTranslator.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
                   }
                }
             }
@@ -1081,7 +1081,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
 
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                   AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheRegexLookups, TranslationType.Full, TranslationScopes.None );
 
                   return true;
@@ -1090,7 +1090,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   _defaultRegexes.RemoveAt( i );
 
-                  XuaLogger.Default.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
+                  XuaLogger.AutoTranslator.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
                }
             }
          }
@@ -1105,7 +1105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             result = _staticTranslations.TryGetValue( key.TemplatedOriginal_Text, out value );
             if( result )
             {
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Static lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Static lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                AddTranslationToCache( key.TemplatedOriginal_Text, value, true, TranslationType.Full, TranslationScopes.None );
 
                return result;
@@ -1119,7 +1119,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                result = _staticTranslations.TryGetValue( key.TemplatedOriginal_Text_InternallyTrimmed, out value );
                if( result )
                {
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Static lookup: '{key.TemplatedOriginal_Text_InternallyTrimmed}' => '{value}'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Static lookup: '{key.TemplatedOriginal_Text_InternallyTrimmed}' => '{value}'" );
                   AddTranslationToCache( key.TemplatedOriginal_Text, value, true, TranslationType.Full, TranslationScopes.None );
 
                   return result;

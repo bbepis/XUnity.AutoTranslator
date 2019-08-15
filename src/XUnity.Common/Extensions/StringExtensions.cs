@@ -7,6 +7,9 @@ using System.Text;
 
 namespace XUnity.Common.Extensions
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class StringExtensions
    {
 
@@ -15,6 +18,12 @@ namespace XUnity.Common.Extensions
       private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
       private static readonly char[] Spaces = new char[] { ' ', '　' };
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="fullOrRelativePath"></param>
+      /// <param name="basePath"></param>
+      /// <returns></returns>
       public static string MakeRelativePath( this string fullOrRelativePath, string basePath )
       {
          var builder = new StringBuilder();
@@ -89,6 +98,11 @@ namespace XUnity.Common.Extensions
          return builder.ToString();
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="path"></param>
+      /// <returns></returns>
       public static string SanitizeForFileSystem( this string path )
       {
          var builder = new StringBuilder( path.Length );
@@ -102,6 +116,13 @@ namespace XUnity.Common.Extensions
          return builder.ToString();
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="text"></param>
+      /// <param name="maxStringLength"></param>
+      /// <param name="splitOnCharacters"></param>
+      /// <returns></returns>
       public static string SplitToLines( this string text, int maxStringLength, params char[] splitOnCharacters )
       {
          var sb = new StringBuilder();
@@ -129,6 +150,12 @@ namespace XUnity.Common.Extensions
          return sb.ToString();
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="str"></param>
+      /// <param name="prefix"></param>
+      /// <returns></returns>
       public static bool StartsWithStrict( this string str, string prefix )
       {
          var len = Math.Min( str.Length, prefix.Length );
@@ -142,6 +169,13 @@ namespace XUnity.Common.Extensions
          return true;
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="strSource"></param>
+      /// <param name="strStart"></param>
+      /// <param name="strEnd"></param>
+      /// <returns></returns>
       public static string GetBetween( this string strSource, string strStart, string strEnd )
       {
          const int kNotFound = -1;
@@ -159,6 +193,12 @@ namespace XUnity.Common.Extensions
          return string.Empty;
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="that"></param>
+      /// <param name="other"></param>
+      /// <returns></returns>
       public static bool RemindsOf( this string that, string other )
       {
          return that.StartsWith( other ) || other.StartsWith( that ) || that.EndsWith( other ) || other.EndsWith( that );

@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
             }
             else
             {
-               XuaLogger.Default.Warn( "Could not find the TextMeshPro font resource: " + Settings.OverrideFontTextMeshPro );
+               XuaLogger.AutoTranslator.Warn( "Could not find the TextMeshPro font resource: " + Settings.OverrideFontTextMeshPro );
             }
          }
 

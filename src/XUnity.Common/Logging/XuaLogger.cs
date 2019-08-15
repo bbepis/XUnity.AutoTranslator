@@ -7,11 +7,7 @@ using System.Text;
 namespace XUnity.Common.Logging
 {
    /// <summary>
-   /// Use this class to send log messaages to the console with.
-   ///
-   /// You should not use a plugin-manager supplied logger. This
-   /// logger will automatically delegate the logs to the correct
-   /// logger based on which plugin framework it is used in.
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
    public abstract class XuaLogger
    {
@@ -20,9 +16,9 @@ namespace XUnity.Common.Logging
       private static XuaLogger _resourceRedirector;
 
       /// <summary>
-      /// Gets the current XuaLogger.
+      /// Gets the auto translator logger.
       /// </summary>
-      public static XuaLogger Default
+      public static XuaLogger AutoTranslator
       {
          get
          {
@@ -38,6 +34,9 @@ namespace XUnity.Common.Logging
          }
       }
 
+      /// <summary>
+      /// Gets the common logger.
+      /// </summary>
       public static XuaLogger Common
       {
          get
@@ -54,6 +53,9 @@ namespace XUnity.Common.Logging
          }
       }
 
+      /// <summary>
+      /// Gets the resource redirector logger.
+      /// </summary>
       public static XuaLogger ResourceRedirector
       {
          get
@@ -90,6 +92,9 @@ namespace XUnity.Common.Logging
          Source = source;
       }
 
+      /// <summary>
+      /// Gets the source to be written to the log.
+      /// </summary>
       public string Source { get; set; }
 
       /// <summary>

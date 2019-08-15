@@ -196,7 +196,7 @@ namespace BingTranslate
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.AutoTranslator.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
@@ -205,21 +205,21 @@ namespace BingTranslate
 
          if( response.IsTimedOut )
          {
-            XuaLogger.Default.Warn( "A timeout error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.AutoTranslator.Warn( "A timeout error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
          // failure
          if( response.Error != null )
          {
-            XuaLogger.Default.Warn( response.Error, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.AutoTranslator.Warn( response.Error, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
          // failure
          if( response.Data == null )
          {
-            XuaLogger.Default.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.AutoTranslator.Warn( null, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
             yield break;
          }
 
@@ -234,12 +234,12 @@ namespace BingTranslate
 
             if( _ig == null || _iid == null )
             {
-               XuaLogger.Default.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
+               XuaLogger.AutoTranslator.Warn( "An error occurred while setting up BingTranslate IG/IID. Proceeding without..." );
             }
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
+            XuaLogger.AutoTranslator.Warn( e, "An error occurred while setting up BingTranslate IG. Proceeding without..." );
          }
       }
 

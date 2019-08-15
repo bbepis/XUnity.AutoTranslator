@@ -57,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while loading translations." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while loading translations." );
          }
       }
 
@@ -89,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            }
                            catch( Exception e )
                            {
-                              XuaLogger.Default.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
+                              XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
                            }
                         }
                         else
@@ -134,10 +134,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          var hadTranslated = HasTranslated( key );
 
-         AddTranslation( key, value );
-         // how do we override an existing translation in a file?
+         if( !hadTranslated )
+         {
+            AddTranslation( key, value );
 
-         QueueNewTranslationForDisk( key, value, hadTranslated );
+            QueueNewTranslationForDisk( key, value, hadTranslated );
+         }
       }
 
       private void QueueNewTranslationForDisk( string key, string value, bool hadTranslated )
@@ -388,7 +390,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      _defaultRegexes.RemoveAt( i );
 
-                     XuaLogger.Default.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
+                     XuaLogger.AutoTranslator.Error( e, $"Failed while attempting to replace or match text of regex '{regex.Original}'. Removing that regex from the cache." );
                   }
                }
             }

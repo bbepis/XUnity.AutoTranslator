@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace XUnity.Common.Constants
 {
+#pragma warning disable CS1591 // Really could not care less..
+
    public static class ClrTypes
    {
       // TextMeshPro

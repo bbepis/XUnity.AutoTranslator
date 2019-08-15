@@ -304,11 +304,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   _ongoingJobs[ key ] = job;
                   Manager.OngoingTranslations++;
 
-                  if( !Settings.EnableSilentMode ) XuaLogger.Default.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
                }
                else
                {
-                  XuaLogger.Default.Warn( $"Dequeued: '{unpreparedUntranslatedText}' because the current endpoint has already failed this translation 3 times." );
+                  XuaLogger.AutoTranslator.Warn( $"Dequeued: '{unpreparedUntranslatedText}' because the current endpoint has already failed this translation 3 times." );
                   job.State = TranslationJobState.Failed;
                   job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
@@ -358,7 +358,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                _ongoingJobs[ key ] = job;
                Manager.OngoingTranslations++;
 
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
                CoroutineHelper.Start(
                   Translate(
                      new[] { untranslatedText },
@@ -369,7 +369,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
             else
             {
-               XuaLogger.Default.Warn( $"Dequeued: '{unpreparedUntranslatedText}' because the current endpoint has already failed this translation 3 times." );
+               XuaLogger.AutoTranslator.Warn( $"Dequeued: '{unpreparedUntranslatedText}' because the current endpoint has already failed this translation 3 times." );
                job.State = TranslationJobState.Failed;
                job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
@@ -402,7 +402,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RemoveOngoingTranslation( job.Key );
 
-               if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
                Manager.InvokeJobCompleted( job );
             }
@@ -424,7 +424,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                RemoveOngoingTranslation( key );
             }
 
-            XuaLogger.Default.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
+            XuaLogger.AutoTranslator.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
          }
       }
 
@@ -439,7 +439,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          RemoveOngoingTranslation( job.Key );
 
-         if( !Settings.EnableSilentMode ) XuaLogger.Default.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
+         if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Completed: '{job.Key.TemplatedOriginal_Text}' => '{job.TranslatedText}'" );
 
          Manager.InvokeJobCompleted( job );
       }
@@ -474,11 +474,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       {
          if( e == null )
          {
-            XuaLogger.Default.Error( error );
+            XuaLogger.AutoTranslator.Error( error );
          }
          else
          {
-            XuaLogger.Default.Error( e, error );
+            XuaLogger.AutoTranslator.Error( e, error );
          }
 
          if( jobs.Length == 1 )
@@ -495,7 +495,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                Manager.InvokeJobFailed( job );
 
-               XuaLogger.Default.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
+               XuaLogger.AutoTranslator.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
             }
          }
          else
@@ -514,10 +514,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                AddUnstartedJob( key, job );
                RemoveOngoingTranslation( key );
 
-               XuaLogger.Default.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
+               XuaLogger.AutoTranslator.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
             }
 
-            XuaLogger.Default.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
+            XuaLogger.AutoTranslator.Error( "A batch operation failed. Disabling batching and restarting failed jobs." );
          }
 
          if( !HasFailedDueToConsecutiveErrors )
@@ -526,7 +526,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
             if( HasFailedDueToConsecutiveErrors )
             {
-               XuaLogger.Default.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down translator endpoint." );
+               XuaLogger.AutoTranslator.Error( $"{Settings.MaxErrors} or more consecutive errors occurred. Shutting down translator endpoint." );
 
                ClearAllJobs();
             }
@@ -539,7 +539,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          HasBatchLogicFailed = false;
 
-         XuaLogger.Default.Info( "Re-enabled batching." );
+         XuaLogger.AutoTranslator.Info( "Re-enabled batching." );
       }
 
       public bool EnqueueTranslation( object ui, UntranslatedText key, InternalTranslationResult translationResult, ParserTranslationContext context, bool checkOtherEndpoints, bool saveResultGlobally )
@@ -567,7 +567,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             }
          }
 
-         if( !Settings.EnableSilentMode ) XuaLogger.Default.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
+         if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
 
          var newJob = new TranslationJob( this, key, saveResultGlobally );
          newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
@@ -631,7 +631,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          foreach( var job in unstartedJobs )
          {
-            XuaLogger.Default.Warn( $"Dequeued: '{job.Key.TemplatedOriginal_Text}'" );
+            XuaLogger.AutoTranslator.Warn( $"Dequeued: '{job.Key.TemplatedOriginal_Text}'" );
             job.Value.State = TranslationJobState.Failed;
             job.Value.ErrorMessage = "Translation failed because all jobs on endpoint was cleared.";
 

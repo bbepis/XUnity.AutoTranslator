@@ -81,7 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, $"Error occurred while reading config '{key}' in section '{section}'. Updating the config to its default value '{defaultValue}'." );
+            XuaLogger.AutoTranslator.Error( e, $"Error occurred while reading config '{key}' in section '{section}'. Updating the config to its default value '{defaultValue}'." );
 
             if( defaultValue != null )
             {

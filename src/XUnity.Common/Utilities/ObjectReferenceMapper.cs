@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class ObjectReferenceMapper
    {
       private static readonly object Sync = new object();
@@ -14,6 +17,12 @@ namespace XUnity.Common.Utilities
          MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="obj"></param>
+      /// <param name="t"></param>
       public static void SetExtensionData<T>( this object obj, T t )
          where T : new()
       {
@@ -40,6 +49,12 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="obj"></param>
+      /// <returns></returns>
       public static T GetOrCreateExtensionData<T>( this object obj )
          where T : new()
       {
@@ -85,6 +100,12 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="obj"></param>
+      /// <returns></returns>
       public static T GetExtensionData<T>( this object obj )
          where T : new()
       {
@@ -123,6 +144,9 @@ namespace XUnity.Common.Utilities
          return default( T );
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
       public static void Cull()
       {
          lock( Sync )
@@ -131,6 +155,10 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <returns></returns>
       public static List<KeyValuePair<object, object>> GetAllRegisteredObjects()
       {
          lock( Sync )
@@ -139,6 +167,10 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="obj"></param>
       public static void Remove( object obj )
       {
          lock( Sync )

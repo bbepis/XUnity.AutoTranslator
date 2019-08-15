@@ -9,6 +9,9 @@ using XUnity.Common.Logging;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class HookingHelper
    {
       private static readonly MethodInfo PatchMethod12 = ClrTypes.HarmonyInstance?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
@@ -40,6 +43,11 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="types"></param>
+      /// <param name="forceMonoModHooks"></param>
       public static void PatchAll( IEnumerable<Type> types, bool forceMonoModHooks )
       {
          foreach( var type in types )
@@ -48,6 +56,11 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="type"></param>
+      /// <param name="forceMonoModHooks"></param>
       public static void PatchType( Type type, bool forceMonoModHooks )
       {
          MethodBase original = null;

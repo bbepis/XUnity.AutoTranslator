@@ -11,19 +11,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
    /// resource redirector that is interested in either updating of dumping redirected resources.
    /// </summary>
    /// <typeparam name="TAsset">The type of asset being redirected.</typeparam>
-   internal abstract class ResourceRedirectHandlerBase<TAsset> : IResourceRedirectHandler<TAsset>
+   public abstract class ResourceRedirectHandlerBase<TAsset>
       where TAsset : UnityEngine.Object
    {
+      /// <summary>
+      /// Constructs the resource redirection handler.
+      /// </summary>
       public ResourceRedirectHandlerBase()
       {
-         ResourceRedirectionManager<TAsset>.AssetLoading += Handle;
+         ResourceRedirector.ResourceRedirection.RegisterAssetLoadedFor<TAsset>( Handle );
       }
+
+      /// <summary>
+      /// Gets a bool indicating if resource dumping is enabled in the Auto Translator.
+      /// </summary>
+      public bool IsDumpingEnabled => Settings.EnableDumping;
 
       /// <summary>
       /// Method to be invoked whenever a resource of the specified type is redirected.
       /// </summary>
       /// <param name="context">A context containing all relevant information of the resource redirection.</param>
-      public void Handle( IRedirectionContext<TAsset> context )
+      public void Handle( AssetLoadedContext<TAsset> context )
       {
          if( context.HasReferenceBeenRedirectedBefore )
          {
@@ -32,23 +40,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
          }
 
          var modificationFilePath = CalculateModificationFilePath( context );
-         if( Settings.RedirectedFiles.Contains( modificationFilePath ) )
+         if( File.Exists( modificationFilePath ) ) // IO, ewww!
          {
             try
             {
                context.Handled = ReplaceOrUpdateAsset( modificationFilePath, context );
                if( context.Handled )
                {
-                  XuaLogger.Default.Debug( $"Replaced resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Debug( $"Replaced resource file: '{modificationFilePath}'." );
                }
                else
                {
-                  XuaLogger.Default.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
                }
             }
             catch( Exception e )
             {
-               XuaLogger.Default.Error( e, $"An error occurred while loading resource file: '{modificationFilePath}'." );
+               XuaLogger.AutoTranslator.Error( e, $"An error occurred while loading resource file: '{modificationFilePath}'." );
             }
          }
          else if( Settings.EnableDumping )
@@ -58,16 +66,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
                context.Handled = DumpAsset( modificationFilePath, context );
                if( context.Handled )
                {
-                  XuaLogger.Default.Debug( $"Dumped resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{modificationFilePath}'." );
                }
                else
                {
-                  XuaLogger.Default.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
                }
             }
             catch( Exception e )
             {
-               XuaLogger.Default.Error( e, $"An error occurred while dumping resource file: '{modificationFilePath}'." );
+               XuaLogger.AutoTranslator.Error( e, $"An error occurred while dumping resource file: '{modificationFilePath}'." );
             }
          }
       }
@@ -78,7 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       /// <param name="calculatedModificationPath">This is the modification path calculated in the CalculateModificationFilePath method.</param>
       /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
       /// <returns>A bool indicating if the event should be considered handled.</returns>
-      protected abstract bool ReplaceOrUpdateAsset( string calculatedModificationPath, IRedirectionContext<TAsset> context );
+      protected abstract bool ReplaceOrUpdateAsset( string calculatedModificationPath, AssetLoadedContext<TAsset> context );
 
       /// <summary>
       /// Method invoked when an asset should be dumped.
@@ -86,13 +94,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       /// <param name="calculatedModificationPath">This is the modification path calculated in the CalculateModificationFilePath method.</param>
       /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
       /// <returns>A bool indicating if the event should be considered handled.</returns>
-      protected abstract bool DumpAsset( string calculatedModificationPath, IRedirectionContext<TAsset> context );
+      protected abstract bool DumpAsset( string calculatedModificationPath, AssetLoadedContext<TAsset> context );
 
       /// <summary>
       /// Method invoked when a new resource event is fired to calculate a unique path for the resource.
       /// </summary>
       /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
       /// <returns>A string uniquely representing a path for the redirected resource.</returns>
-      protected abstract string CalculateModificationFilePath( IRedirectionContext<TAsset> context );
+      protected abstract string CalculateModificationFilePath( AssetLoadedContext<TAsset> context );
    }
 }

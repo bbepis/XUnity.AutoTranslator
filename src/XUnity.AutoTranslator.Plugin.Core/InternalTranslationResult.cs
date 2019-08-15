@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while notifying of translation failure." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while notifying of translation failure." );
          }
       }
 
@@ -92,7 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while notifying of translation completion." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while notifying of translation completion." );
          }
       }
 

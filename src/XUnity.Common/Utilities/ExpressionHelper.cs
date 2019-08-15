@@ -7,8 +7,16 @@ using System.Text;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class ExpressionHelper
    {
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="method"></param>
+      /// <returns></returns>
       public static Delegate CreateTypedFastInvoke( MethodInfo method )
       {
          if( method == null ) throw new ArgumentNullException( "method" );
@@ -38,6 +46,11 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="method"></param>
+      /// <returns></returns>
       public static Func<object, object[], object> CreateFastInvoke( MethodInfo method )
       {
          var instanceParameterExpression = Expression.Parameter( typeof( object ), "instance" );

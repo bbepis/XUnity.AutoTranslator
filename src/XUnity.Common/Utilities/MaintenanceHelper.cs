@@ -7,12 +7,20 @@ using XUnity.Common.Logging;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class MaintenanceHelper
    {
       private static readonly object Sync = new object();
       private static readonly List<ActionRegistration> RegisteredActions = new List<ActionRegistration>();
       private static bool _initialized;
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="action"></param>
+      /// <param name="filter"></param>
       public static void AddMaintenanceFunction( Action action, int filter )
       {
          lock( Sync )

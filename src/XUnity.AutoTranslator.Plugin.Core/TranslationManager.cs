@@ -55,7 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( primaryEndpoint.Error != null )
                {
-                  XuaLogger.Default.Error( primaryEndpoint.Error, "Error occurred during the initialization of the selected translate endpoint." );
+                  XuaLogger.AutoTranslator.Error( primaryEndpoint.Error, "Error occurred during the initialization of the selected translate endpoint." );
                }
                else
                {
@@ -64,12 +64,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else if( !string.IsNullOrEmpty( Settings.ServiceEndpoint ) )
             {
-               XuaLogger.Default.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
+               XuaLogger.AutoTranslator.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
             }
 
             if( Settings.DisableCertificateValidation )
             {
-               XuaLogger.Default.Info( $"Disabling certificate checks for endpoints because of configuration." );
+               XuaLogger.AutoTranslator.Info( $"Disabling certificate checks for endpoints because of configuration." );
 
                ServicePointManager.ServerCertificateValidationCallback += ( a1, a2, a3, a4 ) => true;
             }
@@ -78,13 +78,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var callback = httpSecurity.GetCertificateValidationCheck();
                if( callback != null && !Features.SupportsNet4x )
                {
-                  XuaLogger.Default.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
+                  XuaLogger.AutoTranslator.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
 
                   ServicePointManager.ServerCertificateValidationCallback += callback;
                }
                else
                {
-                  XuaLogger.Default.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
+                  XuaLogger.AutoTranslator.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
                }
             }
 
@@ -93,7 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while constructing endpoints. Shutting plugin down." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while constructing endpoints. Shutting plugin down." );
 
             Settings.IsShutdown = true;
          }
@@ -129,7 +129,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "Could not instantiate class: " + type.Name );
+            XuaLogger.AutoTranslator.Error( e, "Could not instantiate class: " + type.Name );
             return;
          }
 

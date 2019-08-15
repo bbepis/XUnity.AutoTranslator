@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up text getter compat hooks." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up text getter compat hooks." );
          }
       }
 
@@ -76,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up image hooks." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up image hooks." );
          }
       }
 
@@ -88,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up text asset hooks." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up text asset hooks." );
          }
       }
 
@@ -104,7 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for UGUI." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for UGUI." );
          }
 
          try
@@ -116,7 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
          }
 
          try
@@ -128,7 +128,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for NGUI." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for NGUI." );
          }
 
          try
@@ -140,7 +140,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for IMGUI." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for IMGUI." );
          }
 
          try
@@ -149,7 +149,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for Utage." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for Utage." );
          }
 
          try
@@ -161,7 +161,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, "An error occurred while setting up hooks for TextMesh." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for TextMesh." );
          }
       }
 
@@ -198,7 +198,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                                     addMethod.Invoke( component, new object[] { callback } );
                                  }
 
-                                 XuaLogger.Default.Info( eventName + " was hooked by external plugin." );
+                                 XuaLogger.AutoTranslator.Info( eventName + " was hooked by external plugin." );
                                  return true;
                               }
                               catch { }
@@ -211,7 +211,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
          catch( Exception e )
          {
-            XuaLogger.Default.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
+            XuaLogger.AutoTranslator.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
          }
 
          return false;

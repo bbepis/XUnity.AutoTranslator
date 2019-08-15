@@ -109,7 +109,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( existingHash != hash )
                {
-                  XuaLogger.Default.Warn( "Detected duplicate image name: " + name );
+                  XuaLogger.AutoTranslator.Warn( "Detected duplicate image name: " + name );
                   detectedDuplicateName = true;
 
                   Settings.AddDuplicateName( name );

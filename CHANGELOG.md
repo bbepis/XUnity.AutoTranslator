@@ -1,4 +1,9 @@
-﻿### 3.8.1
+﻿### 4.0.0
+ * BREAKING CHANGE - Restructuring of internal and some public APIs - ITranslationEndpoint API not affected.
+ * FEATURE - Resource Redirection API.
+ * FEATURE - Support for redirecting translation processing to an external process.
+
+### 3.8.1
  * BUG FIX - Minor bug in relation to harmony initialization
  * BUG FIX - Fixed bug in MonoMod hooking that would cause it to always use native hooks over managed hooks
  * BUG FIX - Fixed bug in 'EnableLegacyTextureLoading' which should now work consistently

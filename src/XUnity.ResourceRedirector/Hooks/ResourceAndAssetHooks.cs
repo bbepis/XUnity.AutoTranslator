@@ -28,7 +28,6 @@ namespace XUnity.ResourceRedirector.Hooks
          typeof( AssetBundle_LoadAssetAsync_Internal_Hook ),
          typeof( AssetBundle_LoadAssetWithSubAssets_Internal_Hook ),
          typeof( AssetBundle_LoadAssetWithSubAssetsAsync_Internal_Hook ),
-         typeof( AssetBundleCreateRequest_assetBundle_Hook ),
          typeof( AssetBundleRequest_asset_Hook ),
          typeof( AssetBundleRequest_allAssets_Hook ),
 
@@ -63,9 +62,14 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleCreateRequest MM_Detour( string path, uint crc, ulong offset )
       {
-         var result = _original( path, crc, offset );
+         AssetBundleCreateRequest result;
 
-         ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( path, result );
+         ResourceRedirection.Hook_AssetBundleLoading_Postfix( path, out result );
+
+         if( result == null )
+         {
+            result = _original( path, crc, offset );
+         }
 
          return result;
       }
@@ -94,9 +98,14 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundle MM_Detour( string path, uint crc, ulong offset )
       {
-         var result = _original( path, crc, offset );
+         AssetBundle result;
 
-         ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( path, result, null );
+         ResourceRedirection.Hook_AssetBundleLoaded_Postfix( path, out result );
+
+         if( result == null )
+         {
+            result = _original( path, crc, offset );
+         }
 
          return result;
       }
@@ -190,7 +199,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
+         ResourceRedirection.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -221,7 +230,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
+         ResourceRedirection.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -252,7 +261,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoading( self, result );
+         ResourceRedirection.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -287,7 +296,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
             }
          }
 
@@ -320,7 +329,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result );
+         ResourceRedirection.Hook_AssetLoaded_Postfix( self, null, ref result );
 
          return result;
       }
@@ -351,7 +360,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoading( self, result );
+         ResourceRedirection.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -381,12 +390,12 @@ namespace XUnity.ResourceRedirector.Hooks
       static UnityEngine.Object[] MM_Detour( AssetBundle self, string name, Type type )
       {
          var result = _original( self, name, type );
-         
+
          if( result != null )
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( self, null, ref result[ i ] );
             }
          }
 
@@ -419,38 +428,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self, name, type );
 
-         ResourceRedirectionManager.Hook_AssetLoading( self, result );
-
-         return result;
-      }
-   }
-
-   internal static class AssetBundleCreateRequest_assetBundle_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return true;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Property( typeof( AssetBundleCreateRequest ), "assetBundle" ).GetGetMethod();
-      }
-
-      delegate AssetBundle OriginalMethod( AssetBundleCreateRequest self );
-
-      static OriginalMethod _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<OriginalMethod>();
-      }
-
-      static AssetBundle MM_Detour( AssetBundleCreateRequest self )
-      {
-         var result = _original( self );
-
-         ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( null, result, self );
+         ResourceRedirection.Hook_AssetLoading( self, result );
 
          return result;
       }
@@ -481,7 +459,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirectionManager.Hook_AssetLoaded_Postfix( null, self, ref result );
+         ResourceRedirection.Hook_AssetLoaded_Postfix( null, self, ref result );
 
          return result;
       }
@@ -516,7 +494,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_AssetLoaded_Postfix( null, self, ref result[ i ] );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( null, self, ref result[ i ] );
             }
          }
 
@@ -549,7 +527,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirectionManager.Hook_ResourceLoaded( path, true, ref result );
+         ResourceRedirection.Hook_ResourceLoaded( path, true, ref result );
 
          return result;
       }
@@ -584,7 +562,7 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             for( int i = 0; i < result.Length; i++ )
             {
-               ResourceRedirectionManager.Hook_ResourceLoaded( path, false, ref result[ i ] );
+               ResourceRedirection.Hook_ResourceLoaded( path, false, ref result[ i ] );
             }
          }
 
@@ -617,7 +595,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirectionManager.Hook_ResourceLoaded( path, true, ref result );
+         ResourceRedirection.Hook_ResourceLoaded( path, true, ref result );
 
          return result;
       }

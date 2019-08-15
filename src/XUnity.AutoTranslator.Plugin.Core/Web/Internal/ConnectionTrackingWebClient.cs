@@ -377,7 +377,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
                foreach( var idleEntry in idleEntries )
                {
                   ActiveConnections.Remove( idleEntry.Key );
-                  XuaLogger.Default.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to inactivity." );
+                  XuaLogger.AutoTranslator.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to inactivity." );
                }
             }
          }
@@ -417,7 +417,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
                foreach( var idleEntry in idleEntries )
                {
                   ActiveConnections.Remove( idleEntry.Key );
-                  XuaLogger.Default.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to force shutdown." );
+                  XuaLogger.AutoTranslator.Debug( $"Closing connections to endpoint '{idleEntry.Key}' due to force shutdown." );
                }
             }
          }
