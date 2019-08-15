@@ -118,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       public static string PreferredStoragePath;
       public static bool EnableDumping;
-      public static bool EnableTextAssetResourceRedirector;
+      public static bool EnableTextAssetRedirector;
       public static bool EnableLoggingUnhandledResources;
 
 
@@ -200,7 +200,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             TextureHashGenerationStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureHashGenerationStrategy", TextureHashGenerationStrategy.FromImageName );
 
             PreferredStoragePath = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "PreferredStoragePath", @"RedirectedResources" );
-            EnableTextAssetResourceRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetResourceRedirector", false );
+            EnableTextAssetRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetRedirector", false );
             EnableLoggingUnhandledResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableLoggingUnhandledResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
 

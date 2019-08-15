@@ -158,10 +158,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ResourceRedirector.ResourceRedirection.LogUnhandledResources = true;
             }
 
-            if( Settings.EnableTextAssetResourceRedirector )
+            if( Settings.EnableTextAssetRedirector )
             {
                HooksSetup.InstallTextAssetHooks();
-               new TextAssetResourceRedirectHandler();
+               new TextAssetLoadedHandler();
             }
          }
          catch( Exception e )

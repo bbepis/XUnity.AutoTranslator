@@ -11,13 +11,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
    /// resource redirector that is interested in either updating of dumping redirected resources.
    /// </summary>
    /// <typeparam name="TAsset">The type of asset being redirected.</typeparam>
-   public abstract class ResourceRedirectHandlerBase<TAsset>
+   public abstract class AssetLoadedHandlerBase<TAsset>
       where TAsset : UnityEngine.Object
    {
       /// <summary>
       /// Constructs the resource redirection handler.
       /// </summary>
-      public ResourceRedirectHandlerBase()
+      public AssetLoadedHandlerBase()
       {
          ResourceRedirector.ResourceRedirection.RegisterAssetLoadedFor<TAsset>( Handle );
       }

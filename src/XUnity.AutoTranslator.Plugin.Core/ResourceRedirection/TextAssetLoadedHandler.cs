@@ -7,7 +7,7 @@ using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
 {
-   internal class TextAssetResourceRedirectHandler : ResourceRedirectHandlerBase<TextAsset>
+   internal class TextAssetLoadedHandler : AssetLoadedHandlerBase<TextAsset>
    {
       protected override string CalculateModificationFilePath( AssetLoadedContext<TextAsset> context )
       {
