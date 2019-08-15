@@ -199,4 +199,13 @@
   <data name="Lec_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build-x86\bin\net35\Lec.ExtProtocol.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Common_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build-net45\bin\net45\Common.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Common_ExtProtocol_Executor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build-net45\bin\net45\Common.ExtProtocol.Executor.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Http_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build-net45\bin\net45\Http.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

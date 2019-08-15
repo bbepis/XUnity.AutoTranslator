@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <RootNamespace>XUnity.AutoTranslator.Setup.Build_net45</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputPath>bin</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Translators\Common.ExtProtocol.Executor\Common.ExtProtocol.Executor.csproj" />
+    <ProjectReference Include="..\Translators\Common.ExtProtocol\Common.ExtProtocol.csproj" />
+    <ProjectReference Include="..\Translators\Http.ExtProtocol\Http.ExtProtocol.csproj" />
+  </ItemGroup>
+
+</Project>

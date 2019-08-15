@@ -103,6 +103,26 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Common_ExtProtocol {
+            get {
+                object obj = ResourceManager.GetObject("Common_ExtProtocol", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Common_ExtProtocol_Executor {
+            get {
+                object obj = ResourceManager.GetObject("Common_ExtProtocol_Executor", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] CustomTranslate {
             get {
                 object obj = ResourceManager.GetObject("CustomTranslate", resourceCulture);
@@ -136,6 +156,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         internal static byte[] GoogleTranslateLegitimate {
             get {
                 object obj = ResourceManager.GetObject("GoogleTranslateLegitimate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Http_ExtProtocol {
+            get {
+                object obj = ResourceManager.GetObject("Http_ExtProtocol", resourceCulture);
                 return ((byte[])(obj));
             }
         }
