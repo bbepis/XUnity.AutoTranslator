@@ -51,7 +51,7 @@ namespace XUnity.ResourceRedirector
 
       /// <summary>
       /// Gets the path of the asset.
-      /// For the Resources API, this is the everything but the last segment of the resource.
+      /// For the Resources API, this is the everything but the last segment of the resource (which is the asset name).
       /// For the Assetbundle API, this is the name of the asset bundle.
       /// </summary>
       public string AssetPath { get; }

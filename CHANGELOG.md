@@ -1,8 +1,8 @@
 ﻿### 4.0.0
- * BREAKING CHANGE - Restructuring of internal and some public APIs - ITranslationEndpoint API not affected.
- * BREAKING CHANGE - Changed file layout in Translators directory - should replace folder entirely upon upgrade.
- * FEATURE - Resource Redirection API.
- * FEATURE - Support for redirecting translation processing to an external process.
+ * BREAKING CHANGE - Restructuring of internal and some public APIs - ITranslateEndpoint API not affected
+ * BREAKING CHANGE - Changed file layout in Translators directory - should replace folder entirely upon upgrade to avoid redundant files that may be picked up unintentionally by mod loaders
+ * FEATURE - Resource Redirection API
+ * FEATURE - Support for redirecting translation processing to an external process
 
 ### 3.8.1
  * BUG FIX - Minor bug in relation to harmony initialization
