@@ -17,18 +17,18 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class ResourceRedirection
    {
-      private static readonly string LoweredCurrentDirectory = Environment.CurrentDirectory.ToLowerInvariant();
       private static readonly object Sync = new object();
-      private static readonly MethodInfo CallHandleAssetOrResource_Method = typeof( ResourceRedirection ).GetMethod( "CallHandleAssetOrResource", BindingFlags.Static | BindingFlags.NonPublic );
-      private static readonly WeakDictionary<AssetBundleRequest, AssetBundle> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AssetBundle>();
+      private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
 
-      private protected static readonly List<Action<AssetLoadedContext>> RedirectionsForAllAssets = new List<Action<AssetLoadedContext>>();
+      private protected static readonly List<Action<AssetLoadedContext>> RedirectionsForAssets = new List<Action<AssetLoadedContext>>();
+      private protected static readonly List<Action<ResourceLoadedContext>> RedirectionsForResources = new List<Action<ResourceLoadedContext>>();
       private protected static readonly List<Action<AssetBundleLoadingContext>> RedirectionsForAssetBundles = new List<Action<AssetBundleLoadingContext>>();
       private protected static readonly List<Action<AsyncAssetBundleLoadingContext>> RedirectionsForAsyncAssetBundles = new List<Action<AsyncAssetBundleLoadingContext>>();
       private static bool _initialized = false;
       private static bool _logUnhandledResources = false;
 
       private static bool _isFiringAssetLoadedEvent = false;
+      private static bool _isFiringResourceLoadedEvent = false;
       private static bool _isFiringAssetBundleLoadingEvent = false;
       private static bool _isFiringAsyncAssetBundleLoadingEvent = false;
 
@@ -73,15 +73,14 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetBundleLoaded_Postfix( string path, out AssetBundle bundle )
+      internal static void Hook_AssetBundleLoaded_Postfix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
          if( !_isFiringAssetBundleLoadingEvent )
          {
             _isFiringAssetBundleLoadingEvent = true;
             try
             {
-               var normalizedPath = path.ToLowerInvariant().MakeRelativePath( LoweredCurrentDirectory );
-               var context = new AssetBundleLoadingContext( path, normalizedPath );
+               var context = new AssetBundleLoadingContext( path, crc, offset, loadType );
 
                var list2 = RedirectionsForAssetBundles;
                var len2 = list2.Count;
@@ -122,15 +121,14 @@ namespace XUnity.ResourceRedirector
          bundle = null;
       }
 
-      internal static void Hook_AssetBundleLoading_Postfix( string path, out AssetBundleCreateRequest request )
+      internal static void Hook_AssetBundleLoading_Postfix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
       {
          if( !_isFiringAsyncAssetBundleLoadingEvent )
          {
             _isFiringAsyncAssetBundleLoadingEvent = true;
             try
             {
-               var normalizedPath = path.ToLowerInvariant().MakeRelativePath( LoweredCurrentDirectory );
-               var context = new AsyncAssetBundleLoadingContext( path, normalizedPath );
+               var context = new AsyncAssetBundleLoadingContext( path, crc, offset, loadType );
 
                var list2 = RedirectionsForAsyncAssetBundles;
                var len2 = list2.Count;
@@ -170,175 +168,272 @@ namespace XUnity.ResourceRedirector
          request = null;
       }
 
-      internal static void Hook_AssetLoaded_Postfix( AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
+      internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
       {
          if( asset == null ) return;
 
+         var arr = new[] { asset };
+
+         Hook_AssetLoaded_Postfix( assetName, assetType, loadType, parentBundle, request, ref arr );
+
+         asset = arr[ 0 ];
+      }
+
+      internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, AssetBundleRequest request, ref UnityEngine.Object[] assets )
+      {
+         if( assets == null ) return;
+
          lock( Sync )
          {
-            if( parentBundle == null )
+            if( bundle == null )
             {
-               if( !AssetBundleRequestToAssetBundle.TryGetValue( request, out parentBundle ) )
+               if( !AssetBundleRequestToAssetBundle.TryGetValue( request, out var loadInfo ) )
                {
                   XuaLogger.ResourceRedirector.Error( "Could not find asset bundle from request object!" );
                   return;
                }
+               else
+               {
+                  bundle = loadInfo.Bundle;
+                  assetName = loadInfo.AssetName;
+                  assetType = loadInfo.AssetType;
+                  loadType = loadInfo.LoadType;
+               }
             }
          }
 
-         var path = parentBundle.name;
-
-         // Is this a problem???
-         if( path == null )
+         if( loadType == AssetLoadType.LoadByType )
          {
-            XuaLogger.ResourceRedirector.Error( "Could not obtain path for asset bundle!" );
-            return;
+            for( int i = 0; i < assets.Length; i++ )
+            {
+               var asset = assets[ i ];
+               var arr = new[] { asset };
+               FireAssetLoadedEvent( assetName, assetType, bundle, loadType, ref arr );
+               assets[ i ] = arr[ 0 ];
+            }
          }
-
-         FireAssetOrResourceLoadedEvent( path, parentBundle, AssetSource.AssetBundle, ref asset );
+         else
+         {
+            FireAssetLoadedEvent( assetName, assetType, bundle, loadType, ref assets );
+         }
       }
 
-      internal static void Hook_AssetLoading( AssetBundle parentBundle, AssetBundleRequest request )
+      internal static void Hook_AssetLoading( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, AssetBundleRequest request )
       {
          // create ref from request to parentBundle?
          lock( Sync )
          {
-            if( parentBundle != null && request != null )
+            if( bundle != null && request != null )
             {
-               AssetBundleRequestToAssetBundle[ request ] = parentBundle;
+               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo( assetName, assetType, loadType, bundle );
             }
          }
       }
 
-      internal static void Hook_ResourceLoaded( string path, bool pathIncludesAssetName, ref UnityEngine.Object asset )
+      internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object asset )
       {
          if( asset == null ) return;
 
-         if( pathIncludesAssetName )
-         {
-            // remove asset name
-            path = path.ToLowerInvariant();
-            var loweredAssetName = asset.name.ToLowerInvariant();
+         var arr = new[] { asset };
 
-            if( path.EndsWith( loweredAssetName ) )
-            {
-               path = path.Remove( path.Length - loweredAssetName.Length ).TrimEnd( '\\', '/' );
-            }
-         }
+         Hook_ResourceLoaded_Postfix( assetPath, assetType, loadType, ref arr );
 
-         FireAssetOrResourceLoadedEvent( path, null, AssetSource.Resources, ref asset );
+         asset = arr[ 0 ];
       }
 
-      internal static void FireAssetOrResourceLoadedEvent( string path, AssetBundle assetBundle, AssetSource source, ref UnityEngine.Object asset )
+      internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
       {
-         // prevent recursion from plugins
+         if( assets == null ) return;
 
+         if( loadType == ResourceLoadType.LoadByType )
+         {
+            for( int i = 0; i < assets.Length; i++ )
+            {
+               var asset = assets[ i ];
+               var arr = new[] { asset };
+               FireResourceLoadedEvent( assetPath, assetType, loadType, ref arr );
+               assets[ i ] = arr[ 0 ];
+            }
+         }
+         else
+         {
+            FireResourceLoadedEvent( assetPath, assetType, loadType, ref assets );
+         }
+      }
+
+      internal static void FireAssetLoadedEvent( string assetLoadName, Type assetLoadType, AssetBundle assetBundle, AssetLoadType loadType, ref UnityEngine.Object[] assets )
+      {
          if( !_isFiringAssetLoadedEvent )
          {
             _isFiringAssetLoadedEvent = true;
+            var context = new AssetLoadedContext( assetLoadName, assetLoadType, loadType, assetBundle, assets );
+
             try
             {
-               var type = asset.GetType();
+               var list2 = RedirectionsForAssets;
+               var len2 = list2.Count;
+               for( int i = 0; i < len2; i++ )
+               {
+                  try
+                  {
+                     var redirection = list2[ i ];
 
-               // make relative and normalize
-               path = path.ToLowerInvariant();
+                     redirection( context );
 
-               var args = new object[] { asset, path, assetBundle, source };
-               CallHandleAssetOrResource_Method
-                  .MakeGenericMethod( type )
-                  .Invoke( null, args );
+                     if( context.Handled ) return;
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetLoaded event." );
+                  }
+               }
 
-               asset = (UnityEngine.Object)args[ 0 ];
+               if( !context.Handled && _logUnhandledResources )
+               {
+                  foreach( var asset in assets )
+                  {
+                     var uniquePath = context.GetUniqueFileSystemAssetPath( asset );
+                     XuaLogger.ResourceRedirector.Debug( $"Found asset that no AssetLoaded handler could handle '{asset.GetType().FullName}' loaded through '{loadType.ToString()}' ({uniquePath})." );
+                  }
+               }
+
+               if( context.Handled )
+               {
+                  assets = context.Assets;
+               }
             }
             catch( Exception e )
             {
-               XuaLogger.ResourceRedirector.Error( e, "An error occurred while redirecting resource." );
+               XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AssetLoaded event." );
             }
             finally
             {
+               assets = context.Assets; // Only GETTER ... for now...
+
+               foreach( var asset in assets )
+               {
+                  var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+                  ext.HasBeenRedirected = true;
+               }
+
                _isFiringAssetLoadedEvent = false;
             }
          }
       }
 
-
-      internal static void CallHandleAssetOrResource<TAsset>( ref TAsset asset, string path, AssetBundle assetBundle, AssetSource source )
-         where TAsset : UnityEngine.Object
+      internal static void FireResourceLoadedEvent( string resourceLoadPath, Type resourceLoadType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
       {
-         var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
-         try
+         if( !_isFiringResourceLoadedEvent )
          {
-            var context = new AssetLoadedContext<TAsset>( source, path, assetBundle, asset, ext.HasBeenRedirected );
+            _isFiringResourceLoadedEvent = true;
+            var context = new ResourceLoadedContext( resourceLoadPath, resourceLoadType, loadType, assets );
 
-            ResourceRedirection<TAsset>.Invoke( context );
-
-            if( !context.Handled && _logUnhandledResources )
+            try
             {
-               XuaLogger.ResourceRedirector.Debug( $"Found asset that no AssetLoaded handler could handle '{typeof( TAsset ).FullName}' ({context.UniqueFileSystemAssetPath})." );
-            }
+               var list2 = RedirectionsForResources;
+               var len2 = list2.Count;
+               for( int i = 0; i < len2; i++ )
+               {
+                  try
+                  {
+                     var redirection = list2[ i ];
 
-            if( context.Handled )
-            {
-               asset = context.Asset;
+                     redirection( context );
+
+                     if( context.Handled ) return;
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking ResourceLoaded event." );
+                  }
+               }
+
+               if( !context.Handled && _logUnhandledResources )
+               {
+                  foreach( var asset in assets )
+                  {
+                     var uniquePath = context.GetUniqueFileSystemAssetPath( asset );
+                     XuaLogger.ResourceRedirector.Debug( $"Found asset that no ResourceLoaded handler could handle '{asset.GetType().FullName}' loaded through '{loadType.ToString()}' ({uniquePath})." );
+                  }
+               }
+
+               if( context.Handled )
+               {
+                  assets = context.Assets;
+               }
             }
-         }
-         finally
-         {
-            ext.HasBeenRedirected = true;
+            catch( Exception e )
+            {
+               XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking ResourceLoaded event." );
+            }
+            finally
+            {
+               assets = context.Assets; // Only GETTER ... for now...
+
+               foreach( var asset in assets )
+               {
+                  var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+                  ext.HasBeenRedirected = true;
+               }
+
+               _isFiringResourceLoadedEvent = false;
+            }
          }
       }
 
       /// <summary>
-      /// Register AssetLoaded event for asset of specific type.
+      /// Register ReourceLoaded event for all assets.
       /// </summary>
-      /// <typeparam name="TAsset">The type of asset to listen to.</typeparam>
       /// <param name="action">The callback.</param>
-      public static void RegisterAssetLoadedFor<TAsset>( Action<AssetLoadedContext<TAsset>> action )
-         where TAsset : UnityEngine.Object
+      public static void RegisterResourceLoadedHook( Action<ResourceLoadedContext> action )
       {
-         ResourceRedirection<TAsset>.AddRedirection( action );
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         Initialize();
+
+         RedirectionsForResources.Add( action );
       }
 
       /// <summary>
-      /// Unregister AssetLoaded event for asset of specific type.
+      /// Unregister ReourceLoaded event for all assets.
       /// </summary>
-      /// <typeparam name="TAsset">The type of asset to stop listening to.</typeparam>
       /// <param name="action">The callback.</param>
-      public static void UnregisterAssetLoadedFor<TAsset>( Action<AssetLoadedContext<TAsset>> action )
-         where TAsset : UnityEngine.Object
+      public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action )
       {
-         ResourceRedirection<TAsset>.RemoveRedirection( action );
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         RedirectionsForResources.Remove( action );
       }
 
       /// <summary>
       /// Register AssetLoaded event for all assets.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void RegisterAseetLoadedForAll( Action<AssetLoadedContext> action )
+      public static void RegisterAssetLoadedHook( Action<AssetLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
          Initialize();
 
-         RedirectionsForAllAssets.Add( action );
+         RedirectionsForAssets.Add( action );
       }
 
       /// <summary>
       /// Unregister AssetLoaded event for all assets.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void UnregisterAssetLoadedForAll( Action<AssetLoadedContext> action )
+      public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         RedirectionsForAllAssets.Remove( action );
+         RedirectionsForAssets.Remove( action );
       }
 
       /// <summary>
       /// Register AssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void RegisterAseetBundleLoadingForAll( Action<AssetBundleLoadingContext> action )
+      public static void RegisterAseetBundleLoadingHook( Action<AssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
@@ -351,7 +446,7 @@ namespace XUnity.ResourceRedirector
       /// Unregister AssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void UnregisterAssetBundleLoadingForAll( Action<AssetBundleLoadingContext> action )
+      public static void UnregisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
@@ -362,7 +457,7 @@ namespace XUnity.ResourceRedirector
       /// Register AsyncAssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void RegisterAsyncAseetBundleLoadingForAll( Action<AsyncAssetBundleLoadingContext> action )
+      public static void RegisterAsyncAseetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
@@ -375,80 +470,11 @@ namespace XUnity.ResourceRedirector
       /// Unregister AsyncAssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void UnregisterAsyncAssetBundleLoadingForAll( Action<AsyncAssetBundleLoadingContext> action )
+      public static void UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
          RedirectionsForAsyncAssetBundles.Remove( action );
-      }
-   }
-
-   internal class ResourceRedirection<TAsset> : ResourceRedirection
-      where TAsset : UnityEngine.Object
-   {
-      private static readonly List<Action<AssetLoadedContext<TAsset>>> RedirectionsForSpecificType = new List<Action<AssetLoadedContext<TAsset>>>();
-
-      /// <summary>
-      /// Adds a resource redirection handler.
-      /// </summary>
-      /// <param name="action">The action to be invoked.</param>
-      public static void AddRedirection( Action<AssetLoadedContext<TAsset>> action )
-      {
-         if( action == null ) throw new ArgumentNullException( "action" );
-
-         Initialize();
-
-         RedirectionsForSpecificType.Add( action );
-      }
-
-      /// <summary>
-      /// Removes a previously added redirection handler.
-      /// </summary>
-      /// <param name="action">The action that was previously added.</param>
-      public static void RemoveRedirection( Action<AssetLoadedContext<TAsset>> action )
-      {
-         if( action == null ) throw new ArgumentNullException( "action" );
-
-         RedirectionsForSpecificType.Remove( action );
-      }
-
-      internal static void Invoke( AssetLoadedContext<TAsset> context )
-      {
-         var list1 = RedirectionsForSpecificType;
-         var len1 = list1.Count;
-         for( int i = 0; i < len1; i++ )
-         {
-            try
-            {
-               var redirection = list1[ i ];
-
-               redirection( context );
-
-               if( context.Handled ) return;
-            }
-            catch( Exception ex )
-            {
-               XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetLoaded event." );
-            }
-         }
-
-         var list2 = RedirectionsForAllAssets;
-         var len2 = list2.Count;
-         for( int i = 0; i < len2; i++ )
-         {
-            try
-            {
-               var redirection = list2[ i ];
-
-               redirection( context );
-
-               if( context.Handled ) return;
-            }
-            catch( Exception ex )
-            {
-               XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetLoaded event." );
-            }
-         }
       }
    }
 }

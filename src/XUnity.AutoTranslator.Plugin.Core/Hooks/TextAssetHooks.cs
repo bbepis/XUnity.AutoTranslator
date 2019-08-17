@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.ResourceRedirection;
+using XUnity.AutoTranslator.Plugin.Core.AssetRedirection;
 using XUnity.Common.Harmony;
 using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;

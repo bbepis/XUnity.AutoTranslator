@@ -1,4 +1,4 @@
-﻿namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+﻿namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    internal class TextAssetExtensionData
    {

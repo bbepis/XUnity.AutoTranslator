@@ -28,7 +28,7 @@ using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 using XUnity.AutoTranslator.Plugin.Utilities;
-using XUnity.AutoTranslator.Plugin.Core.ResourceRedirection;
+using XUnity.AutoTranslator.Plugin.Core.AssetRedirection;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 using XUnity.Common.Constants;

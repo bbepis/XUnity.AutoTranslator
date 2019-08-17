@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using XUnity.Common.Extensions;
 
 namespace XUnity.ResourceRedirector
 {
@@ -8,21 +9,36 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AsyncAssetBundleLoadingContext
    {
-      internal AsyncAssetBundleLoadingContext( string assetBundlePath, string normalizedAssetBundlePath )
+      private string _normalizedPath;
+
+      internal AsyncAssetBundleLoadingContext( string assetBundlePath, uint crc, ulong offset, AssetBundleLoadType loadType )
       {
-         AssetBundlePath = assetBundlePath;
-         NormalizedAssetBundlePath = normalizedAssetBundlePath;
+         Parameters = new AssetBundleLoadParameters( assetBundlePath, crc, offset, loadType );
       }
 
       /// <summary>
-      /// Gets the path of the asset bundle.
+      /// Gets a normalized path to the asset bundle that is:
+      ///  * Relative to the current directory
+      ///  * Lower-casing
+      ///  * Uses '\' as separators.
       /// </summary>
-      public string AssetBundlePath { get; } // relative? absolute? Could make relative!
+      /// <returns></returns>
+      public string GetNormalizedPath()
+      {
+         if( _normalizedPath == null && Parameters.Path != null )
+         {
+            _normalizedPath = Parameters.Path
+               .ToLowerInvariant()
+               .Replace( '/', '\\' )
+               .MakeRelativePath( Constants.LoweredCurrentDirectory );
+         }
+         return _normalizedPath;
+      }
 
       /// <summary>
-      /// Gets the normalized path of the asset bundle.
+      /// Gets the parameters of the original call.
       /// </summary>
-      public string NormalizedAssetBundlePath { get; }
+      public AssetBundleLoadParameters Parameters { get; set; }
 
       /// <summary>
       /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.

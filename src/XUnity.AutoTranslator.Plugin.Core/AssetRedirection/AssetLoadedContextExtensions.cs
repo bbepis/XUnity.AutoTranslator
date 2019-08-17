@@ -6,7 +6,7 @@ using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.ResourceRedirector;
 
-namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
+namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    /// <summary>
    /// Extension methods to calculate preferred resources paths for redirected resources.
@@ -16,55 +16,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.ResourceRedirection
       /// <summary>
       /// Gets the default resource and preferred path to store the redirected resource at.
       /// </summary>
-      /// <typeparam name="TAsset"></typeparam>
       /// <param name="context"></param>
+      /// <param name="asset"></param>
       /// <param name="extension"></param>
       /// <returns></returns>
-      public static string GetPreferredFilePath<TAsset>( this AssetLoadedContext<TAsset> context, string extension )
-         where TAsset : UnityEngine.Object
+      public static string GetPreferredFilePath( this IAssetOrResourceLoadedContext context, UnityEngine.Object asset, string extension )
       {
-         return Path.Combine( Settings.RedirectedResourcesPath, context.UniqueFileSystemAssetPath ) + extension;
+         return Path.Combine( Settings.RedirectedResourcesPath, context.GetUniqueFileSystemAssetPath( asset ) ) + extension;
       }
 
       /// <summary>
       /// Gets the default resource and preferred path to store the redirected resource at.
       /// </summary>
-      /// <typeparam name="TAsset"></typeparam>
       /// <param name="context"></param>
       /// <param name="parentDirectory"></param>
+      /// <param name="asset"></param>
       /// <param name="extension"></param>
       /// <returns></returns>
-      public static string GetPreferredFilePath<TAsset>( this AssetLoadedContext<TAsset> context, string parentDirectory, string extension )
-         where TAsset : UnityEngine.Object
+      public static string GetPreferredFilePath( this IAssetOrResourceLoadedContext context, string parentDirectory, UnityEngine.Object asset, string extension )
       {
-         return Path.Combine( parentDirectory, context.UniqueFileSystemAssetPath ) + extension;
+         return Path.Combine( parentDirectory, context.GetUniqueFileSystemAssetPath( asset ) ) + extension;
       }
 
       /// <summary>
       /// Gets the preferred path to store the resource at if a specific file name is required.
       /// </summary>
-      /// <typeparam name="TAsset"></typeparam>
       /// <param name="context"></param>
+      /// <param name="asset"></param>
       /// <param name="fileName"></param>
       /// <returns></returns>
-      public static string GetPreferredFilePathWithCustomFileName<TAsset>( this AssetLoadedContext<TAsset> context, string fileName )
-         where TAsset : UnityEngine.Object
+      public static string GetPreferredFilePathWithCustomFileName( this IAssetOrResourceLoadedContext context, UnityEngine.Object asset, string fileName )
       {
-         return Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, context.UniqueFileSystemAssetPath ), fileName );
+         return Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, context.GetUniqueFileSystemAssetPath( asset ) ), fileName );
       }
 
       /// <summary>
       /// Gets the preferred path to store the resource at if a specific file name is required.
       /// </summary>
-      /// <typeparam name="TAsset"></typeparam>
       /// <param name="context"></param>
       /// <param name="parentDirectory"></param>
+      /// <param name="asset"></param>
       /// <param name="fileName"></param>
       /// <returns></returns>
-      public static string GetPreferredFilePathWithCustomFileName<TAsset>( this AssetLoadedContext<TAsset> context, string parentDirectory, string fileName )
-         where TAsset : UnityEngine.Object
+      public static string GetPreferredFilePathWithCustomFileName( this IAssetOrResourceLoadedContext context, string parentDirectory, UnityEngine.Object asset, string fileName )
       {
-         return Path.Combine( Path.Combine( parentDirectory, context.UniqueFileSystemAssetPath ), fileName );
+         return Path.Combine( Path.Combine( parentDirectory, context.GetUniqueFileSystemAssetPath( asset ) ), fileName );
       }
    }
 }

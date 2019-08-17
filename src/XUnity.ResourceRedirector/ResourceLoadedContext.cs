@@ -1,24 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using UnityEngine;
 using XUnity.Common.Utilities;
 
 namespace XUnity.ResourceRedirector
 {
    /// <summary>
-   /// The operation context surrounding the asset loaded event.
+   /// The operation context surrounding the ResourceLoaded hook.
    /// </summary>
-   public class AssetLoadedContext : IAssetOrResourceLoadedContext
+   public class ResourceLoadedContext : IAssetOrResourceLoadedContext
    {
       private bool? _hasBeenRedirectedBefore;
       private string _uniqueFileSystemAssetPath;
 
-      internal AssetLoadedContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, UnityEngine.Object[] assets )
+      internal ResourceLoadedContext( string assetPath, Type assetType, ResourceLoadType loadType, UnityEngine.Object[] assets )
       {
-         OriginalParameters = new AssetLoadParameters( assetName, assetType, loadType );
-         Bundle = bundle;
+         OriginalParameters = new ResourceLoadParameters( assetPath, assetType, loadType );
          Assets = assets;
          Handled = false;
       }
@@ -46,41 +43,40 @@ namespace XUnity.ResourceRedirector
          // TODO: Optimize with StringBuilder
          if( _uniqueFileSystemAssetPath == null )
          {
-            string path = "assets";
+            string path = "resources";
 
-            var assetBundleName = Bundle.name;
-            if( !string.IsNullOrEmpty( assetBundleName ) )
+            if( !string.IsNullOrEmpty( OriginalParameters.Path ) )
             {
-               path = Path.Combine( path, assetBundleName.ToLowerInvariant() );
-            }
-            else
-            {
-               path = Path.Combine( path, "unnamed_assetbundle" );
+               path = Path.Combine( path, OriginalParameters.Path.ToLowerInvariant() );
             }
 
-            var assetName = asset.name;
-            if( !string.IsNullOrEmpty( assetName ) )
+            if( OriginalParameters.LoadType == ResourceLoadType.LoadByType )
             {
-               path = Path.Combine( path, assetName.ToLowerInvariant() );
-            }
-            else
-            {
-               string suffix = null;
-               if( Assets.Length > 1 )
+               var assetName = asset.name;
+               if( !string.IsNullOrEmpty( assetName ) )
                {
-                  var idx = Array.IndexOf( Assets, asset );
-                  if( idx == -1 )
-                  {
-                     suffix = "_with_unknown_index";
-                  }
-                  else
-                  {
-                     suffix = "_" + idx.ToString( CultureInfo.InvariantCulture );
-                  }
+                  path = Path.Combine( path, assetName.ToLowerInvariant() );
                }
+               else
+               {
+                  string suffix = null;
+                  if( Assets.Length > 1 )
+                  {
+                     var idx = Array.IndexOf( Assets, asset );
+                     if( idx == -1 )
+                     {
+                        suffix = "_with_unknown_index";
+                     }
+                     else
+                     {
+                        suffix = "_" + idx.ToString( CultureInfo.InvariantCulture );
+                     }
+                  }
 
-               path = Path.Combine( path, OriginalParameters.LoadType == AssetLoadType.LoadMainAsset ? "main_asset" : "unnamed_asset" + suffix );
+                  path = Path.Combine( path, "unnamed_asset" + suffix );
+               }
             }
+
 
             path = path.Replace( '/', '\\' );
 
@@ -93,12 +89,7 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets the original parameters the asset load call was called with.
       /// </summary>
-      public AssetLoadParameters OriginalParameters { get; }
-
-      /// <summary>
-      /// Gets the AssetBundle if the asset is being loaded through the AssetBundle API, otherwise null.
-      /// </summary>
-      public AssetBundle Bundle { get; }
+      public ResourceLoadParameters OriginalParameters { get; }
 
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
