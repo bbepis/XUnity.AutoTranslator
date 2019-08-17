@@ -15,6 +15,7 @@
  * [Texture Translation](#texture-translation)
  * [Integrating with Auto Translator](#integrating-with-auto-translator)
  * [Implementing a Translator](#implementing-a-translator)
+ * [Implementing a Resource Redirector](#implementing-a-resource-redirector)
  
 ## Introduction
 This is a plugin that is capable of using various online translators to provide on-the-fly translations for various Unity-based games.
@@ -301,6 +302,12 @@ DuplicateTextureNames=           ;Indicates specific texture names that are dupl
 DetectDuplicateTextureNames=False;Indicates if the plugin should detect duplicate texture names.
 EnableLegacyTextureLoading=False ;Indicates the plugin should use a different strategy to load images, that may be relevant if the game engine is old
 
+[ResourceRedirector]
+PreferredStoragePath=RedirectedResources ;Indicates the preferred storage for redirected resources in relation to the Auto Translator
+EnableTextAssetRedirector=False  ;Indicates if TextAssets should be redirected
+EnableLoggingUnhandledResources=False ;Indicates if the plugin should log the assets that has not been handled by a redirector
+EnableDumping=False              ;Indicates if translatable resources that are found should be dumped
+
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
 DisableCertificateValidation=False ;Indiciates whether certificate validations for the .NET API should be disabled
@@ -339,7 +346,7 @@ EnableLog=False                  ;Enables extra logging for debugging purposes
 
 [Migrations]
 Enable=True                      ;Used to enable automatic migrations of this configuration file
-Tag=2.9.0                        ;Tag representing the last version this plugin was executed under. Do not edit
+Tag=4.0.0                        ;Tag representing the last version this plugin was executed under. Do not edit
 ```
 
 ### Behaviour Configuration Explanation
@@ -546,13 +553,24 @@ This is controlled by the configuration option `CacheWhitespaceDifferences=False
 ### Resource Redirection
 Sometimes it's easier to provide a translation to a game by directly overriding the game resource files. However, directly overriding the game resource files is also problematic because that means the modification will likely only work for one version of the game.
 
-To overcome this problem, and allow for modification of resource files, this plugin also has a resource redirector module that allows redirecting any kind of resources loaded by the game.
+To overcome this problem, and allow for modification of resource files, this plugin also has a resource redirector module that allows redirecting any kind of resource loaded by the game.
 
-... CONFIG
+Before we get into the details of this module, it is worth mentioning that it is:
+ * It is not a plugin. Rather it is just a library that is not beholden to any plugin manager. 
+ * It is game independent.
+ * And while it may be redistributed with the Auto Translator, it is completely independent from it and it can be used without having the Auto Translator installed.
 
-By default this plugin comes with one resource redirector for `TextAsset`, which basically outputs the raw text assets to the file system allowing them to be individually overridden.
+The DLLs required for the Resource Redirector to work are `XUnity.Common.dll` and `XUnity.ResourceRedirector.dll`. By themselves, these libraries do nothing.
 
-More redirectors can be implemented for specific games, though this does require programming knowledge, see THIS SECTION for more information.
+By default the Auto Translator plugin comes with one resource redirector for `TextAsset`, which basically outputs the raw text assets to the file system allowing them to be individually overridden.
+
+More redirectors can be implemented for specific games, though this does require programming knowledge, see [this section](#implementing-a-resource-redirector) for more information.
+
+The Auto Translator has the following Resource Redirector-specific configuration:
+ * `PreferredStoragePath`: Indicates where the Auto Translator should store redirected resources.
+ * `EnableTextAssetRedirector`: Indicates if the TextAsset redirector is enabled.
+ * `EnableLoggingUnhandledResources`: Indicates if Resource Redirector should log unhandled resources to the console (can also be controlled through Resource Redirector API surface).
+ * `EnableDumping`: Indicates if resources redirected to the Auto Translator should be dumped for overwriting if possible.
 
 ## Regarding Redistribution
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:
@@ -921,76 +939,716 @@ Another way to implement a translator is to implement the `ExtProtocolEndpoint` 
 If instead, you use the interface directly, it is also possible to extend from MonoBehaviour to get access to all the normal lifecycle callbacks of Unity components.
 
 ## Implementing a Resource Redirector
-A resource director allows you to modify resources as they are being loaded by the game. When a resource is being redirected, you receive the following interface when intercepting a redirected resource:
+The resource director allows you to modify resources as they are being loaded by the game.
+
+The following API surface is made available by the Resource Redirector:
 
 ```C#
 /// <summary>
-/// Information related to the OnAssetLoading event.
+/// Entrypoint to the resource redirection API.
 /// </summary>
-/// <typeparam name="TAsset">Is the asset being loaded.</typeparam>
-public interface IRedirectionContext<TAsset>
+public static class ResourceRedirection
 {
     /// <summary>
-    /// Gets a set of all the files stored under the preferred storage path.
+    /// Gets or sets a bool indicating if the resource redirector
+    /// should log which assets has no handler.
     /// </summary>
-    HashSet<string> FilesInPreferredStorage { get; }
+    public static bool LogUnhandledResources { get; set; }
 
     /// <summary>
-    /// Gets the preferred storage path.
+    /// Register ReourceLoaded event.
     /// </summary>
-    string PreferredStoragePath { get; }
+    /// <param name="action">The callback.</param>
+    public static void RegisterResourceLoadedHook( Action<ResourceLoadedContext> action );
 
     /// <summary>
-    /// Gets a unique path of the resource being loaded.
+    /// Unregister ReourceLoaded event.
     /// </summary>
-    string RelativeResourcePath { get; }
+    /// <param name="action">The callback.</param>
+    public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
 
     /// <summary>
-    /// Gets a bool indicating if resources should be dumped if possible.
+    /// Register AssetLoaded event.
     /// </summary>
-    bool IsDumpingEnabled { get; }
+    /// <param name="action">The callback.</param>
+    public static void RegisterAssetLoadedHook( Action<AssetLoadedContext> action );
 
     /// <summary>
-    /// Gets or sets (to be overriden) the asset being loaded.
+    /// Unregister AssetLoaded event.
     /// </summary>
-    TAsset Asset { get; set; }
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action );
+
+    /// <summary>
+    /// Register AssetBundleLoading event.
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action );
+
+    /// <summary>
+    /// Unregister AssetBundleLoading event.
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action );
+
+    /// <summary>
+    /// Register AsyncAssetBundleLoading event.
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action );
+
+    /// <summary>
+    /// Unregister AsyncAssetBundleLoading event.
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action );
+}
+
+```
+
+Let's attach some comments to this API.
+
+### Resource Loaded Methods
+The methods `RegisterResourceLoadedHook( Action<ResourceLoadedContext> action )` and `UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
+
+This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+
+The `ResourceLoadedContext` class has the following definition:
+
+```C#
+/// <summary>
+/// The operation context surrounding the ResourceLoaded hook.
+/// </summary>
+public class ResourceLoadedContext : IAssetOrResourceLoadedContext
+{
+    /// <summary>
+    /// Gets a bool indicating if this resource has already been redirected before.
+    /// </summary>
+    public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets a file system path for the specfic asset that should be unique.
+    /// </summary>
+    /// <param name="asset"></param>
+    /// <returns></returns>
+    public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets the original parameters the asset load call was called with.
+    /// </summary>
+    public ResourceLoadParameters OriginalParameters { get; }
+
+    /// <summary>
+    /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    /// </summary>
+    public UnityEngine.Object[] Assets { get; }
 
     /// <summary>
     /// Gets or sets a bool indicating if this event has been handled. Setting
     /// this will cause it to no longer propagate.
     /// </summary>
-    bool Handled { get; set; }
+    public bool Handled { get; set; }
 }
 ```
 
-In this interface, the `TAsset` will be an instance of a subtype of `UnityEngine.Object` that you subscribed to.
+One thing that is worth noticing is that it is actually a `UnityEngine.Object[]` array being redirected, and not just a single object. This is because not all the different calls to the `Resources` API load a single resource, for instance the `Resources.LoadAll` method.
 
-There's two ways to implement a resource redirector:
+Now specfically in the case of the `Resources` postfix hooks there will only ever be one asset in this array. This is because the callback is called for each asset returned by `Resources.LoadAll` call. This is to enable a scenario where one handler only handles some of the resources in the array, while another handles the others.
 
-### Implenting a resource redirector through events
-This approach should be used if you are implementing a plugin. Here's an example of how to implement a resource redirector for the `Texture2D` class:
+The API is kept like this to support the potential support in the future for prefix hooks.
+
+If you update or replace the asset being loaded you should set the `Handled` property to true to stop propagation of this event to other handlers.
+
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
 ```C#
-public class MyPlugin : XPluginBase
+/// <summary>
+/// Class representing the original parameters of the load call.
+/// </summary>
+public class ResourceLoadParameters
 {
-    public void Start()
+    /// <summary>
+    /// Gets the name of the resource being loaded. Will not be the complete resource path if 'LoadByType' is used.
+    /// </summary>
+    public string Path { get; set; }
+
+    /// <summary>
+    /// Gets the type that passed to the resource load call.
+    /// </summary>
+    public Type Type { get; set; }
+
+    /// <summary>
+    /// Gets the type of call that loaded this resource. NOTE: 'LoadByType' usually loads a number of assets
+    /// at a time. But in the context of the ResourceLoaded hook, these will be hooked as individual calls.
+    /// </summary>
+    public ResourceLoadType LoadType { get; }
+}
+
+/// <summary>
+/// Enum representing the different ways a resource may be loaded.
+/// </summary>
+public enum ResourceLoadType
+{
+    /// <summary>
+    /// Indicates that this call is loading all assets of a specific type (below a specific path) in the Resources API.
+    /// </summary>
+    LoadByType,
+
+    /// <summary>
+    /// Indicates that this call is loading a single named asset in the Resources API.
+    /// </summary>
+    LoadNamed,
+
+    /// <summary>
+    /// Indicates that this call is loading a single named built-in asset in the Resources API.
+    /// </summary>
+    LoadNamedBuiltIn
+}
+```
+
+It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of resources.
+
+### Asset Loaded Methods
+The methods `RegisterAssetLoadedHook( Action<AssetLoadedContext> action )` and `UnregisterAssetLoadedHook( Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
+
+This API is a postfix hook to the `AssetBundle` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+
+The `AssetLoadedContext` class has the following definition:
+
+```C#
+/// <summary>
+/// The operation context surrounding the asset loaded event.
+/// </summary>
+public class AssetLoadedContext : IAssetOrResourceLoadedContext
+{
+    /// <summary>
+    /// Gets a bool indicating if this resource has already been redirected before.
+    /// </summary>
+    public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets a file system path for the specfic asset that should be unique.
+    /// </summary>
+    /// <param name="asset"></param>
+    /// <returns></returns>
+    public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets the original parameters the asset load call was called with.
+    /// </summary>
+    public AssetLoadParameters OriginalParameters { get; }
+	
+    /// <summary>
+    /// Gets the AssetBundle associated with the loaded assets.
+    /// </summary>
+    public AssetBundle Bundle { get; }
+
+    /// <summary>
+    /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    /// </summary>
+    public UnityEngine.Object[] Assets { get; }
+
+    /// <summary>
+    /// Gets or sets a bool indicating if this event has been handled. Setting
+    /// this will cause it to no longer propagate.
+    /// </summary>
+    public bool Handled { get; set; }
+}
+```
+
+One thing that is worth noticing is that it is actually an `UnityEngine.Object[]` array being redirected, and not just a single object. This is because not all the different calls to the `AssetBundle` API load a single resource, for instance the `AssetBundle.LoadAllAssets` or `AssetBundle.LoadAssetWithSubAssets` method.
+
+Now specfically in the case of the `AssetBundle` postfix hooks the array will only ever contain more than one object in case the orignal method is `AssetBundle.LoadAssetWithSubAssets`. This is because the call to `AssetBundle.LoadAllAssets` is routed into individuals callback for each asset being loaded.
+
+If your update or replace the asset being loaded you should set the `Handled` property to true to stop propagation of this event to other handlers.
+
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+
+```C#
+/// <summary>
+/// Class representing the original parameters of the load call.
+/// </summary>
+public class AssetLoadParameters
+{
+    /// <summary>
+    /// Gets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Gets the type that passed to the asset load call.
+    /// </summary>
+    public Type Type { get; set; }
+
+    /// <summary>
+    /// Gets the type of call that loaded this asset. NOTE: 'LoadByType' usually loads a number of assets
+    /// at a time. But in the context of the AssetLoaded hook, these will be hooked as individual calls.
+    /// </summary>
+    public AssetLoadType LoadType { get; }
+}
+
+/// <summary>
+/// Enum representing the different ways an asset may be loaded.
+/// </summary>
+public enum AssetLoadType
+{
+    /// <summary>
+    /// Indicates that this asset has been loaded as the 'mainAsset' in the AssetBundle API.
+    /// </summary>
+    LoadMainAsset,
+
+    /// <summary>
+    /// Indicates that this call is loading all assets of a specific type in an AssetBundle API.
+    /// </summary>
+    LoadByType,
+
+    /// <summary>
+    /// Indicates that this call is loading a specific named asset in the AssetBundle API.
+    /// </summary>
+    LoadNamed,
+
+    /// <summary>
+    /// Indicates that this call is loading a specific named asset and all those below it in the AssetBundle API.
+    /// </summary>
+    LoadNamedWithSubAssets
+}
+```
+
+It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of assets.
+
+### AssetBundle Load Methods
+It is also possible to hook the loading of `AssetBundles` themselves. Unlike in the case of assets/resources, this requires a different callback based on whether or not the resource is being loaded in a synchronous or an asynchronous way.
+
+#### AssetBundle Synchrous Load Methods
+The methods `RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )` and `UnregisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )` are used to hook the synchronous AssetBundle load methods.
+
+This API is a `Prefix` to the `AssetBundle` API, which means that it is called before the AssetBundle is loaded.
+
+The `AssetBundleLoadingContext` class has the following definition:
+
+```C#
+/// <summary>
+/// The operation context surrounding the asset bundle loading event.
+/// </summary>
+public class AssetBundleLoadingContext
+{
+    /// <summary>
+    /// Gets a normalized path to the asset bundle that is:
+    ///  * Relative to the current directory
+    ///  * Lower-casing
+    ///  * Uses '\' as separators.
+    /// </summary>
+    /// <returns></returns>
+    public string GetNormalizedPath();
+
+    /// <summary>
+    /// Gets the parameters of the original call.
+    /// </summary>
+    public AssetBundleLoadParameters OriginalParameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets the AssetBundle being loaded.
+    /// </summary>
+    public AssetBundle Bundle { get; set; }
+
+    /// <summary>
+    /// Gets or sets a bool indicating if this event has been handled. Setting
+    /// this will cause it to no longer propagate.
+    /// </summary>
+    public bool Handled { get; set; }
+}
+```
+
+Because this is a prefix API, the `Bundle` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
+
+If you update the `Bundle` property, remember to set the `Handled` property as well so the event does not propagate to other handlers.
+
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+
+```C#
+/// <summary>
+/// Class representing the original parameters of the load call.
+/// </summary>
+public class AssetBundleLoadParameters
+{
+    /// <summary>
+    /// Gets the loaded path. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public string Path { get; }
+
+    /// <summary>
+    /// Gets the crc. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public uint Crc { get; }
+
+    /// <summary>
+    /// Gets the offset. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public ulong Offset { get; }
+
+    /// <summary>
+    /// Gets the type of call that is loading this asset bundle.
+    /// </summary>
+    public AssetBundleLoadType LoadType { get; }
+}
+
+/// <summary>
+/// Enum representing the different ways an asset bundle may be loaded.
+/// </summary>
+public enum AssetBundleLoadType
+{
+    /// <summary>
+    /// Indicates that the asset bundle is being loaded through a call to 'LoadFromFile' or 'LoadFromFileAsync'.
+    /// </summary>
+    LoadFromFile,
+}
+```
+
+As can be seen, the current implementation only hooks the LoadFromFile/LoadFromFileAsync ways of loading AssetBundles, but this may be expanded in the future.
+
+It may also be worth looking at the `GetNormalizedPath()` method instead of the `Path` property of the original call parameters. This is because the path passed to the method can take literally any form:
+ * Absolute path
+ * Relative path
+ * Include a stray '..' in the middle of the path
+
+#### AssetBundle Asynchrounous Load Methods
+The methods `RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` and `UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` are used to hook the asynchronous AssetBundle load methods.
+
+This API is a `Prefix` to the `AssetBundle` API, which means that it is called before the `AssetBundleCreateRequest` is created.
+
+The `AsyncAssetBundleLoadingContext` class has the following definition:
+
+```C#
+/// <summary>
+/// The operation context surrounding the asset bundle loading event when loaded
+/// through the async API.
+/// </summary>
+public class AsyncAssetBundleLoadingContext
+{
+    /// <summary>
+    /// Gets a normalized path to the asset bundle that is:
+    ///  * Relative to the current directory
+    ///  * Lower-casing
+    ///  * Uses '\' as separators.
+    /// </summary>
+    /// <returns></returns>
+    public string GetNormalizedPath();
+
+    /// <summary>
+    /// Gets the parameters of the original call.
+    /// </summary>
+    public AssetBundleLoadParameters OriginalParameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
+    /// </summary>
+    public AssetBundleCreateRequest Request { get; set; }
+
+    /// <summary>
+    /// Gets or sets a bool indicating if this event has been handled. Setting
+    /// this will cause it to no longer propagate.
+    /// </summary>
+    public bool Handled { get; set; }
+}
+```
+
+Because this is a prefix API, the `Request` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
+
+If you update the `Request` property, remember to set the `Handled` property as well so the event does not propagate to other handlers.
+
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+
+```C#
+/// <summary>
+/// Class representing the original parameters of the load call.
+/// </summary>
+public class AssetBundleLoadParameters
+{
+    /// <summary>
+    /// Gets the loaded path. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public string Path { get; }
+
+    /// <summary>
+    /// Gets the crc. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public uint Crc { get; }
+
+    /// <summary>
+    /// Gets the offset. Only relevant for 'LoadFromFile'.
+    /// </summary>
+    public ulong Offset { get; }
+
+    /// <summary>
+    /// Gets the type of call that is loading this asset bundle.
+    /// </summary>
+    public AssetBundleLoadType LoadType { get; }
+}
+
+/// <summary>
+/// Enum representing the different ways an asset bundle may be loaded.
+/// </summary>
+public enum AssetBundleLoadType
+{
+    /// <summary>
+    /// Indicates that the asset bundle is being loaded through a call to 'LoadFromFile' or 'LoadFromFileAsync'.
+    /// </summary>
+    LoadFromFile,
+}
+```
+
+As can be see, the current implementation only hooks the LoadFromFile/LoadFromFileAsync ways of loading AssetBundles, but this may be expanded in the future.
+
+It may also be worth looking at the `GetNormalizedPath()` method instead of the `Path` property of the original call parameters. This is because the path passed to the method can take literally any form:
+ * Absolute path
+ * Relative path
+ * Include a stray '..' in the middle of the path
+
+### Implemting an Asset Redirector
+Here's an example of how a resource redirection may be implemented to hook all `Texture2D` objects loaded through the `AssetBundle` API:
+
+```C#
+class TextureReplacementPlugin
+{
+    void Awake()
     {
-        ResourceRedirector<Texture2D>.AssetLoading += ResourceRedirector_AssetLoading;
+        ResourceRedirection.RegisterAssetLoadedHook( AssetLoaded );
     }
 
-    private void ResourceRedirector_AssetLoading(IRedirectionContext<Texture2D> context)
+    public void AssetLoaded( AssetLoadedContext context )
     {
-        var texture2d = context.Asset;
-            
-        // TODO: Modify, replace or dump it the texture
-
-        context.Asset = texture2d;
-        context.Handled = true;
+        for( int i = 0; i < context.Assets.Length; i++ )
+        {
+            var asset = context.Assets[ i ];
+            if( asset is Texture2D texture2d )
+            {
+                // TODO: Modify, replace or dump the texture
+		    
+                context.Handled = true;
+                context.Assets[ i ] = texture2d; // only need to update the reference if you created a new texture
+            }
+        }
     }
 }
 ```
 
-### Implenting a resource redirector through interface
-This approach should be used if you simply wish to make an addon to this plugin, rather than a fully fledged plugin by yourself. Here's an example of how to implement a resource redirector for the `Texture2D` class:
+### Implemting an AssetBundle Redirector
+Here's an example of how a resource redirection may be implemented to redirect non-existing resources to a seperate 'mods' directory.
 
+```C#
+class AssetBundleRedirectorPlugin
+{
+    void Awake()
+    {
+        ResourceRedirection.RegisterAssetBundleLoadingHook( AssetBundleLoading );
+        ResourceRedirection.RegisterAsyncAssetBundleLoadingHook( AsyncAssetBundleLoading );
+    }
 
+    public void AssetBundleLoading( AssetBundleLoadingContext context )
+    {
+        if( !File.Exists( context.OriginalParameters.Path ) )
+        {
+            // the game is trying to load a path that does not exist, lets redirect to our own resources
+		    
+            // obtain different resource path
+            var normalizedPath = context.GetNormalizedPath();
+            var modFolderPath = Path.Combine( "mods", normalizedPath );
+		    
+            // if the path exists, let's load that instead
+            if( File.Exists( modFolderPath ) )
+            {
+                var bundle = AssetBundle.LoadFromFile( modFolderPath );
+		    
+                context.Bundle = bundle;
+                context.Handled = true;
+            }
+        }
+    }
+
+    public void AsyncAssetBundleLoading( AsyncAssetBundleLoadingContext context )
+    {
+        if( !File.Exists( context.OriginalParameters.Path ) )
+        {
+            // the game is trying to load a path that does not exist, lets redirect to our own resources
+		    
+            // obtain different resource path
+            var normalizedPath = context.GetNormalizedPath();
+            var modFolderPath = Path.Combine( "mods", normalizedPath );
+		    
+            // if the path exists, let's load that instead
+            if( File.Exists( modFolderPath ) )
+            {
+                var request = AssetBundle.LoadFromFileAsync( modFolderPath );
+		    
+                context.Request = request;
+                context.Handled = true;
+            }
+        }
+    }
+}
+```
+
+### Implementing an Asset/Resource Handler (Auto Translator)
+This section shows how to implement an asset/resource redirector that respects the Auto Translator configuration.
+
+The `XUnity.AutoTranslator.Core.Plugin.dll` assembly has a base class that can be used to implement a plugin that dumps resources for the purposes of translation:
+
+```C#
+/// <summary>
+/// Base implementation of resource redirect handler that takes care of the plumming for a
+/// resource redirector that is interested in either updating or dumping redirected resources.
+/// </summary>
+/// <typeparam name="TAsset">The type of asset being redirected.</typeparam>
+public abstract class AssetLoadedHandlerBase<TAsset>
+    where TAsset : UnityEngine.Object
+{
+    /// <summary>
+    /// Gets a bool indicating if resource dumping is enabled in the Auto Translator.
+    /// </summary>
+    protected bool IsDumpingEnabled { get; }
+
+    /// <summary>
+    /// Method invoked when an asset should be updated or replaced.
+    /// </summary>
+    /// <param name="calculatedModificationPath">This is the modification path calculated in the CalculateModificationFilePath method.</param>
+    /// <param name="asset">The asset to be updated or replaced.</param>
+    /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
+    /// <returns>A bool indicating if the event should be considered handled.</returns>
+    protected abstract bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref TAsset asset, IAssetOrResourceLoadedContext context );
+
+    /// <summary>
+    /// Method invoked when an asset should be dumped.
+    /// </summary>
+    /// <param name="calculatedModificationPath">This is the modification path calculated in the CalculateModificationFilePath method.</param>
+    /// <param name="asset">The asset to be updated or replaced.</param>
+    /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
+    /// <returns>A bool indicating if the event should be considered handled.</returns>
+    protected abstract bool DumpAsset( string calculatedModificationPath, TAsset asset, IAssetOrResourceLoadedContext context );
+
+    /// <summary>
+    /// Method invoked when a new resource event is fired to calculate a unique path for the resource.
+    /// </summary>
+    /// <param name="asset">The asset to be updated or replaced.</param>
+    /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
+    /// <returns>A string uniquely representing a path for the redirected resource.</returns>
+    protected abstract string CalculateModificationFilePath( TAsset asset, IAssetOrResourceLoadedContext context );
+
+    /// <summary>
+    /// Method to be invoked to indicate if the asset should be handled or not.
+    /// </summary>
+    /// <param name="asset">The asset to be updated or replaced.</param>
+    /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
+    /// <returns>A bool indicating if the asset should be handled.</returns>
+    protected abstract bool ShouldHandleAsset( TAsset asset, IAssetOrResourceLoadedContext context );
+}
+```
+
+The Auto Translation includes one default implementation of this class for TextAssets. It looks like this:
+
+```C#
+internal class TextAssetLoadedHandler : AssetLoadedHandlerBase<TextAsset>
+{
+    protected override string CalculateModificationFilePath( TextAsset asset, IAssetOrResourceLoadedContext context )
+    {
+        return context.GetPreferredFilePath( asset, ".txt" );
+    }
+
+    protected override bool DumpAsset( string calculatedModificationPath, TextAsset asset, IAssetOrResourceLoadedContext context )
+    {
+        Directory.CreateDirectory( new FileInfo( calculatedModificationPath ).Directory.FullName );
+        File.WriteAllBytes( calculatedModificationPath, asset.bytes );
+
+        return true;
+    }
+
+    protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref TextAsset asset, IAssetOrResourceLoadedContext context )
+    {
+        var data = File.ReadAllBytes( calculatedModificationPath );
+        var text = Encoding.UTF8.GetString( data );
+         
+        var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
+        ext.Data = data;
+        ext.Text = text;
+
+        return true;
+    }
+
+    protected override bool ShouldHandleAsset( TextAsset asset, IAssetOrResourceLoadedContext context )
+    {
+        return !context.HasReferenceBeenRedirectedBefore( asset );
+    }
+}
+```
+
+Another examples of an implementation of this class would be for Koikatsu that enables replacing its custom resources:
+
+```C#
+public class ScenarioDataResourceRedirector : AssetLoadedHandlerBase<ScenarioData>
+{
+    protected override string CalculateModificationFilePath(ScenarioData asset, IAssetOrResourceLoadedContext context)
+    {
+        return context.GetPreferredFilePathWithCustomFileName(@"BepInEx\translation", asset, "translation.txt")
+            .Replace(@"\assets", "")
+            .Replace(".unity3d", "");
+    }
+
+    protected override bool DumpAsset(string calculatedModificationPath, ScenarioData asset, IAssetOrResourceLoadedContext context)
+    {
+        var cache = new SimpleTextTranslationCache(calculatedModificationPath, false);
+
+        foreach (var param in asset.list)
+        {
+            if (param.Command == Command.Text)
+            {
+                for (int i = 0; i < param.Args.Length; i++)
+                {
+                    var key = param.Args[i];
+
+                    if (!string.IsNullOrEmpty(key) && LanguageHelper.IsTranslatable(key))
+                    {
+                        cache.AddTranslationToCache(key, key);
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected override bool ReplaceOrUpdateAsset(string calculatedModificationPath, ref ScenarioData asset, IAssetOrResourceLoadedContext context)
+    {
+        var cache = new SimpleTextTranslationCache(calculatedModificationPath, true);
+
+        foreach (var param in asset.list)
+        {
+            if (param.Command == Command.Text)
+            {
+                for (int i = 0; i < param.Args.Length; i++)
+                {
+                    var key = param.Args[i];
+                    if (!string.IsNullOrEmpty(key))
+                    {
+                        if (cache.TryGetTranslation(key, true, out var translated))
+                        {
+                            param.Args[i] = translated;
+                        }
+                        else if (IsDumpingEnabled && LanguageHelper.IsTranslatable(key))
+                        {
+                            cache.AddTranslationToCache(key, key);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected override bool ShouldHandleAsset(ScenarioData asset, IAssetOrResourceLoadedContext context)
+    {
+        return !context.HasReferenceBeenRedirectedBefore(asset);
+    }
+}
+```
+
+Once you have implemented one of these classes, you just need to instantiate it and it will do it's magic. 

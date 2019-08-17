@@ -37,7 +37,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets a unique file system path for the specfic asset that should be unique.
+      /// Gets a file system path for the specfic asset that should be unique.
       /// </summary>
       /// <param name="asset"></param>
       /// <returns></returns>
@@ -96,7 +96,7 @@ namespace XUnity.ResourceRedirector
       public AssetLoadParameters OriginalParameters { get; }
 
       /// <summary>
-      /// Gets the AssetBundle if the asset is being loaded through the AssetBundle API, otherwise null.
+      /// Gets the AssetBundle associated with the loaded assets.
       /// </summary>
       public AssetBundle Bundle { get; }
 

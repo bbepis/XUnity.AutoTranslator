@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    /// <summary>
    /// Base implementation of resource redirect handler that takes care of the plumming for a
-   /// resource redirector that is interested in either updating of dumping redirected resources.
+   /// resource redirector that is interested in either updating or dumping redirected resources.
    /// </summary>
    /// <typeparam name="TAsset">The type of asset being redirected.</typeparam>
    public abstract class AssetLoadedHandlerBase<TAsset>

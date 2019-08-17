@@ -15,15 +15,15 @@ namespace XUnity.ResourceRedirector
    /// <summary>
    /// Entrypoint to the resource redirection API.
    /// </summary>
-   public class ResourceRedirection
+   public static class ResourceRedirection
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
 
-      private protected static readonly List<Action<AssetLoadedContext>> RedirectionsForAssets = new List<Action<AssetLoadedContext>>();
-      private protected static readonly List<Action<ResourceLoadedContext>> RedirectionsForResources = new List<Action<ResourceLoadedContext>>();
-      private protected static readonly List<Action<AssetBundleLoadingContext>> RedirectionsForAssetBundles = new List<Action<AssetBundleLoadingContext>>();
-      private protected static readonly List<Action<AsyncAssetBundleLoadingContext>> RedirectionsForAsyncAssetBundles = new List<Action<AsyncAssetBundleLoadingContext>>();
+      private static readonly List<Action<AssetLoadedContext>> RedirectionsForAssets = new List<Action<AssetLoadedContext>>();
+      private static readonly List<Action<ResourceLoadedContext>> RedirectionsForResources = new List<Action<ResourceLoadedContext>>();
+      private static readonly List<Action<AssetBundleLoadingContext>> RedirectionsForAssetBundles = new List<Action<AssetBundleLoadingContext>>();
+      private static readonly List<Action<AsyncAssetBundleLoadingContext>> RedirectionsForAsyncAssetBundles = new List<Action<AsyncAssetBundleLoadingContext>>();
       private static bool _initialized = false;
       private static bool _logUnhandledResources = false;
 
@@ -73,7 +73,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetBundleLoaded_Postfix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
+      internal static void Hook_AssetBundleLoaded_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
          if( !_isFiringAssetBundleLoadingEvent )
          {
@@ -121,7 +121,7 @@ namespace XUnity.ResourceRedirector
          bundle = null;
       }
 
-      internal static void Hook_AssetBundleLoading_Postfix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
+      internal static void Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
       {
          if( !_isFiringAsyncAssetBundleLoadingEvent )
          {
@@ -382,7 +382,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Register ReourceLoaded event for all assets.
+      /// Register ReourceLoaded event.
       /// </summary>
       /// <param name="action">The callback.</param>
       public static void RegisterResourceLoadedHook( Action<ResourceLoadedContext> action )
@@ -395,7 +395,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Unregister ReourceLoaded event for all assets.
+      /// Unregister ReourceLoaded event.
       /// </summary>
       /// <param name="action">The callback.</param>
       public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action )
@@ -406,7 +406,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Register AssetLoaded event for all assets.
+      /// Register AssetLoaded event.
       /// </summary>
       /// <param name="action">The callback.</param>
       public static void RegisterAssetLoadedHook( Action<AssetLoadedContext> action )
@@ -419,7 +419,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Unregister AssetLoaded event for all assets.
+      /// Unregister AssetLoaded event.
       /// </summary>
       /// <param name="action">The callback.</param>
       public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action )
@@ -433,7 +433,7 @@ namespace XUnity.ResourceRedirector
       /// Register AssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void RegisterAseetBundleLoadingHook( Action<AssetBundleLoadingContext> action )
+      public static void RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
@@ -457,7 +457,7 @@ namespace XUnity.ResourceRedirector
       /// Register AsyncAssetBundleLoading event.
       /// </summary>
       /// <param name="action">The callback.</param>
-      public static void RegisterAsyncAseetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )
+      public static void RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 

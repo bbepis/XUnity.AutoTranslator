@@ -34,7 +34,7 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets a unique file system path for the specfic asset that should be unique.
+      /// Gets a file system path for the specfic asset that should be unique.
       /// </summary>
       /// <param name="asset"></param>
       /// <returns></returns>
