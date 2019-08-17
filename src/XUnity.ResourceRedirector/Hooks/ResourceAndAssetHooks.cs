@@ -64,9 +64,9 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var handled = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( result == null )
+         if( !handled )
          {
             result = _original( path, crc, offset );
          }
@@ -100,9 +100,9 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         ResourceRedirection.Hook_AssetBundleLoaded_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var handled = ResourceRedirection.Hook_AssetBundleLoaded_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( result == null )
+         if( !handled )
          {
             result = _original( path, crc, offset );
          }

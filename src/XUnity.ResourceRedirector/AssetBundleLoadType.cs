@@ -8,7 +8,7 @@
       /// <summary>
       /// Indicates that the asset bundle is being loaded through a call to 'LoadFromFile' or 'LoadFromFileAsync'.
       /// </summary>
-      LoadFromFile,
+      LoadFromFile = 1,
       //LoadFromMemory,
 
       // other places, online resource, etc.

@@ -73,7 +73,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetBundleLoaded_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
+      internal static bool Hook_AssetBundleLoaded_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
          if( !_isFiringAssetBundleLoadingEvent )
          {
@@ -103,7 +103,12 @@ namespace XUnity.ResourceRedirector
                if( context.Handled )
                {
                   bundle = context.Bundle;
-                  return;
+                  return true;
+               }
+
+               if( _logUnhandledResources )
+               {
+                  XuaLogger.ResourceRedirector.Debug( $"Found asset bundle that no AssetBundleLoading handler could handle ({path})." );
                }
             }
             finally
@@ -112,16 +117,12 @@ namespace XUnity.ResourceRedirector
             }
          }
 
-         if( _logUnhandledResources )
-         {
-            XuaLogger.ResourceRedirector.Debug( $"Found asset bundle that no AssetBundleLoading handler could handle ({path})." );
-         }
-
 
          bundle = null;
+         return false;
       }
 
-      internal static void Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
+      internal static bool Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
       {
          if( !_isFiringAsyncAssetBundleLoadingEvent )
          {
@@ -151,7 +152,12 @@ namespace XUnity.ResourceRedirector
                if( context.Handled )
                {
                   request = context.Request;
-                  return;
+                  return true;
+               }
+
+               if( _logUnhandledResources )
+               {
+                  XuaLogger.ResourceRedirector.Debug( $"Found asset bundle that no AsyncAssetBundleLoading handler could handle ({path})." );
                }
             }
             finally
@@ -160,29 +166,33 @@ namespace XUnity.ResourceRedirector
             }
          }
 
-         if( _logUnhandledResources )
-         {
-            XuaLogger.ResourceRedirector.Debug( $"Found asset bundle that no AsyncAssetBundleLoading handler could handle ({path})." );
-         }
-
          request = null;
+         return false;
       }
 
       internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
       {
-         if( asset == null ) return;
+         UnityEngine.Object[] arr;
+         if( asset == null )
+         {
+            arr = null;
+         }
+         else
+         {
+            arr = new[] { asset };
+         }
 
-         var arr = new[] { asset };
 
          Hook_AssetLoaded_Postfix( assetName, assetType, loadType, parentBundle, request, ref arr );
 
-         asset = arr[ 0 ];
+         if( arr != null && arr.Length > 0 )
+         {
+            asset = arr[ 0 ];
+         }
       }
 
       internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, AssetBundleRequest request, ref UnityEngine.Object[] assets )
       {
-         if( assets == null ) return;
-
          lock( Sync )
          {
             if( bundle == null )
@@ -202,7 +212,7 @@ namespace XUnity.ResourceRedirector
             }
          }
 
-         if( loadType == AssetLoadType.LoadByType )
+         if( loadType == AssetLoadType.LoadByType && assets != null )
          {
             for( int i = 0; i < assets.Length; i++ )
             {
@@ -232,20 +242,28 @@ namespace XUnity.ResourceRedirector
 
       internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object asset )
       {
-         if( asset == null ) return;
+         UnityEngine.Object[] arr;
+         if( asset == null )
+         {
+            arr = null;
+         }
+         else
+         {
+            arr = new[] { asset };
+         }
 
-         var arr = new[] { asset };
 
          Hook_ResourceLoaded_Postfix( assetPath, assetType, loadType, ref arr );
 
-         asset = arr[ 0 ];
+         if( arr != null && arr.Length > 0 )
+         {
+            asset = arr[ 0 ];
+         }
       }
 
       internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
       {
-         if( assets == null ) return;
-
-         if( loadType == ResourceLoadType.LoadByType )
+         if( loadType == ResourceLoadType.LoadByType && assets != null )
          {
             for( int i = 0; i < assets.Length; i++ )
             {
@@ -267,6 +285,7 @@ namespace XUnity.ResourceRedirector
          {
             _isFiringAssetLoadedEvent = true;
             var context = new AssetLoadedContext( assetLoadName, assetLoadType, loadType, assetBundle, assets );
+            var previousAssets = assets;
 
             try
             {
@@ -288,7 +307,7 @@ namespace XUnity.ResourceRedirector
                   }
                }
 
-               if( !context.Handled && _logUnhandledResources )
+               if( !context.Handled && _logUnhandledResources && assets != null )
                {
                   foreach( var asset in assets )
                   {
@@ -308,12 +327,13 @@ namespace XUnity.ResourceRedirector
             }
             finally
             {
-               assets = context.Assets; // Only GETTER ... for now...
-
-               foreach( var asset in assets )
+               if( previousAssets != null )
                {
-                  var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
-                  ext.HasBeenRedirected = true;
+                  foreach( var asset in previousAssets )
+                  {
+                     var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+                     ext.HasBeenRedirected = true;
+                  }
                }
 
                _isFiringAssetLoadedEvent = false;
@@ -327,6 +347,7 @@ namespace XUnity.ResourceRedirector
          {
             _isFiringResourceLoadedEvent = true;
             var context = new ResourceLoadedContext( resourceLoadPath, resourceLoadType, loadType, assets );
+            var previousAssets = assets;
 
             try
             {
@@ -348,7 +369,7 @@ namespace XUnity.ResourceRedirector
                   }
                }
 
-               if( !context.Handled && _logUnhandledResources )
+               if( !context.Handled && _logUnhandledResources && assets != null )
                {
                   foreach( var asset in assets )
                   {
@@ -368,12 +389,13 @@ namespace XUnity.ResourceRedirector
             }
             finally
             {
-               assets = context.Assets; // Only GETTER ... for now...
-
-               foreach( var asset in assets )
+               if( previousAssets != null )
                {
-                  var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
-                  ext.HasBeenRedirected = true;
+                  foreach( var asset in previousAssets )
+                  {
+                     var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+                     ext.HasBeenRedirected = true;
+                  }
                }
 
                _isFiringResourceLoadedEvent = false;

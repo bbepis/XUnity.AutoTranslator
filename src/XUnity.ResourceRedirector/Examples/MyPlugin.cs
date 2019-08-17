@@ -16,10 +16,12 @@ namespace XUnity.ResourceRedirector.Examples
 
       public void AssetLoaded( AssetLoadedContext context )
       {
+         if( context.Assets == null ) return;
+
          for( int i = 0; i < context.Assets.Length; i++ )
          {
             var asset = context.Assets[ i ];
-            if( asset is Texture2D texture2d )
+            if( asset is Texture2D texture2d ) // also acts as a null check
             {
                // TODO: Modify, replace or dump the texture
 

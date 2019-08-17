@@ -61,6 +61,9 @@ The file structure should like like this
 {GameDirectory}/ReiPatcher/Mono.Cecil.Rocks.dll
 {GameDirectory}/ReiPatcher/ReiPatcher.exe
 {GameDirectory}/{GameExeName}_Data/Managed/ReiPatcher.exe
+{GameDirectory}/{GameExeName}_Data/Managed/XUnity.Common.dll
+{GameDirectory}/{GameExeName}_Data/Managed/XUnity.ResourceRedirector.dll
+{GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
 {GameDirectory}/{GameExeName}_Data/Managed/MonoMod.RuntimeDetour.dll
@@ -82,6 +85,8 @@ REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow i
 
 The file structure should like like this:
 ```
+{GameDirectory}/BepInEx/XUnity.Common.dll
+{GameDirectory}/BepInEx/XUnity.ResourceRedirector.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.BepInEx.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
@@ -103,6 +108,8 @@ REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow i
 
 The file structure should like like this:
 ```
+{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.Common.dll
+{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.ResourceRedirector.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.BepInEx.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
@@ -124,6 +131,8 @@ REQUIRES: [IPA plugin manager](https://github.com/Eusth/IPA) (follow its install
 
 The file structure should like like this
 ```
+{GameDirectory}/Plugins/XUnity.Common.dll
+{GameDirectory}/Plugins/XUnity.ResourceRedirector.dll
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.IPA.dll
 {GameDirectory}/Plugins/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
@@ -144,6 +153,8 @@ REQUIRES: UnityInjector (follow its installation instructions first!).
 
 The file structure should like like this
 ```
+{GameDirectory}/UnityInjector/XUnity.Common.dll
+{GameDirectory}/UnityInjector/XUnity.ResourceRedirector.dll
 {GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.UnityInjector.dll
 {GameDirectory}/UnityInjector/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
@@ -1041,7 +1052,13 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
     /// <summary>
     /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
     /// </summary>
-    public UnityEngine.Object[] Assets { get; }
+    public UnityEngine.Object[] Assets { get; set; }
+
+    /// <summary>
+    /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+    /// additional null guards to prevent NullReferenceExceptions when using it.
+    /// </summary>
+    public UnityEngine.Object Asset { get; set; }
 
     /// <summary>
     /// Gets or sets a bool indicating if this event has been handled. Setting
@@ -1146,7 +1163,13 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     /// <summary>
     /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
     /// </summary>
-    public UnityEngine.Object[] Assets { get; }
+    public UnityEngine.Object[] Assets { get; set; }
+
+    /// <summary>
+    /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+    /// additional null guards to prevent NullReferenceExceptions when using it.
+    /// </summary>
+    public UnityEngine.Object Asset { get; set; }
 
     /// <summary>
     /// Gets or sets a bool indicating if this event has been handled. Setting
@@ -1417,10 +1440,12 @@ class TextureReplacementPlugin
 
     public void AssetLoaded( AssetLoadedContext context )
     {
+        if( context.Assets == null ) return;
+
         for( int i = 0; i < context.Assets.Length; i++ )
         {
             var asset = context.Assets[ i ];
-            if( asset is Texture2D texture2d )
+            if( asset is Texture2D texture2d ) // also acts as a null check
             {
                 // TODO: Modify, replace or dump the texture
 		    

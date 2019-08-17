@@ -8,16 +8,16 @@
       /// <summary>
       /// Indicates that this call is loading all assets of a specific type (below a specific path) in the Resources API.
       /// </summary>
-      LoadByType,
+      LoadByType = 1,
 
       /// <summary>
       /// Indicates that this call is loading a single named asset in the Resources API.
       /// </summary>
-      LoadNamed,
+      LoadNamed = 2,
 
       /// <summary>
       /// Indicates that this call is loading a single named built-in asset in the Resources API.
       /// </summary>
-      LoadNamedBuiltIn
+      LoadNamedBuiltIn = 3
    }
 }

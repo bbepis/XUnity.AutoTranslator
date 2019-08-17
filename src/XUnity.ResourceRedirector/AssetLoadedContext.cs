@@ -103,7 +103,31 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
       /// </summary>
-      public UnityEngine.Object[] Assets { get; }
+      public UnityEngine.Object[] Assets { get; set; }
+
+      /// <summary>
+      /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+      /// additional null guards to prevent NullReferenceExceptions when using it.
+      /// </summary>
+      public UnityEngine.Object Asset
+      {
+         get
+         {
+            if( Assets == null || Assets.Length < 1 )
+            {
+               return null;
+            }
+            return Assets[ 0 ];
+         }
+         set
+         {
+            if( Assets == null || Assets.Length < 1 )
+            {
+               Assets = new UnityEngine.Object[ 1 ];
+            }
+            Assets[ 0 ] = value;
+         }
+      }
 
       /// <summary>
       /// Gets or sets a bool indicating if this event has been handled. Setting
