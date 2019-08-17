@@ -212,7 +212,7 @@ namespace XUnity.ResourceRedirector
             }
          }
 
-         if( loadType == AssetLoadType.LoadByType && assets != null )
+         if( loadType == AssetLoadType.LoadByType && assets != null && assets.Length != 0 )
          {
             for( int i = 0; i < assets.Length; i++ )
             {
@@ -224,7 +224,19 @@ namespace XUnity.ResourceRedirector
          }
          else
          {
+            bool noEntries = assets?.Length == 0;
+            var previousAssets = assets;
+            if( noEntries )
+            {
+               assets = null;
+            }
+
             FireAssetLoadedEvent( assetName, assetType, bundle, loadType, ref assets );
+
+            if( noEntries && assets == null )
+            {
+               assets = previousAssets;
+            }
          }
       }
 
@@ -263,7 +275,7 @@ namespace XUnity.ResourceRedirector
 
       internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
       {
-         if( loadType == ResourceLoadType.LoadByType && assets != null )
+         if( loadType == ResourceLoadType.LoadByType && assets != null && assets.Length != 0 )
          {
             for( int i = 0; i < assets.Length; i++ )
             {
@@ -275,7 +287,19 @@ namespace XUnity.ResourceRedirector
          }
          else
          {
+            bool noEntries = assets?.Length == 0;
+            var previousAssets = assets;
+            if( noEntries )
+            {
+               assets = null;
+            }
+
             FireResourceLoadedEvent( assetPath, assetType, loadType, ref assets );
+
+            if( noEntries && assets == null )
+            {
+               assets = previousAssets;
+            }
          }
       }
 
