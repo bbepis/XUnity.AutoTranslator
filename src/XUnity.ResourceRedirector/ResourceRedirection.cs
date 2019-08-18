@@ -278,7 +278,6 @@ namespace XUnity.ResourceRedirector
 
                if( _logAllLoadedResources && assets != null )
                {
-                  // print out which were not handled. Asset count will ONLY by changed if handledByCall is true
                   for( int i = 0; i < assets.Length; i++ )
                   {
                      var asset = assets[ i ];
@@ -333,13 +332,13 @@ namespace XUnity.ResourceRedirector
 
                               redirection( contextPerResource );
 
-                              if( contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
+                              if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
                               {
                                  assets[ j ] = contextPerResource.Assets[ 0 ];
                               }
                               else
                               {
-                                 XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoaded event. You must not remove an asset reference when with hook behaviour {HookBehaviour.OneCallbackPerResourceLoaded}." );
+                                 XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoaded event. You must not remove an asset reference when hooking with behaviour {HookBehaviour.OneCallbackPerResourceLoaded}." );
                               }
 
                               if( contextPerResource.Handled ) break;
@@ -390,7 +389,6 @@ namespace XUnity.ResourceRedirector
 
                if( _logAllLoadedResources && assets != null )
                {
-                  // print out which were not handled. Asset count will ONLY by changed if handledByCall is true
                   for( int i = 0; i < assets.Length; i++ )
                   {
                      var asset = assets[ i ];
@@ -445,13 +443,13 @@ namespace XUnity.ResourceRedirector
 
                               redirection( contextPerResource );
 
-                              if( contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
+                              if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
                               {
                                  assets[ j ] = contextPerResource.Assets[ 0 ];
                               }
                               else
                               {
-                                 XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in ResourceLoaded event. You must not remove an asset reference when with hook behaviour {HookBehaviour.OneCallbackPerResourceLoaded}." );
+                                 XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in ResourceLoaded event. You must not remove an asset reference when hooking with behaviour {HookBehaviour.OneCallbackPerResourceLoaded}." );
                               }
 
                               if( contextPerResource.Handled ) break;

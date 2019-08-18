@@ -30,12 +30,6 @@ namespace XUnity.Common.Extensions
          int offset = 0;
          bool impossible = false;
 
-         //// this is the easy case.  The file is inside of the working directory.
-         //if( fullPath.StartsWith( basePath ) )
-         //{
-         //   return fullPath.Substring( basePath.Length + 1 );
-         //}
-
          // the hard case has to back out of the working directory
          string[] baseDirs = basePath.Split( new char[] { ':', '\\', '/' } );
          var fileDirs = fullOrRelativePath.Split( new char[] { ':', '\\', '/' } ).ToList();
@@ -46,6 +40,31 @@ namespace XUnity.Common.Extensions
             // can't create a relative path between separate harddrives/partitions.
             impossible = true;
          }
+
+         // remove internal '..' from file dir
+         bool hasSeenActualSegment = false;
+         for( int i = 0; i < fileDirs.Count; i++ )
+         {
+            if( fileDirs[ i ] == ".." )
+            {
+               if( hasSeenActualSegment )
+               {
+                  var previousIndex = i - 1;
+                  if( previousIndex >= 0 )
+                  {
+                     fileDirs.RemoveAt( i );
+                     fileDirs.RemoveAt( previousIndex );
+                     i -= 2;
+                  }
+               }
+            }
+            else
+            {
+               hasSeenActualSegment = true;
+            }
+         }
+
+         // COMMENT: Assumption is that basePath is formed OK with no stray ".."!
 
          if( !impossible )
          {
@@ -63,37 +82,17 @@ namespace XUnity.Common.Extensions
             }
          }
 
-         for( int i = offset; i < fileDirs.Count; i++ )
-         {
-            if( fileDirs[ i ] == ".." )
-            {
-               var previousIndex = i - 1;
-               if( previousIndex >= offset )
-               {
-                  fileDirs.RemoveAt( i );
-                  fileDirs.RemoveAt( previousIndex );
-                  i -= 2;
-               }
-            }
-         }
-
          // step into the file path
          for( int i = offset; i < fileDirs.Count - 1; i++ )
          {
             var dir = fileDirs[ i ];
-            if( dir != null )
-            {
-               builder.Append( dir )
-                  .Append( '\\' );
-            }
+            builder.Append( dir )
+               .Append( '\\' );
          }
 
          var lastIndex = fileDirs.Count - 1;
          var lastDir = fileDirs[ lastIndex ];
-         if( lastDir != null )
-         {
-            builder.Append( lastDir );
-         }
+         builder.Append( lastDir );
 
          return builder.ToString();
       }

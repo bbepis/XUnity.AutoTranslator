@@ -7,12 +7,12 @@ namespace XUnity.Common.Utilities
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public static class ObjectReferenceMapper
+   public static class ExtensionDataHelper
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> DynamicFields = new WeakDictionary<object, object>();
 
-      static ObjectReferenceMapper()
+      static ExtensionDataHelper()
       {
          MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
       }
@@ -77,6 +77,7 @@ namespace XUnity.Common.Utilities
                      return t;
                   }
                }
+
                if( !( value is T ) )
                {
                   var newDictionary = new Dictionary<Type, object>();

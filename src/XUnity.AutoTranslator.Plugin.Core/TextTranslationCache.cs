@@ -10,6 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -42,6 +43,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public TextTranslationCache()
       {
          LoadStaticTranslations();
+
+         // start function to write translations to file
+         MaintenanceHelper.AddMaintenanceFunction( SaveNewTranslationsToDisk, 1 );
       }
 
       private static IEnumerable<string> GetTranslationFiles()
@@ -424,7 +428,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal void SaveNewTranslationsToDisk()
+      private void SaveNewTranslationsToDisk()
       {
          if( _newTranslations.Count > 0 )
          {

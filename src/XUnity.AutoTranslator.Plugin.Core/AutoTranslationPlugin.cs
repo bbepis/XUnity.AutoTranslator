@@ -143,9 +143,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // initialize ui
          InitializeGUI();
 
-         // start function to write translations to file
-         MaintenanceHelper.AddMaintenanceFunction( TextCache.SaveNewTranslationsToDisk, 1 );
-
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
@@ -2266,7 +2263,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations();
 
          var context = new TextureReloadContext();
-         foreach( var kvp in ObjectReferenceMapper.GetAllRegisteredObjects() )
+         foreach( var kvp in ExtensionDataHelper.GetAllRegisteredObjects() )
          {
             var ui = kvp.Key;
             try
@@ -2322,7 +2319,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             catch( Exception )
             {
                // not super pretty, no...
-               ObjectReferenceMapper.Remove( ui );
+               ExtensionDataHelper.Remove( ui );
             }
          }
       }
@@ -2333,7 +2330,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _hasOverridenFont = !_hasOverridenFont;
 
-            var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
+            var objects = ExtensionDataHelper.GetAllRegisteredObjects();
             XuaLogger.AutoTranslator.Info( $"Toggling fonts of {objects.Count} objects." );
 
             if( _hasOverridenFont )
@@ -2355,7 +2352,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      catch( Exception )
                      {
                         // not super pretty, no...
-                        ObjectReferenceMapper.Remove( ui );
+                        ExtensionDataHelper.Remove( ui );
                      }
                   }
                }
@@ -2377,7 +2374,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   catch( Exception )
                   {
                      // not super pretty, no...
-                     ObjectReferenceMapper.Remove( ui );
+                     ExtensionDataHelper.Remove( ui );
                   }
                }
             }
@@ -2387,7 +2384,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void ToggleTranslation()
       {
          _isInTranslatedMode = !_isInTranslatedMode;
-         var objects = ObjectReferenceMapper.GetAllRegisteredObjects();
+         var objects = ExtensionDataHelper.GetAllRegisteredObjects();
 
          XuaLogger.AutoTranslator.Info( $"Toggling translations of {objects.Count} objects." );
 
@@ -2419,7 +2416,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                catch( Exception )
                {
                   // not super pretty, no...
-                  ObjectReferenceMapper.Remove( ui );
+                  ExtensionDataHelper.Remove( ui );
                }
             }
          }
@@ -2451,7 +2448,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                catch( Exception )
                {
                   // not super pretty, no...
-                  ObjectReferenceMapper.Remove( ui );
+                  ExtensionDataHelper.Remove( ui );
                }
             }
          }
