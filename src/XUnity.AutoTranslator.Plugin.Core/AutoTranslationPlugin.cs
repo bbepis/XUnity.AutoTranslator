@@ -153,9 +153,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            if( Settings.EnableLoggingUnhandledResources )
+            if( Settings.LogAllLoadedResources )
             {
-               ResourceRedirector.ResourceRedirection.LogUnhandledResources = true;
+               ResourceRedirection.LogAllLoadedResources = true;
             }
 
             if( Settings.EnableTextAssetRedirector )

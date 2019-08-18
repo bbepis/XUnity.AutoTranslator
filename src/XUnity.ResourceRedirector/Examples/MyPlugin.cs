@@ -11,23 +11,17 @@ namespace XUnity.ResourceRedirector.Examples
    {
       void Awake()
       {
-         ResourceRedirection.RegisterAssetLoadedHook( AssetLoaded );
+         ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, AssetLoaded );
       }
 
       public void AssetLoaded( AssetLoadedContext context )
       {
-         if( context.Assets == null ) return;
-
-         for( int i = 0; i < context.Assets.Length; i++ )
+         if( context.Asset is Texture2D texture2d ) // also acts as a null check
          {
-            var asset = context.Assets[ i ];
-            if( asset is Texture2D texture2d ) // also acts as a null check
-            {
-               // TODO: Modify, replace or dump the texture
+            // TODO: Modify, replace or dump the texture
 
-               context.Handled = true;
-               context.Assets[ i ] = texture2d; // only need to update the reference if you created a new texture
-            }
+            context.Handled = true;
+            context.Asset = texture2d; // only need to update the reference if you created a new texture
          }
       }
    }
@@ -55,8 +49,8 @@ namespace XUnity.ResourceRedirector.Examples
             {
                var bundle = AssetBundle.LoadFromFile( modFolderPath );
 
-               context.Bundle = bundle;
                context.Handled = true;
+               context.Bundle = bundle;
             }
          }
       }
@@ -76,8 +70,8 @@ namespace XUnity.ResourceRedirector.Examples
             {
                var request = AssetBundle.LoadFromFileAsync( modFolderPath );
 
-               context.Request = request;
                context.Handled = true;
+               context.Request = request;
             }
          }
       }

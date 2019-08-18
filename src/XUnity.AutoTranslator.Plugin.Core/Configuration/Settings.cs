@@ -119,7 +119,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string PreferredStoragePath;
       public static bool EnableDumping;
       public static bool EnableTextAssetRedirector;
-      public static bool EnableLoggingUnhandledResources;
+      public static bool LogAllLoadedResources;
 
 
       public static float Height;
@@ -201,7 +201,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             PreferredStoragePath = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "PreferredStoragePath", @"RedirectedResources" );
             EnableTextAssetRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetRedirector", false );
-            EnableLoggingUnhandledResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableLoggingUnhandledResources", false );
+            LogAllLoadedResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "LogAllLoadedResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
 
             RedirectedResourcesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, PreferredStoragePath ).Replace( "/", "\\" ).Parameterize();

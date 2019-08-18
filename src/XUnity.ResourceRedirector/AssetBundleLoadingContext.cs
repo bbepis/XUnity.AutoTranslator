@@ -38,7 +38,7 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets the parameters of the original call.
       /// </summary>
-      public AssetBundleLoadParameters OriginalParameters { get; set; }
+      public AssetBundleLoadParameters OriginalParameters { get; }
 
       /// <summary>
       /// Gets or sets the AssetBundle being loaded.

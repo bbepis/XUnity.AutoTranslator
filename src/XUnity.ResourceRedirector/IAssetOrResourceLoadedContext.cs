@@ -20,7 +20,13 @@
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
       /// </summary>
-      UnityEngine.Object[] Assets { get; }
+      UnityEngine.Object[] Assets { get; set; }
+
+      /// <summary>
+      /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+      /// additional null guards to prevent NullReferenceExceptions when using it.
+      /// </summary>
+      UnityEngine.Object Asset { get; set; }
 
       /// <summary>
       /// Gets or sets a bool indicating if this event has been handled. Setting

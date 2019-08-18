@@ -12,9 +12,6 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AssetLoadedContext : IAssetOrResourceLoadedContext
    {
-      private bool? _hasBeenRedirectedBefore;
-      private string _uniqueFileSystemAssetPath;
-
       internal AssetLoadedContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, UnityEngine.Object[] assets )
       {
          OriginalParameters = new AssetLoadParameters( assetName, assetType, loadType );
@@ -28,12 +25,7 @@ namespace XUnity.ResourceRedirector
       /// </summary>
       public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset )
       {
-         if( !_hasBeenRedirectedBefore.HasValue )
-         {
-            var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
-            _hasBeenRedirectedBefore = ext.HasBeenRedirected;
-         }
-         return _hasBeenRedirectedBefore.Value;
+         return asset.GetExtensionData<ResourceExtensionData>()?.HasBeenRedirected == true;
       }
 
       /// <summary>
@@ -43,8 +35,8 @@ namespace XUnity.ResourceRedirector
       /// <returns></returns>
       public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset )
       {
-         // TODO: Optimize with StringBuilder
-         if( _uniqueFileSystemAssetPath == null )
+         var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
+         if( ext.FullFileSystemAssetPath == null )
          {
             string path = "assets";
 
@@ -84,10 +76,10 @@ namespace XUnity.ResourceRedirector
 
             path = path.Replace( '/', '\\' );
 
-            _uniqueFileSystemAssetPath = path;
+            ext.FullFileSystemAssetPath = path;
          }
 
-         return _uniqueFileSystemAssetPath;
+         return ext.FullFileSystemAssetPath;
       }
 
       /// <summary>
@@ -102,6 +94,8 @@ namespace XUnity.ResourceRedirector
 
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+      ///
+      /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets' and you subscribed with 'OneCallbackPerLoadCall'.
       /// </summary>
       public UnityEngine.Object[] Assets { get; set; }
 

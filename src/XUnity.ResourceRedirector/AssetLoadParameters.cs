@@ -20,13 +20,13 @@ namespace XUnity.ResourceRedirector
       public string Name { get; set; }
 
       /// <summary>
-      /// Gets the type that passed to the asset load call.
+      /// Gets the type that passed to the asset load call. 
       /// </summary>
       public Type Type { get; set; }
 
       /// <summary>
-      /// Gets the type of call that loaded this asset. NOTE: 'LoadByType' usually loads a number of assets
-      /// at a time. But in the context of the AssetLoaded hook, these will be hooked as individual calls.
+      /// Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
+      /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
       /// </summary>
       public AssetLoadType LoadType { get; }
    }

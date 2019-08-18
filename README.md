@@ -316,7 +316,7 @@ EnableLegacyTextureLoading=False ;Indicates the plugin should use a different st
 [ResourceRedirector]
 PreferredStoragePath=RedirectedResources ;Indicates the preferred storage for redirected resources in relation to the Auto Translator
 EnableTextAssetRedirector=False  ;Indicates if TextAssets should be redirected
-EnableLoggingUnhandledResources=False ;Indicates if the plugin should log the assets that has not been handled by a redirector
+LogAllLoadedResources=False      ;Indicates if the plugin should log to the console all loaded assets. Useful to determine what can be hooked
 EnableDumping=False              ;Indicates if translatable resources that are found should be dumped
 
 [Http]
@@ -580,7 +580,7 @@ More redirectors can be implemented for specific games, though this does require
 The Auto Translator has the following Resource Redirector-specific configuration:
  * `PreferredStoragePath`: Indicates where the Auto Translator should store redirected resources.
  * `EnableTextAssetRedirector`: Indicates if the TextAsset redirector is enabled.
- * `EnableLoggingUnhandledResources`: Indicates if Resource Redirector should log unhandled resources to the console (can also be controlled through Resource Redirector API surface).
+ * `LogAllLoadedResources`: Indicates if Resource Redirector should log all resources to the console (can also be controlled through Resource Redirector API surface).
  * `EnableDumping`: Indicates if resources redirected to the Auto Translator should be dumped for overwriting if possible.
 
 ## Regarding Redistribution
@@ -950,7 +950,7 @@ Another way to implement a translator is to implement the `ExtProtocolEndpoint` 
 If instead, you use the interface directly, it is also possible to extend from MonoBehaviour to get access to all the normal lifecycle callbacks of Unity components.
 
 ## Implementing a Resource Redirector
-The resource director allows you to modify resources as they are being loaded by the game.
+The resource director allows you to modify resources loaded through the `Resources` and `AssetBundle` API as they are being loaded by the game.
 
 The following API surface is made available by the Resource Redirector:
 
@@ -961,34 +961,32 @@ The following API surface is made available by the Resource Redirector:
 public static class ResourceRedirection
 {
     /// <summary>
-    /// Gets or sets a bool indicating if the resource redirector
-    /// should log which assets has no handler.
-    /// </summary>
-    public static bool LogUnhandledResources { get; set; }
-
-    /// <summary>
     /// Register ReourceLoaded event.
     /// </summary>
+    /// <param name="behaviour">The behaviour of the callback.</param>
     /// <param name="action">The callback.</param>
-    public static void RegisterResourceLoadedHook( Action<ResourceLoadedContext> action );
+    public static void RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action );
 
     /// <summary>
     /// Unregister ReourceLoaded event.
     /// </summary>
+    /// <param name="behaviour">The behaviour of the callback.</param>
     /// <param name="action">The callback.</param>
-    public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
+    public static void UnregisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action );
 
     /// <summary>
     /// Register AssetLoaded event.
     /// </summary>
+    /// <param name="behaviour">The behaviour of the callback.</param>
     /// <param name="action">The callback.</param>
-    public static void RegisterAssetLoadedHook( Action<AssetLoadedContext> action );
+    public static void RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action );
 
     /// <summary>
     /// Unregister AssetLoaded event.
     /// </summary>
+    /// <param name="behaviour">The behaviour of the callback.</param>
     /// <param name="action">The callback.</param>
-    public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action );
+    public static void UnregisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action );
 
     /// <summary>
     /// Register AssetBundleLoading event.
@@ -1020,7 +1018,7 @@ public static class ResourceRedirection
 Let's attach some comments to this API.
 
 ### Resource Loaded Methods
-The methods `RegisterResourceLoadedHook( Action<ResourceLoadedContext> action )` and `UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
+The methods `RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` and `UnregisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
 
 This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
 
@@ -1033,7 +1031,7 @@ The `ResourceLoadedContext` class has the following definition:
 public class ResourceLoadedContext : IAssetOrResourceLoadedContext
 {
     /// <summary>
-    /// Gets a bool indicating if this resource has already been redirected before.
+    /// Gets a bool indicating if this resource has been redirected before.
     /// </summary>
     public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
 
@@ -1051,6 +1049,8 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
 
     /// <summary>
     /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    ///
+    /// Consider using this if the load type is 'LoadByType' and you subscribed with 'OneCallbackPerLoadCall'.
     /// </summary>
     public UnityEngine.Object[] Assets { get; set; }
 
@@ -1068,13 +1068,36 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
 }
 ```
 
-One thing that is worth noticing is that it is actually a `UnityEngine.Object[]` array being redirected, and not just a single object. This is because not all the different calls to the `Resources` API load a single resource, for instance the `Resources.LoadAll` method.
+The HookBehaviour is an enum with the following definition:
 
-Now specfically in the case of the `Resources` postfix hooks there will only ever be one asset in this array. This is because the callback is called for each asset returned by `Resources.LoadAll` call. This is to enable a scenario where one handler only handles some of the resources in the array, while another handles the others.
+```C#
+/// <summary>
+/// Enum indicating how the resource redirector should treat the callback.
+/// </summary>
+public enum HookBehaviour
+{
+    /// <summary>
+    /// Specifies that exactly one callback should be received per call to asset/resource load method.
+    /// </summary>
+    OneCallbackPerLoadCall = 1,
 
-The API is kept like this to support the potential support in the future for prefix hooks.
+    /// <summary>
+    /// Specifies that exactly one callback should be received per loaded asset/resources. This means
+    /// that the 'Asset' property should be used over the 'Assets' property on the context object.
+    /// Do note that when using this option, if no resources are returned by a load call, no callbacks
+    /// will be received.
+    /// </summary>
+    OneCallbackPerResourceLoaded = 2
+}
+```
 
-If you update or replace the asset being loaded you should set the `Handled` property to true to stop propagation of this event to other handlers.
+An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
+ * You've subscribed with `OneCallbackPerLoadCall`.
+ * The `LoadType` in the `OriginalParameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
+
+In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
+
+If you update or replace the asset being loaded you can set the `Handled` property to true to stop propagation of this event to other handlers. Even if you don't set `Handled` true any changes made to the `Asset` or `Assets` properties will still take effect.
 
 In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
@@ -1095,8 +1118,8 @@ public class ResourceLoadParameters
     public Type Type { get; set; }
 
     /// <summary>
-    /// Gets the type of call that loaded this resource. NOTE: 'LoadByType' usually loads a number of assets
-    /// at a time. But in the context of the ResourceLoaded hook, these will be hooked as individual calls.
+    /// Gets the type of call that loaded this asset. If 'LoadByType' is specified
+    /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
     /// </summary>
     public ResourceLoadType LoadType { get; }
 }
@@ -1125,8 +1148,10 @@ public enum ResourceLoadType
 
 It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of resources.
 
+Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
+
 ### Asset Loaded Methods
-The methods `RegisterAssetLoadedHook( Action<AssetLoadedContext> action )` and `UnregisterAssetLoadedHook( Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
+The methods `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` and `UnregisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
 
 This API is a postfix hook to the `AssetBundle` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
 
@@ -1139,7 +1164,7 @@ The `AssetLoadedContext` class has the following definition:
 public class AssetLoadedContext : IAssetOrResourceLoadedContext
 {
     /// <summary>
-    /// Gets a bool indicating if this resource has already been redirected before.
+    /// Gets a bool indicating if this resource has been redirected before.
     /// </summary>
     public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
 
@@ -1162,6 +1187,8 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
 
     /// <summary>
     /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    ///
+    /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets' and you subscribed with 'OneCallbackPerLoadCall'.
     /// </summary>
     public UnityEngine.Object[] Assets { get; set; }
 
@@ -1179,11 +1206,36 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
 }
 ```
 
-One thing that is worth noticing is that it is actually an `UnityEngine.Object[]` array being redirected, and not just a single object. This is because not all the different calls to the `AssetBundle` API load a single resource, for instance the `AssetBundle.LoadAllAssets` or `AssetBundle.LoadAssetWithSubAssets` method.
+The HookBehaviour is an enum with the following definition:
 
-Now specfically in the case of the `AssetBundle` postfix hooks the array will only ever contain more than one object in case the orignal method is `AssetBundle.LoadAssetWithSubAssets`. This is because the call to `AssetBundle.LoadAllAssets` is routed into individuals callback for each asset being loaded.
+```C#
+/// <summary>
+/// Enum indicating how the resource redirector should treat the callback.
+/// </summary>
+public enum HookBehaviour
+{
+    /// <summary>
+    /// Specifies that exactly one callback should be received per call to asset/resource load method.
+    /// </summary>
+    OneCallbackPerLoadCall = 1,
 
-If your update or replace the asset being loaded you should set the `Handled` property to true to stop propagation of this event to other handlers.
+    /// <summary>
+    /// Specifies that exactly one callback should be received per loaded asset/resources. This means
+    /// that the 'Asset' property should be used over the 'Assets' property on the context object.
+    /// Do note that when using this option, if no resources are returned by a load call, no callbacks
+    /// will be received.
+    /// </summary>
+    OneCallbackPerResourceLoaded = 2
+}
+```
+
+An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
+ * You've subscribed with `OneCallbackPerLoadCall`.
+ * The `LoadType` in the `OriginalParameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
+
+In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
+
+If you update or replace the asset being loaded you can set the `Handled` property to true to stop propagation of this event to other handlers. Even if you don't set `Handled` true any changes made to the `Asset` or `Assets` properties will still take effect.
 
 In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
@@ -1204,8 +1256,8 @@ public class AssetLoadParameters
     public Type Type { get; set; }
 
     /// <summary>
-    /// Gets the type of call that loaded this asset. NOTE: 'LoadByType' usually loads a number of assets
-    /// at a time. But in the context of the AssetLoaded hook, these will be hooked as individual calls.
+    /// Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
+    /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
     /// </summary>
     public AssetLoadType LoadType { get; }
 }
@@ -1238,6 +1290,8 @@ public enum AssetLoadType
 ```
 
 It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of assets.
+
+Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
 
 ### AssetBundle Load Methods
 It is also possible to hook the loading of `AssetBundles` themselves. Unlike in the case of assets/resources, this requires a different callback based on whether or not the resource is being loaded in a synchronous or an asynchronous way.
@@ -1435,23 +1489,17 @@ class TextureReplacementPlugin
 {
     void Awake()
     {
-        ResourceRedirection.RegisterAssetLoadedHook( AssetLoaded );
+        ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, AssetLoaded );
     }
 
     public void AssetLoaded( AssetLoadedContext context )
     {
-        if( context.Assets == null ) return;
-
-        for( int i = 0; i < context.Assets.Length; i++ )
+        if( context.Asset is Texture2D texture2d ) // also acts as a null check
         {
-            var asset = context.Assets[ i ];
-            if( asset is Texture2D texture2d ) // also acts as a null check
-            {
-                // TODO: Modify, replace or dump the texture
+            // TODO: Modify, replace or dump the texture
 		    
-                context.Handled = true;
-                context.Assets[ i ] = texture2d; // only need to update the reference if you created a new texture
-            }
+            context.Handled = true;
+            context.Asset = texture2d; // only need to update the reference if you created a new texture
         }
     }
 }
@@ -1484,8 +1532,8 @@ class AssetBundleRedirectorPlugin
             {
                 var bundle = AssetBundle.LoadFromFile( modFolderPath );
 		    
-                context.Bundle = bundle;
                 context.Handled = true;
+                context.Bundle = bundle;
             }
         }
     }
@@ -1505,8 +1553,8 @@ class AssetBundleRedirectorPlugin
             {
                 var request = AssetBundle.LoadFromFileAsync( modFolderPath );
 		    
-                context.Request = request;
                 context.Handled = true;
+                context.Request = request;
             }
         }
     }

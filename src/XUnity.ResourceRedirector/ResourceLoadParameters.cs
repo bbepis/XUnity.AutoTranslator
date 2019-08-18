@@ -26,8 +26,8 @@ namespace XUnity.ResourceRedirector
       public Type Type { get; set; }
 
       /// <summary>
-      /// Gets the type of call that loaded this resource. NOTE: 'LoadByType' usually loads a number of assets
-      /// at a time. But in the context of the ResourceLoaded hook, these will be hooked as individual calls.
+      /// Gets the type of call that loaded this asset. If 'LoadByType' is specified
+      /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
       /// </summary>
       public ResourceLoadType LoadType { get; }
    }
