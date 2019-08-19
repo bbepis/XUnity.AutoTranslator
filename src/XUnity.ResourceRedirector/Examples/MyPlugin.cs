@@ -11,7 +11,7 @@ namespace XUnity.ResourceRedirector.Examples
    {
       void Awake()
       {
-         ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, AssetLoaded );
+         ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, 0, AssetLoaded );
       }
 
       public void AssetLoaded( AssetLoadedContext context )
@@ -30,8 +30,8 @@ namespace XUnity.ResourceRedirector.Examples
    {
       void Awake()
       {
-         ResourceRedirection.RegisterAssetBundleLoadingHook( AssetBundleLoading );
-         ResourceRedirection.RegisterAsyncAssetBundleLoadingHook( AsyncAssetBundleLoading );
+         ResourceRedirection.RegisterAssetBundleLoadingHook( 0, AssetBundleLoading );
+         ResourceRedirection.RegisterAsyncAssetBundleLoadingHook( 0, AsyncAssetBundleLoading );
       }
 
       public void AssetBundleLoading( AssetBundleLoadingContext context )

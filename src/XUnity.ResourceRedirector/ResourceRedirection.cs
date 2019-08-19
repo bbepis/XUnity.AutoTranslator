@@ -12,6 +12,7 @@ using XUnity.ResourceRedirector.Hooks;
 
 namespace XUnity.ResourceRedirector
 {
+
    /// <summary>
    /// Entrypoint to the resource redirection API.
    /// </summary>
@@ -19,12 +20,12 @@ namespace XUnity.ResourceRedirector
    {
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
-      private static readonly List<Action<AssetLoadedContext>> RedirectionsForAssetsPerCall = new List<Action<AssetLoadedContext>>();
-      private static readonly List<Action<AssetLoadedContext>> RedirectionsForAssetsPerResource = new List<Action<AssetLoadedContext>>();
-      private static readonly List<Action<ResourceLoadedContext>> RedirectionsForResourcesPerCall = new List<Action<ResourceLoadedContext>>();
-      private static readonly List<Action<ResourceLoadedContext>> RedirectionsForResourcesPerResource = new List<Action<ResourceLoadedContext>>();
-      private static readonly List<Action<AssetBundleLoadingContext>> RedirectionsForAssetBundles = new List<Action<AssetBundleLoadingContext>>();
-      private static readonly List<Action<AsyncAssetBundleLoadingContext>> RedirectionsForAsyncAssetBundles = new List<Action<AsyncAssetBundleLoadingContext>>();
+      private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> RedirectionsForAssetsPerCall = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
+      private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> RedirectionsForAssetsPerResource = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
+      private static readonly List<PrioritizedItem<Action<ResourceLoadedContext>>> RedirectionsForResourcesPerCall = new List<PrioritizedItem<Action<ResourceLoadedContext>>>();
+      private static readonly List<PrioritizedItem<Action<ResourceLoadedContext>>> RedirectionsForResourcesPerResource = new List<PrioritizedItem<Action<ResourceLoadedContext>>>();
+      private static readonly List<PrioritizedItem<Action<AssetBundleLoadingContext>>> RedirectionsForAssetBundles = new List<PrioritizedItem<Action<AssetBundleLoadingContext>>>();
+      private static readonly List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>> RedirectionsForAsyncAssetBundles = new List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>>();
       private static bool _initialized = false;
       private static bool _logAllLoadedResources = false;
 
@@ -96,7 +97,7 @@ namespace XUnity.ResourceRedirector
                   {
                      var redirection = list2[ i ];
 
-                     redirection( context );
+                     redirection.Item( context );
 
                      if( context.Handled ) break;
                   }
@@ -142,7 +143,7 @@ namespace XUnity.ResourceRedirector
                   {
                      var redirection = list2[ i ];
 
-                     redirection( context );
+                     redirection.Item( context );
 
                      if( context.Handled ) break;
                   }
@@ -295,7 +296,7 @@ namespace XUnity.ResourceRedirector
                   {
                      var redirection = list1[ i ];
 
-                     redirection( contextPerCall );
+                     redirection.Item( contextPerCall );
 
                      if( contextPerCall.Assets.Contains( null ) )
                      {
@@ -330,7 +331,7 @@ namespace XUnity.ResourceRedirector
                            {
                               var redirection = list2[ i ];
 
-                              redirection( contextPerResource );
+                              redirection.Item( contextPerResource );
 
                               if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
                               {
@@ -393,7 +394,7 @@ namespace XUnity.ResourceRedirector
                   {
                      var asset = assets[ i ];
                      var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Resource: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
                   }
                }
 
@@ -406,7 +407,7 @@ namespace XUnity.ResourceRedirector
                   {
                      var redirection = list1[ i ];
 
-                     redirection( contextPerCall );
+                     redirection.Item( contextPerCall );
 
                      if( contextPerCall.Assets.Contains( null ) )
                      {
@@ -441,7 +442,7 @@ namespace XUnity.ResourceRedirector
                            {
                               var redirection = list2[ i ];
 
-                              redirection( contextPerResource );
+                              redirection.Item( contextPerResource );
 
                               if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
                               {
@@ -491,93 +492,102 @@ namespace XUnity.ResourceRedirector
       /// Register ReourceLoaded event.
       /// </summary>
       /// <param name="behaviour">The behaviour of the callback.</param>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
       /// <param name="action">The callback.</param>
-      public static void RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )
+      public static void RegisterResourceLoadedHook( HookBehaviour behaviour, int priority, Action<ResourceLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
+
+         var item = PrioritizedItem.Create( action, priority );
+         if( RedirectionsForResourcesPerCall.Contains( item )
+            || RedirectionsForResourcesPerResource.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
 
          Initialize();
 
          if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
          {
-            RedirectionsForResourcesPerCall.Add( action );
+            RedirectionsForResourcesPerCall.BinarySearchInsert( item );
          }
          else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
          {
-            RedirectionsForResourcesPerResource.Add( action );
+            RedirectionsForResourcesPerResource.BinarySearchInsert( item );
          }
       }
 
       /// <summary>
       /// Unregister ReourceLoaded event.
       /// </summary>
-      /// <param name="behaviour">The behaviour of the callback.</param>
       /// <param name="action">The callback.</param>
-      public static void UnregisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )
+      public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
-         {
-            RedirectionsForResourcesPerCall.Remove( action );
-         }
-         else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
-         {
-            RedirectionsForResourcesPerResource.Remove( action );
-         }
+         RedirectionsForResourcesPerCall.RemoveAll( x => x.Item == action );
+         RedirectionsForResourcesPerResource.RemoveAll( x => x.Item == action );
       }
 
       /// <summary>
       /// Register AssetLoaded event.
       /// </summary>
       /// <param name="behaviour">The behaviour of the callback.</param>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
       /// <param name="action">The callback.</param>
-      public static void RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )
+      public static void RegisterAssetLoadedHook( HookBehaviour behaviour, int priority, Action<AssetLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
+
+         var item = PrioritizedItem.Create( action, priority );
+         if( RedirectionsForAssetsPerCall.Contains( item )
+            || RedirectionsForAssetsPerResource.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
 
          Initialize();
 
          if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
          {
-            RedirectionsForAssetsPerCall.Add( action );
+            RedirectionsForAssetsPerCall.Add( item );
          }
          else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
          {
-            RedirectionsForAssetsPerResource.Add( action );
+            RedirectionsForAssetsPerResource.Add( item );
          }
       }
 
       /// <summary>
       /// Unregister AssetLoaded event.
       /// </summary>
-      /// <param name="behaviour">The behaviour of the callback.</param>
       /// <param name="action">The callback.</param>
-      public static void UnregisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )
+      public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
-         {
-            RedirectionsForAssetsPerCall.Remove( action );
-         }
-         else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
-         {
-            RedirectionsForAssetsPerResource.Remove( action );
-         }
+         RedirectionsForAssetsPerCall.RemoveAll( x => x.Item == action );
+         RedirectionsForAssetsPerResource.RemoveAll( x => x.Item == action );
       }
 
       /// <summary>
       /// Register AssetBundleLoading event.
       /// </summary>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
       /// <param name="action">The callback.</param>
-      public static void RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )
+      public static void RegisterAssetBundleLoadingHook( int priority, Action<AssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
+         var item = PrioritizedItem.Create( action, priority );
+         if( RedirectionsForAssetBundles.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
+
          Initialize();
 
-         RedirectionsForAssetBundles.Add( action );
+         RedirectionsForAssetBundles.Add( item );
       }
 
       /// <summary>
@@ -588,20 +598,27 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         RedirectionsForAssetBundles.Remove( action );
+         RedirectionsForAssetBundles.RemoveAll( x => x.Item == action );
       }
 
       /// <summary>
       /// Register AsyncAssetBundleLoading event.
       /// </summary>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
       /// <param name="action">The callback.</param>
-      public static void RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )
+      public static void RegisterAsyncAssetBundleLoadingHook( int priority, Action<AsyncAssetBundleLoadingContext> action )
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
+         var item = PrioritizedItem.Create( action, priority );
+         if( RedirectionsForAsyncAssetBundles.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
+
          Initialize();
 
-         RedirectionsForAsyncAssetBundles.Add( action );
+         RedirectionsForAsyncAssetBundles.Add( item );
       }
 
       /// <summary>
@@ -612,7 +629,7 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         RedirectionsForAsyncAssetBundles.Remove( action );
+         RedirectionsForAsyncAssetBundles.RemoveAll( x => x.Item == action );
       }
    }
 }

@@ -19,8 +19,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// </summary>
       public AssetLoadedHandlerBase()
       {
-         ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, HandleAsset );
-         ResourceRedirection.RegisterResourceLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, HandleResource );
+         ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, 0, HandleAsset );
+         ResourceRedirection.RegisterResourceLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, 0, HandleResource );
       }
 
       /// <summary>

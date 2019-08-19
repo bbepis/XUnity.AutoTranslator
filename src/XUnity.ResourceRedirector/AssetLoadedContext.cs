@@ -38,16 +38,16 @@ namespace XUnity.ResourceRedirector
          var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
          if( ext.FullFileSystemAssetPath == null )
          {
-            string path = "assets";
+            string path;
 
             var assetBundleName = Bundle.name;
             if( !string.IsNullOrEmpty( assetBundleName ) )
             {
-               path = Path.Combine( path, assetBundleName.ToLowerInvariant() );
+               path = assetBundleName.ToLowerInvariant();
             }
             else
             {
-               path = Path.Combine( path, "unnamed_assetbundle" );
+               path = "unnamed_assetbundle";
             }
 
             var assetName = asset.name;
@@ -128,5 +128,61 @@ namespace XUnity.ResourceRedirector
       /// this will cause it to no longer propagate.
       /// </summary>
       public bool Handled { get; set; }
+
+      //public void Complete( bool skipRemainingPostfixes, bool? skipOriginalCall )
+      //{
+
+      //}
    }
+
+   //public class AssetLoadingContext
+   //{
+
+   //   /// <summary>
+   //   /// Gets the original parameters the asset load call was called with.
+   //   /// </summary>
+   //   public AssetLoadParameters OriginalParameters { get; }
+
+   //   /// <summary>
+   //   /// Gets the AssetBundle associated with the loaded assets.
+   //   /// </summary>
+   //   public AssetBundle Bundle { get; }
+
+   //   /// <summary>
+   //   /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+   //   ///
+   //   /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets' and you subscribed with 'OneCallbackPerLoadCall'.
+   //   /// </summary>
+   //   public UnityEngine.Object[] Assets { get; set; }
+
+   //   /// <summary>
+   //   /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+   //   /// additional null guards to prevent NullReferenceExceptions when using it.
+   //   /// </summary>
+   //   public UnityEngine.Object Asset
+   //   {
+   //      get
+   //      {
+   //         if( Assets == null || Assets.Length < 1 )
+   //         {
+   //            return null;
+   //         }
+   //         return Assets[ 0 ];
+   //      }
+   //      set
+   //      {
+   //         if( Assets == null || Assets.Length < 1 )
+   //         {
+   //            Assets = new UnityEngine.Object[ 1 ];
+   //         }
+   //         Assets[ 0 ] = value;
+   //      }
+   //   }
+
+   //   /// <summary>
+   //   /// Gets or sets a bool indicating if this event has been handled. Setting
+   //   /// this will cause it to no longer propagate.
+   //   /// </summary>
+   //   public bool Handled { get; set; }
+   //}
 }

@@ -1,4 +1,6 @@
-﻿namespace XUnity.ResourceRedirector
+﻿using System;
+
+namespace XUnity.ResourceRedirector
 {
    /// <summary>
    /// Enum indicating how the resource redirector should treat the callback.

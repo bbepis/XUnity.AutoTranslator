@@ -35,11 +35,11 @@ namespace XUnity.ResourceRedirector
          var ext = asset.GetOrCreateExtensionData<ResourceExtensionData>();
          if( ext.FullFileSystemAssetPath == null )
          {
-            string path = "resources";
+            string path = string.Empty;
 
             if( !string.IsNullOrEmpty( OriginalParameters.Path ) )
             {
-               path = Path.Combine( path, OriginalParameters.Path.ToLowerInvariant() );
+               path = OriginalParameters.Path.ToLowerInvariant();
             }
 
             if( OriginalParameters.LoadType == ResourceLoadType.LoadByType )
