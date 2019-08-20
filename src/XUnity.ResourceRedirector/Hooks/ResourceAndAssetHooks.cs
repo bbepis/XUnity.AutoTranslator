@@ -64,9 +64,9 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         var handled = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var skipOriginalCall = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( !handled )
+         if( !skipOriginalCall )
          {
             result = _original( path, crc, offset );
          }
@@ -100,9 +100,9 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var handled = ResourceRedirection.Hook_AssetBundleLoaded_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var skipOriginalCall = ResourceRedirection.Hook_AssetBundleLoaded_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( !handled )
+         if( !skipOriginalCall )
          {
             result = _original( path, crc, offset );
          }
@@ -197,9 +197,19 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object MM_Detour( AssetBundle self )
       {
-         var result = _original( self );
+         UnityEngine.Object result = null;
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
+         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
+
+         if( !intention.SkipOriginalCall )
+         {
+            result = _original( self );
+         }
+
+         if( !intention.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
+         }
 
          return result;
       }
@@ -228,9 +238,19 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         UnityEngine.Object result = null;
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamed, self, null, ref result );
+         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+
+         if( !intention.SkipOriginalCall )
+         {
+            result = _original( self, name, type );
+         }
+
+         if( !intention.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamed, self, null, ref result );
+         }
 
          return result;
       }
@@ -259,9 +279,16 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleRequest MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         AssetBundleRequest result = null;
 
-         ResourceRedirection.Hook_AssetLoading( name, type, AssetLoadType.LoadNamed, self, result );
+         var skipOriginal = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+
+         if( !skipOriginal )
+         {
+            result = _original( self, name, type );
+         }
+         
+         ResourceRedirection.Hook_AssetLoading_Postfix( name, type, AssetLoadType.LoadNamed, self, result );
 
          return result;
       }
@@ -290,9 +317,19 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object[] MM_Detour( AssetBundle self, Type type )
       {
-         var result = _original( self, type );
+         UnityEngine.Object[] result = null;
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( null, type, AssetLoadType.LoadByType, self, null, ref result );
+         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+
+         if( !intention.SkipOriginalCall )
+         {
+            result = _original( self, type );
+         }
+
+         if( !intention.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( null, type, AssetLoadType.LoadByType, self, null, ref result );
+         }
 
          return result;
       }
@@ -321,9 +358,19 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         UnityEngine.Object result = null;
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamed, self, null, ref result );
+         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+
+         if( !intention.SkipOriginalCall )
+         {
+            result = _original( self, name, type );
+         }
+
+         if( !intention.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamed, self, null, ref result );
+         }
 
          return result;
       }
@@ -352,9 +399,16 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleRequest MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         AssetBundleRequest result = null;
 
-         ResourceRedirection.Hook_AssetLoading( name, type, AssetLoadType.LoadNamed, self, result );
+         var skipOriginal = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+
+         if( !skipOriginal )
+         {
+            result = _original( self, name, type );
+         }
+
+         ResourceRedirection.Hook_AssetLoading_Postfix( name, type, AssetLoadType.LoadNamed, self, result );
 
          return result;
       }
@@ -383,17 +437,35 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object[] MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         UnityEngine.Object[] result = null;
 
          if( name == string.Empty )
          {
-            // LoadAll
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, type, AssetLoadType.LoadByType, self, null, ref result );
+            var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+
+            if( !intention.SkipOriginalCall )
+            {
+               result = _original( self, name, type );
+            }
+
+            if( !intention.SkipAllPostfixes )
+            {
+               ResourceRedirection.Hook_AssetLoaded_Postfix( null, type, AssetLoadType.LoadByType, self, null, ref result );
+            }
          }
          else
          {
-            // LoadSpecificWithSubAssets
-            ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, null, ref result );
+            var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+
+            if( !intention.SkipOriginalCall )
+            {
+               result = _original( self, name, type );
+            }
+
+            if( !intention.SkipAllPostfixes )
+            {
+               ResourceRedirection.Hook_AssetLoaded_Postfix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, null, ref result );
+            }
          }
 
          return result;
@@ -423,17 +495,29 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleRequest MM_Detour( AssetBundle self, string name, Type type )
       {
-         var result = _original( self, name, type );
+         AssetBundleRequest result = null;
 
          if( name == string.Empty )
          {
-            // LoadAllAsync
-            ResourceRedirection.Hook_AssetLoading( null, type, AssetLoadType.LoadByType, self, result );
+            var skipOriginal = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+
+            if( !skipOriginal )
+            {
+               result = _original( self, name, type );
+            }
+            
+            ResourceRedirection.Hook_AssetLoading_Postfix( null, type, AssetLoadType.LoadByType, self, result );
          }
          else
          {
-            // LoadSpecificWithSubAssetsAsync
-            ResourceRedirection.Hook_AssetLoading( name, type, AssetLoadType.LoadNamedWithSubAssets, self, result );
+            var skipOriginal = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+
+            if( !skipOriginal )
+            {
+               result = _original( self, name, type );
+            }
+
+            ResourceRedirection.Hook_AssetLoading_Postfix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, result );
          }
 
          return result;
@@ -465,7 +549,10 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+         if( !ResourceRedirection.ShouldSkipPostfixes( self ) )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+         }
 
          return result;
       }
@@ -496,7 +583,10 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( self );
 
-         ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+         if( !ResourceRedirection.ShouldSkipPostfixes( self ) )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+         }
 
          return result;
       }

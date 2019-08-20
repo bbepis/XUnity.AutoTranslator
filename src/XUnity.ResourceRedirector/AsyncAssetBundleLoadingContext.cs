@@ -4,8 +4,7 @@ using XUnity.Common.Extensions;
 namespace XUnity.ResourceRedirector
 {
    /// <summary>
-   /// The operation context surrounding the asset bundle loading event when loaded
-   /// through the async API.
+   /// The operation context surrounding the AsyncAssetBundleLoading hook (asynchronous).
    /// </summary>
    public class AsyncAssetBundleLoadingContext
    {
@@ -36,19 +35,31 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Indicate your work is done and if any other hooks to this asset bundle load should be called.
+      /// </summary>
+      /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+      /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
+      public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null )
+      {
+         SkipRemainingPrefixes = skipRemainingPrefixes;
+         if( skipOriginalCall.HasValue )
+         {
+            SkipOriginalCall = skipOriginalCall.Value;
+         }
+      }
+
+      /// <summary>
       /// Gets the parameters of the original call.
       /// </summary>
-      public AssetBundleLoadParameters OriginalParameters { get; set; }
+      public AssetBundleLoadParameters OriginalParameters { get; }
 
       /// <summary>
       /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
       /// </summary>
       public AssetBundleCreateRequest Request { get; set; }
 
-      /// <summary>
-      /// Gets or sets a bool indicating if this event has been handled. Setting
-      /// this will cause it to no longer propagate.
-      /// </summary>
-      public bool Handled { get; set; }
+      internal bool SkipRemainingPrefixes { get; private set; }
+
+      internal bool SkipOriginalCall { get; private set; }
    }
 }

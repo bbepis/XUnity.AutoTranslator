@@ -14,7 +14,6 @@ namespace XUnity.ResourceRedirector
       {
          OriginalParameters = new ResourceLoadParameters( assetPath, assetType, loadType );
          Assets = assets;
-         Handled = false;
       }
 
       /// <summary>
@@ -79,6 +78,15 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
+      /// </summary>
+      /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+      public void Complete( bool skipRemainingPostfixes = true )
+      {
+         SkipRemainingPostfixes = skipRemainingPostfixes;
+      }
+
+      /// <summary>
       /// Gets the original parameters the asset load call was called with.
       /// </summary>
       public ResourceLoadParameters OriginalParameters { get; }
@@ -114,10 +122,6 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      /// <summary>
-      /// Gets or sets a bool indicating if this event has been handled. Setting
-      /// this will cause it to no longer propagate.
-      /// </summary>
-      public bool Handled { get; set; }
+      internal bool SkipRemainingPostfixes { get; set; }
    }
 }

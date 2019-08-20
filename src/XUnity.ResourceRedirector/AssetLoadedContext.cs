@@ -8,7 +8,7 @@ using XUnity.Common.Utilities;
 namespace XUnity.ResourceRedirector
 {
    /// <summary>
-   /// The operation context surrounding the asset loaded event.
+   /// The operation context surrounding the AssetLoaded hook.
    /// </summary>
    public class AssetLoadedContext : IAssetOrResourceLoadedContext
    {
@@ -17,7 +17,6 @@ namespace XUnity.ResourceRedirector
          OriginalParameters = new AssetLoadParameters( assetName, assetType, loadType );
          Bundle = bundle;
          Assets = assets;
-         Handled = false;
       }
 
       /// <summary>
@@ -83,6 +82,15 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
+      /// </summary>
+      /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+      public void Complete( bool skipRemainingPostfixes = true )
+      {
+         SkipRemainingPostfixes = skipRemainingPostfixes;
+      }
+
+      /// <summary>
       /// Gets the original parameters the asset load call was called with.
       /// </summary>
       public AssetLoadParameters OriginalParameters { get; }
@@ -123,66 +131,6 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      /// <summary>
-      /// Gets or sets a bool indicating if this event has been handled. Setting
-      /// this will cause it to no longer propagate.
-      /// </summary>
-      public bool Handled { get; set; }
-
-      //public void Complete( bool skipRemainingPostfixes, bool? skipOriginalCall )
-      //{
-
-      //}
+      internal bool SkipRemainingPostfixes { get; private set; }
    }
-
-   //public class AssetLoadingContext
-   //{
-
-   //   /// <summary>
-   //   /// Gets the original parameters the asset load call was called with.
-   //   /// </summary>
-   //   public AssetLoadParameters OriginalParameters { get; }
-
-   //   /// <summary>
-   //   /// Gets the AssetBundle associated with the loaded assets.
-   //   /// </summary>
-   //   public AssetBundle Bundle { get; }
-
-   //   /// <summary>
-   //   /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
-   //   ///
-   //   /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets' and you subscribed with 'OneCallbackPerLoadCall'.
-   //   /// </summary>
-   //   public UnityEngine.Object[] Assets { get; set; }
-
-   //   /// <summary>
-   //   /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
-   //   /// additional null guards to prevent NullReferenceExceptions when using it.
-   //   /// </summary>
-   //   public UnityEngine.Object Asset
-   //   {
-   //      get
-   //      {
-   //         if( Assets == null || Assets.Length < 1 )
-   //         {
-   //            return null;
-   //         }
-   //         return Assets[ 0 ];
-   //      }
-   //      set
-   //      {
-   //         if( Assets == null || Assets.Length < 1 )
-   //         {
-   //            Assets = new UnityEngine.Object[ 1 ];
-   //         }
-   //         Assets[ 0 ] = value;
-   //      }
-   //   }
-
-   //   /// <summary>
-   //   /// Gets or sets a bool indicating if this event has been handled. Setting
-   //   /// this will cause it to no longer propagate.
-   //   /// </summary>
-   //   public bool Handled { get; set; }
-   //}
 }

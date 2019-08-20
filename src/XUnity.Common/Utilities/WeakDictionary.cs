@@ -159,7 +159,6 @@ namespace XUnity.Common.Utilities
    /// </remarks>
    public sealed class WeakDictionary<TKey, TValue> : BaseDictionary<TKey, TValue>
        where TKey : class
-       where TValue : class
    {
 
       private Dictionary<object, TValue> dictionary;
@@ -214,7 +213,7 @@ namespace XUnity.Common.Utilities
          {
             return true;
          }
-         value = null;
+         value = default( TValue );
          return false;
       }
 

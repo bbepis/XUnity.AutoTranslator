@@ -41,8 +41,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             {
                try
                {
-                  context.Handled = ReplaceOrUpdateAsset( modificationFilePath, ref castedAsset, context );
-                  if( context.Handled )
+                  bool handled = ReplaceOrUpdateAsset( modificationFilePath, ref castedAsset, context );
+                  if( handled )
                   {
                      XuaLogger.AutoTranslator.Debug( $"Replaced resource file: '{modificationFilePath}'." );
                   }
@@ -50,6 +50,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   {
                      XuaLogger.AutoTranslator.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
                   }
+
+                  context.Complete(
+                     skipRemainingPostfixes: handled );
                }
                catch( Exception e )
                {
@@ -60,8 +63,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             {
                try
                {
-                  context.Handled = DumpAsset( modificationFilePath, castedAsset, context );
-                  if( context.Handled )
+                  bool handled = DumpAsset( modificationFilePath, castedAsset, context );
+                  if( handled )
                   {
                      XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{modificationFilePath}'." );
                   }
@@ -69,6 +72,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   {
                      XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
                   }
+
+                  context.Complete(
+                     skipRemainingPostfixes: handled );
                }
                catch( Exception e )
                {

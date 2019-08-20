@@ -29,9 +29,9 @@
       UnityEngine.Object Asset { get; set; }
 
       /// <summary>
-      /// Gets or sets a bool indicating if this event has been handled. Setting
-      /// this will cause it to no longer propagate.
+      /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
       /// </summary>
-      bool Handled { get; set; }
+      /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+      void Complete( bool skipRemainingPostfixes = true );
    }
 }
