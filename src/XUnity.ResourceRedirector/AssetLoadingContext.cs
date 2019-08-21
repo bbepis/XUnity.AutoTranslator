@@ -6,7 +6,7 @@ namespace XUnity.ResourceRedirector
    /// <summary>
    /// The operation context surrounding the AssetLoading hook (synchronous).
    /// </summary>
-   public class AssetLoadingContext
+   public class AssetLoadingContext : IAssetLoadingContext
    {
       internal AssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
       {

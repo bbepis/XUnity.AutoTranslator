@@ -160,6 +160,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                HooksSetup.InstallTextAssetHooks();
                new TextAssetLoadedHandler();
             }
+
+            //ResourceRedirection.RedirectMissingAssetBundlesToEmptyAssetBundle( 0 );
+
+            //ResourceRedirection.EnableHighPoly();
+
+            //ResourceRedirection.EmulateAssetBundles( int.MaxValue, "emulation" );
          }
          catch( Exception e )
          {

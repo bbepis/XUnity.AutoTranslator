@@ -8,4 +8,10 @@
     <DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

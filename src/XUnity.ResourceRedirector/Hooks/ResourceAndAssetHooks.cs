@@ -16,6 +16,7 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       public static readonly Type[] All = new[]
       {
+         //typeof( AssetBundleCreateRequest_assetBundle_Hook ),
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
          //typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
@@ -38,6 +39,37 @@ namespace XUnity.ResourceRedirector.Hooks
          //typeof( Resources_FindObjectsOfTypeAll_Hook ), // impossible
       };
    }
+
+   //internal static class AssetBundleCreateRequest_assetBundle_Hook
+   //{
+   //   static bool Prepare( object instance )
+   //   {
+   //      return true;
+   //   }
+
+   //   static MethodBase TargetMethod( object instance )
+   //   {
+   //      return AccessToolsShim.Property( typeof( AssetBundleCreateRequest ), "assetBundle" ).GetGetMethod();
+   //   }
+
+   //   delegate AssetBundle OriginalMethod( AssetBundleCreateRequest self );
+
+   //   static OriginalMethod _original;
+
+   //   static void MM_Init( object detour )
+   //   {
+   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
+   //   }
+
+   //   static AssetBundle MM_Detour( AssetBundleCreateRequest self )
+   //   {
+   //      var result = _original( self );
+
+   //      ResourceRedirection.AssociateAssetBundleWithDummy( self, result );
+
+   //      return result;
+   //   }
+   //}
 
    internal static class AssetBundle_LoadFromFileAsync_Hook
    {

@@ -6,7 +6,7 @@ namespace XUnity.ResourceRedirector
    /// <summary>
    /// The operation context surrounding the AsyncAssetBundleLoading hook (asynchronous).
    /// </summary>
-   public class AsyncAssetBundleLoadingContext
+   public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
    {
       private string _normalizedPath;
 

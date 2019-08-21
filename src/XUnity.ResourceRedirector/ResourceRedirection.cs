@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,6 +22,8 @@ namespace XUnity.ResourceRedirector
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
       private static readonly WeakDictionary<AssetBundleRequest, bool> AssetBundleRequestToSkipPostfixes = new WeakDictionary<AssetBundleRequest, bool>();
+      //private static readonly WeakDictionary<AssetBundleCreateRequest, bool> DummyRequests = new WeakDictionary<AssetBundleCreateRequest, bool>();
+      //private static readonly WeakDictionary<AssetBundle, bool> DummyAssetBundles = new WeakDictionary<AssetBundle, bool>();
 
       private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerCall = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerResource = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
@@ -73,12 +76,146 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+      //public static void EnableHighPoly()
+      //{
+      //   RegisterAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetAsset ) );
+      //   RegisterAsyncAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetRequest ) );
+
+      //   void HandleAssetRedirection<TContext>( TContext context, Func<TContext, string, bool> changeAsset )
+      //      where TContext : IAssetLoadingContext
+      //   {
+      //      var param = context.OriginalParameters;
+      //      var name = param.Name;
+      //      if( param.LoadType == AssetLoadType.LoadNamed && name.EndsWith( "_low" ) )
+      //      {
+      //         var newName = name.Substring( 0, name.Length - 4 );
+      //         var ok = changeAsset( context, newName );
+      //         if( ok )
+      //         {
+      //            context.Complete(
+      //               skipRemainingPrefixes: true,
+      //               skipOriginalCall: true );
+      //         }
+      //      }
+      //   }
+
+      //   // synchronous specific code
+      //   bool SetRequest( AsyncAssetLoadingContext context, string newName )
+      //   {
+      //      var request = context.Bundle.LoadAssetAsync( newName );
+      //      if( request != null )
+      //      {
+      //         context.Request = request;
+      //         return true;
+      //      }
+      //      return false;
+      //   }
+
+      //   // asynchronous specific code
+      //   bool SetAsset( AssetLoadingContext context, string newName )
+      //   {
+      //      var asset = context.Bundle.LoadAsset( newName );
+      //      if( asset != null )
+      //      {
+      //         context.Asset = asset;
+      //         return true;
+      //      }
+      //      return false;
+      //   }
+      //}
+      
+      /// <summary>
+      /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
+      /// over the default asset bundles if they exist.
+      /// </summary>
+      /// <param name="hookPriority">Priority of the hook.</param>
+      /// <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
+      public static void EmulateAssetBundles( int hookPriority, string emulationDirectory )
+      {
+         RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetBundle ) );
+         RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetRequest ) );
+
+         // define base callback
+         void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
+            where T : IAssetBundleLoadingContext
+         {
+            if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile )
+            {
+               var normalizedPath = context.GetNormalizedPath();
+               var emulatedPath = Path.Combine( emulationDirectory, normalizedPath );
+               if( File.Exists( emulatedPath ) )
+               {
+                  changeBundle( context, emulatedPath );
+
+                  context.Complete(
+                     skipRemainingPrefixes: true,
+                     skipOriginalCall: true );
+               }
+            }
+         }
+
+         // synchronous specific code
+         void SetBundle( AssetBundleLoadingContext context, string path )
+         {
+            context.Bundle = AssetBundle.LoadFromFile( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+         }
+
+         // asynchronous specific code
+         void SetRequest( AsyncAssetBundleLoadingContext context, string path )
+         {
+            context.Request = AssetBundle.LoadFromFileAsync( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+         }
+      }
+
+      /// <summary>
+      /// Creates an asset bundle hook that redirects asset bundles loads to an empty
+      /// asset bundle if the file that is being loaded does not exist.
+      /// </summary>
+      /// <param name="hookPriority">Priority of the hook.</param>
+      public static void RedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority )
+      {
+         RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetBundle ) );
+         RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetRequest ) );
+
+         // define base callback
+         void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
+            where TContext : IAssetBundleLoadingContext
+         {
+            if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile
+               && !File.Exists( context.OriginalParameters.Path ) )
+            {
+               var buffer = Properties.Resources.empty;
+               CabHelper.RandomizeCab( buffer );
+
+               changeBundle( context, buffer );
+
+               context.Complete(
+                  skipRemainingPrefixes: true,
+                  skipOriginalCall: true );
+
+               XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.OriginalParameters.Path );
+            }
+         }
+
+         // synchronous specific code
+         void SetBundle( AssetBundleLoadingContext context, byte[] assetBundleData )
+         {
+            var bundle = AssetBundle.LoadFromMemory( assetBundleData );
+            context.Bundle = bundle;
+         }
+
+         // asynchronous specific code
+         void SetRequest( AsyncAssetBundleLoadingContext context, byte[] assetBundleData )
+         {
+            var request = AssetBundle.LoadFromMemoryAsync( assetBundleData );
+            context.Request = request;
+         }
+      }
+
       internal static void Cull()
       {
          lock( Sync )
          {
-            // FIXME: Test this working as expected
-
             AssetBundleRequestToAssetBundle.RemoveCollectedEntries();
             AssetBundleRequestToSkipPostfixes.RemoveCollectedEntries();
          }
@@ -86,11 +223,14 @@ namespace XUnity.ResourceRedirector
 
       internal static bool ShouldSkipPostfixes( AssetBundleRequest request )
       {
-         if( AssetBundleRequestToSkipPostfixes.TryGetValue( request, out var result ) )
+         lock( Sync )
          {
-            return result;
+            if( AssetBundleRequestToSkipPostfixes.TryGetValue( request, out var result ) )
+            {
+               return result;
+            }
+            return false;
          }
-         return false;
       }
 
       internal static bool Hook_AssetBundleLoaded_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
@@ -195,7 +335,7 @@ namespace XUnity.ResourceRedirector
          }
          else if( arr.Length > 1 )
          {
-            XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoaded event. Returned more than one asset to call requiring only a single asset." );
+            XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoadeding event. Returned more than one asset to call requiring only a single asset." );
             asset = arr[ 0 ];
          }
          else if( arr.Length == 1 )
@@ -226,11 +366,6 @@ namespace XUnity.ResourceRedirector
                      var redirection = list1[ i ];
 
                      redirection.Item( context );
-
-                     if( context.Assets.Contains( null ) )
-                     {
-                        XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoading event. If you want to remove an asset from the array, replace the entire array." );
-                     }
 
                      if( context.SkipRemainingPrefixes ) break;
                   }
@@ -288,7 +423,10 @@ namespace XUnity.ResourceRedirector
 
                request = context.Request;
 
-               AssetBundleRequestToSkipPostfixes[ request ] = context.SkipAllPostfixes;
+               lock( Sync )
+               {
+                  AssetBundleRequestToSkipPostfixes[ request ] = context.SkipAllPostfixes;
+               }
                return context.SkipOriginalCall;
             }
             catch( Exception e )
@@ -435,11 +573,6 @@ namespace XUnity.ResourceRedirector
 
                      redirection.Item( contextPerCall );
 
-                     if( contextPerCall.Assets.Contains( null ) )
-                     {
-                        XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in AssetLoaded event. If you want to remove an asset from the array, replace the entire array." );
-                     }
-
                      if( contextPerCall.SkipRemainingPostfixes ) break;
                   }
                   catch( Exception ex )
@@ -545,11 +678,6 @@ namespace XUnity.ResourceRedirector
                      var redirection = list1[ i ];
 
                      redirection.Item( contextPerCall );
-
-                     if( contextPerCall.Assets.Contains( null ) )
-                     {
-                        XuaLogger.ResourceRedirector.Warn( $"Illegal behaviour by redirection handler in ResourceLoaded event. If you want to remove an asset from the array, replace the entire array." );
-                     }
 
                      if( contextPerCall.SkipRemainingPostfixes ) break;
                   }

@@ -4,10 +4,11 @@ using XUnity.Common.Extensions;
 
 namespace XUnity.ResourceRedirector
 {
+
    /// <summary>
    /// The operation context surrounding the AssetBundleLoading hook (synchronous).
    /// </summary>
-   public class AssetBundleLoadingContext
+   public class AssetBundleLoadingContext : IAssetBundleLoadingContext
    {
       private string _normalizedPath;
 
