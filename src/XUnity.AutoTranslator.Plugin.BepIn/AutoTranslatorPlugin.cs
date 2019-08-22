@@ -39,8 +39,6 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
 
       public string ConfigPath => _dataPath;
 
-      public bool AllowRuntimeHooksByDefault => false;
-
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )

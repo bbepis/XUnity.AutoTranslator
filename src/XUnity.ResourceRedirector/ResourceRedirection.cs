@@ -20,10 +20,9 @@ namespace XUnity.ResourceRedirector
    public static class ResourceRedirection
    {
       private static readonly object Sync = new object();
+
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
       private static readonly WeakDictionary<AssetBundleRequest, bool> AssetBundleRequestToSkipPostfixes = new WeakDictionary<AssetBundleRequest, bool>();
-      //private static readonly WeakDictionary<AssetBundleCreateRequest, bool> DummyRequests = new WeakDictionary<AssetBundleCreateRequest, bool>();
-      //private static readonly WeakDictionary<AssetBundle, bool> DummyAssetBundles = new WeakDictionary<AssetBundle, bool>();
 
       private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerCall = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedItem<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerResource = new List<PrioritizedItem<Action<AssetLoadedContext>>>();
@@ -33,6 +32,11 @@ namespace XUnity.ResourceRedirector
       private static readonly List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>> PrefixRedirectionsForAsyncAssetBundles = new List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>>();
       private static readonly List<PrioritizedItem<Action<AssetLoadingContext>>> PrefixRedirectionsForAssetsPerCall = new List<PrioritizedItem<Action<AssetLoadingContext>>>();
       private static readonly List<PrioritizedItem<Action<AsyncAssetLoadingContext>>> PrefixRedirectionsForAsyncAssetsPerCall = new List<PrioritizedItem<Action<AsyncAssetLoadingContext>>>();
+      
+      private static Action<AssetBundleLoadingContext> _emulateAssetBundles;
+      private static Action<AsyncAssetBundleLoadingContext> _emulateAssetBundlesAsync;
+      private static Action<AssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmpty;
+      private static Action<AsyncAssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmptyAsync;
 
       private static bool _initialized = false;
       private static bool _logAllLoadedResources = false;
@@ -64,7 +68,10 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Initialize()
+      /// <summary>
+      /// Initializes the Resource Redirector.
+      /// </summary>
+      public static void Initialize()
       {
          if( !_initialized )
          {
@@ -123,47 +130,68 @@ namespace XUnity.ResourceRedirector
       //      return false;
       //   }
       //}
-      
+
       /// <summary>
       /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
       /// over the default asset bundles if they exist.
       /// </summary>
       /// <param name="hookPriority">Priority of the hook.</param>
       /// <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
-      public static void EmulateAssetBundles( int hookPriority, string emulationDirectory )
+      public static void EnableEmulateAssetBundles( int hookPriority, string emulationDirectory )
       {
-         RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetBundle ) );
-         RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetRequest ) );
-
-         // define base callback
-         void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
-            where T : IAssetBundleLoadingContext
+         if( _emulateAssetBundles == null && _emulateAssetBundlesAsync == null )
          {
-            if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile )
-            {
-               var normalizedPath = context.GetNormalizedPath();
-               var emulatedPath = Path.Combine( emulationDirectory, normalizedPath );
-               if( File.Exists( emulatedPath ) )
-               {
-                  changeBundle( context, emulatedPath );
+            _emulateAssetBundles = ctx => HandleAssetBundleEmulation( ctx, SetBundle );
+            _emulateAssetBundlesAsync = ctx => HandleAssetBundleEmulation( ctx, SetRequest );
 
-                  context.Complete(
-                     skipRemainingPrefixes: true,
-                     skipOriginalCall: true );
+            RegisterAssetBundleLoadingHook( hookPriority, _emulateAssetBundles );
+            RegisterAsyncAssetBundleLoadingHook( hookPriority, _emulateAssetBundlesAsync );
+
+            // define base callback
+            void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
+               where T : IAssetBundleLoadingContext
+            {
+               if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile )
+               {
+                  var normalizedPath = context.GetNormalizedPath();
+                  var emulatedPath = Path.Combine( emulationDirectory, normalizedPath );
+                  if( File.Exists( emulatedPath ) )
+                  {
+                     changeBundle( context, emulatedPath );
+
+                     context.Complete(
+                        skipRemainingPrefixes: true,
+                        skipOriginalCall: true );
+                  }
                }
             }
-         }
 
-         // synchronous specific code
-         void SetBundle( AssetBundleLoadingContext context, string path )
-         {
-            context.Bundle = AssetBundle.LoadFromFile( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
-         }
+            // synchronous specific code
+            void SetBundle( AssetBundleLoadingContext context, string path )
+            {
+               context.Bundle = AssetBundle.LoadFromFile( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+            }
 
-         // asynchronous specific code
-         void SetRequest( AsyncAssetBundleLoadingContext context, string path )
+            // asynchronous specific code
+            void SetRequest( AsyncAssetBundleLoadingContext context, string path )
+            {
+               context.Request = AssetBundle.LoadFromFileAsync( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+            }
+         }
+      }
+
+      /// <summary>
+      /// Disable a previously enabled asset bundle emulation.
+      /// </summary>
+      public static void DisableEmulateAssetBundles()
+      {
+         if( _emulateAssetBundles != null && _emulateAssetBundlesAsync != null )
          {
-            context.Request = AssetBundle.LoadFromFileAsync( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+            UnregisterAssetBundleLoadingHook( _emulateAssetBundles );
+            UnregisterAsyncAssetBundleLoadingHook( _emulateAssetBundlesAsync );
+
+            _emulateAssetBundles = null;
+            _emulateAssetBundlesAsync = null;
          }
       }
 
@@ -172,43 +200,64 @@ namespace XUnity.ResourceRedirector
       /// asset bundle if the file that is being loaded does not exist.
       /// </summary>
       /// <param name="hookPriority">Priority of the hook.</param>
-      public static void RedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority )
+      public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority )
       {
-         RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetBundle ) );
-         RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetRequest ) );
-
-         // define base callback
-         void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
-            where TContext : IAssetBundleLoadingContext
+         if( _redirectionMissingAssetBundlesToEmpty == null && _redirectionMissingAssetBundlesToEmptyAsync == null )
          {
-            if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile
-               && !File.Exists( context.OriginalParameters.Path ) )
+            _redirectionMissingAssetBundlesToEmpty = ctx => HandleMissingBundle( ctx, SetBundle );
+            _redirectionMissingAssetBundlesToEmptyAsync = ctx => HandleMissingBundle( ctx, SetRequest );
+
+            RegisterAssetBundleLoadingHook( hookPriority, _redirectionMissingAssetBundlesToEmpty );
+            RegisterAsyncAssetBundleLoadingHook( hookPriority, _redirectionMissingAssetBundlesToEmptyAsync );
+
+            // define base callback
+            void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
+               where TContext : IAssetBundleLoadingContext
             {
-               var buffer = Properties.Resources.empty;
-               CabHelper.RandomizeCab( buffer );
+               if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile
+                  && !File.Exists( context.OriginalParameters.Path ) )
+               {
+                  var buffer = Properties.Resources.empty;
+                  CabHelper.RandomizeCab( buffer );
 
-               changeBundle( context, buffer );
+                  changeBundle( context, buffer );
 
-               context.Complete(
-                  skipRemainingPrefixes: true,
-                  skipOriginalCall: true );
+                  context.Complete(
+                     skipRemainingPrefixes: true,
+                     skipOriginalCall: true );
 
-               XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.OriginalParameters.Path );
+                  XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.OriginalParameters.Path );
+               }
+            }
+
+            // synchronous specific code
+            void SetBundle( AssetBundleLoadingContext context, byte[] assetBundleData )
+            {
+               var bundle = AssetBundle.LoadFromMemory( assetBundleData );
+               context.Bundle = bundle;
+            }
+
+            // asynchronous specific code
+            void SetRequest( AsyncAssetBundleLoadingContext context, byte[] assetBundleData )
+            {
+               var request = AssetBundle.LoadFromMemoryAsync( assetBundleData );
+               context.Request = request;
             }
          }
+      }
 
-         // synchronous specific code
-         void SetBundle( AssetBundleLoadingContext context, byte[] assetBundleData )
+      /// <summary>
+      /// Disable a previously enabled redirect missing asset bundles to empty asset bundle.
+      /// </summary>
+      public static void DisableRedirectMissingAssetBundlesToEmptyAssetBundle()
+      {
+         if( _redirectionMissingAssetBundlesToEmpty != null && _redirectionMissingAssetBundlesToEmptyAsync != null )
          {
-            var bundle = AssetBundle.LoadFromMemory( assetBundleData );
-            context.Bundle = bundle;
-         }
+            UnregisterAssetBundleLoadingHook( _redirectionMissingAssetBundlesToEmpty );
+            UnregisterAsyncAssetBundleLoadingHook( _redirectionMissingAssetBundlesToEmptyAsync );
 
-         // asynchronous specific code
-         void SetRequest( AsyncAssetBundleLoadingContext context, byte[] assetBundleData )
-         {
-            var request = AssetBundle.LoadFromMemoryAsync( assetBundleData );
-            context.Request = request;
+            _redirectionMissingAssetBundlesToEmpty = null;
+            _redirectionMissingAssetBundlesToEmptyAsync = null;
          }
       }
 

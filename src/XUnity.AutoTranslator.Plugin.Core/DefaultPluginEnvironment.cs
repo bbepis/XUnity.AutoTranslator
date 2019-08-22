@@ -33,8 +33,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string ConfigPath => _dataFolder;
 
-      public bool AllowRuntimeHooksByDefault => true;
-
       public void SaveConfig()
       {
          _file.Save( _configPath );

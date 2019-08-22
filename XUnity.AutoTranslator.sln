@@ -10,6 +10,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BepIn", "src\XUnity.AutoTranslator.Plugin.BepIn\XUnity.AutoTranslator.Plugin.BepIn.csproj", "{5442ED94-2800-47A4-BBAC-C00FBA676D02}"
 	ProjectSection(ProjectDependencies) = postProject
 		{848D741E-A4F2-4680-AFD2-74C8723CE3C4} = {848D741E-A4F2-4680-AFD2-74C8723CE3C4}
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985} = {E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}
 		{1C574D77-FCC8-4249-8890-0B00EF092705} = {1C574D77-FCC8-4249-8890-0B00EF092705}
 	EndProjectSection
 EndProject
@@ -93,6 +94,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BepIn-5x", "src\XUnity.AutoTranslator.Plugin.BepIn-5x\XUnity.AutoTranslator.Plugin.BepIn-5x.csproj", "{ADCCF172-7D31-42C6-B9D4-1779EAC8B403}"
 	ProjectSection(ProjectDependencies) = postProject
 		{848D741E-A4F2-4680-AFD2-74C8723CE3C4} = {848D741E-A4F2-4680-AFD2-74C8723CE3C4}
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B} = {526D9044-1C4D-4A06-BAEB-0EB135F04F6B}
 		{1C574D77-FCC8-4249-8890-0B00EF092705} = {1C574D77-FCC8-4249-8890-0B00EF092705}
 	EndProjectSection
 EndProject
@@ -112,7 +114,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.Common.Tests", "test\XUnity.Common.Tests\XUnity.Common.Tests.csproj", "{B704D970-E95D-4297-AF83-A4F7DAFC1690}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Setup.Build-net45", "src\XUnity.AutoTranslator.Setup.Build-net45\XUnity.AutoTranslator.Setup.Build-net45.csproj", "{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup.Build-net45", "src\XUnity.AutoTranslator.Setup.Build-net45\XUnity.AutoTranslator.Setup.Build-net45.csproj", "{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.ResourceRedirector.BepIn-5x", "src\XUnity.ResourceRedirector.BepIn-5x\XUnity.ResourceRedirector.BepIn-5x.csproj", "{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.ResourceRedirector.BepIn", "src\XUnity.ResourceRedirector.BepIn\XUnity.ResourceRedirector.BepIn.csproj", "{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -402,6 +408,22 @@ Global
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}.Release|x86.ActiveCfg = Release|Any CPU
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}.Release|x86.Build.0 = Release|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Debug|x86.Build.0 = Debug|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|x86.ActiveCfg = Release|Any CPU
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|x86.Build.0 = Release|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|x86.Build.0 = Debug|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.ActiveCfg = Release|Any CPU
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -443,6 +465,8 @@ Global
 		{B9D3F6D2-F140-4F14-B6BF-CA41C9F49E28} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{B704D970-E95D-4297-AF83-A4F7DAFC1690} = {2A4A3DDF-338C-40C0-8E26-2A810BAAADD6}
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
+		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
+		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}
