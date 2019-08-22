@@ -5,7 +5,6 @@ using XUnity.ResourceRedirector.Constants;
 
 namespace XUnity.ResourceRedirector
 {
-
    /// <summary>
    /// The operation context surrounding the AssetBundleLoading hook (synchronous).
    /// </summary>

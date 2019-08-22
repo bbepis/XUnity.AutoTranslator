@@ -28,6 +28,8 @@ If you intend on redistributing this plugin as part of a translation suite for a
 
 From version 3.0.0 it is possible to implement custom translators. See [this section](#implementing-a-translator) for more info.
 
+From version 4.0.0 it comes with a resource redirector (version 1.0.0) that enables redirecting resources for any purpose. See more information [here](#resource-redirection).
+
 ## Plugin Frameworks
 The mod can be installed without any external dependencies or as a plugin to the following Plugin Managers/Mod Loaders:
  * [BepInEx](https://github.com/bbepis/BepInEx) (recommended)
@@ -567,7 +569,7 @@ Sometimes it's easier to provide a translation to a game by directly overriding 
 To overcome this problem, and allow for modification of resource files, this plugin also has a resource redirector module that allows redirecting any kind of resource loaded by the game.
 
 Before we get into the details of this module, it is worth mentioning that it is:
- * It is not a plugin. Rather it is just a library that is not beholden to any plugin manager. 
+ * It is not a plugin. Rather it is just a library that is not beholden to any plugin manager (it does come with a plugin-compatible BepInEx DLL but this is only to manage configuration).
  * It is game independent.
  * And while it may be redistributed with the Auto Translator, it is completely independent from it and it can be used without having the Auto Translator installed.
 
@@ -961,197 +963,240 @@ The following API surface is made available by the Resource Redirector:
 public static class ResourceRedirection
 {
     /// <summary>
-    /// Register ReourceLoaded event.
+    /// Gets or sets a bool indicating if the resource redirector
+    /// should log all loaded resources/assets to the console.
+    /// </summary>
+    public static bool LogAllLoadedResources { get; set; }
+
+    /// <summary>
+    /// Register an AssetLoading hook (prefix to loading an asset from an asset bundle).
+    /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAssetLoadingHook( int priority, Action<AssetLoadingContext> action );
+
+    /// <summary>
+    /// Unregister an AssetLoading hook (prefix to loading an asset from an asset bundle).
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAssetLoadingHook( Action<AssetLoadingContext> action );
+
+    /// <summary>
+    /// Register an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+    /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAsyncAssetLoadingHook( int priority, Action<AsyncAssetLoadingContext> action );
+
+    /// <summary>
+    /// Unregister an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAsyncAssetLoadingHook( Action<AsyncAssetLoadingContext> action );
+
+    /// <summary>
+    /// Register an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="behaviour">The behaviour of the callback.</param>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
     /// <param name="action">The callback.</param>
-    public static void RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action );
+    public static void RegisterAssetLoadedHook( HookBehaviour behaviour, int priority, Action<AssetLoadedContext> action );
 
     /// <summary>
-    /// Unregister ReourceLoaded event.
-    /// </summary>
-    /// <param name="behaviour">The behaviour of the callback.</param>
-    /// <param name="action">The callback.</param>
-    public static void UnregisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action );
-
-    /// <summary>
-    /// Register AssetLoaded event.
-    /// </summary>
-    /// <param name="behaviour">The behaviour of the callback.</param>
-    /// <param name="action">The callback.</param>
-    public static void RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action );
-
-    /// <summary>
-    /// Unregister AssetLoaded event.
-    /// </summary>
-    /// <param name="behaviour">The behaviour of the callback.</param>
-    /// <param name="action">The callback.</param>
-    public static void UnregisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action );
-
-    /// <summary>
-    /// Register AssetBundleLoading event.
+    /// Unregister an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="action">The callback.</param>
-    public static void RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action );
+    public static void UnregisterAssetLoadedHook( Action<AssetLoadedContext> action );
 
     /// <summary>
-    /// Unregister AssetBundleLoading event.
+    /// Register an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
+    /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAssetBundleLoadingHook( int priority, Action<AssetBundleLoadingContext> action );
+
+    /// <summary>
+    /// Unregister an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
     /// </summary>
     /// <param name="action">The callback.</param>
     public static void UnregisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action );
 
     /// <summary>
-    /// Register AsyncAssetBundleLoading event.
+    /// Register an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
     /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
     /// <param name="action">The callback.</param>
-    public static void RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action );
+    public static void RegisterAsyncAssetBundleLoadingHook( int priority, Action<AsyncAssetBundleLoadingContext> action );
 
     /// <summary>
-    /// Unregister AsyncAssetBundleLoading event.
+    /// Unregister an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
     /// </summary>
     /// <param name="action">The callback.</param>
     public static void UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action );
+
+    /// <summary>
+    /// Register a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+    /// </summary>
+    /// <param name="behaviour">The behaviour of the callback.</param>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterResourceLoadedHook( HookBehaviour behaviour, int priority, Action<ResourceLoadedContext> action );
+
+    /// <summary>
+    /// Unregister a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
 }
 
 ```
 
 Let's attach some comments to this API.
 
-### Resource Loaded Methods
-The methods `RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` and `UnregisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
+### Asset Loading/Loaded Methods
+The resource redirector comes with both postfix and prefix callbacks when loading an asset from the `AssetBundle` API.
 
-This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+The event callback chain looks like this `[AssetLoading / AsyncAssetLoading hooks] => [Original Method] => [AssetLoaded hooks]`. The `AssetLoaded` event handles postfixes for both synchronous and asynchronous loading of assets.
 
-The `ResourceLoadedContext` class has the following definition:
+#### Asset Loading Methods
+The methods `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` and `RegisterAsyncAssetLoadingHook( int priority, Action<AsyncAssetLoadingContext> action )` hooks into the `AssetBundle` API when loading assets.
+
+These methods registers prefix callbacks, which means the assets themselves wont be loaded yet when they are called.
+
+The callbacks take the types `AssetLoadingContext` and `AsyncAssetLoadingContext` as an argument, respectively. Let's take a look at their definitions:
 
 ```C#
 /// <summary>
-/// The operation context surrounding the ResourceLoaded hook.
+/// The operation context surrounding the AssetLoading hook (synchronous).
 /// </summary>
-public class ResourceLoadedContext : IAssetOrResourceLoadedContext
+public class AssetLoadingContext : IAssetLoadingContext
 {
     /// <summary>
-    /// Gets a bool indicating if this resource has been redirected before.
+    /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
     /// </summary>
-    public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
-
-    /// <summary>
-    /// Gets a file system path for the specfic asset that should be unique.
-    /// </summary>
-    /// <param name="asset"></param>
-    /// <returns></returns>
-    public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
+    /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+    /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
+    /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null, bool? skipAllPostfixes = null );
 
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    public ResourceLoadParameters OriginalParameters { get; }
+    public AssetLoadParameters OriginalParameters { get; }
 
     /// <summary>
-    /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    /// Gets the AssetBundle associated with the loaded assets.
+    /// </summary>
+    public AssetBundle Bundle { get; }
+
+    /// <summary>
+    /// Gets or sets the loaded assets.
     ///
-    /// Consider using this if the load type is 'LoadByType' and you subscribed with 'OneCallbackPerLoadCall'.
+    /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
     /// </summary>
     public UnityEngine.Object[] Assets { get; set; }
 
     /// <summary>
-    /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+    /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
     /// additional null guards to prevent NullReferenceExceptions when using it.
     /// </summary>
     public UnityEngine.Object Asset { get; set; }
-
-    /// <summary>
-    /// Gets or sets a bool indicating if this event has been handled. Setting
-    /// this will cause it to no longer propagate.
-    /// </summary>
-    public bool Handled { get; set; }
 }
-```
 
-The HookBehaviour is an enum with the following definition:
-
-```C#
 /// <summary>
-/// Enum indicating how the resource redirector should treat the callback.
+/// The operation context surrounding the AsyncAssetLoading hook (asynchronous).
 /// </summary>
-public enum HookBehaviour
+public class AsyncAssetLoadingContext : IAssetLoadingContext
 {
     /// <summary>
-    /// Specifies that exactly one callback should be received per call to asset/resource load method.
+    /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
     /// </summary>
-    OneCallbackPerLoadCall = 1,
+    /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+    /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
+    /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null, bool? skipAllPostfixes = null );
 
     /// <summary>
-    /// Specifies that exactly one callback should be received per loaded asset/resources. This means
-    /// that the 'Asset' property should be used over the 'Assets' property on the context object.
-    /// Do note that when using this option, if no resources are returned by a load call, no callbacks
-    /// will be received.
+    /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    OneCallbackPerResourceLoaded = 2
+    public AssetLoadParameters OriginalParameters { get; }
+
+    /// <summary>
+    /// Gets the AssetBundle associated with the loaded assets.
+    /// </summary>
+    public AssetBundle Bundle { get; }
+
+    /// <summary>
+    /// Gets or sets the AssetBundleRequest used to load assets.
+    /// </summary>
+    public AssetBundleRequest Request { get; set; }
 }
 ```
 
-An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
- * You've subscribed with `OneCallbackPerLoadCall`.
- * The `LoadType` in the `OriginalParameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
+The only difference between these two contexts is that one has an `Asset/Assets` property you can set, while the other has a `Request` property you can set.
 
-In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
+If you can handle the loading of the asset remember to call the `Complete` method to indicate your intentions regarding:
+ * Whether the rest of the prefixes registered should be skipped.
+ * Whether the original method should be skipped.
+ * Whether all the postfixes should be skipped.
 
-If you update or replace the asset being loaded you can set the `Handled` property to true to stop propagation of this event to other handlers. Even if you don't set `Handled` true any changes made to the `Asset` or `Assets` properties will still take effect.
+An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following condition apply:
+ * The `LoadType` in the `OriginalParameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+Finally, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class ResourceLoadParameters
+public class AssetLoadParameters
 {
     /// <summary>
-    /// Gets the name of the resource being loaded. Will not be the complete resource path if 'LoadByType' is used.
+    /// Gets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
     /// </summary>
-    public string Path { get; set; }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Gets the type that passed to the resource load call.
+    /// Gets the type that passed to the asset load call.
     /// </summary>
     public Type Type { get; set; }
 
     /// <summary>
-    /// Gets the type of call that loaded this asset. If 'LoadByType' is specified
+    /// Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
     /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
     /// </summary>
-    public ResourceLoadType LoadType { get; }
+    public AssetLoadType LoadType { get; }
 }
 
 /// <summary>
-/// Enum representing the different ways a resource may be loaded.
+/// Enum representing the different ways an asset may be loaded.
 /// </summary>
-public enum ResourceLoadType
+public enum AssetLoadType
 {
     /// <summary>
-    /// Indicates that this call is loading all assets of a specific type (below a specific path) in the Resources API.
+    /// Indicates that this asset has been loaded as the 'mainAsset' in the AssetBundle API.
+    /// </summary>
+    LoadMainAsset,
+
+    /// <summary>
+    /// Indicates that this call is loading all assets of a specific type in an AssetBundle API.
     /// </summary>
     LoadByType,
 
     /// <summary>
-    /// Indicates that this call is loading a single named asset in the Resources API.
+    /// Indicates that this call is loading a specific named asset in the AssetBundle API.
     /// </summary>
     LoadNamed,
 
     /// <summary>
-    /// Indicates that this call is loading a single named built-in asset in the Resources API.
+    /// Indicates that this call is loading a specific named asset and all those below it in the AssetBundle API.
     /// </summary>
-    LoadNamedBuiltIn
+    LoadNamedWithSubAssets
 }
 ```
 
-It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of resources.
-
-Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
-
-### Asset Loaded Methods
-The methods `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` and `UnregisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
+#### Asset Loaded Methods
+The method `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
 
 This API is a postfix hook to the `AssetBundle` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
 
@@ -1159,12 +1204,12 @@ The `AssetLoadedContext` class has the following definition:
 
 ```C#
 /// <summary>
-/// The operation context surrounding the asset loaded event.
+/// The operation context surrounding the AssetLoaded hook.
 /// </summary>
 public class AssetLoadedContext : IAssetOrResourceLoadedContext
 {
     /// <summary>
-    /// Gets a bool indicating if this resource has been redirected before.
+    /// Gets a bool indicating if this resource has already been redirected before.
     /// </summary>
     public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
 
@@ -1176,10 +1221,16 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
 
     /// <summary>
+    /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
+    /// </summary>
+    /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+    public void Complete( bool skipRemainingPostfixes = true );
+
+    /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
     public AssetLoadParameters OriginalParameters { get; }
-	
+
     /// <summary>
     /// Gets the AssetBundle associated with the loaded assets.
     /// </summary>
@@ -1197,12 +1248,6 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     /// additional null guards to prevent NullReferenceExceptions when using it.
     /// </summary>
     public UnityEngine.Object Asset { get; set; }
-
-    /// <summary>
-    /// Gets or sets a bool indicating if this event has been handled. Setting
-    /// this will cause it to no longer propagate.
-    /// </summary>
-    public bool Handled { get; set; }
 }
 ```
 
@@ -1235,9 +1280,10 @@ An important points to make here, is that there is both an `Asset` and an `Asset
 
 In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
 
-If you update or replace the asset being loaded you can set the `Handled` property to true to stop propagation of this event to other handlers. Even if you don't set `Handled` true any changes made to the `Asset` or `Assets` properties will still take effect.
+If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
+ * Whether the remaining postfixes should be called.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition (which is the same as for the prefix hooks for asset loading!):
 
 ```C#
 /// <summary>
@@ -1293,21 +1339,162 @@ It is also worth mentioning that these hooks handles both synchronous and asynch
 
 Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
 
+### Resource Load Methods
+The resource redirector comes only with postfix callbacks when loading an asset from the `Resources` API.
+
+The event callback chain looks like this `[Original Method] => [ResourceLoaded hooks]`. The `ResourceLoaded` event handles postfixes for both synchronous and asynchronous loading of assets.
+
+#### Resource Loaded Methods
+The method `RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
+
+This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+
+The `ResourceLoadedContext` class has the following definition:
+
+```C#
+/// <summary>
+/// The operation context surrounding the ResourceLoaded hook.
+/// </summary>
+public class ResourceLoadedContext : IAssetOrResourceLoadedContext
+{
+    /// <summary>
+    /// Gets a bool indicating if this resource has already been redirected before.
+    /// </summary>
+    public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets a file system path for the specfic asset that should be unique.
+    /// </summary>
+    /// <param name="asset"></param>
+    /// <returns></returns>
+    public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
+    /// </summary>
+    /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+    public void Complete( bool skipRemainingPostfixes = true );
+
+    /// <summary>
+    /// Gets the original parameters the asset load call was called with.
+    /// </summary>
+    public ResourceLoadParameters OriginalParameters { get; }
+
+    /// <summary>
+    /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+    ///
+    /// Consider using this if the load type is 'LoadByType' and you subscribed with 'OneCallbackPerLoadCall'.
+    /// </summary>
+    public UnityEngine.Object[] Assets { get; set; }
+
+    /// <summary>
+    /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+    /// additional null guards to prevent NullReferenceExceptions when using it.
+    /// </summary>
+    public UnityEngine.Object Asset { get; set; }
+}
+```
+
+The HookBehaviour is an enum with the following definition:
+
+```C#
+/// <summary>
+/// Enum indicating how the resource redirector should treat the callback.
+/// </summary>
+public enum HookBehaviour
+{
+    /// <summary>
+    /// Specifies that exactly one callback should be received per call to asset/resource load method.
+    /// </summary>
+    OneCallbackPerLoadCall = 1,
+
+    /// <summary>
+    /// Specifies that exactly one callback should be received per loaded asset/resources. This means
+    /// that the 'Asset' property should be used over the 'Assets' property on the context object.
+    /// Do note that when using this option, if no resources are returned by a load call, no callbacks
+    /// will be received.
+    /// </summary>
+    OneCallbackPerResourceLoaded = 2
+}
+```
+
+An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
+ * You've subscribed with `OneCallbackPerLoadCall`.
+ * The `LoadType` in the `OriginalParameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
+
+In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
+
+If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
+ * Whether the remaining postfixes should be called.
+
+In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+
+```C#
+/// <summary>
+/// Class representing the original parameters of the load call.
+/// </summary>
+public class ResourceLoadParameters
+{
+    /// <summary>
+    /// Gets the name of the resource being loaded. Will not be the complete resource path if 'LoadByType' is used.
+    /// </summary>
+    public string Path { get; set; }
+
+    /// <summary>
+    /// Gets the type that passed to the resource load call.
+    /// </summary>
+    public Type Type { get; set; }
+
+    /// <summary>
+    /// Gets the type of call that loaded this asset. If 'LoadByType' is specified
+    /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
+    /// </summary>
+    public ResourceLoadType LoadType { get; }
+}
+
+/// <summary>
+/// Enum representing the different ways a resource may be loaded.
+/// </summary>
+public enum ResourceLoadType
+{
+    /// <summary>
+    /// Indicates that this call is loading all assets of a specific type (below a specific path) in the Resources API.
+    /// </summary>
+    LoadByType,
+
+    /// <summary>
+    /// Indicates that this call is loading a single named asset in the Resources API.
+    /// </summary>
+    LoadNamed,
+
+    /// <summary>
+    /// Indicates that this call is loading a single named built-in asset in the Resources API.
+    /// </summary>
+    LoadNamedBuiltIn
+}
+```
+
+It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of resources.
+
+Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
+
 ### AssetBundle Load Methods
-It is also possible to hook the loading of `AssetBundles` themselves. Unlike in the case of assets/resources, this requires a different callback based on whether or not the resource is being loaded in a synchronous or an asynchronous way.
+It is also possible to hook the loading of `AssetBundles` themselves. Only prefix hooks are supported when loading an asset bundle.
+
+The event callback chain looks like this `[AssetBundleLoading/AsyncAssetBundleLoading hooks] => [Original Method]`.
 
 #### AssetBundle Synchrous Load Methods
-The methods `RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )` and `UnregisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )` are used to hook the synchronous AssetBundle load methods.
+The method `RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action )` is used to hook the synchronous AssetBundle load methods.
 
-This API is a `Prefix` to the `AssetBundle` API, which means that it is called before the AssetBundle is loaded.
+This API is a prefix to the `AssetBundle` API, which means that it is called before the AssetBundle is loaded.
 
 The `AssetBundleLoadingContext` class has the following definition:
 
 ```C#
 /// <summary>
-/// The operation context surrounding the asset bundle loading event.
+/// The operation context surrounding the AssetBundleLoading hook (synchronous).
 /// </summary>
-public class AssetBundleLoadingContext
+public class AssetBundleLoadingContext : IAssetBundleLoadingContext
 {
     /// <summary>
     /// Gets a normalized path to the asset bundle that is:
@@ -1319,26 +1506,29 @@ public class AssetBundleLoadingContext
     public string GetNormalizedPath();
 
     /// <summary>
+    /// Indicate your work is done and if any other hooks to this asset bundle load should be called.
+    /// </summary>
+    /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+    /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset bundle, you likely want to set this to true.</param>
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null );
+
+    /// <summary>
     /// Gets the parameters of the original call.
     /// </summary>
-    public AssetBundleLoadParameters OriginalParameters { get; set; }
+    public AssetBundleLoadParameters OriginalParameters { get; }
 
     /// <summary>
     /// Gets or sets the AssetBundle being loaded.
     /// </summary>
     public AssetBundle Bundle { get; set; }
-
-    /// <summary>
-    /// Gets or sets a bool indicating if this event has been handled. Setting
-    /// this will cause it to no longer propagate.
-    /// </summary>
-    public bool Handled { get; set; }
 }
 ```
 
 Because this is a prefix API, the `Bundle` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
 
-If you update the `Bundle` property, remember to set the `Handled` property as well so the event does not propagate to other handlers.
+If you update the `Bundle` property, remember to call the `Complete` to indicate your intentions regarding:
+ * Whether or not the remaining prefixes should be skipped.
+ * Whether or not the original method should be skipped.
 
 In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
@@ -1389,18 +1579,17 @@ It may also be worth looking at the `GetNormalizedPath()` method instead of the 
  * Include a stray '..' in the middle of the path
 
 #### AssetBundle Asynchrounous Load Methods
-The methods `RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` and `UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` are used to hook the asynchronous AssetBundle load methods.
+The method `RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` is used to hook the asynchronous AssetBundle load methods.
 
-This API is a `Prefix` to the `AssetBundle` API, which means that it is called before the `AssetBundleCreateRequest` is created.
+This API is a prefix to the `AssetBundle` API, which means that it is called before the `AssetBundleCreateRequest` is created.
 
 The `AsyncAssetBundleLoadingContext` class has the following definition:
 
 ```C#
 /// <summary>
-/// The operation context surrounding the asset bundle loading event when loaded
-/// through the async API.
+/// The operation context surrounding the AsyncAssetBundleLoading hook (asynchronous).
 /// </summary>
-public class AsyncAssetBundleLoadingContext
+public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
 {
     /// <summary>
     /// Gets a normalized path to the asset bundle that is:
@@ -1412,26 +1601,29 @@ public class AsyncAssetBundleLoadingContext
     public string GetNormalizedPath();
 
     /// <summary>
+    /// Indicate your work is done and if any other hooks to this asset bundle load should be called.
+    /// </summary>
+    /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+    /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null );
+
+    /// <summary>
     /// Gets the parameters of the original call.
     /// </summary>
-    public AssetBundleLoadParameters OriginalParameters { get; set; }
+    public AssetBundleLoadParameters OriginalParameters { get; }
 
     /// <summary>
     /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
     /// </summary>
     public AssetBundleCreateRequest Request { get; set; }
-
-    /// <summary>
-    /// Gets or sets a bool indicating if this event has been handled. Setting
-    /// this will cause it to no longer propagate.
-    /// </summary>
-    public bool Handled { get; set; }
 }
 ```
 
 Because this is a prefix API, the `Request` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
 
-If you update the `Request` property, remember to set the `Handled` property as well so the event does not propagate to other handlers.
+If you update the `Request` property, remember to call the `Complete` to indicate your intentions regarding:
+ * Whether or not the remaining prefixes should be skipped.
+ * Whether or not the original method should be skipped.
 
 In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
 
@@ -1489,7 +1681,10 @@ class TextureReplacementPlugin
 {
     void Awake()
     {
-        ResourceRedirection.RegisterAssetLoadedHook( HookBehaviour.OneCallbackPerResourceLoaded, AssetLoaded );
+        ResourceRedirection.RegisterAssetLoadedHook(
+            behaviour: HookBehaviour.OneCallbackPerResourceLoaded,
+            priority: 0,
+            action: AssetLoaded );
     }
 
     public void AssetLoaded( AssetLoadedContext context )
@@ -1497,9 +1692,10 @@ class TextureReplacementPlugin
         if( context.Asset is Texture2D texture2d ) // also acts as a null check
         {
             // TODO: Modify, replace or dump the texture
-		    
-            context.Handled = true;
+                
             context.Asset = texture2d; // only need to update the reference if you created a new texture
+            context.Complete(
+                skipRemainingPostfixes: true );
         }
     }
 }
@@ -1513,8 +1709,13 @@ class AssetBundleRedirectorPlugin
 {
     void Awake()
     {
-        ResourceRedirection.RegisterAssetBundleLoadingHook( AssetBundleLoading );
-        ResourceRedirection.RegisterAsyncAssetBundleLoadingHook( AsyncAssetBundleLoading );
+        ResourceRedirection.RegisterAssetBundleLoadingHook(
+            priority: 1000,
+            action: AssetBundleLoading );
+
+        ResourceRedirection.RegisterAsyncAssetBundleLoadingHook(
+            priority: 1000,
+            action: AsyncAssetBundleLoading );
     }
 
     public void AssetBundleLoading( AssetBundleLoadingContext context )
@@ -1532,8 +1733,10 @@ class AssetBundleRedirectorPlugin
             {
                 var bundle = AssetBundle.LoadFromFile( modFolderPath );
 		    
-                context.Handled = true;
                 context.Bundle = bundle;
+                context.Complete(
+                    skipRemainingPrefixes: true,
+                    skipOriginalCall: true );
             }
         }
     }
@@ -1541,7 +1744,7 @@ class AssetBundleRedirectorPlugin
     public void AsyncAssetBundleLoading( AsyncAssetBundleLoadingContext context )
     {
         if( !File.Exists( context.OriginalParameters.Path ) )
-        {
+            {
             // the game is trying to load a path that does not exist, lets redirect to our own resources
 		    
             // obtain different resource path
@@ -1553,10 +1756,108 @@ class AssetBundleRedirectorPlugin
             {
                 var request = AssetBundle.LoadFromFileAsync( modFolderPath );
 		    
-                context.Handled = true;
                 context.Request = request;
+                context.Complete(
+                    skipRemainingPrefixes: true,
+                    skipOriginalCall: true );
             }
         }
+    }
+}
+```
+
+Here's the redirector that is activated if the `EmulateAssetBundles` option is enabled in the plugin, which allows loading asset bundles from a different location than the game is requesting the bundle from:
+
+```C#
+/// <summary>
+/// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
+/// over the default asset bundles if they exist.
+/// </summary>
+/// <param name="hookPriority">Priority of the hook.</param>
+/// <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
+public static void EnableEmulateAssetBundles( int hookPriority, string emulationDirectory )
+{
+    RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetBundle ) );
+    RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleAssetBundleEmulation( ctx, SetRequest ) );
+		    
+    // define base callback
+    void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
+        where T : IAssetBundleLoadingContext
+    {
+        if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile )
+        {
+            var normalizedPath = context.GetNormalizedPath();
+            var emulatedPath = Path.Combine( emulationDirectory, normalizedPath );
+            if( File.Exists( emulatedPath ) )
+            {
+                changeBundle( context, emulatedPath );
+		    
+                context.Complete(
+                    skipRemainingPrefixes: true,
+                    skipOriginalCall: true );
+            }
+        }
+    }
+		    
+    // synchronous specific code
+    void SetBundle( AssetBundleLoadingContext context, string path )
+    {
+        context.Bundle = AssetBundle.LoadFromFile( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+    }
+		    
+    // asynchronous specific code
+    void SetRequest( AsyncAssetBundleLoadingContext context, string path )
+    {
+        context.Request = AssetBundle.LoadFromFileAsync( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+    }
+}
+```
+
+Here's the redirector that is activated if the `RedirectMissingAssetBundles` option is enabled in the plugin, which essentially simply loads an empty asset bundle if an asset bundle cannot be found:
+
+```C#
+/// <summary>
+/// Creates an asset bundle hook that redirects asset bundles loads to an empty
+/// asset bundle if the file that is being loaded does not exist.
+/// </summary>
+/// <param name="hookPriority">Priority of the hook.</param>
+public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority )
+{
+    RegisterAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetBundle ) );
+    RegisterAsyncAssetBundleLoadingHook( hookPriority, ctx => HandleMissingBundle( ctx, SetRequest ) );
+	    
+    // define base callback
+    void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
+        where TContext : IAssetBundleLoadingContext
+    {
+        if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile
+            && !File.Exists( context.OriginalParameters.Path ) )
+        {
+            var buffer = Properties.Resources.empty;
+            CabHelper.RandomizeCab( buffer );
+	    
+            changeBundle( context, buffer );
+	    
+            context.Complete(
+                skipRemainingPrefixes: true,
+                skipOriginalCall: true );
+	    
+            XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.OriginalParameters.Path );
+        }
+    }
+	    
+    // synchronous specific code
+    void SetBundle( AssetBundleLoadingContext context, byte[] assetBundleData )
+    {
+        var bundle = AssetBundle.LoadFromMemory( assetBundleData );
+        context.Bundle = bundle;
+    }
+	    
+    // asynchronous specific code
+    void SetRequest( AsyncAssetBundleLoadingContext context, byte[] assetBundleData )
+    {
+        var request = AssetBundle.LoadFromMemoryAsync( assetBundleData );
+        context.Request = request;
     }
 }
 ```
@@ -1564,7 +1865,9 @@ class AssetBundleRedirectorPlugin
 ### Implementing an Asset/Resource Handler (Auto Translator)
 This section shows how to implement an asset/resource redirector that respects the Auto Translator configuration.
 
-The `XUnity.AutoTranslator.Core.Plugin.dll` assembly has a base class that can be used to implement a plugin that dumps resources for the purposes of translation:
+The `XUnity.AutoTranslator.Core.Plugin.dll` assembly has a base class that can be used to implement a plugin that dumps resources for the purposes of translation.
+
+This class simply hooks the postfix to the load of assets from the `AssetBundle` and the `Resources` API. Here's how the base class looks:
 
 ```C#
 /// <summary>

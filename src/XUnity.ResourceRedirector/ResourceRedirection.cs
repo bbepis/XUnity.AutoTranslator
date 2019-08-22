@@ -32,7 +32,7 @@ namespace XUnity.ResourceRedirector
       private static readonly List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>> PrefixRedirectionsForAsyncAssetBundles = new List<PrioritizedItem<Action<AsyncAssetBundleLoadingContext>>>();
       private static readonly List<PrioritizedItem<Action<AssetLoadingContext>>> PrefixRedirectionsForAssetsPerCall = new List<PrioritizedItem<Action<AssetLoadingContext>>>();
       private static readonly List<PrioritizedItem<Action<AsyncAssetLoadingContext>>> PrefixRedirectionsForAsyncAssetsPerCall = new List<PrioritizedItem<Action<AsyncAssetLoadingContext>>>();
-      
+
       private static Action<AssetBundleLoadingContext> _emulateAssetBundles;
       private static Action<AsyncAssetBundleLoadingContext> _emulateAssetBundlesAsync;
       private static Action<AssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmpty;
