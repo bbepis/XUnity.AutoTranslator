@@ -35,11 +35,11 @@ namespace XUnity.ResourceRedirector.Examples
       void Awake()
       {
          ResourceRedirection.RegisterAssetBundleLoadingHook(
-            priority: 0,
+            priority: 1000,
             action: AssetBundleLoading );
 
          ResourceRedirection.RegisterAsyncAssetBundleLoadingHook(
-            priority: 0,
+            priority: 1000,
             action: AsyncAssetBundleLoading );
       }
 
