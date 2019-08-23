@@ -85,8 +85,8 @@ namespace XUnity.ResourceRedirector
 
       //public static void EnableHighPoly()
       //{
-      //   RegisterAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetAsset ) );
-      //   RegisterAsyncAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetRequest ) );
+      //   ResourceRedirection.RegisterAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetAsset ) );
+      //   ResourceRedirection.RegisterAsyncAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetRequest ) );
 
       //   void HandleAssetRedirection<TContext>( TContext context, Func<TContext, string, bool> changeAsset )
       //      where TContext : IAssetLoadingContext
@@ -101,7 +101,8 @@ namespace XUnity.ResourceRedirector
       //         {
       //            context.Complete(
       //               skipRemainingPrefixes: true,
-      //               skipOriginalCall: true );
+      //               skipOriginalCall: true,
+      //               skipAllPostfixes: true );
       //         }
       //      }
       //   }
@@ -162,6 +163,8 @@ namespace XUnity.ResourceRedirector
                      context.Complete(
                         skipRemainingPrefixes: true,
                         skipOriginalCall: true );
+
+                     XuaLogger.ResourceRedirector.Warn( "Redirected asset bundle: " + context.OriginalParameters.Path );
                   }
                }
             }

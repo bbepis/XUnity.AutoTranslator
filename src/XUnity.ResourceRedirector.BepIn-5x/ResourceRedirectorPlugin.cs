@@ -19,7 +19,7 @@ namespace XUnity.ResourceRedirector.BepIn_5x
 
       [Category( "Settings" )]
       [DisplayName( "Emulate asset bundles" )]
-      [Description( "Indicates whether or not asset bundle emulation should be enabled. This will allow the plugin to look for asset bundles in the 'emulations' directory before looking in the default location." )]
+      [Description( "Indicates whether or not asset bundle emulation should be enabled. This will allow the plugin to look for asset bundles in the 'emulation' directory before looking in the default location." )]
       public ConfigWrapper<bool> EmulateAssetBundles { get; set; }
 
       void Awake()
@@ -45,7 +45,7 @@ namespace XUnity.ResourceRedirector.BepIn_5x
       {
          if( EmulateAssetBundles.Value )
          {
-            ResourceRedirection.EnableEmulateAssetBundles( 10000, "emulations" );
+            ResourceRedirection.EnableEmulateAssetBundles( 10000, "emulation" );
          }
          else
          {

@@ -36,6 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       {
          if( context.Asset is TAsset castedAsset && ShouldHandleAsset( castedAsset, context ) )
          {
+            var unqiuePath = context.GetUniqueFileSystemAssetPath( castedAsset );
             var modificationFilePath = CalculateModificationFilePath( castedAsset, context );
             if( File.Exists( modificationFilePath ) ) // IO, ewww!
             {
@@ -44,11 +45,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   bool handled = ReplaceOrUpdateAsset( modificationFilePath, ref castedAsset, context );
                   if( handled )
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Replaced resource file: '{modificationFilePath}'." );
+                     XuaLogger.AutoTranslator.Debug( $"Replaced or updated resource file: '{unqiuePath}'." );
                   }
                   else
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Did not replace resource file: '{modificationFilePath}'." );
+                     XuaLogger.AutoTranslator.Debug( $"Did not replace or update resource file: '{unqiuePath}'." );
                   }
 
                   context.Complete(
@@ -56,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                catch( Exception e )
                {
-                  XuaLogger.AutoTranslator.Error( e, $"An error occurred while loading resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Error( e, $"An error occurred while replacing or updating resource file: '{unqiuePath}'." );
                }
             }
             else if( Settings.EnableDumping )
@@ -66,11 +67,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   bool handled = DumpAsset( modificationFilePath, castedAsset, context );
                   if( handled )
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{modificationFilePath}'." );
+                     XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{unqiuePath}'." );
                   }
                   else
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{modificationFilePath}'." );
+                     XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{unqiuePath}'." );
                   }
 
                   context.Complete(
@@ -78,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                catch( Exception e )
                {
-                  XuaLogger.AutoTranslator.Error( e, $"An error occurred while dumping resource file: '{modificationFilePath}'." );
+                  XuaLogger.AutoTranslator.Error( e, $"An error occurred while dumping resource file: '{unqiuePath}'." );
                }
             }
 

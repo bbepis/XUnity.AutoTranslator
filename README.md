@@ -1048,6 +1048,31 @@ public static class ResourceRedirection
     /// </summary>
     /// <param name="action">The callback.</param>
     public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
+
+    /// <summary>
+    /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
+    /// over the default asset bundles if they exist.
+    /// </summary>
+    /// <param name="hookPriority">Priority of the hook.</param>
+    /// <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
+    public static void EnableEmulateAssetBundles( int hookPriority, string emulationDirectory );
+
+    /// <summary>
+    /// Disable a previously enabled asset bundle emulation.
+    /// </summary>
+    public static void DisableEmulateAssetBundles();
+
+    /// <summary>
+    /// Creates an asset bundle hook that redirects asset bundles loads to an empty
+    /// asset bundle if the file that is being loaded does not exist.
+    /// </summary>
+    /// <param name="hookPriority">Priority of the hook.</param>
+    public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority );
+
+    /// <summary>
+    /// Disable a previously enabled redirect missing asset bundles to empty asset bundle.
+    /// </summary>
+    public static void DisableRedirectMissingAssetBundlesToEmptyAssetBundle();
 }
 
 ```
@@ -1965,7 +1990,6 @@ public class ScenarioDataResourceRedirector : AssetLoadedHandlerBase<ScenarioDat
     protected override string CalculateModificationFilePath(ScenarioData asset, IAssetOrResourceLoadedContext context)
     {
         return context.GetPreferredFilePathWithCustomFileName(@"BepInEx\translation", asset, "translation.txt")
-            .Replace(@"\assets", "")
             .Replace(".unity3d", "");
     }
 
