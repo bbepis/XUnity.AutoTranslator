@@ -164,7 +164,7 @@ namespace XUnity.ResourceRedirector
                         skipRemainingPrefixes: true,
                         skipOriginalCall: true );
 
-                     XuaLogger.ResourceRedirector.Warn( "Redirected asset bundle: " + context.OriginalParameters.Path );
+                     XuaLogger.ResourceRedirector.Info( "Redirected asset bundle: " + context.OriginalParameters.Path );
                   }
                }
             }
