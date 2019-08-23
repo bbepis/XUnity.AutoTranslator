@@ -10,7 +10,7 @@ namespace XUnity.ResourceRedirector
    {
       internal AssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
       {
-         OriginalParameters = new AssetLoadParameters( assetName, assetType, loadType );
+         Parameters = new AssetLoadingParameters( assetName, assetType, loadType );
          Bundle = bundle;
       }
 
@@ -34,9 +34,9 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets the original parameters the asset load call was called with.
+      /// Gets the parameters the asset load call was called with.
       /// </summary>
-      public AssetLoadParameters OriginalParameters { get; }
+      public AssetLoadingParameters Parameters { get; }
 
       /// <summary>
       /// Gets the AssetBundle associated with the loaded assets.

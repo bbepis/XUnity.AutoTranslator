@@ -22,9 +22,9 @@
       void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
       /// <summary>
-      /// Gets the parameters of the original call.
+      /// Gets the parameters of the call.
       /// </summary>
-      AssetBundleLoadParameters OriginalParameters { get; }
+      AssetBundleLoadingParameters Parameters { get; }
 
    }
 }

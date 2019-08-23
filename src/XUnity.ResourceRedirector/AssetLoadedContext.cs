@@ -14,7 +14,7 @@ namespace XUnity.ResourceRedirector
    {
       internal AssetLoadedContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, UnityEngine.Object[] assets )
       {
-         OriginalParameters = new AssetLoadParameters( assetName, assetType, loadType );
+         Parameters = new AssetLoadedParameters( assetName, assetType, loadType );
          Bundle = bundle;
          Assets = assets;
       }
@@ -70,7 +70,7 @@ namespace XUnity.ResourceRedirector
                   }
                }
 
-               path = Path.Combine( path, OriginalParameters.LoadType == AssetLoadType.LoadMainAsset ? "main_asset" : "unnamed_asset" + suffix );
+               path = Path.Combine( path, Parameters.LoadType == AssetLoadType.LoadMainAsset ? "main_asset" : "unnamed_asset" + suffix );
             }
 
             path = path.Replace( '/', '\\' );
@@ -91,9 +91,9 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets the original parameters the asset load call was called with.
+      /// Gets the parameters the asset load call was called with.
       /// </summary>
-      public AssetLoadParameters OriginalParameters { get; }
+      public AssetLoadedParameters Parameters { get; }
 
       /// <summary>
       /// Gets the AssetBundle associated with the loaded assets.

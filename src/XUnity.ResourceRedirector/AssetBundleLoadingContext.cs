@@ -14,7 +14,7 @@ namespace XUnity.ResourceRedirector
 
       internal AssetBundleLoadingContext( string assetBundlePath, uint crc, ulong offset, AssetBundleLoadType loadType )
       {
-         OriginalParameters = new AssetBundleLoadParameters( assetBundlePath, crc, offset, loadType );
+         Parameters = new AssetBundleLoadingParameters( assetBundlePath, crc, offset, loadType );
       }
 
       /// <summary>
@@ -26,9 +26,9 @@ namespace XUnity.ResourceRedirector
       /// <returns></returns>
       public string GetNormalizedPath()
       {
-         if( _normalizedPath == null && OriginalParameters.Path != null )
+         if( _normalizedPath == null && Parameters.Path != null )
          {
-            _normalizedPath = OriginalParameters.Path
+            _normalizedPath = Parameters.Path
                .ToLowerInvariant()
                .Replace( '/', '\\' )
                .MakeRelativePath( EnvironmentEx.LoweredCurrentDirectory );
@@ -51,9 +51,9 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets the parameters of the original call.
+      /// Gets the parameters of the call.
       /// </summary>
-      public AssetBundleLoadParameters OriginalParameters { get; }
+      public AssetBundleLoadingParameters Parameters { get; }
 
       /// <summary>
       /// Gets or sets the AssetBundle being loaded.

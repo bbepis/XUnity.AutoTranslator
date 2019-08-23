@@ -16,9 +16,9 @@ namespace XUnity.ResourceRedirector
       void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true );
 
       /// <summary>
-      /// Gets the original parameters the asset load call was called with.
+      /// Gets the parameters the asset load call was called with.
       /// </summary>
-      AssetLoadParameters OriginalParameters { get; }
+      AssetLoadingParameters Parameters { get; }
 
       /// <summary>
       /// Gets the AssetBundle associated with the loaded assets.

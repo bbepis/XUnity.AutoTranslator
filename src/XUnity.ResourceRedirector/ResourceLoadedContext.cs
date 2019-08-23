@@ -12,7 +12,7 @@ namespace XUnity.ResourceRedirector
    {
       internal ResourceLoadedContext( string assetPath, Type assetType, ResourceLoadType loadType, UnityEngine.Object[] assets )
       {
-         OriginalParameters = new ResourceLoadParameters( assetPath, assetType, loadType );
+         Parameters = new ResourceLoadedParameters( assetPath, assetType, loadType );
          Assets = assets;
       }
 
@@ -36,12 +36,12 @@ namespace XUnity.ResourceRedirector
          {
             string path = string.Empty;
 
-            if( !string.IsNullOrEmpty( OriginalParameters.Path ) )
+            if( !string.IsNullOrEmpty( Parameters.Path ) )
             {
-               path = OriginalParameters.Path.ToLowerInvariant();
+               path = Parameters.Path.ToLowerInvariant();
             }
 
-            if( OriginalParameters.LoadType == ResourceLoadType.LoadByType )
+            if( Parameters.LoadType == ResourceLoadType.LoadByType )
             {
                var assetName = asset.name;
                if( !string.IsNullOrEmpty( assetName ) )
@@ -87,9 +87,9 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
-      /// Gets the original parameters the asset load call was called with.
+      /// Gets the parameters the asset load call was called with.
       /// </summary>
-      public ResourceLoadParameters OriginalParameters { get; }
+      public ResourceLoadedParameters Parameters { get; }
 
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.

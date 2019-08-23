@@ -45,7 +45,7 @@ namespace XUnity.ResourceRedirector.Examples
 
       public void AssetBundleLoading( AssetBundleLoadingContext context )
       {
-         if( !File.Exists( context.OriginalParameters.Path ) )
+         if( !File.Exists( context.Parameters.Path ) )
          {
             // the game is trying to load a path that does not exist, lets redirect to our own resources
 
@@ -68,7 +68,7 @@ namespace XUnity.ResourceRedirector.Examples
 
       public void AsyncAssetBundleLoading( AsyncAssetBundleLoadingContext context )
       {
-         if( !File.Exists( context.OriginalParameters.Path ) )
+         if( !File.Exists( context.Parameters.Path ) )
          {
             // the game is trying to load a path that does not exist, lets redirect to our own resources
 

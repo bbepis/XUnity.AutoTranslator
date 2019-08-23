@@ -1108,7 +1108,7 @@ public class AssetLoadingContext : IAssetLoadingContext
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    public AssetLoadParameters OriginalParameters { get; }
+    public AssetLoadingParameters Parameters { get; }
 
     /// <summary>
     /// Gets the AssetBundle associated with the loaded assets.
@@ -1145,7 +1145,7 @@ public class AsyncAssetLoadingContext : IAssetLoadingContext
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    public AssetLoadParameters OriginalParameters { get; }
+    public AssetLoadingParameters Parameters { get; }
 
     /// <summary>
     /// Gets the AssetBundle associated with the loaded assets.
@@ -1167,23 +1167,23 @@ If you can handle the loading of the asset remember to call the `Complete` metho
  * Whether all the postfixes should be skipped.
 
 An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following condition apply:
- * The `LoadType` in the `OriginalParameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
+ * The `LoadType` in the `Parameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
 
-Finally, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+Finally, if we take a look at the `Parameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class AssetLoadParameters
+public class AssetLoadingParameters
 {
     /// <summary>
-    /// Gets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
+    /// Gets or sets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
     /// </summary>
     public string Name { get; set; }
 
     /// <summary>
-    /// Gets the type that passed to the asset load call.
+    /// Gets or sets the type that passed to the asset load call.
     /// </summary>
     public Type Type { get; set; }
 
@@ -1221,6 +1221,8 @@ public enum AssetLoadType
 }
 ```
 
+Another way to change the result of the asset load operation is to change the value of the `Name` and `Type` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
+
 #### Asset Loaded Methods
 The method `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
 
@@ -1255,7 +1257,7 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    public AssetLoadParameters OriginalParameters { get; }
+    public AssetLoadedParameters Parameters { get; }
 
     /// <summary>
     /// Gets the AssetBundle associated with the loaded assets.
@@ -1302,30 +1304,30 @@ public enum HookBehaviour
 
 An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
  * You've subscribed with `OneCallbackPerLoadCall`.
- * The `LoadType` in the `OriginalParameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
+ * The `LoadType` in the `Parameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
 
 In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
 
 If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
  * Whether the remaining postfixes should be called.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition (which is the same as for the prefix hooks for asset loading!):
+In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class AssetLoadParameters
+public class AssetLoadedParameters
 {
     /// <summary>
     /// Gets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets the type that passed to the asset load call.
     /// </summary>
-    public Type Type { get; set; }
+    public Type Type { get; }
 
     /// <summary>
     /// Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
@@ -1404,7 +1406,7 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
-    public ResourceLoadParameters OriginalParameters { get; }
+    public ResourceLoadParameters Parameters { get; }
 
     /// <summary>
     /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
@@ -1446,20 +1448,20 @@ public enum HookBehaviour
 
 An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
  * You've subscribed with `OneCallbackPerLoadCall`.
- * The `LoadType` in the `OriginalParameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
+ * The `LoadType` in the `Parameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
 
 In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
 
 If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
  * Whether the remaining postfixes should be called.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class ResourceLoadParameters
+public class ResourceLoadedParameters
 {
     /// <summary>
     /// Gets the name of the resource being loaded. Will not be the complete resource path if 'LoadByType' is used.
@@ -1539,9 +1541,9 @@ public class AssetBundleLoadingContext : IAssetBundleLoadingContext
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
-    /// Gets the parameters of the original call.
+    /// Gets the parameters of the call.
     /// </summary>
-    public AssetBundleLoadParameters OriginalParameters { get; }
+    public AssetBundleLoadingParameters Parameters { get; }
 
     /// <summary>
     /// Gets or sets the AssetBundle being loaded.
@@ -1556,26 +1558,26 @@ If you update the `Bundle` property, remember to call the `Complete` to indicate
  * Whether or not the remaining prefixes should be skipped.
  * Whether or not the original method should be skipped.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class AssetBundleLoadParameters
+public class AssetBundleLoadingParameters
 {
     /// <summary>
-    /// Gets the loaded path. Only relevant for 'LoadFromFile'.
+    /// Gets or sets the loaded path. Only relevant for 'LoadFromFile'.
     /// </summary>
     public string Path { get; }
 
     /// <summary>
-    /// Gets the crc. Only relevant for 'LoadFromFile'.
+    /// Gets or sets the crc. Only relevant for 'LoadFromFile'.
     /// </summary>
     public uint Crc { get; }
 
     /// <summary>
-    /// Gets the offset. Only relevant for 'LoadFromFile'.
+    /// Gets or sets the offset. Only relevant for 'LoadFromFile'.
     /// </summary>
     public ulong Offset { get; }
 
@@ -1603,6 +1605,8 @@ It may also be worth looking at the `GetNormalizedPath()` method instead of the 
  * Absolute path
  * Relative path
  * Include a stray '..' in the middle of the path
+ 
+Another way to change the result of the asset bundle load operation is to change the value of the `Path`, `Crc` and `Offset` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
 
 #### AssetBundle Asynchrounous Load Methods
 The method `RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` is used to hook the asynchronous AssetBundle load methods.
@@ -1634,9 +1638,9 @@ public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
-    /// Gets the parameters of the original call.
+    /// Gets the parameters of the call.
     /// </summary>
-    public AssetBundleLoadParameters OriginalParameters { get; }
+    public AssetBundleLoadingParameters Parameters { get; }
 
     /// <summary>
     /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
@@ -1651,13 +1655,13 @@ If you update the `Request` property, remember to call the `Complete` to indicat
  * Whether or not the remaining prefixes should be skipped.
  * Whether or not the original method should be skipped.
 
-In addition, if we take a look at the `OriginalParameters` property of the context object, we will find the following definition:
+In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
 
 ```C#
 /// <summary>
 /// Class representing the original parameters of the load call.
 /// </summary>
-public class AssetBundleLoadParameters
+public class AssetBundleLoadingParameters
 {
     /// <summary>
     /// Gets the loaded path. Only relevant for 'LoadFromFile'.
@@ -1698,8 +1702,10 @@ It may also be worth looking at the `GetNormalizedPath()` method instead of the 
  * Absolute path
  * Relative path
  * Include a stray '..' in the middle of the path
+ 
+Another way to change the result of the asset bundle load operation is to change the value of the `Path`, `Crc` and `Offset` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
 
-### Implemting an Asset Redirector
+### Implementing an Asset Redirector
 Here's an example of how a resource redirection may be implemented to hook all `Texture2D` objects loaded through the `AssetBundle` API:
 
 ```C#
@@ -1746,7 +1752,7 @@ class AssetBundleRedirectorPlugin
 
     public void AssetBundleLoading( AssetBundleLoadingContext context )
     {
-        if( !File.Exists( context.OriginalParameters.Path ) )
+        if( !File.Exists( context.Parameters.Path ) )
         {
             // the game is trying to load a path that does not exist, lets redirect to our own resources
 		    
@@ -1769,7 +1775,7 @@ class AssetBundleRedirectorPlugin
 
     public void AsyncAssetBundleLoading( AsyncAssetBundleLoadingContext context )
     {
-        if( !File.Exists( context.OriginalParameters.Path ) )
+        if( !File.Exists( context.Parameters.Path ) )
             {
             // the game is trying to load a path that does not exist, lets redirect to our own resources
 		    
@@ -1810,7 +1816,7 @@ public static void EnableEmulateAssetBundles( int hookPriority, string emulation
     void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
         where T : IAssetBundleLoadingContext
     {
-        if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile )
+        if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromFile )
         {
             var normalizedPath = context.GetNormalizedPath();
             var emulatedPath = Path.Combine( emulationDirectory, normalizedPath );
@@ -1828,13 +1834,13 @@ public static void EnableEmulateAssetBundles( int hookPriority, string emulation
     // synchronous specific code
     void SetBundle( AssetBundleLoadingContext context, string path )
     {
-        context.Bundle = AssetBundle.LoadFromFile( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+        context.Bundle = AssetBundle.LoadFromFile( path, context.Parameters.Crc, context.Parameters.Offset );
     }
 		    
     // asynchronous specific code
     void SetRequest( AsyncAssetBundleLoadingContext context, string path )
     {
-        context.Request = AssetBundle.LoadFromFileAsync( path, context.OriginalParameters.Crc, context.OriginalParameters.Offset );
+        context.Request = AssetBundle.LoadFromFileAsync( path, context.Parameters.Crc, context.Parameters.Offset );
     }
 }
 ```
@@ -1856,8 +1862,8 @@ public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hook
     void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
         where TContext : IAssetBundleLoadingContext
     {
-        if( context.OriginalParameters.LoadType == AssetBundleLoadType.LoadFromFile
-            && !File.Exists( context.OriginalParameters.Path ) )
+        if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromFile
+            && !File.Exists( context.Parameters.Path ) )
         {
             var buffer = Properties.Resources.empty;
             CabHelper.RandomizeCab( buffer );
@@ -1868,7 +1874,7 @@ public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hook
                 skipRemainingPrefixes: true,
                 skipOriginalCall: true );
 	    
-            XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.OriginalParameters.Path );
+            XuaLogger.ResourceRedirector.Warn( "Tried to load non-existing asset bundle: " + context.Parameters.Path );
         }
     }
 	    

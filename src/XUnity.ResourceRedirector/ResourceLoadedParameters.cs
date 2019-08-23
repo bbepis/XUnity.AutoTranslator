@@ -4,11 +4,11 @@ using UnityEngine;
 namespace XUnity.ResourceRedirector
 {
    /// <summary>
-   /// Class representing the original parameters of the load call.
+   /// Class representing the parameters of the load call.
    /// </summary>
-   public class ResourceLoadParameters
+   public class ResourceLoadedParameters
    {
-      internal ResourceLoadParameters( string path, Type type, ResourceLoadType loadType )
+      internal ResourceLoadedParameters( string path, Type type, ResourceLoadType loadType )
       {
          Path = path;
          Type = type;
