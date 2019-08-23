@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using XUnity.ResourceRedirector.Constants;
@@ -11,14 +12,18 @@ namespace XUnity.ResourceRedirector.BepIn_5x
    [BepInPlugin( PluginData.Identifier, PluginData.Name, PluginData.Version )]
    public class ResourceRedirectorPlugin : BaseUnityPlugin
    {
-      public ConfigWrapper<bool> LogAllLoadedResources;
-      public ConfigWrapper<bool> EmulateAssetBundles;
-      public ConfigWrapper<bool> RedirectMissingAssetBundles;
+      [Category( "Settings" )]
+      [DisplayName( "Log all loaded resources" )]
+      [Description( "Indicates whether or not all loaded resources should be logged to the console. Prepare for spam if enabled." )]
+      public ConfigWrapper<bool> LogAllLoadedResources { get; set; }
+
+      [Category( "Settings" )]
+      [DisplayName( "Emulate asset bundles" )]
+      [Description( "Indicates whether or not asset bundle emulation should be enabled. This will allow the plugin to look for asset bundles in the 'emulations' directory before looking in the default location." )]
+      public ConfigWrapper<bool> EmulateAssetBundles { get; set; }
 
       void Awake()
       {
-         ResourceRedirection.Initialize();
-
          LogAllLoadedResources = Config.Wrap( new ConfigDefinition( "General", "LogAllLoadedResources", "Indicates whether or not unhandled assets/bundles should be logged to the console." ), false );
          ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
          LogAllLoadedResources.SettingChanged += ( s, e ) => ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
@@ -28,17 +33,12 @@ namespace XUnity.ResourceRedirector.BepIn_5x
          ToggleEmulateAssetBundles( null, null );
          EmulateAssetBundles.SettingChanged += ToggleEmulateAssetBundles;
 
-         RedirectMissingAssetBundles = Config.Wrap( new ConfigDefinition( "General", "RedirectMissingAssetBundles", "Indicates whether or not to redirect missing asset bundles to a dynamically generated empty asset bundle." ), false );
-         ToggleDisableRedirectMissingAssetBundles( null, null );
-         RedirectMissingAssetBundles.SettingChanged += ToggleEmulateAssetBundles;
-
          Config.ConfigReloaded += Config_ConfigReloaded;
       }
 
       private void Config_ConfigReloaded( object sender, EventArgs e )
       {
          ToggleEmulateAssetBundles( null, null );
-         ToggleDisableRedirectMissingAssetBundles( null, null );
       }
 
       private void ToggleEmulateAssetBundles( object sender, EventArgs args )
@@ -50,18 +50,6 @@ namespace XUnity.ResourceRedirector.BepIn_5x
          else
          {
             ResourceRedirection.DisableEmulateAssetBundles();
-         }
-      }
-
-      private void ToggleDisableRedirectMissingAssetBundles( object sender, EventArgs args )
-      {
-         if( EmulateAssetBundles.Value )
-         {
-            ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( -1000000 );
-         }
-         else
-         {
-            ResourceRedirection.DisableRedirectMissingAssetBundlesToEmptyAssetBundle();
          }
       }
    }

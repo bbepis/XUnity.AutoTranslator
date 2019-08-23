@@ -20,7 +20,7 @@ namespace XUnity.ResourceRedirector
       /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
       /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
       /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
-      public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null, bool? skipAllPostfixes = null )
+      public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true )
       {
          SkipRemainingPrefixes = skipRemainingPrefixes;
          if( skipOriginalCall.HasValue )

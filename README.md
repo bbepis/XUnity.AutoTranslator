@@ -66,7 +66,6 @@ The file structure should like like this
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.Common.dll
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.ResourceRedirector.dll
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
-{GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/{GameExeName}_Data/Managed/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
 {GameDirectory}/{GameExeName}_Data/Managed/MonoMod.RuntimeDetour.dll
 {GameDirectory}/{GameExeName}_Data/Managed/MonoMod.Utils.dll
@@ -89,8 +88,9 @@ The file structure should like like this:
 ```
 {GameDirectory}/BepInEx/XUnity.Common.dll
 {GameDirectory}/BepInEx/XUnity.ResourceRedirector.dll
+{GameDirectory}/BepInEx/XUnity.ResourceRedirector.BepIn.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.Core.dll
-{GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.BepInEx.dll
+{GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.BepIn.dll
 {GameDirectory}/BepInEx/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
 {GameDirectory}/BepInEx/ExIni.dll
 {GameDirectory}/BepInEx/Translators/{Translator}.dll
@@ -110,10 +110,11 @@ REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow i
 
 The file structure should like like this:
 ```
-{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.Common.dll
-{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.ResourceRedirector.dll
+{GameDirectory}/BepInEx/core/XUnity.Common.dll
+{GameDirectory}/BepInEx/plugins/XUnity.ResourceRedirector/XUnity.ResourceRedirector.dll
+{GameDirectory}/BepInEx/plugins/XUnity.ResourceRedirector/XUnity.ResourceRedirector.BepIn-5x.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.Core.dll
-{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.BepInEx.dll
+{GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.BepIn.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/ExIni.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/Translators/{Translator}.dll
@@ -1077,7 +1078,7 @@ public class AssetLoadingContext : IAssetLoadingContext
     /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
     /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
     /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
-    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null, bool? skipAllPostfixes = null );
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true );
 
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
@@ -1114,7 +1115,7 @@ public class AsyncAssetLoadingContext : IAssetLoadingContext
     /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
     /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
     /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
-    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null, bool? skipAllPostfixes = null );
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true );
 
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
@@ -1510,7 +1511,7 @@ public class AssetBundleLoadingContext : IAssetBundleLoadingContext
     /// </summary>
     /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
     /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset bundle, you likely want to set this to true.</param>
-    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null );
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
     /// Gets the parameters of the original call.
@@ -1605,7 +1606,7 @@ public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
     /// </summary>
     /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
     /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
-    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = null );
+    public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
     /// Gets the parameters of the original call.
