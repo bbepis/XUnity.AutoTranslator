@@ -255,3 +255,6 @@ dist/
 
 # Trampoline dll
 **/b979b301af8b4ef48f224de6dcf2ddf6.dll
+
+# Game DLL ignores
+/libs/Koikatsu
