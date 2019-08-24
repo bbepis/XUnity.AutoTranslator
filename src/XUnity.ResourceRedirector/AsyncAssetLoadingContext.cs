@@ -34,6 +34,16 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Disables recursive calls if you make an asset/asset bundle load call
+      /// from within your callback. If you want to prevent recursion this should
+      /// be called before you load the asset/asset bundle.
+      /// </summary>
+      public void DisableRecursion()
+      {
+         ResourceRedirection.RecursionEnabled = false;
+      }
+
+      /// <summary>
       /// Gets the parameters the asset load call was called with.
       /// </summary>
       public AssetLoadingParameters Parameters { get; }

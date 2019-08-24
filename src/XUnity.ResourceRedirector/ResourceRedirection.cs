@@ -13,7 +13,6 @@ using XUnity.ResourceRedirector.Hooks;
 
 namespace XUnity.ResourceRedirector
 {
-
    /// <summary>
    /// Entrypoint to the resource redirection API.
    /// </summary>
@@ -40,6 +39,8 @@ namespace XUnity.ResourceRedirector
 
       private static bool _initialized = false;
       private static bool _logAllLoadedResources = false;
+
+      internal static bool RecursionEnabled = true;
 
       /// <summary>
       /// Gets or sets a bool indicating if the resource redirector
@@ -307,6 +308,12 @@ namespace XUnity.ResourceRedirector
             XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle: ({context.GetNormalizedPath()})." );
          }
 
+         if( !RecursionEnabled )
+         {
+            bundle = null;
+            return new AssetBundleLoadingPrefixResult( context.Parameters, context.SkipOriginalCall );
+         }
+
          var list2 = PrefixRedirectionsForAssetBundles;
          var len2 = list2.Count;
          for( int i = 0; i < len2; i++ )
@@ -327,6 +334,7 @@ namespace XUnity.ResourceRedirector
                }
                finally
                {
+                  RecursionEnabled = true;
                   redirection.IsBeingCalled = false;
                }
             }
@@ -342,6 +350,12 @@ namespace XUnity.ResourceRedirector
          if( _logAllLoadedResources )
          {
             XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle (async): ({context.GetNormalizedPath()})." );
+         }
+
+         if( !RecursionEnabled )
+         {
+            request = null;
+            return new AssetBundleLoadingPrefixResult( context.Parameters, context.SkipOriginalCall );
          }
 
          var list2 = PrefixRedirectionsForAsyncAssetBundles;
@@ -364,6 +378,7 @@ namespace XUnity.ResourceRedirector
                }
                finally
                {
+                  RecursionEnabled = true;
                   redirection.IsBeingCalled = false;
                }
             }
@@ -402,6 +417,11 @@ namespace XUnity.ResourceRedirector
          {
             var context = new AssetLoadingContext( assetName, assetType, loadType, bundle );
 
+            if( !RecursionEnabled )
+            {
+               return new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
+            }
+
             // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAssetsPerCall;
             var len1 = list1.Count;
@@ -423,6 +443,7 @@ namespace XUnity.ResourceRedirector
                   }
                   finally
                   {
+                     RecursionEnabled = true;
                      redirection.IsBeingCalled = false;
                   }
                }
@@ -446,6 +467,11 @@ namespace XUnity.ResourceRedirector
          {
             var context = new AsyncAssetLoadingContext( assetName, assetType, loadType, bundle );
 
+            if( !RecursionEnabled )
+            {
+               return new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
+            }
+
             // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAsyncAssetsPerCall;
             var len1 = list1.Count;
@@ -467,6 +493,7 @@ namespace XUnity.ResourceRedirector
                   }
                   finally
                   {
+                     RecursionEnabled = true;
                      redirection.IsBeingCalled = false;
                   }
                }
@@ -605,6 +632,11 @@ namespace XUnity.ResourceRedirector
                }
             }
 
+            if( !RecursionEnabled )
+            {
+               return;
+            }
+
             // handle "per call" hooks first
             var list1 = PostfixRedirectionsForAssetsPerCall;
             var len1 = list1.Count;
@@ -626,6 +658,7 @@ namespace XUnity.ResourceRedirector
                   }
                   finally
                   {
+                     RecursionEnabled = true;
                      redirection.IsBeingCalled = false;
                   }
                }
@@ -654,6 +687,7 @@ namespace XUnity.ResourceRedirector
                            {
                               redirection.IsBeingCalled = true;
                               redirection.Callback( contextPerResource );
+
                               if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
                               {
                                  assets[ j ] = contextPerResource.Assets[ 0 ];
@@ -671,6 +705,7 @@ namespace XUnity.ResourceRedirector
                            }
                            finally
                            {
+                              RecursionEnabled = true;
                               redirection.IsBeingCalled = false;
                            }
                         }
@@ -717,6 +752,11 @@ namespace XUnity.ResourceRedirector
                }
             }
 
+            if( !RecursionEnabled )
+            {
+               return;
+            }
+
             // handle "per call" hooks first
             var list1 = PostfixRedirectionsForResourcesPerCall;
             var len1 = list1.Count;
@@ -738,6 +778,7 @@ namespace XUnity.ResourceRedirector
                   }
                   finally
                   {
+                     RecursionEnabled = true;
                      redirection.IsBeingCalled = false;
                   }
                }
@@ -784,6 +825,7 @@ namespace XUnity.ResourceRedirector
                            }
                            finally
                            {
+                              RecursionEnabled = true;
                               redirection.IsBeingCalled = false;
                            }
                         }

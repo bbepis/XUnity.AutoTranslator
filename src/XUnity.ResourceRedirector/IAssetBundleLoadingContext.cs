@@ -22,6 +22,13 @@
       void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
       /// <summary>
+      /// Disables recursive calls if you make an asset/asset bundle load call
+      /// from within your callback. If you want to prevent recursion this should
+      /// be called before you load the asset/asset bundle.
+      /// </summary>
+      void DisableRecursion();
+
+      /// <summary>
       /// Gets the parameters of the call.
       /// </summary>
       AssetBundleLoadingParameters Parameters { get; }

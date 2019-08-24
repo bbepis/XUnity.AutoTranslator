@@ -33,5 +33,12 @@
       /// </summary>
       /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
       void Complete( bool skipRemainingPostfixes = true );
+
+      /// <summary>
+      /// Disables recursive calls if you make an asset/asset bundle load call
+      /// from within your callback. If you want to prevent recursion this should
+      /// be called before you load the asset/asset bundle.
+      /// </summary>
+      void DisableRecursion();
    }
 }
