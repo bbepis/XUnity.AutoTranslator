@@ -133,7 +133,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var intention = ResourceRedirection.Hook_AssetBundleLoaded_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var intention = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
          if( !intention.SkipOriginalCall )
          {

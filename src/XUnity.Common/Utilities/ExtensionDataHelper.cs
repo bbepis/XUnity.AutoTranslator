@@ -20,6 +20,20 @@ namespace XUnity.Common.Utilities
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
+      public static int WeakReferenceCount
+      {
+         get
+         {
+            lock( Sync )
+            {
+               return DynamicFields.Count;
+            }
+         }
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
       /// <typeparam name="T"></typeparam>
       /// <param name="obj"></param>
       /// <param name="t"></param>

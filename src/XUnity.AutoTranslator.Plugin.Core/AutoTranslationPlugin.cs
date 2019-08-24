@@ -161,10 +161,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                new TextAssetLoadedHandler();
             }
 
-            //ResourceRedirection.RedirectMissingAssetBundlesToEmptyAssetBundle( 0 );
-
-            //ResourceRedirection.EnableHighPoly();
-
+            //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
+            //ResourceRedirection.EnableHighPoly1();
             //ResourceRedirection.EmulateAssetBundles( int.MaxValue, "emulation" );
          }
          catch( Exception e )

@@ -3,15 +3,17 @@ using System.Collections.Generic;
 
 namespace XUnity.ResourceRedirector
 {
-   internal static class PrioritizedCallback
+   internal class PrioritizedCallback
    {
       public static PrioritizedCallback<TCallback> Create<TCallback>( TCallback item, int priority )
+      where TCallback : Delegate
       {
          return new PrioritizedCallback<TCallback>( item, priority );
       }
    }
 
-   internal class PrioritizedCallback<TCallback> : IComparable<PrioritizedCallback<TCallback>>, IEquatable<PrioritizedCallback<TCallback>>
+   internal class PrioritizedCallback<TCallback> : PrioritizedCallback, IComparable<PrioritizedCallback<TCallback>>, IEquatable<PrioritizedCallback<TCallback>>
+      where TCallback : Delegate
    {
       public PrioritizedCallback( TCallback callback, int priority )
       {
@@ -45,6 +47,11 @@ namespace XUnity.ResourceRedirector
          var hashCode = -1406788065;
          hashCode = hashCode * -1521134295 + EqualityComparer<TCallback>.Default.GetHashCode( Callback );
          return hashCode;
+      }
+
+      public override string ToString()
+      {
+         return "[" + Priority + "] " + Callback.Method.DeclaringType?.Name + "." + Callback.Method?.Name;
       }
    }
 }

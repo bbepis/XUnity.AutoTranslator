@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -78,7 +79,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      //public static void EnableHighPoly()
+      //public static void EnableHighPoly1()
       //{
       //   ResourceRedirection.RegisterAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetAsset ) );
       //   ResourceRedirection.RegisterAsyncAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetRequest ) );
@@ -179,7 +180,7 @@ namespace XUnity.ResourceRedirector
                         skipRemainingPrefixes: true,
                         skipOriginalCall: true );
 
-                     XuaLogger.ResourceRedirector.Info( "Redirected asset bundle: " + context.Parameters.Path );
+                     XuaLogger.ResourceRedirector.Debug( "Redirected asset bundle: '" + context.Parameters.Path + "' => '" + emulatedPath + "'" );
                   }
                }
             }
@@ -279,7 +280,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Cull()
+      private static void Cull()
       {
          lock( Sync )
          {
@@ -300,7 +301,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static AssetBundleLoadingPrefixResult Hook_AssetBundleLoaded_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
+      internal static AssetBundleLoadingPrefixResult Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
          var context = new AssetBundleLoadingContext( path, crc, offset, loadType );
          if( _logAllLoadedResources )
@@ -855,6 +856,27 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+      private static void LogEventRegistration( string eventType, IEnumerable callbacks )
+      {
+         XuaLogger.ResourceRedirector.Debug( $"Registered new callback for {eventType}." );
+         LogCallbackOrder( eventType, callbacks );
+      }
+
+      private static void LogEventUnregistration( string eventType, IEnumerable callbacks )
+      {
+         XuaLogger.ResourceRedirector.Debug( $"Unregistered callback for {eventType}." );
+         LogCallbackOrder( eventType, callbacks );
+      }
+
+      private static void LogCallbackOrder( string eventType, IEnumerable callbacks )
+      {
+         XuaLogger.ResourceRedirector.Debug( $"New callback order for {eventType}:" );
+         foreach( var redirection in callbacks )
+         {
+            XuaLogger.ResourceRedirector.Debug( redirection.ToString() );
+         }
+      }
+
       /// <summary>
       /// Register an AssetLoading hook (prefix to loading an asset from an asset bundle).
       /// </summary>
@@ -872,7 +894,9 @@ namespace XUnity.ResourceRedirector
 
          Initialize();
 
-         PrefixRedirectionsForAssetsPerCall.Add( item );
+         PrefixRedirectionsForAssetsPerCall.BinarySearchInsert( item );
+
+         LogEventRegistration( "AssetLoading", PrefixRedirectionsForAssetsPerCall );
       }
 
       /// <summary>
@@ -884,6 +908,8 @@ namespace XUnity.ResourceRedirector
          if( action == null ) throw new ArgumentNullException( "action" );
 
          PrefixRedirectionsForAssetsPerCall.RemoveAll( x => x.Callback == action );
+
+         LogEventUnregistration( "AssetLoading", PrefixRedirectionsForAssetsPerCall );
       }
 
       /// <summary>
@@ -903,7 +929,9 @@ namespace XUnity.ResourceRedirector
 
          Initialize();
 
-         PrefixRedirectionsForAsyncAssetsPerCall.Add( item );
+         PrefixRedirectionsForAsyncAssetsPerCall.BinarySearchInsert( item );
+
+         LogEventRegistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
       }
 
       /// <summary>
@@ -915,6 +943,8 @@ namespace XUnity.ResourceRedirector
          if( action == null ) throw new ArgumentNullException( "action" );
 
          PrefixRedirectionsForAsyncAssetsPerCall.RemoveAll( x => x.Callback == action );
+
+         LogEventUnregistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
       }
 
       /// <summary>
@@ -938,11 +968,15 @@ namespace XUnity.ResourceRedirector
 
          if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
          {
-            PostfixRedirectionsForAssetsPerCall.Add( item );
+            PostfixRedirectionsForAssetsPerCall.BinarySearchInsert( item );
+
+            LogEventRegistration( $"AssetLoaded ({behaviour.ToString()})", PostfixRedirectionsForAssetsPerCall );
          }
          else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
          {
-            PostfixRedirectionsForAssetsPerResource.Add( item );
+            PostfixRedirectionsForAssetsPerResource.BinarySearchInsert( item );
+
+            LogEventRegistration( $"AssetLoaded ({behaviour.ToString()})", PostfixRedirectionsForAssetsPerResource );
          }
       }
 
@@ -954,8 +988,17 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         PostfixRedirectionsForAssetsPerCall.RemoveAll( x => x.Callback == action );
-         PostfixRedirectionsForAssetsPerResource.RemoveAll( x => x.Callback == action );
+         var c1 = PostfixRedirectionsForAssetsPerCall.RemoveAll( x => x.Callback == action );
+         if( c1 > 0 )
+         {
+            LogEventRegistration( $"AssetLoaded ({HookBehaviour.OneCallbackPerLoadCall.ToString()})", PostfixRedirectionsForAssetsPerCall );
+         }
+
+         var c2 = PostfixRedirectionsForAssetsPerResource.RemoveAll( x => x.Callback == action );
+         if( c2 > 0 )
+         {
+            LogEventRegistration( $"AssetLoaded ({HookBehaviour.OneCallbackPerResourceLoaded.ToString()})", PostfixRedirectionsForAssetsPerResource );
+         }
       }
 
       /// <summary>
@@ -975,7 +1018,9 @@ namespace XUnity.ResourceRedirector
 
          Initialize();
 
-         PrefixRedirectionsForAssetBundles.Add( item );
+         PrefixRedirectionsForAssetBundles.BinarySearchInsert( item );
+
+         LogEventRegistration( $"AssetBundleLoading", PrefixRedirectionsForAssetBundles );
       }
 
       /// <summary>
@@ -987,6 +1032,8 @@ namespace XUnity.ResourceRedirector
          if( action == null ) throw new ArgumentNullException( "action" );
 
          PrefixRedirectionsForAssetBundles.RemoveAll( x => x.Callback == action );
+
+         LogEventUnregistration( $"AssetBundleLoading", PrefixRedirectionsForAssetBundles );
       }
 
       /// <summary>
@@ -1006,7 +1053,9 @@ namespace XUnity.ResourceRedirector
 
          Initialize();
 
-         PrefixRedirectionsForAsyncAssetBundles.Add( item );
+         PrefixRedirectionsForAsyncAssetBundles.BinarySearchInsert( item );
+
+         LogEventRegistration( $"AsyncAssetBundleLoading", PrefixRedirectionsForAsyncAssetBundles );
       }
 
       /// <summary>
@@ -1018,10 +1067,12 @@ namespace XUnity.ResourceRedirector
          if( action == null ) throw new ArgumentNullException( "action" );
 
          PrefixRedirectionsForAsyncAssetBundles.RemoveAll( x => x.Callback == action );
+
+         LogEventUnregistration( $"AsyncAssetBundleLoading", PrefixRedirectionsForAsyncAssetBundles );
       }
 
       /// <summary>
-      /// Register a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+      /// Register a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
       /// </summary>
       /// <param name="behaviour">The behaviour of the callback.</param>
       /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
@@ -1042,10 +1093,14 @@ namespace XUnity.ResourceRedirector
          if( behaviour == HookBehaviour.OneCallbackPerLoadCall )
          {
             PostfixRedirectionsForResourcesPerCall.BinarySearchInsert( item );
+
+            LogEventRegistration( $"ResourceLoaded ({behaviour.ToString()})", PostfixRedirectionsForResourcesPerCall );
          }
          else if( behaviour == HookBehaviour.OneCallbackPerResourceLoaded )
          {
             PostfixRedirectionsForResourcesPerResource.BinarySearchInsert( item );
+
+            LogEventRegistration( $"ResourceLoaded ({behaviour.ToString()})", PostfixRedirectionsForResourcesPerResource );
          }
       }
 
@@ -1057,8 +1112,17 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         PostfixRedirectionsForResourcesPerCall.RemoveAll( x => x.Callback == action );
-         PostfixRedirectionsForResourcesPerResource.RemoveAll( x => x.Callback == action );
+         var c1 = PostfixRedirectionsForResourcesPerCall.RemoveAll( x => x.Callback == action );
+         if( c1 > 0 )
+         {
+            LogEventRegistration( $"ReourceLoaded ({HookBehaviour.OneCallbackPerLoadCall.ToString()})", PostfixRedirectionsForResourcesPerCall );
+         }
+
+         var c2 = PostfixRedirectionsForResourcesPerResource.RemoveAll( x => x.Callback == action );
+         if( c2 > 0 )
+         {
+            LogEventRegistration( $"ReourceLoaded ({HookBehaviour.OneCallbackPerResourceLoaded.ToString()})", PostfixRedirectionsForResourcesPerResource );
+         }
       }
    }
 }

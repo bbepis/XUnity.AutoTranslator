@@ -1404,6 +1404,13 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
     public void Complete( bool skipRemainingPostfixes = true );
 
     /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
+
+    /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
     public ResourceLoadParameters Parameters { get; }
@@ -1541,6 +1548,13 @@ public class AssetBundleLoadingContext : IAssetBundleLoadingContext
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
+
+    /// <summary>
     /// Gets the parameters of the call.
     /// </summary>
     public AssetBundleLoadingParameters Parameters { get; }
@@ -1638,6 +1652,13 @@ public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true );
 
     /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
+
+    /// <summary>
     /// Gets the parameters of the call.
     /// </summary>
     public AssetBundleLoadingParameters Parameters { get; }
@@ -1732,6 +1753,17 @@ class TextureReplacementPlugin
     }
 }
 ```
+
+### About Recursion
+As you may have noticed, all of the context classes shown in the previous sections had a method called `DisableRecursion`.
+
+The purpose of this method is, as it name states, to disable recursion. That only leaves the question, when does recursion occur?
+
+Recursion will happen anytime you try to load an asset/resource/asset bundle from within your callback using the `AssetBundle` or `Resources` API. Essentially, what it means is that all callbacks (except the one loading the resource) will get a change to modify the resource that is being loaded by your callback.
+
+This may not always be desirable, so if you call the method `DisableRecursion` *before* you load your resource, this recursive behaviour is disabled. In many other cases, this behaviour is very desirable because it means that it is less important to set the *correct* priority, whatever that may be.
+
+Recursion has an important side effect for other prefix/postfix callbacks, and that is that they will always be called if you make a recursive load call in your callback, even if you indicate through the `Complete` method that they should not be called. So if, in your scenario, it is important to avoid this, you must disable recursion.
 
 ### Implemting an AssetBundle Redirector
 Here's an example of how a resource redirection may be implemented to redirect non-existing resources to a seperate 'mods' directory.
