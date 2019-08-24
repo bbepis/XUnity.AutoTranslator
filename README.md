@@ -1106,6 +1106,13 @@ public class AssetLoadingContext : IAssetLoadingContext
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true );
 
     /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
+
+    /// <summary>
     /// Gets the original parameters the asset load call was called with.
     /// </summary>
     public AssetLoadingParameters Parameters { get; }
@@ -1141,6 +1148,13 @@ public class AsyncAssetLoadingContext : IAssetLoadingContext
     /// <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
     /// <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
     public void Complete( bool skipRemainingPrefixes = true, bool? skipOriginalCall = true, bool? skipAllPostfixes = true );
+
+    /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
 
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
@@ -1253,6 +1267,13 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     /// </summary>
     /// <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
     public void Complete( bool skipRemainingPostfixes = true );
+
+    /// <summary>
+    /// Disables recursive calls if you make an asset/asset bundle load call
+    /// from within your callback. If you want to prevent recursion this should
+    /// be called before you load the asset/asset bundle.
+    /// </summary>
+    public void DisableRecursion();
 
     /// <summary>
     /// Gets the original parameters the asset load call was called with.
