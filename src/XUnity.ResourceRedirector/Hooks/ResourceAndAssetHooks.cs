@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;
 
@@ -14,7 +15,7 @@ namespace XUnity.ResourceRedirector.Hooks
 {
    internal static class ResourceAndAssetHooks
    {
-      public static readonly Type[] All = new[]
+      public static readonly Type[] GeneralHooks = new[]
       {
          //typeof( AssetBundleCreateRequest_assetBundle_Hook ),
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
@@ -37,6 +38,20 @@ namespace XUnity.ResourceRedirector.Hooks
          //typeof( Resources_LoadAsync_Hook ), // not needed
          typeof( Resources_GetBuiltinResource_Hook ),
          //typeof( Resources_FindObjectsOfTypeAll_Hook ), // impossible
+         
+
+         //typeof( Resources_UnloadAsset_Hook )
+      };
+
+      public static readonly Type[] SyncOverAsyncHooks = new Type[]
+      {
+         typeof( AsyncOperation_isDone_Hook ),
+         typeof( AsyncOperation_progress_Hook ),
+         typeof( AsyncOperation_priority_Hook ),
+         typeof( AsyncOperation_set_priority_Hook ),
+         typeof( AsyncOperation_allowSceneActivation_Hook ),
+         typeof( AsyncOperation_set_allowSceneActivation_Hook ),
+         typeof( AsyncOperation_Finalize_Hook ),
       };
    }
 
@@ -316,15 +331,15 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleRequest result = null;
 
-         var intention = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
 
-         var p = intention.Parameters;
-         if( !intention.SkipOriginalCall )
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
          {
             result = _original( self, p.Name, p.Type );
          }
-         
-         ResourceRedirection.Hook_AssetLoading_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, result );
+
+         ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
 
          return result;
       }
@@ -437,19 +452,17 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleRequest MM_Detour( AssetBundle self, string name, Type type )
       {
-         //return new UnityEngineInternal.AssetBundleRequest();
-
          AssetBundleRequest result = null;
 
-         var intention = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
 
-         var p = intention.Parameters;
-         if( !intention.SkipOriginalCall )
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
          {
             result = _original( self, p.Name, p.Type );
          }
 
-         ResourceRedirection.Hook_AssetLoading_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, result );
+         ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
 
          return result;
       }
@@ -542,27 +555,27 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( name == string.Empty )
          {
-            var intention = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
 
-            var p = intention.Parameters;
-            if( !intention.SkipOriginalCall )
+            var p = context.Parameters;
+            if( !context.SkipOriginalCall )
             {
                result = _original( self, name, p.Type );
             }
-            
-            ResourceRedirection.Hook_AssetLoading_Postfix( null, p.Type, AssetLoadType.LoadByType, self, result );
+
+            ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
          }
          else
          {
-            var intention = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
 
-            var p = intention.Parameters;
-            if( !intention.SkipOriginalCall )
+            var p = context.Parameters;
+            if( !context.SkipOriginalCall )
             {
                result = _original( self, p.Name, p.Type );
             }
 
-            ResourceRedirection.Hook_AssetLoading_Postfix( p.Name, p.Type, AssetLoadType.LoadNamedWithSubAssets, self, result );
+            ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
          }
 
          return result;
@@ -592,14 +605,34 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object MM_Detour( AssetBundleRequest self )
       {
-         var result = _original( self );
-
-         if( !ResourceRedirection.ShouldSkipPostfixes( self ) )
+         if( ResourceRedirection.TryGetAssetBundleLoadInfo( self, out var info ) )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
-         }
+            UnityEngine.Object result = null;
 
-         return result;
+            if( info.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
+            {
+               var assets = info.Assets;
+               if( assets != null && assets.Length > 0 )
+               {
+                  result = assets[ 0 ];
+               }
+            }
+            else
+            {
+               result = _original( self );
+            }
+
+            if( !info.SkipAllPostfixes )
+            {
+               ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+            }
+
+            return result;
+         }
+         else
+         {
+            return _original( self );
+         }
       }
    }
 
@@ -626,16 +659,63 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static UnityEngine.Object[] MM_Detour( AssetBundleRequest self )
       {
-         var result = _original( self );
-
-         if( !ResourceRedirection.ShouldSkipPostfixes( self ) )
+         if( ResourceRedirection.TryGetAssetBundleLoadInfo( self, out var info ) )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
-         }
+            UnityEngine.Object[] result;
 
-         return result;
+            if( info.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
+            {
+               result = info.Assets;
+            }
+            else
+            {
+               result = _original( self );
+            }
+
+            if( !info.SkipAllPostfixes )
+            {
+               ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+            }
+
+            return result;
+         }
+         else
+         {
+            return _original( self );
+         }
       }
    }
+
+   //internal static class Resources_UnloadAsset_Hook
+   //{
+   //   static bool Prepare( object instance )
+   //   {
+   //      return true;
+   //   }
+
+   //   static MethodBase TargetMethod( object instance )
+   //   {
+   //      return AccessToolsShim.Method( typeof( Resources ), "UnloadAsset", typeof( UnityEngine.Object ) );
+   //   }
+
+   //   delegate void OriginalMethod( UnityEngine.Object assetToUnload );
+
+   //   static OriginalMethod _original;
+
+   //   static void MM_Init( object detour )
+   //   {
+   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
+   //   }
+
+   //   static void MM_Detour( UnityEngine.Object assetToUnload )
+   //   {
+   //      // nothing to do!
+
+   //      XuaLogger.ResourceRedirector.Warn( "Unloading asset: " + assetToUnload.GetType().Name + " (" + assetToUnload.name + ")" );
+
+   //      _original( assetToUnload );
+   //   }
+   //}
 
    internal static class Resources_Load_Hook
    {
@@ -770,4 +850,228 @@ namespace XUnity.ResourceRedirector.Hooks
    //      return actualResult.ToArray();
    //   }
    //}
+
+   internal static class AsyncOperation_isDone_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "isDone" ).GetGetMethod();
+      }
+
+      delegate bool OriginalMethod( AsyncOperation self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static bool MM_Detour( AsyncOperation self )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return true;
+         }
+
+         return _original( self );
+      }
+   }
+
+   internal static class AsyncOperation_progress_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "progress" ).GetGetMethod();
+      }
+
+      delegate float OriginalMethod( AsyncOperation self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static float MM_Detour( AsyncOperation self )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return 100.0f;
+         }
+
+         return _original( self );
+      }
+   }
+
+   internal static class AsyncOperation_priority_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "priority" ).GetGetMethod();
+      }
+
+      delegate int OriginalMethod( AsyncOperation self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static int MM_Detour( AsyncOperation self )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return 0;
+         }
+
+         return _original( self );
+      }
+   }
+
+   internal static class AsyncOperation_set_priority_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "priority" ).GetSetMethod();
+      }
+
+      delegate void OriginalMethod( AsyncOperation self, int value );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( AsyncOperation self, int value )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return;
+         }
+
+         _original( self, value );
+      }
+   }
+
+   internal static class AsyncOperation_allowSceneActivation_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "allowSceneActivation" ).GetGetMethod();
+      }
+
+      delegate bool OriginalMethod( AsyncOperation self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static bool MM_Detour( AsyncOperation self )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return true; // do not believe this has an impact
+         }
+
+         return _original( self );
+      }
+   }
+
+   internal static class AsyncOperation_set_allowSceneActivation_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AsyncOperation ), "allowSceneActivation" ).GetSetMethod();
+      }
+
+      delegate void OriginalMethod( AsyncOperation self, bool value );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( AsyncOperation self, bool value )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return;
+         }
+
+         _original( self, value );
+      }
+   }
+
+   internal static class AsyncOperation_Finalize_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return typeof( AsyncOperation ).GetMethod( "Finalize", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly );
+      }
+
+      delegate void OriginalMethod( AsyncOperation self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( AsyncOperation self )
+      {
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( self ) )
+         {
+            return;
+         }
+
+         _original( self );
+      }
+   }
 }

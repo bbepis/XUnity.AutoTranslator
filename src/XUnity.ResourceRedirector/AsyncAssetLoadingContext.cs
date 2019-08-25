@@ -8,6 +8,9 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AsyncAssetLoadingContext : IAssetLoadingContext
    {
+      private UnityEngine.Object[] _assets;
+      private AssetBundleRequest _request;
+
       internal AsyncAssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
       {
          Parameters = new AssetLoadingParameters( assetName, assetType, loadType );
@@ -56,11 +59,82 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets or sets the AssetBundleRequest used to load assets.
       /// </summary>
-      public AssetBundleRequest Request { get; set; }
+      public AssetBundleRequest Request
+      {
+         get
+         {
+            return _request;
+         }
+         set
+         {
+
+            _request = value;
+            ResolveType = AsyncAssetLoadingResolve.ThroughRequest;
+         }
+      }
+
+      /// <summary>
+      /// Gets or sets the loaded assets.
+      ///
+      /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+      /// </summary>
+      public UnityEngine.Object[] Assets
+      {
+         get
+         {
+            return _assets;
+         }
+         set
+         {
+            if( !ResourceRedirection.SyncOverAsyncEnabled )
+            {
+               throw new InvalidOperationException( "Trying to set the Assets/Asset property in async load operation while 'SyncOverAsyncAssetLoads' is disabled is not allowed. Consider settting the Request property instead if possible or enabling 'SyncOverAsyncAssetLoads' through the method 'ResourceRedirection.EnableSyncOverAsyncAssetLoads()'." );
+            }
+
+            _assets = value;
+            ResolveType = AsyncAssetLoadingResolve.ThroughAssets;
+         }
+      }
+
+      /// <summary>
+      /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+      /// additional null guards to prevent NullReferenceExceptions when using it.
+      /// </summary>
+      public UnityEngine.Object Asset
+      {
+         get
+         {
+            if( Assets == null || Assets.Length < 1 )
+            {
+               return null;
+            }
+            return Assets[ 0 ];
+         }
+         set
+         {
+            if( !ResourceRedirection.SyncOverAsyncEnabled )
+            {
+               throw new InvalidOperationException( "Trying to set the Assets/Asset property in async load operation while 'SyncOverAsyncAssetLoads' is disabled is not allowed. Consider settting the Request property instead if possible or enabling 'SyncOverAsyncAssetLoads' through the method 'ResourceRedirection.EnableSyncOverAsyncAssetLoads'." );
+            }
+
+            if( Assets == null || Assets.Length < 1 )
+            {
+               Assets = new UnityEngine.Object[ 1 ];
+            }
+            Assets[ 0 ] = value;
+            ResolveType = AsyncAssetLoadingResolve.ThroughAssets;
+         }
+      }
+
+      /// <summary>
+      /// Gets or sets how this load operation should be resolved.
+      /// Setting the Asset/Assets/Request property will automatically update this value.
+      /// </summary>
+      public AsyncAssetLoadingResolve ResolveType { get; set; }
 
       internal bool SkipRemainingPrefixes { get; private set; }
 
-      internal bool SkipOriginalCall { get; private set; }
+      internal bool SkipOriginalCall { get; set; }
 
       internal bool SkipAllPostfixes { get; private set; }
    }

@@ -22,7 +22,6 @@ namespace XUnity.ResourceRedirector
       private static readonly object Sync = new object();
 
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetBundleLoadInfo>();
-      private static readonly WeakDictionary<AssetBundleRequest, bool> AssetBundleRequestToSkipPostfixes = new WeakDictionary<AssetBundleRequest, bool>();
 
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerCall = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerResource = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
@@ -30,8 +29,9 @@ namespace XUnity.ResourceRedirector
       private static readonly List<PrioritizedCallback<Action<ResourceLoadedContext>>> PostfixRedirectionsForResourcesPerResource = new List<PrioritizedCallback<Action<ResourceLoadedContext>>>();
       private static readonly List<PrioritizedCallback<Action<AssetBundleLoadingContext>>> PrefixRedirectionsForAssetBundles = new List<PrioritizedCallback<Action<AssetBundleLoadingContext>>>();
       private static readonly List<PrioritizedCallback<Action<AsyncAssetBundleLoadingContext>>> PrefixRedirectionsForAsyncAssetBundles = new List<PrioritizedCallback<Action<AsyncAssetBundleLoadingContext>>>();
-      private static readonly List<PrioritizedCallback<Action<AssetLoadingContext>>> PrefixRedirectionsForAssetsPerCall = new List<PrioritizedCallback<Action<AssetLoadingContext>>>();
-      private static readonly List<PrioritizedCallback<Action<AsyncAssetLoadingContext>>> PrefixRedirectionsForAsyncAssetsPerCall = new List<PrioritizedCallback<Action<AsyncAssetLoadingContext>>>();
+
+      private static readonly List<PrioritizedCallback<Delegate>> PrefixRedirectionsForAssetsPerCall = new List<PrioritizedCallback<Delegate>>();
+      private static readonly List<PrioritizedCallback<Delegate>> PrefixRedirectionsForAsyncAssetsPerCall = new List<PrioritizedCallback<Delegate>>();
 
       private static Action<AssetBundleLoadingContext> _emulateAssetBundles;
       private static Action<AsyncAssetBundleLoadingContext> _emulateAssetBundlesAsync;
@@ -39,9 +39,11 @@ namespace XUnity.ResourceRedirector
       private static Action<AsyncAssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmptyAsync;
 
       private static bool _initialized = false;
+      private static bool _initializedSyncOverAsyncEnabled = false;
       private static bool _logAllLoadedResources = false;
 
       internal static bool RecursionEnabled = true;
+      internal static bool SyncOverAsyncEnabled = false;
 
       /// <summary>
       /// Gets or sets a bool indicating if the resource redirector
@@ -73,9 +75,26 @@ namespace XUnity.ResourceRedirector
          {
             _initialized = true;
 
-            HookingHelper.PatchAll( ResourceAndAssetHooks.All, false );
+            HookingHelper.PatchAll( ResourceAndAssetHooks.GeneralHooks, false );
 
             MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
+         }
+      }
+
+      /// <summary>
+      /// Enables experimental hooks that allows returning an Asset instead of a Request from async prefix
+      /// asset load operations.
+      /// </summary>
+      public static void EnableSyncOverAsyncAssetLoads()
+      {
+         Initialize();
+
+         if( !_initializedSyncOverAsyncEnabled )
+         {
+            _initializedSyncOverAsyncEnabled = true;
+            SyncOverAsyncEnabled = true;
+
+            HookingHelper.PatchAll( ResourceAndAssetHooks.SyncOverAsyncHooks, true );
          }
       }
 
@@ -146,6 +165,29 @@ namespace XUnity.ResourceRedirector
       //         // handler to handle this request after us
       //      }
       //   }
+      //}
+
+      //public static void EnableAsyncToSyncRedirector( int priority )
+      //{
+      //   ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+
+      //   RegisterAsyncAndSyncAssetLoadingHook( context =>
+      //   {
+      //      if( context.Parameters.LoadType == AssetLoadType.LoadNamed )
+      //      {
+      //         // PROBLEM: Will be caught by sync version of this hook!
+
+      //         XuaLogger.ResourceRedirector.Warn( "Redirecting async to sync: " + context.Parameters.Name );
+
+      //         context.Asset = context.Bundle.LoadAsset( context.Parameters.Name, context.Parameters.Type );
+
+      //         context.Complete();
+      //      }
+      //      else
+      //      {
+      //         XuaLogger.ResourceRedirector.Warn( "MISSED: " + context.Parameters.Name );
+      //      }
+      //   } );
       //}
 
       /// <summary>
@@ -284,22 +326,55 @@ namespace XUnity.ResourceRedirector
       {
          lock( Sync )
          {
+            Console.WriteLine( "BEFORE: " + AssetBundleRequestToAssetBundle.Count );
+
             AssetBundleRequestToAssetBundle.RemoveCollectedEntries();
-            AssetBundleRequestToSkipPostfixes.RemoveCollectedEntries();
+
+            Console.WriteLine( "AFTER: " + AssetBundleRequestToAssetBundle.Count );
          }
       }
 
-      internal static bool ShouldSkipPostfixes( AssetBundleRequest request )
+      internal static bool TryGetAssetBundleLoadInfo( AssetBundleRequest request, out AsyncAssetBundleLoadInfo result )
       {
          lock( Sync )
          {
-            if( AssetBundleRequestToSkipPostfixes.TryGetValue( request, out var result ) )
-            {
-               return result;
-            }
-            return false; // DEFAULT IS PROBLEM
+            return AssetBundleRequestToAssetBundle.TryGetValue( request, out result );
          }
       }
+
+      internal static bool ShouldBlockAsyncOperationMethods( AsyncOperation operation )
+      {
+         return ResourceRedirection.SyncOverAsyncEnabled
+            && operation is AssetBundleRequest request
+            && ResourceRedirection.TryGetAssetBundleLoadInfo( request, out var result )
+            && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets;
+      }
+
+      //internal static bool ShouldSkipPostfixes( AssetBundleRequest request )
+      //{
+      //   lock( Sync )
+      //   {
+      //      if( AssetBundleRequestToAssetBundle.TryGetValue( request, out var result ) )
+      //      {
+      //         return result.SkipAllPostfixes;
+      //      }
+      //      return false; // DEFAULT IS PROBLEM
+      //   }
+      //}
+
+      //internal static bool TryGetSyncOverAsyncAssets( AssetBundleRequest request, out UnityEngine.Object[] result )
+      //{
+      //   if( !SyncOverAsyncEnabled )
+      //   {
+      //      result = null;
+      //      return false;
+      //   }
+
+      //   lock( Sync )
+      //   {
+      //      return AssetBundleRequestToSyncOverAsyncAsset.TryGetValue( request, out result );
+      //   }
+      //}
 
       internal static AssetBundleLoadingPrefixResult Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
@@ -434,7 +509,14 @@ namespace XUnity.ResourceRedirector
                   try
                   {
                      redirection.IsBeingCalled = true;
-                     redirection.Callback( context );
+                     if( redirection.Callback is Action<AssetLoadingContext> c1 )
+                     {
+                        c1( context );
+                     }
+                     else if( redirection.Callback is Action<IAssetLoadingContext> c2 )
+                     {
+                        c2( context );
+                     }
 
                      if( context.SkipRemainingPrefixes ) break;
                   }
@@ -462,15 +544,14 @@ namespace XUnity.ResourceRedirector
          return new AssetLoadingPrefixResult( new AssetLoadingParameters( assetName, assetType, loadType ), false, false );
       }
 
-      internal static AssetLoadingPrefixResult Hook_AsyncAssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref AssetBundleRequest request )
+      internal static AsyncAssetLoadingContext Hook_AsyncAssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref AssetBundleRequest request )
       {
+         var context = new AsyncAssetLoadingContext( assetName, assetType, loadType, bundle );
          try
          {
-            var context = new AsyncAssetLoadingContext( assetName, assetType, loadType, bundle );
-
             if( !RecursionEnabled )
             {
-               return new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
+               return context;
             }
 
             // handle "per call" hooks first
@@ -484,7 +565,14 @@ namespace XUnity.ResourceRedirector
                   try
                   {
                      redirection.IsBeingCalled = true;
-                     redirection.Callback( context );
+                     if( redirection.Callback is Action<AsyncAssetLoadingContext> c1 )
+                     {
+                        c1( context );
+                     }
+                     else if( redirection.Callback is Action<IAssetLoadingContext> c2 )
+                     {
+                        c2( context );
+                     }
 
                      if( context.SkipRemainingPrefixes ) break;
                   }
@@ -500,21 +588,31 @@ namespace XUnity.ResourceRedirector
                }
             }
 
-            request = context.Request;
-
-            var result = new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
-            lock( Sync )
+            if( context.ResolveType == AsyncAssetLoadingResolve.ThroughRequest )
             {
-               AssetBundleRequestToSkipPostfixes[ request ] = result.SkipAllPostfixes;
+               request = context.Request;
             }
-            return result;
+            else if( context.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
+            {
+               // simply create a dummy request object
+               request = new AssetBundleRequest(); // is this even legal?
+               if( !context.SkipOriginalCall )
+               {
+                  XuaLogger.ResourceRedirector.Warn( "Resolving sync over async asset load, but 'SkipOriginalCall' was not set to true. Forcing it to true." );
+                  context.SkipOriginalCall = true;
+               }
+            }
+            else
+            {
+               throw new InvalidOperationException( "Found invalid ResolveType on context: " + context.ResolveType );
+            }
          }
          catch( Exception e )
          {
             XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AsyncAssetLoading event." );
          }
 
-         return new AssetLoadingPrefixResult( new AssetLoadingParameters( assetName, assetType, loadType ), false, false );
+         return context;
       }
 
       internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
@@ -570,14 +668,22 @@ namespace XUnity.ResourceRedirector
          FireAssetLoadedEvent( assetName, assetType, bundle, loadType, ref assets );
       }
 
-      internal static void Hook_AssetLoading_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, AssetBundleRequest request )
+      internal static void Hook_AssetLoading_Postfix( AsyncAssetLoadingContext context, AssetBundleRequest request )
       {
-         // create ref from request to parentBundle?
          lock( Sync )
          {
-            if( bundle != null && request != null )
+            if( request != null )
             {
-               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo( assetName, assetType, loadType, bundle );
+               var p = context.Parameters;
+
+               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo(
+                  p.Name,
+                  p.Type,
+                  p.LoadType,
+                  context.Bundle,
+                  context.SkipAllPostfixes,
+                  context.ResolveType,
+                  context.Assets );
             }
          }
       }
@@ -886,7 +992,7 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         var item = PrioritizedCallback.Create( action, priority );
+         var item = PrioritizedCallback.Create<Delegate>( action, priority );
          if( PrefixRedirectionsForAssetsPerCall.Contains( item ) )
          {
             throw new ArgumentException( "This callback has already been registered.", "action" );
@@ -913,7 +1019,7 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         PrefixRedirectionsForAssetsPerCall.RemoveAll( x => x.Callback == action );
+         PrefixRedirectionsForAssetsPerCall.RemoveAll( x => Equals( x.Callback, action ) );
 
          LogEventUnregistration( "AssetLoading", PrefixRedirectionsForAssetsPerCall );
       }
@@ -927,7 +1033,7 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         var item = PrioritizedCallback.Create( action, priority );
+         var item = PrioritizedCallback.Create<Delegate>( action, priority );
          if( PrefixRedirectionsForAsyncAssetsPerCall.Contains( item ) )
          {
             throw new ArgumentException( "This callback has already been registered.", "action" );
@@ -954,9 +1060,54 @@ namespace XUnity.ResourceRedirector
       {
          if( action == null ) throw new ArgumentNullException( "action" );
 
-         PrefixRedirectionsForAsyncAssetsPerCall.RemoveAll( x => x.Callback == action );
+         PrefixRedirectionsForAsyncAssetsPerCall.RemoveAll( x => Equals( x.Callback, action ) );
 
          LogEventUnregistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
+      }
+
+      /// <summary>
+      /// Register an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+      /// </summary>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAsyncAndSyncAssetLoadingHook( int priority, Action<IAssetLoadingContext> action )
+      {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         var item = PrioritizedCallback.Create<Delegate>( action, priority );
+         if( PrefixRedirectionsForAsyncAssetsPerCall.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
+
+         Initialize();
+
+         PrefixRedirectionsForAsyncAssetsPerCall.BinarySearchInsert( item );
+         LogEventRegistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
+
+         PrefixRedirectionsForAssetsPerCall.BinarySearchInsert( item );
+         LogEventRegistration( "AssetLoading", PrefixRedirectionsForAssetsPerCall );
+      }
+
+      /// <summary>
+      /// Register an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAsyncAndSyncAssetLoadingHook( Action<IAssetLoadingContext> action ) => RegisterAsyncAndSyncAssetLoadingHook( CallbackPriority.Default, action );
+
+      /// <summary>
+      /// Unregister an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void UnregisterAsyncAndSyncAssetLoadingHook( Action<IAssetLoadingContext> action )
+      {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         PrefixRedirectionsForAsyncAssetsPerCall.RemoveAll( x => Equals( x.Callback, action ) );
+         LogEventUnregistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
+
+         PrefixRedirectionsForAssetsPerCall.RemoveAll( x => Equals( x.Callback, action ) );
+         LogEventUnregistration( "AssetLoading", PrefixRedirectionsForAssetsPerCall );
       }
 
       /// <summary>

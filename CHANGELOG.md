@@ -3,6 +3,7 @@
  * BREAKING CHANGE - Changed file layout in Translators directory - should replace folder entirely upon upgrade to avoid redundant files that may be picked up unintentionally by mod loaders
  * FEATURE - Resource Redirection API
  * FEATURE - Support for redirecting translation processing to an external process
+ * MISC - Updated distributed MonoMod version
 
 ### 3.8.1
  * BUG FIX - Minor bug in relation to harmony initialization

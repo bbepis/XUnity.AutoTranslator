@@ -24,12 +24,12 @@ namespace XUnity.ResourceRedirector.BepIn_5x
 
       void Awake()
       {
-         LogAllLoadedResources = Config.Wrap( new ConfigDefinition( "General", "LogAllLoadedResources", "Indicates whether or not unhandled assets/bundles should be logged to the console." ), false );
+         LogAllLoadedResources = Config.Wrap( new ConfigDefinition( "General", "LogAllLoadedResources" ), false );
          ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
          LogAllLoadedResources.SettingChanged += ( s, e ) => ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
 
 
-         EmulateAssetBundles = Config.Wrap( new ConfigDefinition( "General", "EmulateAssetBundles", "Indicates whether or not to enable emulation of asset bundles being loaded." ), false );
+         EmulateAssetBundles = Config.Wrap( new ConfigDefinition( "General", "EmulateAssetBundles" ), false );
          ToggleEmulateAssetBundles( null, null );
          EmulateAssetBundles.SettingChanged += ToggleEmulateAssetBundles;
 

@@ -996,6 +996,19 @@ public static class ResourceRedirection
     public static void UnregisterAsyncAssetLoadingHook( Action<AsyncAssetLoadingContext> action );
 
     /// <summary>
+    /// Register an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+    /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAsyncAndSyncAssetLoadingHook( int priority, Action<IAssetLoadingContext> action );
+
+    /// <summary>
+    /// Unregister an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAsyncAndSyncAssetLoadingHook( Action<IAssetLoadingContext> action );
+
+    /// <summary>
     /// Register an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="behaviour">The behaviour of the callback.</param>
@@ -1048,6 +1061,12 @@ public static class ResourceRedirection
     /// </summary>
     /// <param name="action">The callback.</param>
     public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
+
+    /// <summary>
+    /// Enables experimental hooks that allows returning an Asset instead of a Request from async prefix
+    /// asset load operations.
+    /// </summary>
+    public static void EnableSyncOverAsyncAssetLoads();
 
     /// <summary>
     /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
@@ -1170,10 +1189,35 @@ public class AsyncAssetLoadingContext : IAssetLoadingContext
     /// Gets or sets the AssetBundleRequest used to load assets.
     /// </summary>
     public AssetBundleRequest Request { get; set; }
+
+    /// <summary>
+    /// Gets or sets the loaded assets.
+    ///
+    /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+    /// </summary>
+    UnityEngine.Object[] Assets { get; set; }
+
+    /// <summary>
+    /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+    /// additional null guards to prevent NullReferenceExceptions when using it.
+    /// </summary>
+    UnityEngine.Object Asset { get; set; }
+
+    /// <summary>
+    /// Gets or sets how this load operation should be resolved.
+    /// Setting the Asset/Assets/Request property will automatically update this value.
+    /// </summary>
+    public AsyncAssetLoadingResolve ResolveType { get; set; }
 }
 ```
 
 The only difference between these two contexts is that one has an `Asset/Assets` property you can set, while the other has a `Request` property you can set.
+
+Now if you actually paid attention to what you were reading(!?), you would notice that both of the above context objects has an `Asset/Assets` property that can be set.
+
+Under normal circumstances, however, you cannot use the `Assets/Asset` property on the the `AsyncAssetLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the asset directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
+
+It is, however, recommended that if you can that you set the `Request` property instead of the `Assets/Asset` property as that will keep the operation asynchronous and not block the game while the asset is being loaded.
 
 If you can handle the loading of the asset remember to call the `Complete` method to indicate your intentions regarding:
  * Whether the rest of the prefixes registered should be skipped.
@@ -1236,6 +1280,10 @@ public enum AssetLoadType
 ```
 
 Another way to change the result of the asset load operation is to change the value of the `Name` and `Type` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
+
+An important additional way to subscribe to the prefix asset loading operations are through the method `RegisterAsyncAndSyncAssetLoadingHook( int priority, Action<IAssetLoadingContext> action )`. This method will handle both async and sync asset loading operations. The `IAssetLoadingContext` is an interface implemented by both the `AssetLoadingContext` and `AsyncAssetLoadingContext`.
+
+Do note, that if you want to use this method you must first call the method `EnableSyncOverAsyncAssetLoads()` to enable the hooks required for this to work.
 
 #### Asset Loaded Methods
 The method `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.

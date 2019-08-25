@@ -31,5 +31,18 @@ namespace XUnity.ResourceRedirector
       /// Gets the AssetBundle associated with the loaded assets.
       /// </summary>
       AssetBundle Bundle { get; }
+
+      /// <summary>
+      /// Gets or sets the loaded assets.
+      ///
+      /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+      /// </summary>
+      UnityEngine.Object[] Assets { get; set; }
+
+      /// <summary>
+      /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+      /// additional null guards to prevent NullReferenceExceptions when using it.
+      /// </summary>
+      UnityEngine.Object Asset { get; set; }
    }
 }
