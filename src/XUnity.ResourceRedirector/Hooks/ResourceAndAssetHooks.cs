@@ -437,6 +437,8 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundleRequest MM_Detour( AssetBundle self, string name, Type type )
       {
+         //return new UnityEngineInternal.AssetBundleRequest();
+
          AssetBundleRequest result = null;
 
          var intention = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );

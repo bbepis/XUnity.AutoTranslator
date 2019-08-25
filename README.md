@@ -1085,7 +1085,7 @@ The resource redirector comes with both postfix and prefix callbacks when loadin
 The event callback chain looks like this `[AssetLoading / AsyncAssetLoading hooks] => [Original Method] => [AssetLoaded hooks]`. The `AssetLoaded` event handles postfixes for both synchronous and asynchronous loading of assets.
 
 #### Asset Loading Methods
-The methods `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` and `RegisterAsyncAssetLoadingHook( int priority, Action<AsyncAssetLoadingContext> action )` hooks into the `AssetBundle` API when loading assets.
+The methods `RegisterAssetLoadingHook( HookBehaviour behaviour, Action<AssetLoadingContext> action )` and `RegisterAsyncAssetLoadingHook( int priority, Action<AsyncAssetLoadingContext> action )` hooks into the `AssetBundle` API when loading assets.
 
 These methods registers prefix callbacks, which means the assets themselves wont be loaded yet when they are called.
 

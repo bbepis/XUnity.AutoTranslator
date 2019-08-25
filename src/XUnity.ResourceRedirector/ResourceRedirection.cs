@@ -152,17 +152,17 @@ namespace XUnity.ResourceRedirector
       /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
       /// over the default asset bundles if they exist.
       /// </summary>
-      /// <param name="hookPriority">Priority of the hook.</param>
+      /// <param name="priority">Priority of the hook.</param>
       /// <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
-      public static void EnableEmulateAssetBundles( int hookPriority, string emulationDirectory )
+      public static void EnableEmulateAssetBundles( int priority, string emulationDirectory )
       {
          if( _emulateAssetBundles == null && _emulateAssetBundlesAsync == null )
          {
             _emulateAssetBundles = ctx => HandleAssetBundleEmulation( ctx, SetBundle );
             _emulateAssetBundlesAsync = ctx => HandleAssetBundleEmulation( ctx, SetRequest );
 
-            RegisterAssetBundleLoadingHook( hookPriority, _emulateAssetBundles );
-            RegisterAsyncAssetBundleLoadingHook( hookPriority, _emulateAssetBundlesAsync );
+            RegisterAssetBundleLoadingHook( priority, _emulateAssetBundles );
+            RegisterAsyncAssetBundleLoadingHook( priority, _emulateAssetBundlesAsync );
 
             // define base callback
             void HandleAssetBundleEmulation<T>( T context, Action<T, string> changeBundle )
@@ -218,16 +218,16 @@ namespace XUnity.ResourceRedirector
       /// Creates an asset bundle hook that redirects asset bundles loads to an empty
       /// asset bundle if the file that is being loaded does not exist.
       /// </summary>
-      /// <param name="hookPriority">Priority of the hook.</param>
-      public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int hookPriority )
+      /// <param name="priority">Priority of the hook.</param>
+      public static void EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int priority )
       {
          if( _redirectionMissingAssetBundlesToEmpty == null && _redirectionMissingAssetBundlesToEmptyAsync == null )
          {
             _redirectionMissingAssetBundlesToEmpty = ctx => HandleMissingBundle( ctx, SetBundle );
             _redirectionMissingAssetBundlesToEmptyAsync = ctx => HandleMissingBundle( ctx, SetRequest );
 
-            RegisterAssetBundleLoadingHook( hookPriority, _redirectionMissingAssetBundlesToEmpty );
-            RegisterAsyncAssetBundleLoadingHook( hookPriority, _redirectionMissingAssetBundlesToEmptyAsync );
+            RegisterAssetBundleLoadingHook( priority, _redirectionMissingAssetBundlesToEmpty );
+            RegisterAsyncAssetBundleLoadingHook( priority, _redirectionMissingAssetBundlesToEmptyAsync );
 
             // define base callback
             void HandleMissingBundle<TContext>( TContext context, Action<TContext, byte[]> changeBundle )
@@ -900,6 +900,12 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Register an AssetLoading hook (prefix to loading an asset from an asset bundle).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAssetLoadingHook( Action<AssetLoadingContext> action ) => RegisterAssetLoadingHook( CallbackPriority.Default, action );
+
+      /// <summary>
       /// Unregister an AssetLoading hook (prefix to loading an asset from an asset bundle).
       /// </summary>
       /// <param name="action">The callback.</param>
@@ -933,6 +939,12 @@ namespace XUnity.ResourceRedirector
 
          LogEventRegistration( "AsyncAssetLoading", PrefixRedirectionsForAsyncAssetsPerCall );
       }
+
+      /// <summary>
+      /// Register an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAsyncAssetLoadingHook( Action<AsyncAssetLoadingContext> action ) => RegisterAsyncAssetLoadingHook( CallbackPriority.Default, action );
 
       /// <summary>
       /// Unregister an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
@@ -981,6 +993,13 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Register an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
+      /// </summary>
+      /// <param name="behaviour">The behaviour of the callback.</param>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action ) => RegisterAssetLoadedHook( behaviour, CallbackPriority.Default, action );
+
+      /// <summary>
       /// Unregister an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
       /// </summary>
       /// <param name="action">The callback.</param>
@@ -1024,6 +1043,12 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Register an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAssetBundleLoadingHook( Action<AssetBundleLoadingContext> action ) => RegisterAssetBundleLoadingHook( CallbackPriority.Default, action );
+
+      /// <summary>
       /// Unregister an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
       /// </summary>
       /// <param name="action">The callback.</param>
@@ -1057,6 +1082,12 @@ namespace XUnity.ResourceRedirector
 
          LogEventRegistration( $"AsyncAssetBundleLoading", PrefixRedirectionsForAsyncAssetBundles );
       }
+
+      /// <summary>
+      /// Register an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action ) => RegisterAsyncAssetBundleLoadingHook( CallbackPriority.Default, action );
 
       /// <summary>
       /// Unregister an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
@@ -1103,6 +1134,13 @@ namespace XUnity.ResourceRedirector
             LogEventRegistration( $"ResourceLoaded ({behaviour.ToString()})", PostfixRedirectionsForResourcesPerResource );
          }
       }
+
+      /// <summary>
+      /// Register a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+      /// </summary>
+      /// <param name="behaviour">The behaviour of the callback.</param>
+      /// <param name="action">The callback.</param>
+      public static void RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action ) => RegisterResourceLoadedHook( behaviour, CallbackPriority.Default, action );
 
       /// <summary>
       /// Unregister a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
