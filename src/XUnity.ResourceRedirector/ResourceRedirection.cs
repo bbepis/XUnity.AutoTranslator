@@ -326,11 +326,7 @@ namespace XUnity.ResourceRedirector
       {
          lock( Sync )
          {
-            Console.WriteLine( "BEFORE: " + AssetBundleRequestToAssetBundle.Count );
-
             AssetBundleRequestToAssetBundle.RemoveCollectedEntries();
-
-            Console.WriteLine( "AFTER: " + AssetBundleRequestToAssetBundle.Count );
          }
       }
 
