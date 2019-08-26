@@ -175,20 +175,26 @@ namespace XUnity.ResourceRedirector
 
       //   RegisterAsyncAndSyncAssetLoadingHook( context =>
       //   {
+      //      XuaLogger.ResourceRedirector.Warn( "Redirecting asset: " + context.Parameters.LoadType );
+
       //      if( context.Parameters.LoadType == AssetLoadType.LoadNamed )
       //      {
-      //         // PROBLEM: Will be caught by sync version of this hook!
-
-      //         XuaLogger.ResourceRedirector.Warn( "Redirecting async to sync: " + context.Parameters.Name );
-
       //         context.Asset = context.Bundle.LoadAsset( context.Parameters.Name, context.Parameters.Type );
-
-      //         context.Complete();
+      //      }
+      //      else if( context.Parameters.LoadType == AssetLoadType.LoadByType )
+      //      {
+      //         context.Assets = context.Bundle.LoadAllAssets( context.Parameters.Type );
+      //      }
+      //      else if( context.Parameters.LoadType == AssetLoadType.LoadNamedWithSubAssets )
+      //      {
+      //         context.Assets = context.Bundle.LoadAssetWithSubAssets( context.Parameters.Name, context.Parameters.Type );
       //      }
       //      else
       //      {
-      //         XuaLogger.ResourceRedirector.Warn( "MISSED: " + context.Parameters.Name );
+      //         context.Asset = context.Bundle.mainAsset;
       //      }
+
+      //      context.Complete();
       //   } );
       //}
 
@@ -209,7 +215,7 @@ namespace XUnity.ResourceRedirector
       //            context.Complete(
       //               skipRemainingPrefixes: true,
       //               skipOriginalCall: true );
-                  
+
       //            XuaLogger.ResourceRedirector.Debug( "Redirected asset bundle: '" + context.Parameters.Path + "' => '" + emulatedPath + "'" );
       //         }
       //      }

@@ -17,9 +17,6 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       public static readonly Type[] GeneralHooks = new[]
       {
-         typeof( AssetBundleCreateRequest_assetBundle_Hook ),
-         typeof( AssetBundleCreateRequest_DisableCompatibilityChecks_Hook ),
-
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
          //typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
@@ -48,6 +45,9 @@ namespace XUnity.ResourceRedirector.Hooks
 
       public static readonly Type[] SyncOverAsyncHooks = new Type[]
       {
+         typeof( AssetBundleCreateRequest_assetBundle_Hook ),
+         typeof( AssetBundleCreateRequest_DisableCompatibilityChecks_Hook ),
+
          typeof( AsyncOperation_isDone_Hook ),
          typeof( AsyncOperation_progress_Hook ),
          typeof( AsyncOperation_priority_Hook ),
