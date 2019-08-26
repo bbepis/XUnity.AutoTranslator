@@ -1049,6 +1049,20 @@ public static class ResourceRedirection
     public static void UnregisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action );
 
     /// <summary>
+    /// Register an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
+    /// </summary>
+    /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+    /// <param name="action">The callback.</param>
+    public static void RegisterAsyncAndSyncAssetBundleLoadingHook( int priority, Action<IAssetBundleLoadingContext> action )M
+
+
+    /// <summary>
+    /// Unregister an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
+    /// </summary>
+    /// <param name="action">The callback.</param>
+    public static void UnregisterAsyncAndSyncAssetBundleLoadingHook( Action<IAssetBundleLoadingContext> action )M
+
+    /// <summary>
     /// Register a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="behaviour">The behaviour of the callback.</param>
@@ -1736,10 +1750,25 @@ public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
     /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
     /// </summary>
     public AssetBundleCreateRequest Request { get; set; }
+
+    /// <summary>
+    /// Gets or sets the AssetBundle being loaded.
+    /// </summary>
+    public AssetBundle Bundle { get; set; }
+
+    /// <summary>
+    /// Gets or sets how this load operation should be resolved.
+    /// Setting the Bundle/Request property will automatically update this value.
+    /// </summary>
+    public AsyncAssetBundleLoadingResolve ResolveType { get; set; }
 }
 ```
 
 Because this is a prefix API, the `Request` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
+
+As you can see there is actually also a `Bundle` property available on the context object. Under normal circumstances, however, you cannot use the `Bundle` property on the the `AsyncAssetBundleLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the bundle directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
+
+It is, however, recommended that if you can that you set the `Request` property instead of the `Bundle` property as that will keep the operation asynchronous and not block the game while the asset is being loaded.
 
 If you update the `Request` property, remember to call the `Complete` to indicate your intentions regarding:
  * Whether or not the remaining prefixes should be skipped.
@@ -1794,6 +1823,10 @@ It may also be worth looking at the `GetNormalizedPath()` method instead of the 
  * Include a stray '..' in the middle of the path
  
 Another way to change the result of the asset bundle load operation is to change the value of the `Path`, `Crc` and `Offset` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
+
+An important additional way to subscribe to the prefix asset bundle loading operations are through the method `RegisterAsyncAndSyncAssetBundleLoadingHook( int priority, Action<IAssetBundleLoadingContext> action )`. This method will handle both async and sync asset bundle loading operations. The `IAssetLoadingContext` is an interface implemented by both the `AssetBundleLoadingContext` and `AsyncAssetBundleLoadingContext`.
+
+Do note, that if you want to use this method you must first call the method `EnableSyncOverAsyncAssetLoads()` to enable the hooks required for this to work.
 
 ### About Recursion
 As you may have noticed, all of the context classes shown in the previous sections had a method called `DisableRecursion`.
@@ -1891,6 +1924,92 @@ class AssetBundleRedirectorPlugin
                 var request = AssetBundle.LoadFromFileAsync( modFolderPath );
 		    
                 context.Request = request;
+                context.Complete(
+                    skipRemainingPrefixes: true,
+                    skipOriginalCall: true );
+            }
+        }
+    }
+}
+```
+
+Here's a smart way to implement the same thing, by having a single method that hooks both the synchronous and asynchronous method at the same time:
+
+```C#
+class AssetBundleRedirectorSyncOverAsyncPlugin
+{
+    void Awake()
+    {
+        ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+	    
+        ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(
+            priority: 1000,
+            action: AssetBundleLoading );
+    }
+
+    public void AssetBundleLoading( IAssetBundleLoadingContext context )
+    {
+        if( !File.Exists( context.Parameters.Path ) )
+        {
+            // the game is trying to load a path that does not exist, lets redirect to our own resources
+	    
+            // obtain different resource path
+            var normalizedPath = context.GetNormalizedPath();
+            var modFolderPath = Path.Combine( "mods", normalizedPath );
+	    
+            // if the path exists, let's load that instead
+            if( File.Exists( modFolderPath ) )
+            {
+                var bundle = AssetBundle.LoadFromFile( modFolderPath );
+	    
+                context.Bundle = bundle;
+                context.Complete(
+                    skipRemainingPrefixes: true,
+                    skipOriginalCall: true );
+            }
+        }
+    }
+}
+```
+
+While this is clean it causes all asset bundles to be loaded synchronously, potentially locking up the game causing FPS lag. Another approach that also handles that could look like this:
+
+```C#
+class SmartAssetBundleRedirectorSyncOverAsyncPlugin
+{
+    void Awake()
+    {
+        ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+	    
+        ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(
+            priority: 1000,
+            action: AssetBundleLoading );
+    }
+
+    public void AssetBundleLoading( IAssetBundleLoadingContext context )
+    {
+        if( !File.Exists( context.Parameters.Path ) )
+        {
+            // the game is trying to load a path that does not exist, lets redirect to our own resources
+	    
+            // obtain different resource path
+            var normalizedPath = context.GetNormalizedPath();
+            var modFolderPath = Path.Combine( "mods", normalizedPath );
+	    
+            // if the path exists, let's load that instead
+            if( File.Exists( modFolderPath ) )
+            {
+                if( context is AsyncAssetBundleLoadingContext asyncContext )
+                {
+                    var request = AssetBundle.LoadFromFileAsync( modFolderPath );
+                    asyncContext.Request = request;
+                }
+                else
+                {
+                    var bundle = AssetBundle.LoadFromFile( modFolderPath );
+                    context.Bundle = bundle;
+                }
+	    
                 context.Complete(
                     skipRemainingPrefixes: true,
                     skipOriginalCall: true );

@@ -88,5 +88,83 @@ namespace XUnity.ResourceRedirector.Examples
             }
          }
       }
+
+      class AssetBundleRedirectorSyncOverAsyncPlugin
+      {
+         void Awake()
+         {
+            ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+
+            ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(
+               priority: 1000,
+               action: AssetBundleLoading );
+         }
+
+         public void AssetBundleLoading( IAssetBundleLoadingContext context )
+         {
+            if( !File.Exists( context.Parameters.Path ) )
+            {
+               // the game is trying to load a path that does not exist, lets redirect to our own resources
+
+               // obtain different resource path
+               var normalizedPath = context.GetNormalizedPath();
+               var modFolderPath = Path.Combine( "mods", normalizedPath );
+
+               // if the path exists, let's load that instead
+               if( File.Exists( modFolderPath ) )
+               {
+                  var bundle = AssetBundle.LoadFromFile( modFolderPath );
+
+                  context.Bundle = bundle;
+                  context.Complete(
+                     skipRemainingPrefixes: true,
+                     skipOriginalCall: true );
+               }
+            }
+         }
+      }
+
+      class SmartAssetBundleRedirectorSyncOverAsyncPlugin
+      {
+         void Awake()
+         {
+            ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+
+            ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(
+               priority: 1000,
+               action: AssetBundleLoading );
+         }
+
+         public void AssetBundleLoading( IAssetBundleLoadingContext context )
+         {
+            if( !File.Exists( context.Parameters.Path ) )
+            {
+               // the game is trying to load a path that does not exist, lets redirect to our own resources
+
+               // obtain different resource path
+               var normalizedPath = context.GetNormalizedPath();
+               var modFolderPath = Path.Combine( "mods", normalizedPath );
+
+               // if the path exists, let's load that instead
+               if( File.Exists( modFolderPath ) )
+               {
+                  if( context is AsyncAssetBundleLoadingContext asyncContext )
+                  {
+                     var request = AssetBundle.LoadFromFileAsync( modFolderPath );
+                     asyncContext.Request = request;
+                  }
+                  else
+                  {
+                     var bundle = AssetBundle.LoadFromFile( modFolderPath );
+                     context.Bundle = bundle;
+                  }
+
+                  context.Complete(
+                     skipRemainingPrefixes: true,
+                     skipOriginalCall: true );
+               }
+            }
+         }
+      }
    }
 }

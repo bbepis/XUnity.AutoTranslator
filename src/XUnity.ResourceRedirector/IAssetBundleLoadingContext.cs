@@ -1,4 +1,6 @@
-﻿namespace XUnity.ResourceRedirector
+﻿using UnityEngine;
+
+namespace XUnity.ResourceRedirector
 {
    /// <summary>
    /// The operation context surrounding the AssetBundleLoading hook (synchronous) and AsyncAssetBundleLoading hook (asynchronous).
@@ -33,5 +35,9 @@
       /// </summary>
       AssetBundleLoadingParameters Parameters { get; }
 
+      /// <summary>
+      /// Gets or sets the AssetBundle being loaded.
+      /// </summary>
+      AssetBundle Bundle { get; set; }
    }
 }

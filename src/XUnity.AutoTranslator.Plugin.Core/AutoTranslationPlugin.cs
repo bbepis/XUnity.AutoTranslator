@@ -161,6 +161,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                new TextAssetLoadedHandler();
             }
 
+            //ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+            //ResourceRedirection.EnableEmulateAssetBundles2( 0, "emulation" );
             //ResourceRedirection.EnableAsyncToSyncRedirector( 0 );
             //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
             //ResourceRedirection.EnableHighPoly1();

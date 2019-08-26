@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace XUnity.ResourceRedirector
 {
-   internal class AsyncAssetBundleLoadInfo
+   internal class AsyncAssetLoadInfo
    {
-      public AsyncAssetBundleLoadInfo(
+      public AsyncAssetLoadInfo(
          string assetName,
          Type assetType,
          AssetLoadType loadType,

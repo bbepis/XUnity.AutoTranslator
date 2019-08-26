@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using XUnity.Common.Extensions;
 using XUnity.ResourceRedirector.Constants;
 
@@ -10,6 +11,8 @@ namespace XUnity.ResourceRedirector
    public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
    {
       private string _normalizedPath;
+      private AssetBundle _bundle;
+      private AssetBundleCreateRequest _request;
 
       internal AsyncAssetBundleLoadingContext( string assetBundlePath, uint crc, ulong offset, AssetBundleLoadType loadType )
       {
@@ -67,10 +70,48 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
       /// </summary>
-      public AssetBundleCreateRequest Request { get; set; }
+      public AssetBundleCreateRequest Request
+      {
+         get
+         {
+            return _request;
+         }
+         set
+         {
+            _request = value;
+            ResolveType = AsyncAssetBundleLoadingResolve.ThroughRequest;
+         }
+      }
+
+      /// <summary>
+      /// Gets or sets the AssetBundle being loaded.
+      /// </summary>
+      public AssetBundle Bundle
+      {
+         get
+         {
+            return _bundle;
+         }
+         set
+         {
+            if( !ResourceRedirection.SyncOverAsyncEnabled )
+            {
+               throw new InvalidOperationException( "Trying to set the Bundle property in async load operation while 'SyncOverAsyncAssetLoads' is disabled is not allowed. Consider settting the Request property instead if possible or enabling 'SyncOverAsyncAssetLoads' through the method 'ResourceRedirection.EnableSyncOverAsyncAssetLoads()'." );
+            }
+
+            _bundle = value;
+            ResolveType = AsyncAssetBundleLoadingResolve.ThroughBundle;
+         }
+      }
+
+      /// <summary>
+      /// Gets or sets how this load operation should be resolved.
+      /// Setting the Bundle/Request property will automatically update this value.
+      /// </summary>
+      public AsyncAssetBundleLoadingResolve ResolveType { get; set; }
 
       internal bool SkipRemainingPrefixes { get; private set; }
 
-      internal bool SkipOriginalCall { get; private set; }
+      internal bool SkipOriginalCall { get; set; }
    }
 }

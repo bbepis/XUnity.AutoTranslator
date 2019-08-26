@@ -17,11 +17,14 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       public static readonly Type[] GeneralHooks = new[]
       {
-         //typeof( AssetBundleCreateRequest_assetBundle_Hook ),
+         typeof( AssetBundleCreateRequest_assetBundle_Hook ),
+         typeof( AssetBundleCreateRequest_DisableCompatibilityChecks_Hook ),
+
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
          //typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
          //typeof( AssetBundle_LoadFromMemory_Hook ), // Cannot be hooked! Missing path
+
          typeof( AssetBundle_mainAsset_Hook ),
          typeof( AssetBundle_Load_Hook ),
          typeof( AssetBundle_LoadAsync_Hook ),
@@ -55,36 +58,69 @@ namespace XUnity.ResourceRedirector.Hooks
       };
    }
 
-   //internal static class AssetBundleCreateRequest_assetBundle_Hook
-   //{
-   //   static bool Prepare( object instance )
-   //   {
-   //      return true;
-   //   }
+   internal static class AssetBundleCreateRequest_assetBundle_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
 
-   //   static MethodBase TargetMethod( object instance )
-   //   {
-   //      return AccessToolsShim.Property( typeof( AssetBundleCreateRequest ), "assetBundle" ).GetGetMethod();
-   //   }
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( typeof( AssetBundleCreateRequest ), "assetBundle" ).GetGetMethod();
+      }
 
-   //   delegate AssetBundle OriginalMethod( AssetBundleCreateRequest self );
+      delegate AssetBundle OriginalMethod( AssetBundleCreateRequest self );
 
-   //   static OriginalMethod _original;
+      static OriginalMethod _original;
 
-   //   static void MM_Init( object detour )
-   //   {
-   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
-   //   }
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
 
-   //   static AssetBundle MM_Detour( AssetBundleCreateRequest self )
-   //   {
-   //      var result = _original( self );
+      static AssetBundle MM_Detour( AssetBundleCreateRequest self )
+      {
+         if( ResourceRedirection.TryGetAssetBundle( self, out var result ) )
+         {
+            return result;
+         }
+         else
+         {
+            return _original( self );
+         }
+      }
+   }
 
-   //      ResourceRedirection.AssociateAssetBundleWithDummy( self, result );
+   internal static class AssetBundleCreateRequest_DisableCompatibilityChecks_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
 
-   //      return result;
-   //   }
-   //}
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundleCreateRequest ), "DisableCompatibilityChecks" );
+      }
+
+      delegate void OriginalMethod( AssetBundleCreateRequest self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( AssetBundleCreateRequest self )
+      {
+         if( !ResourceRedirection.TryGetAssetBundle( self, out var result ) )
+         {
+            _original( self );
+         }
+      }
+   }
 
    internal static class AssetBundle_LoadFromFileAsync_Hook
    {
@@ -111,12 +147,17 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         var intention = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( !intention.SkipOriginalCall )
+         if( !context.SkipOriginalCall )
          {
-            var p = intention.Parameters;
+            var p = context.Parameters;
             result = _original( p.Path, p.Crc, p.Offset );
+         }
+
+         if( context.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
+         {
+            ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
          }
 
          return result;
