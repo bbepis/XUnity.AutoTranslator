@@ -43,6 +43,10 @@ namespace XUnity.ResourceRedirector
       private static bool _initialized = false;
       private static bool _initializedSyncOverAsyncEnabled = false;
       private static bool _logAllLoadedResources = false;
+      private static bool _isFiringAssetBundle;
+      private static bool _isFiringResource;
+      private static bool _isFiringAsset;
+      private static bool _isRecursionDisabledPermanently;
 
       internal static bool RecursionEnabled = true;
       internal static bool SyncOverAsyncEnabled = false;
@@ -100,10 +104,23 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+      /// <summary>
+      /// Disables all recursive behaviour in the plugin. This means that trying to load an asset
+      /// using the hooked APIs will not trigger a callback back into the callback chain. This makes
+      /// setting the correct priorities on callbacks much more important.
+      ///
+      /// This method should not be called lightly. It should not be something a single plugin randomly
+      /// decides to call, but rather decision for how to use the ResourceRedirection API on a game-wide basis.
+      /// </summary>
+      public static void DisableRecursionPermanently()
+      {
+         _isRecursionDisabledPermanently = true;
+      }
+
       //public static void EnableHighPoly1()
       //{
-      //   ResourceRedirection.RegisterAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetAsset ) );
-      //   ResourceRedirection.RegisterAsyncAssetLoadingHook( int.MaxValue, ctx => HandleAssetRedirection( ctx, SetRequest ) );
+      //   ResourceRedirection.RegisterAssetLoadingHook( 0, ctx => HandleAssetRedirection( ctx, SetAsset ) );
+      //   ResourceRedirection.RegisterAsyncAssetLoadingHook( 0, ctx => HandleAssetRedirection( ctx, SetRequest ) );
 
       //   void HandleAssetRedirection<TContext>( TContext context, Func<TContext, string, bool> changeAsset )
       //      where TContext : IAssetLoadingContext
@@ -151,8 +168,8 @@ namespace XUnity.ResourceRedirector
 
       //public static void EnableHighPoly2()
       //{
-      //   ResourceRedirection.RegisterAssetLoadingHook( int.MaxValue, HandleAssetRedirection );
-      //   ResourceRedirection.RegisterAsyncAssetLoadingHook( int.MaxValue, HandleAssetRedirection );
+      //   ResourceRedirection.RegisterAssetLoadingHook( -5, HandleAssetRedirection );
+      //   ResourceRedirection.RegisterAsyncAssetLoadingHook( -5, HandleAssetRedirection );
 
       //   void HandleAssetRedirection<TContext>( TContext context )
       //      where TContext : IAssetLoadingContext
@@ -389,104 +406,131 @@ namespace XUnity.ResourceRedirector
             );
       }
 
-      internal static AssetBundleLoadingPrefixResult Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
+      internal static AssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
       {
          var context = new AssetBundleLoadingContext( path, crc, offset, loadType );
-         if( _logAllLoadedResources )
-         {
-            XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle: ({context.GetNormalizedPath()})." );
-         }
 
-         if( !RecursionEnabled )
+         if( _isFiringAssetBundle && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
          {
             bundle = null;
-            return new AssetBundleLoadingPrefixResult( context.Parameters, context.SkipOriginalCall );
+            return context;
          }
 
-         var list2 = PrefixRedirectionsForAssetBundles;
-         var len2 = list2.Count;
-         for( int i = 0; i < len2; i++ )
+         try
          {
-            var redirection = list2[ i ];
-            if( !redirection.IsBeingCalled )
-            {
-               try
-               {
-                  redirection.IsBeingCalled = true;
-                  if( redirection.Callback is Action<AssetBundleLoadingContext> c1 )
-                  {
-                     c1( context );
-                  }
-                  else if( redirection.Callback is Action<IAssetBundleLoadingContext> c2 )
-                  {
-                     c2( context );
-                  }
+            _isFiringAssetBundle = true;
 
-                  if( context.SkipRemainingPrefixes ) break;
-               }
-               catch( Exception ex )
+            if( _logAllLoadedResources )
+            {
+               XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle: ({context.GetNormalizedPath()})." );
+            }
+
+            var list2 = PrefixRedirectionsForAssetBundles;
+            var len2 = list2.Count;
+            for( int i = 0; i < len2; i++ )
+            {
+               var redirection = list2[ i ];
+               if( !redirection.IsBeingCalled )
                {
-                  XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetBundleLoading event." );
-               }
-               finally
-               {
-                  RecursionEnabled = true;
-                  redirection.IsBeingCalled = false;
+                  try
+                  {
+                     redirection.IsBeingCalled = true;
+                     if( redirection.Callback is Action<AssetBundleLoadingContext> c1 )
+                     {
+                        c1( context );
+                     }
+                     else if( redirection.Callback is Action<IAssetBundleLoadingContext> c2 )
+                     {
+                        c2( context );
+                     }
+
+                     if( context.SkipRemainingPrefixes ) break;
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetBundleLoading event." );
+                  }
+                  finally
+                  {
+                     RecursionEnabled = true;
+                     redirection.IsBeingCalled = false;
+                  }
                }
             }
          }
+         catch( Exception e )
+         {
+            XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AssetBundleLoading event." );
+         }
+         finally
+         {
+            _isFiringAssetBundle = false;
+         }
 
          bundle = context.Bundle;
-         return new AssetBundleLoadingPrefixResult( context.Parameters, context.SkipOriginalCall );
+         return context;
       }
 
       internal static AsyncAssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
       {
          var context = new AsyncAssetBundleLoadingContext( path, crc, offset, loadType );
-         if( _logAllLoadedResources )
-         {
-            XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle (async): ({context.GetNormalizedPath()})." );
-         }
 
-         if( !RecursionEnabled )
+         if( _isFiringAssetBundle && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
          {
             request = null;
             return context;
          }
 
-         var list2 = PrefixRedirectionsForAsyncAssetBundles;
-         var len2 = list2.Count;
-         for( int i = 0; i < len2; i++ )
+         try
          {
-            var redirection = list2[ i ];
-            if( !redirection.IsBeingCalled )
-            {
-               try
-               {
-                  redirection.IsBeingCalled = true;
-                  if( redirection.Callback is Action<AsyncAssetBundleLoadingContext> c1 )
-                  {
-                     c1( context );
-                  }
-                  else if( redirection.Callback is Action<IAssetBundleLoadingContext> c2 )
-                  {
-                     c2( context );
-                  }
+            _isFiringAssetBundle = true;
 
-                  if( context.SkipRemainingPrefixes ) break;
-               }
-               catch( Exception ex )
+            if( _logAllLoadedResources )
+            {
+               XuaLogger.ResourceRedirector.Debug( $"Loading Asset Bundle (async): ({context.GetNormalizedPath()})." );
+            }
+
+            var list2 = PrefixRedirectionsForAsyncAssetBundles;
+            var len2 = list2.Count;
+            for( int i = 0; i < len2; i++ )
+            {
+               var redirection = list2[ i ];
+               if( !redirection.IsBeingCalled )
                {
-                  XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetBundleLoading event." );
-               }
-               finally
-               {
-                  RecursionEnabled = true;
-                  redirection.IsBeingCalled = false;
+                  try
+                  {
+                     redirection.IsBeingCalled = true;
+                     if( redirection.Callback is Action<AsyncAssetBundleLoadingContext> c1 )
+                     {
+                        c1( context );
+                     }
+                     else if( redirection.Callback is Action<IAssetBundleLoadingContext> c2 )
+                     {
+                        c2( context );
+                     }
+
+                     if( context.SkipRemainingPrefixes ) break;
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetBundleLoading event." );
+                  }
+                  finally
+                  {
+                     RecursionEnabled = true;
+                     redirection.IsBeingCalled = false;
+                  }
                }
             }
          }
-
+         catch( Exception e )
+         {
+            XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AsyncAssetBundleLoading event." );
+         }
+         finally
+         {
+            _isFiringAssetBundle = false;
+         }
 
          if( context.ResolveType == AsyncAssetBundleLoadingResolve.ThroughRequest )
          {
@@ -521,7 +565,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static AssetLoadingPrefixResult Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, ref UnityEngine.Object asset )
+      internal static AssetLoadingContext Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, ref UnityEngine.Object asset )
       {
          UnityEngine.Object[] arr = null;
 
@@ -544,16 +588,17 @@ namespace XUnity.ResourceRedirector
          return intention;
       }
 
-      internal static AssetLoadingPrefixResult Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref UnityEngine.Object[] assets )
+      internal static AssetLoadingContext Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref UnityEngine.Object[] assets )
       {
+         var context = new AssetLoadingContext( assetName, assetType, loadType, bundle );
          try
          {
-            var context = new AssetLoadingContext( assetName, assetType, loadType, bundle );
-
-            if( !RecursionEnabled )
+            if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
             {
-               return new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
+               return context;
             }
+
+            _isFiringAsset = true;
 
             // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAssetsPerCall;
@@ -590,15 +635,17 @@ namespace XUnity.ResourceRedirector
             }
 
             assets = context.Assets;
-
-            return new AssetLoadingPrefixResult( context.Parameters, context.SkipOriginalCall, context.SkipAllPostfixes );
          }
          catch( Exception e )
          {
             XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AssetLoading event." );
          }
+         finally
+         {
+            _isFiringAsset = false;
+         }
 
-         return new AssetLoadingPrefixResult( new AssetLoadingParameters( assetName, assetType, loadType ), false, false );
+         return context;
       }
 
       internal static AsyncAssetLoadingContext Hook_AsyncAssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref AssetBundleRequest request )
@@ -606,10 +653,12 @@ namespace XUnity.ResourceRedirector
          var context = new AsyncAssetLoadingContext( assetName, assetType, loadType, bundle );
          try
          {
-            if( !RecursionEnabled )
+            if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
             {
                return context;
             }
+
+            _isFiringAsset = true;
 
             // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAsyncAssetsPerCall;
@@ -667,6 +716,10 @@ namespace XUnity.ResourceRedirector
          catch( Exception e )
          {
             XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AsyncAssetLoading event." );
+         }
+         finally
+         {
+            _isFiringAsset = false;
          }
 
          return context;
@@ -786,6 +839,13 @@ namespace XUnity.ResourceRedirector
          {
             var contextPerCall = new AssetLoadedContext( assetLoadName, assetLoadType, loadType, assetBundle, assets );
 
+            if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
+            {
+               return;
+            }
+
+            _isFiringAsset = true;
+
             if( _logAllLoadedResources && assets != null )
             {
                for( int i = 0; i < assets.Length; i++ )
@@ -794,11 +854,6 @@ namespace XUnity.ResourceRedirector
                   var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
                   XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
                }
-            }
-
-            if( !RecursionEnabled )
-            {
-               return;
             }
 
             // handle "per call" hooks first
@@ -888,6 +943,8 @@ namespace XUnity.ResourceRedirector
          }
          finally
          {
+            _isFiringAsset = false;
+
             if( originalAssets != null )
             {
                foreach( var asset in originalAssets )
@@ -906,6 +963,13 @@ namespace XUnity.ResourceRedirector
          {
             var contextPerCall = new ResourceLoadedContext( resourceLoadPath, resourceLoadType, loadType, assets );
 
+            if( _isFiringResource && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
+            {
+               return;
+            }
+
+            _isFiringResource = true;
+
             if( _logAllLoadedResources && assets != null )
             {
                for( int i = 0; i < assets.Length; i++ )
@@ -914,11 +978,6 @@ namespace XUnity.ResourceRedirector
                   var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
                   XuaLogger.ResourceRedirector.Debug( $"Loaded Resource: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
                }
-            }
-
-            if( !RecursionEnabled )
-            {
-               return;
             }
 
             // handle "per call" hooks first
@@ -1008,6 +1067,8 @@ namespace XUnity.ResourceRedirector
          }
          finally
          {
+            _isFiringResource = false;
+
             if( originalAssets != null )
             {
                foreach( var asset in originalAssets )
@@ -1407,13 +1468,13 @@ namespace XUnity.ResourceRedirector
          var c1 = PostfixRedirectionsForResourcesPerCall.RemoveAll( x => x.Callback == action );
          if( c1 > 0 )
          {
-            LogEventRegistration( $"ReourceLoaded ({HookBehaviour.OneCallbackPerLoadCall.ToString()})", PostfixRedirectionsForResourcesPerCall );
+            LogEventRegistration( $"ResourceLoaded ({HookBehaviour.OneCallbackPerLoadCall.ToString()})", PostfixRedirectionsForResourcesPerCall );
          }
 
          var c2 = PostfixRedirectionsForResourcesPerResource.RemoveAll( x => x.Callback == action );
          if( c2 > 0 )
          {
-            LogEventRegistration( $"ReourceLoaded ({HookBehaviour.OneCallbackPerResourceLoaded.ToString()})", PostfixRedirectionsForResourcesPerResource );
+            LogEventRegistration( $"ResourceLoaded ({HookBehaviour.OneCallbackPerResourceLoaded.ToString()})", PostfixRedirectionsForResourcesPerResource );
          }
       }
    }

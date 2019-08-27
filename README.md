@@ -1053,14 +1053,13 @@ public static class ResourceRedirection
     /// </summary>
     /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
     /// <param name="action">The callback.</param>
-    public static void RegisterAsyncAndSyncAssetBundleLoadingHook( int priority, Action<IAssetBundleLoadingContext> action )M
-
+    public static void RegisterAsyncAndSyncAssetBundleLoadingHook( int priority, Action<IAssetBundleLoadingContext> action );
 
     /// <summary>
     /// Unregister an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
     /// </summary>
     /// <param name="action">The callback.</param>
-    public static void UnregisterAsyncAndSyncAssetBundleLoadingHook( Action<IAssetBundleLoadingContext> action )M
+    public static void UnregisterAsyncAndSyncAssetBundleLoadingHook( Action<IAssetBundleLoadingContext> action );
 
     /// <summary>
     /// Register a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
@@ -1081,6 +1080,16 @@ public static class ResourceRedirection
     /// asset load operations.
     /// </summary>
     public static void EnableSyncOverAsyncAssetLoads();
+
+    /// <summary>
+    /// Disables all recursive behaviour in the plugin. This means that trying to load an asset
+    /// using the hooked APIs will not trigger a callback back into the callback chain. This makes
+    /// setting the correct priorities on callbacks much more important.
+    ///
+    /// This method should not be called lightly. It should not be something a single plugin randomly
+    /// decides to call, but rather decision for how to use the ResourceRedirection API on a game-wide basis.
+    /// </summary>
+    public static void DisableRecursionPermanently();
 
     /// <summary>
     /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
@@ -1829,9 +1838,9 @@ An important additional way to subscribe to the prefix asset bundle loading oper
 Do note, that if you want to use this method you must first call the method `EnableSyncOverAsyncAssetLoads()` to enable the hooks required for this to work.
 
 ### About Recursion
-As you may have noticed, all of the context classes shown in the previous sections had a method called `DisableRecursion`.
+As you may have noticed, all of the context classes shown in the previous sections had a method called `DisableRecursion` and that there is a method called `DisableRecursionPermanently` directly on the `ResourceRedirection` class.
 
-The purpose of this method is, as it name states, to disable recursion. That only leaves the question, when does recursion occur?
+The purpose of these method is, as it name states, to disable recursion. That only leaves the question, when does recursion occur?
 
 Recursion will happen anytime you try to load an asset/resource/asset bundle from within your callback using the `AssetBundle` or `Resources` API. Essentially, what it means is that all callbacks (except the one loading the resource) will get a chance to modify the resource that is being loaded by your callback.
 
@@ -1839,6 +1848,9 @@ This may not always be desirable, so if you call the method `DisableRecursion` *
 
 Recursion has an important side effect for other prefix/postfix callbacks, and that is that they will always be called if you make a recursive load call in your callback, even if you indicate through the `Complete` method that they should not be called. So if, in your scenario, it is important to avoid this, you must disable recursion.
 
+`DisableRecursionPermanently` disables recursion permanently for all subscribers to the ResourceRedirection API no matter who calls it. This is a game-wide setting that should be decided upon between plugin developers rather than by the hand of the individual.
+
+These options exists only because it is not currently known whether or not having recursion enabled gives the best experience to plugin developers.
 
 ### Implementing an Asset Redirector
 Here's an example of how a resource redirection may be implemented to hook all `Texture2D` objects loaded through the `AssetBundle` API:

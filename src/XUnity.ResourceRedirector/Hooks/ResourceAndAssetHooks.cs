@@ -189,11 +189,11 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var intention = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
-         if( !intention.SkipOriginalCall )
+         if( !context.SkipOriginalCall )
          {
-            var p = intention.Parameters;
+            var p = context.Parameters;
             result = _original( p.Path, p.Crc, p.Offset );
          }
 
@@ -289,14 +289,14 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
 
-         if( !intention.SkipOriginalCall )
+         if( !context.SkipOriginalCall )
          {
             result = _original( self );
          }
 
-         if( !intention.SkipAllPostfixes )
+         if( !context.SkipAllPostfixes )
          {
             ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
          }
@@ -330,15 +330,15 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
 
-         var p = intention.Parameters;
-         if( !intention.SkipOriginalCall )
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
          {
             result = _original( self, p.Name, p.Type );
          }
 
-         if( !intention.SkipAllPostfixes )
+         if( !context.SkipAllPostfixes )
          {
             ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, null, ref result );
          }
@@ -411,15 +411,15 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object[] result = null;
 
-         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
 
-         var p = intention.Parameters;
-         if( !intention.SkipOriginalCall )
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
          {
             result = _original( self, p.Type );
          }
 
-         if( !intention.SkipAllPostfixes )
+         if( !context.SkipAllPostfixes )
          {
             ResourceRedirection.Hook_AssetLoaded_Postfix( null, p.Type, AssetLoadType.LoadByType, self, null, ref result );
          }
@@ -453,15 +453,15 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
 
-         var p = intention.Parameters;
-         if( !intention.SkipOriginalCall )
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
          {
             result = _original( self, p.Name, p.Type );
          }
 
-         if( !intention.SkipAllPostfixes )
+         if( !context.SkipAllPostfixes )
          {
             ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, null, ref result );
          }
@@ -536,30 +536,30 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( name == string.Empty )
          {
-            var intention = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+            var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
 
-            var p = intention.Parameters;
-            if( !intention.SkipOriginalCall )
+            var p = context.Parameters;
+            if( !context.SkipOriginalCall )
             {
                result = _original( self, name, p.Type );
             }
 
-            if( !intention.SkipAllPostfixes )
+            if( !context.SkipAllPostfixes )
             {
                ResourceRedirection.Hook_AssetLoaded_Postfix( null, p.Type, AssetLoadType.LoadByType, self, null, ref result );
             }
          }
          else
          {
-            var intention = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+            var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
 
-            var p = intention.Parameters;
-            if( !intention.SkipOriginalCall )
+            var p = context.Parameters;
+            if( !context.SkipOriginalCall )
             {
                result = _original( self, p.Name, p.Type );
             }
 
-            if( !intention.SkipAllPostfixes )
+            if( !context.SkipAllPostfixes )
             {
                ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamedWithSubAssets, self, null, ref result );
             }

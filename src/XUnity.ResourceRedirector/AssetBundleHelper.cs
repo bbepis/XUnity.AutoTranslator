@@ -18,5 +18,16 @@ namespace XUnity.ResourceRedirector
          CabHelper.RandomizeCab( buffer );
          return AssetBundle.LoadFromMemory( buffer );
       }
+
+      /// <summary>
+      /// Creates an empty AssetBundle request with a randomly generated CAB identifier.
+      /// </summary>
+      /// <returns>The asset bundle request with a random CAB identifier.</returns>
+      public static AssetBundleCreateRequest CreateEmptyAssetBundleRequest()
+      {
+         var buffer = Properties.Resources.empty;
+         CabHelper.RandomizeCab( buffer );
+         return AssetBundle.LoadFromMemoryAsync( buffer );
+      }
    }
 }
