@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace XUnity.Common.Utilities
    {
       private static string CreateRandomCab()
       {
-         return Guid.NewGuid().ToString( "N" );
+         return "CAB-" + Guid.NewGuid().ToString( "N" );
       }
 
       /// <summary>
@@ -34,7 +35,7 @@ namespace XUnity.Common.Utilities
 
          var cab = CreateRandomCab();
          var cabBytes = Encoding.ASCII.GetBytes( cab );
-         Buffer.BlockCopy( cabBytes, 36 - origCabLength, assetBundleData, origCabIndex + 4, origCabLength - 4 );
+         Buffer.BlockCopy( cabBytes, 36 - origCabLength, assetBundleData, origCabIndex, origCabLength );
       }
    }
 }

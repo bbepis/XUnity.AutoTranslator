@@ -161,6 +161,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                new TextAssetLoadedHandler();
             }
 
+            //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
+            //var bundle = AssetBundle.LoadFromFile( "idont/really/exist.unity3d" );
+            //var asset = bundle.LoadAsset( "oops" );
+
             //ResourceRedirection.EnableSyncOverAsyncAssetLoads();
             //ResourceRedirection.EnableEmulateAssetBundles2( 0, "emulation" );
             //ResourceRedirection.EnableAsyncToSyncRedirector( 0 );
