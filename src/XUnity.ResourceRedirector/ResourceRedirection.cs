@@ -22,7 +22,7 @@ namespace XUnity.ResourceRedirector
       private static readonly object Sync = new object();
 
       private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetLoadInfo>();
-      private static readonly WeakDictionary<AssetBundleCreateRequest, AssetBundle> AssetBundleCreateRequestToAssetBundle = new WeakDictionary<AssetBundleCreateRequest, AssetBundle>();
+      private static readonly WeakDictionary<AssetBundleCreateRequest, AsyncAssetBundleLoadInfo> AssetBundleCreateRequestToAssetBundle = new WeakDictionary<AssetBundleCreateRequest, AsyncAssetBundleLoadInfo>();
 
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerCall = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerResource = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
@@ -239,6 +239,19 @@ namespace XUnity.ResourceRedirector
       //   } );
       //}
 
+      //public static void Whatever()
+      //{
+      //   ResourceRedirection.EnableSyncOverAsyncAssetLoads();
+
+      //   ResourceRedirection.RegisterAsyncAndSyncAssetLoadingHook( context =>
+      //   {
+      //      XuaLogger.ResourceRedirector.Warn( context.GetNormalizedAssetBundlePath() );
+      //      XuaLogger.ResourceRedirector.Warn( context.GetAssetBundlePath() );
+      //      XuaLogger.ResourceRedirector.Warn( "--------------------" );
+
+      //   } );
+      //}
+
       /// <summary>
       /// Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
       /// over the default asset bundles if they exist.
@@ -388,7 +401,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static bool TryGetAssetBundle( AssetBundleCreateRequest request, out AssetBundle result )
+      internal static bool TryGetAssetBundle( AssetBundleCreateRequest request, out AsyncAssetBundleLoadInfo result )
       {
          lock( Sync )
          {
@@ -402,7 +415,7 @@ namespace XUnity.ResourceRedirector
             && (
                ( operation is AssetBundleRequest r1 && ResourceRedirection.TryGetAssetBundleLoadInfo( r1, out var result ) && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
                ||
-               ( operation is AssetBundleCreateRequest r2 && ResourceRedirection.TryGetAssetBundle( r2, out _ ) )
+               ( operation is AssetBundleCreateRequest r2 && ResourceRedirection.TryGetAssetBundle( r2, out var result2 ) && result2.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
             );
       }
 
@@ -560,7 +573,10 @@ namespace XUnity.ResourceRedirector
          {
             if( request != null )
             {
-               AssetBundleCreateRequestToAssetBundle[ request ] = context.Bundle;
+               AssetBundleCreateRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo(
+                  context.Bundle,
+                  context.Parameters.Path,
+                  context.ResolveType );
             }
          }
       }
@@ -851,8 +867,11 @@ namespace XUnity.ResourceRedirector
                for( int i = 0; i < assets.Length; i++ )
                {
                   var asset = assets[ i ];
-                  var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                  XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                  if( asset != null )
+                  {
+                     var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                  }
                }
             }
 
@@ -975,8 +994,11 @@ namespace XUnity.ResourceRedirector
                for( int i = 0; i < assets.Length; i++ )
                {
                   var asset = assets[ i ];
-                  var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                  XuaLogger.ResourceRedirector.Debug( $"Loaded Resource: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                  if( asset != null )
+                  {
+                     var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                  }
                }
             }
 

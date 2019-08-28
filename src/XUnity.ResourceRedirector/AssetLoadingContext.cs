@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using XUnity.Common.Utilities;
 
 namespace XUnity.ResourceRedirector
 {
@@ -8,10 +9,43 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AssetLoadingContext : IAssetLoadingContext
    {
+      private AssetBundleExtensionData _ext;
+
       internal AssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
       {
          Parameters = new AssetLoadingParameters( assetName, assetType, loadType );
          Bundle = bundle;
+      }
+
+      /// <summary>
+      /// Gets the original path the asset bundle was loaded with.
+      /// </summary>
+      /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+      public string GetAssetBundlePath()
+      {
+         if( _ext == null )
+         {
+            _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
+         }
+
+         return _ext?.Path;
+      }
+
+      /// <summary>
+      /// Gets the normalized path to the asset bundle that is:
+      ///  * Relative to the current directory
+      ///  * Lower-casing
+      ///  * Uses '\' as separators.
+      /// </summary>
+      /// <returns></returns>
+      public string GetNormalizedAssetBundlePath()
+      {
+         if( _ext == null )
+         {
+            _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
+         }
+
+         return _ext?.NormalizedPath;
       }
 
       /// <summary>

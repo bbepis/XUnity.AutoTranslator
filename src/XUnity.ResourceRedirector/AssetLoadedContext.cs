@@ -12,6 +12,8 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AssetLoadedContext : IAssetOrResourceLoadedContext
    {
+      private AssetBundleExtensionData _ext;
+
       internal AssetLoadedContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, UnityEngine.Object[] assets )
       {
          Parameters = new AssetLoadedParameters( assetName, assetType, loadType );
@@ -39,7 +41,8 @@ namespace XUnity.ResourceRedirector
          {
             string path;
 
-            var assetBundleName = Bundle.name;
+            //var assetBundleName = Bundle.name;
+            var assetBundleName = Bundle.GetExtensionData<AssetBundleExtensionData>()?.NormalizedPath;
             if( !string.IsNullOrEmpty( assetBundleName ) )
             {
                path = assetBundleName.ToLowerInvariant();
@@ -79,6 +82,37 @@ namespace XUnity.ResourceRedirector
          }
 
          return ext.FullFileSystemAssetPath;
+      }
+
+      /// <summary>
+      /// Gets the original path the asset bundle was loaded with.
+      /// </summary>
+      /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+      public string GetAssetBundlePath()
+      {
+         if( _ext == null )
+         {
+            _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
+         }
+
+         return _ext?.Path;
+      }
+
+      /// <summary>
+      /// Gets the normalized path to the asset bundle that is:
+      ///  * Relative to the current directory
+      ///  * Lower-casing
+      ///  * Uses '\' as separators.
+      /// </summary>
+      /// <returns></returns>
+      public string GetNormalizedAssetBundlePath()
+      {
+         if( _ext == null )
+         {
+            _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
+         }
+
+         return _ext?.NormalizedPath;
       }
 
       /// <summary>

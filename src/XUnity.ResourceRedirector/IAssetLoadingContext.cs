@@ -8,6 +8,21 @@ namespace XUnity.ResourceRedirector
    public interface IAssetLoadingContext
    {
       /// <summary>
+      /// Gets the original path the asset bundle was loaded with.
+      /// </summary>
+      /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+      string GetAssetBundlePath();
+
+      /// <summary>
+      /// Gets the normalized path to the asset bundle that is:
+      ///  * Relative to the current directory
+      ///  * Lower-casing
+      ///  * Uses '\' as separators.
+      /// </summary>
+      /// <returns></returns>
+      string GetNormalizedAssetBundlePath();
+
+      /// <summary>
       /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
       /// </summary>
       /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>

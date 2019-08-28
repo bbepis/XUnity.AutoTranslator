@@ -1140,6 +1140,21 @@ The callbacks take the types `AssetLoadingContext` and `AsyncAssetLoadingContext
 public class AssetLoadingContext : IAssetLoadingContext
 {
     /// <summary>
+    /// Gets the original path the asset bundle was loaded with.
+    /// </summary>
+    /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+    public string GetAssetBundlePath();
+
+    /// <summary>
+    /// Gets the normalized path to the asset bundle that is:
+    ///  * Relative to the current directory
+    ///  * Lower-casing
+    ///  * Uses '\' as separators.
+    /// </summary>
+    /// <returns></returns>
+    public string GetNormalizedAssetBundlePath();
+
+    /// <summary>
     /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
     /// </summary>
     /// <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
@@ -1183,6 +1198,21 @@ public class AssetLoadingContext : IAssetLoadingContext
 /// </summary>
 public class AsyncAssetLoadingContext : IAssetLoadingContext
 {
+    /// <summary>
+    /// Gets the original path the asset bundle was loaded with.
+    /// </summary>
+    /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+    public string GetAssetBundlePath();
+
+    /// <summary>
+    /// Gets the normalized path to the asset bundle that is:
+    ///  * Relative to the current directory
+    ///  * Lower-casing
+    ///  * Uses '\' as separators.
+    /// </summary>
+    /// <returns></returns>
+    public string GetNormalizedAssetBundlePath();
+
     /// <summary>
     /// Indicate your work is done and if any other hooks to this asset/resource load should be called.
     /// </summary>
@@ -1332,6 +1362,21 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     /// <param name="asset"></param>
     /// <returns></returns>
     public string GetUniqueFileSystemAssetPath( UnityEngine.Object asset );
+
+    /// <summary>
+    /// Gets the original path the asset bundle was loaded with.
+    /// </summary>
+    /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+    public string GetAssetBundlePath();
+
+    /// <summary>
+    /// Gets the normalized path to the asset bundle that is:
+    ///  * Relative to the current directory
+    ///  * Lower-casing
+    ///  * Uses '\' as separators.
+    /// </summary>
+    /// <returns></returns>
+    public string GetNormalizedAssetBundlePath();
 
     /// <summary>
     /// Indicate your work is done and if any other hooks to this asset/resource load should be called.

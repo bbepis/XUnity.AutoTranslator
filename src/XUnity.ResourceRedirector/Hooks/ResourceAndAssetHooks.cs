@@ -6,10 +6,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
 using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;
+using XUnity.ResourceRedirector.Constants;
 
 namespace XUnity.ResourceRedirector.Hooks
 {
@@ -81,14 +83,31 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundle MM_Detour( AssetBundleCreateRequest self )
       {
-         if( ResourceRedirection.TryGetAssetBundle( self, out var result ) )
+         AssetBundle bundle;
+
+         if( ResourceRedirection.TryGetAssetBundle( self, out var info ) )
          {
-            return result;
+            if( info.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
+            {
+               bundle = info.Bundle;
+            }
+            else
+            {
+               bundle = _original( self );
+            }
          }
          else
          {
-            return _original( self );
+            bundle = _original( self );
          }
+
+         if( bundle != null && info != null && info.Path != null ) // should only be null if loaded through non-hooked methods
+         {
+            var ext = bundle.GetOrCreateExtensionData<AssetBundleExtensionData>();
+            ext.Path = info.Path;
+         }
+
+         return bundle;
       }
    }
 
@@ -155,10 +174,7 @@ namespace XUnity.ResourceRedirector.Hooks
             result = _original( p.Path, p.Crc, p.Offset );
          }
 
-         if( context.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
-         {
-            ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
-         }
+         ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
 
          return result;
       }
@@ -191,10 +207,16 @@ namespace XUnity.ResourceRedirector.Hooks
 
          var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
 
+         var p = context.Parameters;
          if( !context.SkipOriginalCall )
          {
-            var p = context.Parameters;
             result = _original( p.Path, p.Crc, p.Offset );
+         }
+
+         if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
+         {
+            var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
+            ext.Path = p.Path;
          }
 
          return result;
