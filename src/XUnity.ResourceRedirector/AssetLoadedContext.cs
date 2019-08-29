@@ -13,6 +13,7 @@ namespace XUnity.ResourceRedirector
    public class AssetLoadedContext : IAssetOrResourceLoadedContext
    {
       private AssetBundleExtensionData _ext;
+      private bool _lookedForExt = false;
 
       internal AssetLoadedContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, UnityEngine.Object[] assets )
       {
@@ -90,8 +91,9 @@ namespace XUnity.ResourceRedirector
       /// <returns>The unmodified, original path the asset bundle was loaded with.</returns>
       public string GetAssetBundlePath()
       {
-         if( _ext == null )
+         if( !_lookedForExt )
          {
+            _lookedForExt = true;
             _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
          }
 
@@ -107,8 +109,9 @@ namespace XUnity.ResourceRedirector
       /// <returns></returns>
       public string GetNormalizedAssetBundlePath()
       {
-         if( _ext == null )
+         if( !_lookedForExt )
          {
+            _lookedForExt = true;
             _ext = Bundle.GetExtensionData<AssetBundleExtensionData>();
          }
 
