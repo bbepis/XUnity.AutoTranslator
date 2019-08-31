@@ -293,7 +293,7 @@ IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any st
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
-TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
+TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters"]
 ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
@@ -407,6 +407,7 @@ To rememdy this, post processing can be applied to translations when 'romaji' is
  * `RemoveAllDiacritics`: Remove all diacritics from the translated text
  * `ReplaceMacronWithCircumflex`: Replaces the macron diacritic with a circumflex.
  * `RemoveApostrophes`: Some translators might decide to include apostrophes after the 'n'-character. Applying this option removes those.
+ * `ReplaceWideCharacters`: Replaces wide-width japanese characters with standard ASCII characters
 
 This type of post processing is also applied to normal translations, but instead uses the option `TranslationPostProcessing`, which can use the same values.
 

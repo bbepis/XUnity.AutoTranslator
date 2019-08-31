@@ -245,6 +245,7 @@ namespace XUnity.ResourceRedirector
 
       //   ResourceRedirection.RegisterAsyncAndSyncAssetLoadingHook( context =>
       //   {
+      //      XuaLogger.ResourceRedirector.Warn( context.Bundle.name );
       //      XuaLogger.ResourceRedirector.Warn( context.GetNormalizedAssetBundlePath() );
       //      XuaLogger.ResourceRedirector.Warn( context.GetAssetBundlePath() );
       //      XuaLogger.ResourceRedirector.Warn( "--------------------" );

@@ -11,6 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       None                         = 0,
       ReplaceMacronWithCircumflex  = 1 << 0,
       RemoveAllDiacritics          = 1 << 1,
-      RemoveApostrophes            = 1 << 2
+      RemoveApostrophes            = 1 << 2,
+      ReplaceWideCharacters        = 1 << 3,
    }
 }

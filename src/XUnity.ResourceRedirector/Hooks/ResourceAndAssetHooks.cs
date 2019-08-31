@@ -25,6 +25,7 @@ namespace XUnity.ResourceRedirector.Hooks
          //typeof( AssetBundle_LoadFromMemory_Hook ), // Cannot be hooked! Missing path
 
          typeof( AssetBundle_mainAsset_Hook ),
+         typeof( AssetBundle_returnMainAsset_Hook ),
          typeof( AssetBundle_Load_Hook ),
          typeof( AssetBundle_LoadAsync_Hook ),
          typeof( AssetBundle_LoadAll_Hook ),
@@ -49,6 +50,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          typeof( AssetBundleCreateRequest_assetBundle_Hook ),
          typeof( AssetBundleCreateRequest_DisableCompatibilityChecks_Hook ),
+         typeof( AssetBundleCreateRequest_SetEnableCompatibilityChecks_Hook ),
 
          typeof( AsyncOperation_isDone_Hook ),
          typeof( AsyncOperation_progress_Hook ),
@@ -115,7 +117,8 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         var enableCompatChecks = AccessToolsShim.Method( typeof( AssetBundleCreateRequest ), "SetEnableCompatibilityChecks", new[] { typeof( bool ) } );
+         return enableCompatChecks == null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -141,6 +144,37 @@ namespace XUnity.ResourceRedirector.Hooks
       }
    }
 
+   internal static class AssetBundleCreateRequest_SetEnableCompatibilityChecks_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         var enableCompatChecks = AccessToolsShim.Method( typeof( AssetBundleCreateRequest ), "SetEnableCompatibilityChecks", new[] { typeof( bool ) } );
+         return enableCompatChecks != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundleCreateRequest ), "SetEnableCompatibilityChecks", new[] { typeof( bool ) } );
+      }
+
+      delegate void OriginalMethod( AssetBundleCreateRequest self, bool set );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static void MM_Detour( AssetBundleCreateRequest self, bool set )
+      {
+         if( !ResourceRedirection.TryGetAssetBundle( self, out var result ) )
+         {
+            _original( self, set );
+         }
+      }
+   }
+
    internal static class AssetBundle_LoadFromFileAsync_Hook
    {
       static bool Prepare( object instance )
@@ -150,7 +184,8 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFileAsync", typeof( string ), typeof( uint ), typeof( ulong ) );
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFileAsync_Internal", typeof( string ), typeof( uint ), typeof( ulong ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFileAsync", typeof( string ), typeof( uint ), typeof( ulong ) );
       }
 
       delegate AssetBundleCreateRequest OriginalMethod( string path, uint crc, ulong offset );
@@ -189,7 +224,8 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFile", typeof( string ), typeof( uint ), typeof( ulong ) );
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFile_Internal", typeof( string ), typeof( uint ), typeof( ulong ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromFile", typeof( string ), typeof( uint ), typeof( ulong ) );
       }
 
       delegate AssetBundle OriginalMethod( string path, uint crc, ulong offset );
@@ -290,12 +326,55 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         var returnMainAsset = AccessToolsShim.Method( typeof( AssetBundle ), "returnMainAsset", new[] { typeof( AssetBundle ) } );
+         return returnMainAsset == null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
          return AccessToolsShim.Property( typeof( AssetBundle ), "mainAsset" ).GetGetMethod();
+      }
+
+      delegate UnityEngine.Object OriginalMethod( AssetBundle self );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static UnityEngine.Object MM_Detour( AssetBundle self )
+      {
+         UnityEngine.Object result = null;
+
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
+
+         if( !context.SkipOriginalCall )
+         {
+            result = _original( self );
+         }
+
+         if( !context.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
+         }
+
+         return result;
+      }
+   }
+
+   internal static class AssetBundle_returnMainAsset_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         var returnMainAsset = AccessToolsShim.Method( typeof( AssetBundle ), "returnMainAsset", new[] { typeof( AssetBundle ) } );
+         return returnMainAsset != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundle ), "returnMainAsset", new[] { typeof( AssetBundle ) } );
       }
 
       delegate UnityEngine.Object OriginalMethod( AssetBundle self );

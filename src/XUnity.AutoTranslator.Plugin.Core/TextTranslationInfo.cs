@@ -11,6 +11,7 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugins.Core.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -179,6 +180,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   };
                }
             }
+
+            //ui.GetType().GetProperty( "resizeTextForBestFit" ).SetValue( ui, true, null );
          }
          else
          {
@@ -228,6 +231,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( g, 2, null );
                   };
                }
+
+               //ClrTypes.TMP_Text.GetProperty( "enableAutoSizing" ).SetValue( ui, true, null );
 
             }
          }

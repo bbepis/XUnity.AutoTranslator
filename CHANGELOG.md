@@ -1,4 +1,7 @@
-﻿### 4.0.0
+﻿### 4.0.1
+ * MISC - Added option to convert japanese wide-width numerics to standard ASCII numerics during translation postprocessing
+
+### 4.0.0
  * BREAKING CHANGE - Restructuring of internal and some public APIs - ITranslateEndpoint API not affected
  * BREAKING CHANGE - Changed file layout in Translators directory - should replace folder entirely upon upgrade to avoid redundant files that may be picked up unintentionally by mod loaders
  * FEATURE - Resource Redirection API

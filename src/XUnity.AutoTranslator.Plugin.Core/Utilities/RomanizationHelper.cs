@@ -22,17 +22,40 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          {
             text = RemoveAllDiacritics( text );
          }
-         if( ( postProcessing & TextPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
+         if( ( postProcessing & TextPostProcessing.RemoveApostrophes ) != 0 )
          {
             text = RemoveNApostrophe( text );
          }
+         if( ( postProcessing & TextPostProcessing.ReplaceWideCharacters ) != 0 )
+         {
+            text = ReplaceWideCharacters( text );
+         }
          return text;
+      }
+
+      public static string ReplaceWideCharacters( string input )
+      {
+         var builder = new StringBuilder( input );
+         var len = input.Length;
+         bool wasChanged = false;
+
+         for( int i = 0; i < len; i++ )
+         {
+            var c = builder[ i ];
+            if( c >= 0xFF00 && c <= 0xFF5E )
+            {
+               wasChanged = true;
+               builder[ i ] = (char)( c - 0xFEE0 );
+            }
+         }
+
+         return wasChanged ? builder.ToString() : input;
       }
 
       public static string ConvertMacronToCircumflex( string romanizedJapaneseText )
       {
          var builder = new StringBuilder( romanizedJapaneseText.Length );
-         for( int i = 0 ; i < romanizedJapaneseText.Length ; i++ )
+         for( int i = 0; i < romanizedJapaneseText.Length; i++ )
          {
             var c = romanizedJapaneseText[ i ];
 
@@ -106,7 +129,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       private static string ReplaceNonCharacters( string input, char replacement )
       {
          var sb = new StringBuilder( input.Length );
-         for( var i = 0 ; i < input.Length ; i++ )
+         for( var i = 0; i < input.Length; i++ )
          {
             if( char.IsSurrogatePair( input, i ) )
             {
