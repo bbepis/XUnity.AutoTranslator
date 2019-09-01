@@ -47,6 +47,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                wasChanged = true;
                builder[ i ] = (char)( c - 0xFEE0 );
             }
+
+            if( c == 0x3000 )
+            {
+               wasChanged = true;
+               builder[ i ] = (char)0x20;
+            }
          }
 
          return wasChanged ? builder.ToString() : input;

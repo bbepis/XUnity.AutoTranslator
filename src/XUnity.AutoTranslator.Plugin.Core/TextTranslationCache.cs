@@ -73,14 +73,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _reverseTokenTranslations.Clear();
                _scopedTranslations.Clear();
                Settings.Replacements.Clear();
+               Settings.Patterns.Clear();
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
                var substitutionFile = Settings.SubstitutionFilePath;
-               LoadTranslationsInFile( mainTranslationFile, false, true );
-               LoadTranslationsInFile( substitutionFile, true, false );
-               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile } ) )
+               var patternFile = Settings.PatternFilePath;
+               LoadTranslationsInFile( mainTranslationFile, false, false, true );
+               LoadTranslationsInFile( substitutionFile, true, false, false );
+               LoadTranslationsInFile( patternFile, false, true, false );
+               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile, patternFile } ) )
                {
-                  LoadTranslationsInFile( fullFileName, false, false );
+                  LoadTranslationsInFile( fullFileName, false, false, false );
                }
             }
             var endTime = Time.realtimeSinceStartup;
@@ -151,10 +154,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             foreach( var kvp in _translations.ToList() )
             {
                var untranslatedResult = parser.Parse( kvp.Key, TranslationScopes.None );
-               if( untranslatedResult.Succeeded )
+               if( untranslatedResult != null )
                {
                   var translatedResult = parser.Parse( kvp.Value, TranslationScopes.None );
-                  if( translatedResult.Succeeded && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                  if( translatedResult != null && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
                   {
                      foreach( var ukvp in untranslatedResult.Arguments )
                      {
@@ -175,10 +178,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                foreach( var kvp in scopedKvp.Value.Translations.ToList() )
                {
                   var untranslatedResult = parser.Parse( kvp.Key, scope );
-                  if( untranslatedResult.Succeeded )
+                  if( untranslatedResult != null )
                   {
                      var translatedResult = parser.Parse( kvp.Value, scope );
-                     if( translatedResult.Succeeded && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                     if( translatedResult != null && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
                      {
                         foreach( var ukvp in untranslatedResult.Arguments )
                         {
@@ -303,10 +306,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public bool IsVariable { get; set; }
       }
 
-      private void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isOutputFile )
+      private void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isPatternFile, bool isOutputFile )
       {
          var fileExists = File.Exists( fullFileName );
-         if( fileExists || isSubstitutionFile )
+         if( fileExists || isSubstitutionFile || isPatternFile )
          {
             if( fileExists )
             {
@@ -341,9 +344,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( isSubstitutionFile )
                            {
-                              if( key != null && value != null )
+                              Settings.Replacements[ key ] = value;
+                           }
+                           else if( isPatternFile )
+                           {
+                              try
                               {
-                                 Settings.Replacements[ key ] = value;
+                                 Settings.Patterns.Add( new RegexTranslationSplitter( key, value ) );
+                              }
+                              catch( Exception e )
+                              {
+                                 XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex splitter: '{translatioOrDirective}'." );
                               }
                            }
                            else
@@ -395,6 +406,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
             else if( isSubstitutionFile )
+            {
+               using( var stream = File.Create( fullFileName ) )
+               {
+                  stream.Write( new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3 ); // UTF-8 BOM
+                  stream.Close();
+               }
+            }
+            else if( isPatternFile )
             {
                using( var stream = File.Create( fullFileName ) )
                {
@@ -580,12 +599,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal void AddTranslationToCache( string key, string value, bool persistToDisk, TranslationType type, int scope )
       {
-         if( ( type & TranslationType.Token ) == TranslationType.Token )
+         if( ( type & TranslationType.Token ) == TranslationType.Token && !persistToDisk )
          {
             AddTokenTranslation( key, value, scope );
          }
 
-         if( ( type & TranslationType.Full ) == TranslationType.Full )
+         if( ( type & TranslationType.Full ) == TranslationType.Full || persistToDisk )
          {
             if( !HasTranslated( key, scope, false ) )
             {

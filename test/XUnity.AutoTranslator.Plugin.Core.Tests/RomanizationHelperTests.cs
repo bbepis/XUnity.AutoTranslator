@@ -12,8 +12,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
    {
       [Theory( DisplayName = "Can_Replace_WideChars_With_AsciiChars" )]
       [InlineData( "～０１２３４５６７８９", "~0123456789" )]
-      [InlineData( "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", @"ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz" )]
-      [InlineData( "ABCDEF", "ABCDEF" )]
+      [InlineData( "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿｀ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ　", @"ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz " )]
+      [InlineData( "ABCDEF ", "ABCDEF " )]
       [InlineData( "「こう見えて怒っているんですよ?……失礼しますね」", "「こう見えて怒っているんですよ?……失礼しますね」" )]
       public void Can_Replace_WideNumerics_With_AsciiNumerics( string originalText, string expectedText )
       {

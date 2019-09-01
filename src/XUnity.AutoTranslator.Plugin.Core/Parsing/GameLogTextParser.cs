@@ -65,9 +65,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             }
          }
 
-         if( !input.EndsWith( "\r\n" ) && !input.EndsWith( "\n" ) ) template.Remove( template.Length - 1, 1 );
+         if( !containsTranslatable ) return null;
 
-         return new ParserResult( input, template.ToString(), containsTranslatable, false, args );
+         if( !input.EndsWith( "\r\n" ) && !input.EndsWith( "\n" ) ) template.Remove( template.Length - 1, 1 );
+         return new ParserResult( input, template.ToString(), false, false, true, args );
       }
    }
 }

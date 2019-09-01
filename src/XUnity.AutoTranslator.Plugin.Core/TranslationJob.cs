@@ -41,7 +41,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationType TranslationType { get; set; }
 
-      public bool IsFullTranslation => ( TranslationType & TranslationType.Full ) == TranslationType.Full;
+      public bool ShouldPersistTranslation
+      {
+         get
+         {
+            var isFull = ( TranslationType & TranslationType.Full ) == TranslationType.Full;
+            if( !isFull )
+            {
+               return Contexts.Any( x => x.Result.PersistTokenResult );
+            }
+
+            return isFull;
+         }
+      }
 
       public void Associate( UntranslatedText key, object ui, InternalTranslationResult translationResult, ParserTranslationContext context, bool saveResultGlobally )
       {

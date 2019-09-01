@@ -1,4 +1,8 @@
-﻿### 4.0.1
+﻿### 4.1.0
+ * FEATURE - Added new concept that allows splitting texts to be translated with a regex before trying to translate them
+ * MISC - Improved NGUI text resizing behaviour
+
+### 4.0.1
  * MISC - Added option to convert japanese wide-width numerics to standard ASCII numerics during translation postprocessing
 
 ### 4.0.0

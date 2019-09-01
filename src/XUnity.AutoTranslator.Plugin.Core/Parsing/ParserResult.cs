@@ -4,24 +4,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    internal class ParserResult
    {
-      public ParserResult( string originalText, string template, bool succeeded, bool persistCombinedResult, Dictionary<string, string> args )
+      public ParserResult( string originalText, string template, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
       {
          OriginalText = originalText;
          Template = template;
-         Succeeded = succeeded;
+         CacheCombinedResult = cacheCombinedResult;
          PersistCombinedResult = persistCombinedResult;
+         PersistTokenResult = persistTokenResult;
          Arguments = args;
       }
 
       public string OriginalText { get; private set; }
 
       public string Template { get; private set; }
-
       public Dictionary<string, string> Arguments { get; private set; }
 
-      public bool Succeeded { get; private set; }
+      public bool CacheCombinedResult { get; }
 
       public bool PersistCombinedResult { get; private set; }
+
+      public bool PersistTokenResult { get; private set; }
 
       public string Untemplate( Dictionary<string, string> arguments )
       {

@@ -21,6 +21,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static readonly string MultiLinePropertyName = "multiLine";
       private static readonly string OverflowMethodPropertyName = "overflowMethod";
       private static readonly string OverflowModePropertyName = "overflowMode";
+      private static readonly string SpacingXPropertyName = "spacingX";
+      private static readonly string UseFloatSpacingPropertyName = "useFloatSpacing";
 
       private Action<object> _unresize;
       private Action<object> _unfont;
@@ -188,30 +190,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // special handling for NGUI to better handle textbox sizing
             if( type == ClrTypes.UILabel )
             {
-               var originalMultiLine = type.GetProperty( MultiLinePropertyName )?.GetGetMethod()?.Invoke( ui, null );
-               var originalOverflowMethod = type.GetProperty( OverflowMethodPropertyName )?.GetGetMethod()?.Invoke( ui, null );
-               //var originalSpacingY = graphic.GetSpacingY();
+               var useFloatSpacingProperty = type.CachedProperty( UseFloatSpacingPropertyName );
+               var spacingXProperty = type.CachedProperty( SpacingXPropertyName );
+               var multiLineProperty = type.CachedProperty( MultiLinePropertyName );
+               var overflowMethodProperty = type.CachedProperty( OverflowMethodPropertyName );
 
-               type.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( ui, new object[] { true } );
-               type.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( ui, new object[] { 0 } );
-               //if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalSpacingY ) )
-               //{
-               //   var alteredSpacing = originalSpacingY.Multiply( Settings.ResizeUILineSpacingScale.Value );
-               //   _alteredSpacing = alteredSpacing;
-               //   graphic.SetSpacingY( alteredSpacing );
-               //}
+               var useFloatSpacingPropertyValue = useFloatSpacingProperty?.Get( ui );
+               var spacingXPropertyValue = spacingXProperty?.Get( ui );
+               var multiLinePropertyValue = multiLineProperty?.Get( ui );
+               var overflowMethodPropertyValue = overflowMethodProperty?.Get( ui );
+
+               useFloatSpacingProperty?.Set( ui, false );
+               spacingXProperty?.Set( ui, -1 );
+               multiLineProperty?.Set( ui, true );
+               overflowMethodProperty?.Set( ui, 0 );
 
                if( _unresize == null )
                {
                   _unresize = g =>
                   {
-                     var gtype = g.GetType();
-                     gtype.GetProperty( MultiLinePropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalMultiLine } );
-                     gtype.GetProperty( OverflowMethodPropertyName )?.GetSetMethod()?.Invoke( g, new object[] { originalOverflowMethod } );
-                     //if( Settings.ResizeUILineSpacingScale.HasValue )
-                     //{
-                     //   g.SetSpacingY( originalSpacingY );
-                     //}
+                     useFloatSpacingProperty?.Set( g, useFloatSpacingPropertyValue );
+                     spacingXProperty?.Set( g, spacingXPropertyValue );
+                     multiLineProperty?.Set( g, multiLinePropertyValue );
+                     overflowMethodProperty?.Set( g, overflowMethodPropertyValue );
                   };
                }
             }

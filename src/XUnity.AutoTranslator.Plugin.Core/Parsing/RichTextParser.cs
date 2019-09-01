@@ -145,7 +145,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
 
          var success = foundIgnoredTag || ( arg != 'A' && templateString.Length > 5 );
-         return new ParserResult( input, templateString, success, true, args );
+         if( !success ) return null;
+
+         return new ParserResult( input, templateString, true, true, false, args );
       }
    }
 }
