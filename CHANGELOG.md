@@ -1,4 +1,7 @@
-﻿### 4.1.0
+﻿### 4.2.0
+ * CHANGE - Changed how splitting regexes are configured to supports scopes + more.
+
+### 4.1.0
  * FEATURE - Added new concept that allows splitting texts to be translated with a regex before trying to translate them
  * MISC - Improved NGUI text resizing behaviour
 

@@ -126,7 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          SpamChecker = new SpamChecker( TranslationManager );
 
          // WORKAROUND: Initialize text parsers with delegate indicating if text should be translated
-         UnityTextParsers.Initialize( ( text, scope ) => TextCache.IsTranslatable( text, true, scope ) && IsBelowMaxLength( text ) );
+         UnityTextParsers.Initialize( TextCache, ( text, scope ) => TextCache.IsTranslatable( text, true, scope ) && IsBelowMaxLength( text ) );
 
          // resource redirectors
          InitializeResourceRedirector();
@@ -1341,6 +1341,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
+         var allowPartial = endpoint == null && result.AllowPartialTranslation;
          var context = new ParserTranslationContext( null, endpoint, translationResult, result );
          if( isGlobal )
          {
@@ -1358,6 +1359,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( TextCache.TryGetTranslation( textKey, false, true, scope, out partTranslation ) )
                      {
                         translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                     }
+                     else if( allowPartial )
+                     {
+                        translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                      }
                      else if( allowStartJob )
                      {
@@ -1408,6 +1413,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( endpoint.TryGetTranslation( textKey, out partTranslation ) )
                      {
                         translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                     }
+                     else if( allowPartial )
+                     {
+                        translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                      }
                      else if( allowStartJob )
                      {
@@ -1731,6 +1740,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Dictionary<string, string> translations = new Dictionary<string, string>();
 
          // attempt to lookup ALL strings immediately; return result if possible; queue operations
+         var allowPartial = TranslationManager.CurrentEndpoint == null && result.AllowPartialTranslation;
          var context = new ParserTranslationContext( ui, TranslationManager.CurrentEndpoint, null, result );
          foreach( var kvp in result.Arguments )
          {
@@ -1746,6 +1756,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( TextCache.TryGetTranslation( textKey, false, true, scope, out partTranslation ) )
                   {
                      translations.Add( variableName, textKey.Untemplate( partTranslation ) );
+                  }
+                  else if( allowPartial )
+                  {
+                     translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                   }
                   else if( allowStartJob )
                   {

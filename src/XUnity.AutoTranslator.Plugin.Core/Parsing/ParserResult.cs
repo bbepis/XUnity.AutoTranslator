@@ -1,38 +1,56 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    internal class ParserResult
    {
-      public ParserResult( string originalText, string template, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
+      public ParserResult( string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
       {
          OriginalText = originalText;
          Template = template;
+         AllowPartialTranslation = allowPartialTranslation;
          CacheCombinedResult = cacheCombinedResult;
          PersistCombinedResult = persistCombinedResult;
          PersistTokenResult = persistTokenResult;
          Arguments = args;
       }
 
-      public string OriginalText { get; private set; }
+      public string OriginalText { get; }
 
-      public string Template { get; private set; }
-      public Dictionary<string, string> Arguments { get; private set; }
+      public string Template { get; }
+      public Dictionary<string, string> Arguments { get; }
+
+      public bool AllowPartialTranslation { get; }
 
       public bool CacheCombinedResult { get; }
 
-      public bool PersistCombinedResult { get; private set; }
+      public bool PersistCombinedResult { get; }
 
-      public bool PersistTokenResult { get; private set; }
+      public bool PersistTokenResult { get; }
 
       public string Untemplate( Dictionary<string, string> arguments )
       {
-         string result = Template;
-         foreach( var kvp in arguments )
+         // This is really not a nice fix...
+         if( arguments.Count > 9 )
          {
-            result = result.Replace( kvp.Key, kvp.Value );
+            var result = new StringBuilder( Template );
+            foreach( var kvp in arguments.OrderByDescending( x => x.Key.Length ) )
+            {
+               result = result.Replace( kvp.Key, kvp.Value );
+            }
+            return result.ToString();
          }
-         return result;
+         else
+         {
+            var result = new StringBuilder( Template );
+            foreach( var kvp in arguments )
+            {
+               result = result.Replace( kvp.Key, kvp.Value );
+            }
+            return result.ToString();
+         }
       }
    }
 }

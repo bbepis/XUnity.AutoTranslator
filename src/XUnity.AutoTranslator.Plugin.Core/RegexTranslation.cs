@@ -16,14 +16,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
             key = key.Substring( 2, key.Length - 2 );
          }
 
-         var startIdx = key.IndexOf( '"' ) + 1;
+         var startIdx = key.IndexOf( '"' );
          if( startIdx == -1 )
          {
             // take entire string
          }
          else
          {
-            var endIdx = key.LastIndexOf( '"', key.Length - 1 );
+            startIdx++;
+            var endIdx = key.LastIndexOf( '"' );
             if( endIdx != startIdx )
             {
                key = key.Substring( startIdx, endIdx - startIdx );
@@ -36,14 +37,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
             value = value.Substring( 2, value.Length - 2 );
          }
 
-         startIdx = value.IndexOf( '"' ) + 1;
+         startIdx = value.IndexOf( '"' );
          if( startIdx == -1 )
          {
             // take entire string
          }
          else
          {
-            var endIdx = value.LastIndexOf( '"', value.Length - 1 );
+            startIdx++;
+            var endIdx = value.LastIndexOf( '"' );
             if( endIdx != startIdx )
             {
                value = value.Substring( startIdx, endIdx - startIdx );
