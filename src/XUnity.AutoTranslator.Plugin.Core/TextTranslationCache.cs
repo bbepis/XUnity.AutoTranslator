@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -55,7 +56,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static IEnumerable<string> GetTranslationFiles()
       {
          return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
-            .Select( x => x.Replace( "/", "\\" ) );
+            .Select( x => x.Replace( "/", "\\" ) )
+            .Where( x => !x.EndsWith( "resizer.txt", true, CultureInfo.InvariantCulture ) );
       }
 
       internal void LoadTranslationFiles()

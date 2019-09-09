@@ -8,6 +8,8 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.AutoTranslator.Plugin.Core.UIResize;
+using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.AutoTranslator.Plugins.Core.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
@@ -24,12 +26,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static readonly string SpacingXPropertyName = "spacingX";
       private static readonly string UseFloatSpacingPropertyName = "useFloatSpacing";
 
+      private Action<object> _unresizeFont;
       private Action<object> _unresize;
       private Action<object> _unfont;
 
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
-      private object _alteredSpacing;
       private int _translationFrame = -1;
 
       public TextTranslationInfo()
@@ -130,7 +132,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return ( (RectTransform)component.transform ).rect.width;
       }
 
-      public void ResizeUI( object ui )
+      public void ResizeUI( object ui, UIResizeCache cache )
       {
          // do not resize if there is no object of ir it is already resized
          if( ui == null ) return;
@@ -156,18 +158,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // likelihood that it will go into multiple lines too.
             var originalHorizontalOverflow = horizontalOverflowProperty.Get( text );
             var originalVerticalOverflow = verticalOverflowProperty.Get( text );
-            var originalLineSpacing = lineSpacingProperty.Get( text );
 
             if( isComponentWide && !(bool)resizeTextForBestFitProperty.Get( text ) )
             {
                horizontalOverflowProperty.Set( text, 0 /* HorizontalWrapMode.Wrap */ );
                verticalOverflowProperty.Set( text, 1 /* VerticalWrapMode.Overflow */ );
-               if( Settings.ResizeUILineSpacingScale.HasValue && !Equals( _alteredSpacing, originalLineSpacing ) )
-               {
-                  var alteredSpacing = (float)originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
-                  _alteredSpacing = alteredSpacing;
-                  lineSpacingProperty.Set( text, alteredSpacing );
-               }
 
                if( _unresize == null )
                {
@@ -175,66 +170,177 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      horizontalOverflowProperty.Set( g, originalHorizontalOverflow );
                      verticalOverflowProperty.Set( g, originalVerticalOverflow );
-                     if( Settings.ResizeUILineSpacingScale.HasValue )
-                     {
-                        lineSpacingProperty.Set( g, originalLineSpacing );
-                     }
                   };
                }
             }
 
-            //ui.GetType().GetProperty( "resizeTextForBestFit" ).SetValue( ui, true, null );
+            bool isLineSpacingSet = false;
+            bool isUntouched = _unresizeFont == null;
+            if( cache.HasAnyResizeCommands && isUntouched )
+            {
+               var segments = text.gameObject.GetPathSegments();
+               var scope = TranslationScopeProvider.GetScope( ui );
+               if( cache.TryGetUIResize( segments, scope, out var result ) )
+               {
+                  if( result.AutoResizeCommand != null )
+                  {
+                     var resizeTextForBestFitValue = resizeTextForBestFitProperty.Get( ui );
+
+                     if( resizeTextForBestFitValue != null )
+                     {
+                        var shouldAutoResize = result.AutoResizeCommand.ShouldAutoResize();
+                        resizeTextForBestFitProperty.Set( ui, shouldAutoResize );
+
+                        _unresizeFont += g =>
+                        {
+                           resizeTextForBestFitProperty.Set( g, resizeTextForBestFitValue );
+                        };
+                     }
+                  }
+
+                  if( result.ResizeCommand != null )
+                  {
+                     var fontSizeProperty = ClrTypes.Text.CachedProperty( "fontSize" );
+                     var currentFontSize = (int?)fontSizeProperty.Get( ui );
+
+                     if( currentFontSize.HasValue )
+                     {
+                        var newFontSize = result.ResizeCommand.GetSize( currentFontSize.Value );
+                        fontSizeProperty.Set( ui, newFontSize );
+
+                        _unresizeFont += g =>
+                        {
+                           fontSizeProperty.Set( g, currentFontSize );
+                        };
+                     }
+                  }
+
+                  if( result.LineSpacingCommand != null )
+                  {
+                     isLineSpacingSet = true;
+                     var lineSpacingValue = (float?)lineSpacingProperty.Get( ui );
+
+                     if( lineSpacingValue.HasValue )
+                     {
+                        var newLineSpacingValue = result.LineSpacingCommand.GetLineSpacing( lineSpacingValue.Value );
+                        lineSpacingProperty.Set( ui, newLineSpacingValue );
+
+                        _unresizeFont += g =>
+                        {
+                           lineSpacingProperty.Set( g, lineSpacingValue );
+                        };
+                     }
+                  }
+               }
+            }
+
+            if( !isLineSpacingSet && Settings.ResizeUILineSpacingScale.HasValue && isUntouched && isComponentWide && !(bool)resizeTextForBestFitProperty.Get( text ) )
+            {
+               var originalLineSpacing = lineSpacingProperty.Get( text );
+
+               var newLineSpacing = (float)originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
+               lineSpacingProperty.Set( text, newLineSpacing );
+
+               _unresizeFont = g =>
+               {
+                  lineSpacingProperty.Set( g, originalLineSpacing );
+               };
+            }
          }
-         else
+         else if( type == ClrTypes.UILabel )
          {
             // special handling for NGUI to better handle textbox sizing
-            if( type == ClrTypes.UILabel )
+
+            var useFloatSpacingProperty = type.CachedProperty( UseFloatSpacingPropertyName );
+            var spacingXProperty = type.CachedProperty( SpacingXPropertyName );
+            var multiLineProperty = type.CachedProperty( MultiLinePropertyName );
+            var overflowMethodProperty = type.CachedProperty( OverflowMethodPropertyName );
+
+            var useFloatSpacingPropertyValue = useFloatSpacingProperty?.Get( ui );
+            var spacingXPropertyValue = spacingXProperty?.Get( ui );
+            var multiLinePropertyValue = multiLineProperty?.Get( ui );
+            var overflowMethodPropertyValue = overflowMethodProperty?.Get( ui );
+
+            useFloatSpacingProperty?.Set( ui, false );
+            spacingXProperty?.Set( ui, -1 );
+            multiLineProperty?.Set( ui, true );
+            overflowMethodProperty?.Set( ui, 0 );
+
+            if( _unresize == null )
             {
-               var useFloatSpacingProperty = type.CachedProperty( UseFloatSpacingPropertyName );
-               var spacingXProperty = type.CachedProperty( SpacingXPropertyName );
-               var multiLineProperty = type.CachedProperty( MultiLinePropertyName );
-               var overflowMethodProperty = type.CachedProperty( OverflowMethodPropertyName );
-
-               var useFloatSpacingPropertyValue = useFloatSpacingProperty?.Get( ui );
-               var spacingXPropertyValue = spacingXProperty?.Get( ui );
-               var multiLinePropertyValue = multiLineProperty?.Get( ui );
-               var overflowMethodPropertyValue = overflowMethodProperty?.Get( ui );
-
-               useFloatSpacingProperty?.Set( ui, false );
-               spacingXProperty?.Set( ui, -1 );
-               multiLineProperty?.Set( ui, true );
-               overflowMethodProperty?.Set( ui, 0 );
-
-               if( _unresize == null )
+               _unresize = g =>
                {
-                  _unresize = g =>
-                  {
-                     useFloatSpacingProperty?.Set( g, useFloatSpacingPropertyValue );
-                     spacingXProperty?.Set( g, spacingXPropertyValue );
-                     multiLineProperty?.Set( g, multiLinePropertyValue );
-                     overflowMethodProperty?.Set( g, overflowMethodPropertyValue );
-                  };
-               }
+                  useFloatSpacingProperty?.Set( g, useFloatSpacingPropertyValue );
+                  spacingXProperty?.Set( g, spacingXPropertyValue );
+                  multiLineProperty?.Set( g, multiLinePropertyValue );
+                  overflowMethodProperty?.Set( g, overflowMethodPropertyValue );
+               };
             }
-            else if( type == ClrTypes.TextMeshPro || type == ClrTypes.TextMeshProUGUI )
+         }
+         else if( type == ClrTypes.TextMeshPro || type == ClrTypes.TextMeshProUGUI )
+         {
+            var originalOverflowMode = ClrTypes.TMP_Text?.GetProperty( OverflowModePropertyName )?.GetValue( ui, null );
+
+            // ellipsis (1) works
+            // masking (2) has a tendency to break in some versions of TMP
+            // truncate (3) works
+            if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
             {
-               var originalOverflowMode = ClrTypes.TMP_Text?.GetProperty( OverflowModePropertyName )?.GetValue( ui, null );
+               ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( ui, 3, null );
 
-               // ellipsis (1) works
-               // masking (2) has a tendency to break in some versions of TMP
-               // truncate (3) works
-               if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
+               _unresize = g =>
                {
-                  ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( ui, 3, null );
+                  ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( g, 2, null );
+               };
+            }
 
-                  _unresize = g =>
+            if( cache.HasAnyResizeCommands )
+            {
+               bool isUntouched = _unresizeFont == null;
+               if( isUntouched )
+               {
+                  var text = (Component)ui;
+                  var t = text.GetType();
+
+                  var segments = text.gameObject.GetPathSegments();
+                  var scope = TranslationScopeProvider.GetScope( ui );
+                  if( cache.TryGetUIResize( segments, scope, out var result ) )
                   {
-                     ClrTypes.TMP_Text.GetProperty( OverflowModePropertyName ).SetValue( g, 2, null );
-                  };
+                     if( result.AutoResizeCommand != null )
+                     {
+                        var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
+                        var enableAutoSizingValue = enableAutoSizingProperty.Get( ui );
+
+                        if( enableAutoSizingValue != null )
+                        {
+                           var shouldAutoResize = result.AutoResizeCommand.ShouldAutoResize();
+                           enableAutoSizingProperty.Set( ui, shouldAutoResize );
+
+                           _unresizeFont += g =>
+                           {
+                              enableAutoSizingProperty.Set( g, enableAutoSizingValue );
+                           };
+                        }
+                     }
+
+                     if( result.ResizeCommand != null )
+                     {
+                        var fontSizeProperty = t.CachedProperty( "fontSize" );
+                        var currentFontSize = (float?)fontSizeProperty.Get( ui );
+
+                        if( currentFontSize.HasValue )
+                        {
+                           var newFontSize = result.ResizeCommand.GetSize( (int)currentFontSize.Value );
+                           fontSizeProperty.Set( ui, (float)newFontSize );
+
+                           _unresizeFont += g =>
+                           {
+                              fontSizeProperty.Set( g, currentFontSize );
+                           };
+                        }
+                     }
+                  }
                }
-
-               //ClrTypes.TMP_Text.GetProperty( "enableAutoSizing" ).SetValue( ui, true, null );
-
             }
          }
       }
@@ -245,6 +351,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          _unresize?.Invoke( graphic );
          _unresize = null;
+
+         _unresizeFont?.Invoke( graphic );
+         _unresizeFont = null;
       }
 
       public void Reset( string newText )

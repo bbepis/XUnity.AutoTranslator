@@ -34,6 +34,7 @@ using XUnity.Common.Utilities;
 using XUnity.Common.Constants;
 using XUnity.ResourceRedirector;
 using XUnity.Common.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.UIResize;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -54,6 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal TextureTranslationCache TextureCache;
+      internal UIResizeCache ResizeCache;
       internal SpamChecker SpamChecker;
 
       /// <summary>
@@ -119,6 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          TextCache = new TextTranslationCache();
          TextureCache = new TextureTranslationCache();
+         ResizeCache = new UIResizeCache();
          TranslationManager = new TranslationManager();
          TranslationManager.JobCompleted += OnJobCompleted;
          TranslationManager.JobFailed += OnJobFailed;
@@ -401,6 +404,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private void LoadTranslations()
       {
+         ResizeCache.LoadResizeCommandsInFiles();
          TextCache.LoadTranslationFiles();
          TextureCache.LoadTranslationFiles();
       }
@@ -589,7 +593,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // be set after changing "resize" properties... brilliant stuff
                if( ui.GetType() != ClrTypes.UILabel )
                {
-                  info?.ResizeUI( ui );
+                  info?.ResizeUI( ui, ResizeCache );
                }
             }
          }
@@ -638,11 +642,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   info.IsCurrentlySettingText = true;
                }
 
+               if( Settings.EnableTextPathLogging )
+               {
+                  var path = ui.GetPath();
+                  if( path != null )
+                  {
+                     XuaLogger.AutoTranslator.Info( path + ": " + text );
+                  }
+               }
+
                if( Settings.EnableUIResizing || Settings.ForceUIResizing )
                {
                   if( isTranslated || Settings.ForceUIResizing )
                   {
-                     info?.ResizeUI( ui );
+                     info?.ResizeUI( ui, ResizeCache );
                   }
                   else
                   {
@@ -2329,13 +2342,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var scope = TranslationScopeProvider.GetScope( component );
 
                      var tti = kvp.Value as TextTranslationInfo;
-                     var originalText = tti.OriginalText;
-                     if( tti != null && !string.IsNullOrEmpty( originalText ) )
+                     if( tti != null && !string.IsNullOrEmpty( tti.OriginalText ) )
                      {
+                        var originalText = tti.OriginalText;
                         var isBelowMaxLength = IsBelowMaxLength( originalText );
                         var key = GetCacheKey( kvp.Key, originalText, false );
                         if( TextCache.TryGetTranslation( key, true, false, scope, out string translatedText ) && !string.IsNullOrEmpty( translatedText ) )
                         {
+                           tti.UnresizeUI( ui );
                            SetTranslatedText( kvp.Key, key.Untemplate( translatedText ), null, tti ); // no need to untemplatize the translated text
                         }
                         else if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
@@ -2346,6 +2360,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                               var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                               if( translation != null )
                               {
+                                 tti.UnresizeUI( ui );
                                  SetTranslatedText( ui, translation, null, tti );
                               }
                            }
@@ -2358,6 +2373,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                               var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                               if( translation != null )
                               {
+                                 tti.UnresizeUI( ui );
                                  SetTranslatedText( ui, translation, null, tti );
                               }
                            }
@@ -2370,6 +2386,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                               var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
                               if( translation != null )
                               {
+                                 tti.UnresizeUI( ui );
                                  SetTranslatedText( ui, translation, null, tti );
                               }
                            }
@@ -2378,12 +2395,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( Settings.EnableTextureTranslation )
+               if( Settings.EnableTextureTranslation && ( ui is Texture2D || ui.IsKnownImageType() ) )
                {
                   TranslateTexture( ui, context );
                }
             }
-            catch( Exception )
+            catch( Exception e )
             {
                // not super pretty, no...
                ExtensionDataHelper.Remove( ui );
@@ -2475,7 +2492,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
 
-                  if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling )
+                  if( Settings.EnableTextureTranslation && Settings.EnableTextureToggling && ( ui is Texture2D || ui.IsKnownImageType() ) )
                   {
                      TranslateTexture( ui, null );
                   }

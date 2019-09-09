@@ -1,4 +1,7 @@
-﻿### 4.2.0
+﻿### 4.3.0
+ * FEATURE - Added UI resize functionality that enables resizing the font-size of translated text components manually
+
+### 4.2.0
  * CHANGE - Changed how splitting regexes are configured to supports scopes + more.
 
 ### 4.1.0
