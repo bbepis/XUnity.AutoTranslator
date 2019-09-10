@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 {
-   class UGUI_ChangeLineSpacingByPercentage : ILineSpacingCommand
+   class UGUI_ChangeLineSpacingByPercentage : IUGUI_LineSpacingCommand
    {
       private float _perc;
 
@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          _perc = float.Parse( args[ 0 ], CultureInfo.InvariantCulture );
       }
 
-      public float GetLineSpacing( float currentSize )
+      public float? GetLineSpacing( float currentSize )
       {
          return currentSize * _perc;
       }

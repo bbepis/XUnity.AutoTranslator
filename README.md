@@ -533,16 +533,20 @@ In the shown example it will reduce the font size of all texts below the specifi
 
 Like any other translation file, these files also support translation scoping, as decribed in [this section](#translation-scoping).
 
-There exists three types of commands:
+The following types of commands exists:
  * Commands that change the font size to a static size:
    * `ChangeFontSizeByPercentage(double percentage)`: Where the percentage is the percentage of the original font size to reduce it to.
    * `ChangeFontSize(int size)`: Where the size if the new size of the font
    * `IgnoreFontSize()`: This can be used to reset font resize behavior that was set on a very 'non-specific' path.
  * Commands that control auto-resizing:
    * `AutoResize(bool enabled)`: Where enabled control if auto-resize behaviour should be enabled.
- * Commands that control the line-height:
-   * UGUI_ChangeLineHeightByPercentage(float percentage)
-   * UGUI_ChangeLineHeight(float lineSpacing)
+ * Commands that control the line spacing (UGUI only):
+   * `UGUI_ChangeLineSpacingByPercentage(float percentage)`
+   * `UGUI_ChangeLineSpacing(float lineSpacing)`
+ * Commands that control horizontal overflow (UGUI only):
+   * `UGUI_HorizontalOverflow(string mode)` - possible values: [wrap, overflow]
+ * Commands that control vertical overflow (UGUI only):
+   * `UGUI_VerticalOverflow(string mode)` - possible values: [truncate, overflow]
 
 But stop you say! How would I determine the path to use? This plugin provides no way to easily determine this, but there are other plugins that will allow you to do this.
 

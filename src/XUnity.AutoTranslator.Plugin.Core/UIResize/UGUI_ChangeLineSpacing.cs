@@ -3,9 +3,9 @@ using System.Globalization;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 {
-   class UGUI_ChangeLineSpacing : ILineSpacingCommand
+   class UGUI_ChangeLineSpacing : IUGUI_LineSpacingCommand
    {
-      private float _size;
+      private float? _size;
 
       public UGUI_ChangeLineSpacing( string[] args )
       {
@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          _size = float.Parse( args[ 0 ], CultureInfo.InvariantCulture );
       }
 
-      public float GetLineSpacing( float currentSize )
+      public float? GetLineSpacing( float currentSize )
       {
          return _size;
       }

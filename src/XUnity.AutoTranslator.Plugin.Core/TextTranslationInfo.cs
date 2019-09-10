@@ -144,37 +144,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var text = (Component)ui;
 
             // text is likely to be longer than there is space for, simply expand out anyway then
+
+            // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
+            // the idea is, if the UI element is larger than the width of half the screen, there is a larger
+            // likelihood that it will go into multiple lines too.
             var componentWidth = GetComponentWidth( text );
             var quarterScreenSize = Screen.width / 4;
             var isComponentWide = componentWidth > quarterScreenSize;
-
             var horizontalOverflowProperty = ClrTypes.Text.CachedProperty( "horizontalOverflow" );
             var verticalOverflowProperty = ClrTypes.Text.CachedProperty( "verticalOverflow" );
             var lineSpacingProperty = ClrTypes.Text.CachedProperty( "lineSpacing" );
             var resizeTextForBestFitProperty = ClrTypes.Text.CachedProperty( "resizeTextForBestFit" );
 
-            // width < quarterScreenSize is used to determine the likelihood of a text using multiple lines
-            // the idea is, if the UI element is larger than the width of half the screen, there is a larger
-            // likelihood that it will go into multiple lines too.
-            var originalHorizontalOverflow = horizontalOverflowProperty.Get( text );
-            var originalVerticalOverflow = verticalOverflowProperty.Get( text );
-
-            if( isComponentWide && !(bool)resizeTextForBestFitProperty.Get( text ) )
-            {
-               horizontalOverflowProperty.Set( text, 0 /* HorizontalWrapMode.Wrap */ );
-               verticalOverflowProperty.Set( text, 1 /* VerticalWrapMode.Overflow */ );
-
-               if( _unresize == null )
-               {
-                  _unresize = g =>
-                  {
-                     horizontalOverflowProperty.Set( g, originalHorizontalOverflow );
-                     verticalOverflowProperty.Set( g, originalVerticalOverflow );
-                  };
-               }
-            }
 
             bool isLineSpacingSet = false;
+            bool isHorizontalOverflowSet = false;
+            bool isVerticalOverflowSet = false;
             bool isUntouched = _unresizeFont == null;
             if( cache.HasAnyResizeCommands && isUntouched )
             {
@@ -206,45 +191,119 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( currentFontSize.HasValue )
                      {
                         var newFontSize = result.ResizeCommand.GetSize( currentFontSize.Value );
-                        fontSizeProperty.Set( ui, newFontSize );
-
-                        _unresizeFont += g =>
+                        if( newFontSize.HasValue )
                         {
-                           fontSizeProperty.Set( g, currentFontSize );
-                        };
+                           fontSizeProperty.Set( ui, newFontSize.Value );
+
+                           _unresizeFont += g =>
+                           {
+                              fontSizeProperty.Set( g, currentFontSize );
+                           };
+                        }
                      }
                   }
 
                   if( result.LineSpacingCommand != null )
                   {
-                     isLineSpacingSet = true;
                      var lineSpacingValue = (float?)lineSpacingProperty.Get( ui );
 
                      if( lineSpacingValue.HasValue )
                      {
                         var newLineSpacingValue = result.LineSpacingCommand.GetLineSpacing( lineSpacingValue.Value );
-                        lineSpacingProperty.Set( ui, newLineSpacingValue );
-
-                        _unresizeFont += g =>
+                        if( newLineSpacingValue.HasValue )
                         {
-                           lineSpacingProperty.Set( g, lineSpacingValue );
-                        };
+                           isLineSpacingSet = true;
+                           lineSpacingProperty.Set( ui, newLineSpacingValue.Value );
+
+                           _unresizeFont += g =>
+                           {
+                              lineSpacingProperty.Set( g, lineSpacingValue );
+                           };
+                        }
+                     }
+                  }
+
+                  if( result.HorizontalOverflowCommand != null )
+                  {
+                     var horizontalOverflowValue = horizontalOverflowProperty.Get( ui );
+
+                     if( horizontalOverflowValue != null )
+                     {
+                        var newHorizontalOverflowValue = result.HorizontalOverflowCommand.GetMode();
+                        if( newHorizontalOverflowValue.HasValue )
+                        {
+                           isHorizontalOverflowSet = true;
+                           horizontalOverflowProperty.Set( ui, newHorizontalOverflowValue.Value );
+
+                           _unresizeFont += g =>
+                           {
+                              horizontalOverflowProperty.Set( g, horizontalOverflowValue );
+                           };
+                        }
+                     }
+                  }
+
+                  if( result.VerticalOverflowCommand != null )
+                  {
+                     var verticalOverflowValue = verticalOverflowProperty.Get( ui );
+
+                     if( verticalOverflowValue != null )
+                     {
+                        var newVerticalOverflowValue = result.VerticalOverflowCommand.GetMode();
+                        if( newVerticalOverflowValue.HasValue )
+                        {
+                           isVerticalOverflowSet = true;
+                           verticalOverflowProperty.Set( ui, newVerticalOverflowValue.Value );
+
+                           _unresizeFont += g =>
+                           {
+                              verticalOverflowProperty.Set( g, verticalOverflowValue );
+                           };
+                        }
                      }
                   }
                }
             }
 
-            if( !isLineSpacingSet && Settings.ResizeUILineSpacingScale.HasValue && isUntouched && isComponentWide && !(bool)resizeTextForBestFitProperty.Get( text ) )
+            bool isBestFit = (bool)resizeTextForBestFitProperty.Get( text );
+            if( isUntouched && isComponentWide && !isBestFit )
             {
-               var originalLineSpacing = lineSpacingProperty.Get( text );
-
-               var newLineSpacing = (float)originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
-               lineSpacingProperty.Set( text, newLineSpacing );
-
-               _unresizeFont = g =>
+               if( !isLineSpacingSet && Settings.ResizeUILineSpacingScale.HasValue )
                {
-                  lineSpacingProperty.Set( g, originalLineSpacing );
-               };
+                  var originalLineSpacing = lineSpacingProperty.Get( text );
+
+                  var newLineSpacing = (float)originalLineSpacing * Settings.ResizeUILineSpacingScale.Value;
+                  lineSpacingProperty.Set( text, newLineSpacing );
+                  
+                  _unresizeFont += g =>
+                  {
+                     lineSpacingProperty.Set( g, originalLineSpacing );
+                  };
+               }
+
+               if( !isVerticalOverflowSet )
+               {
+                  var originalVerticalOverflow = verticalOverflowProperty.Get( text );
+
+                  verticalOverflowProperty.Set( text, 1 /* VerticalWrapMode.Overflow */ );
+                  
+                  _unresizeFont += g =>
+                  {
+                     verticalOverflowProperty.Set( g, originalVerticalOverflow );
+                  };
+               }
+
+               if( !isHorizontalOverflowSet )
+               {
+                  var originalHorizontalOverflow = horizontalOverflowProperty.Get( text );
+
+                  horizontalOverflowProperty.Set( text, 0 /* HorizontalWrapMode.Wrap */ );
+                  
+                  _unresizeFont += g =>
+                  {
+                     horizontalOverflowProperty.Set( g, originalHorizontalOverflow );
+                  };
+               }
             }
          }
          else if( type == ClrTypes.UILabel )
@@ -331,12 +390,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( currentFontSize.HasValue )
                         {
                            var newFontSize = result.ResizeCommand.GetSize( (int)currentFontSize.Value );
-                           fontSizeProperty.Set( ui, (float)newFontSize );
-
-                           _unresizeFont += g =>
+                           if( newFontSize.HasValue )
                            {
-                              fontSizeProperty.Set( g, currentFontSize );
-                           };
+                              fontSizeProperty.Set( ui, (float)newFontSize.Value );
+
+                              _unresizeFont += g =>
+                              {
+                                 fontSizeProperty.Set( g, currentFontSize );
+                              };
+                           }
                         }
                      }
                   }

@@ -97,6 +97,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                   }
                }
             }
+
+            _root.Trim();
          }
       }
 

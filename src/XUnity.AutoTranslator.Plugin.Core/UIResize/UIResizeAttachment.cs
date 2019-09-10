@@ -28,7 +28,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          try
          {
             var commands = typeof( UIResizeAttachment ).Assembly.GetTypes()
-               .Where( x => ( typeof( IFontResizeCommand ).IsAssignableFrom( x ) || typeof( IFontAutoResizeCommand ).IsAssignableFrom( x ) || typeof( ILineSpacingCommand ).IsAssignableFrom( x ) ) && !x.IsInterface && !x.IsAbstract )
+               .Where( x => ( typeof( IFontResizeCommand ).IsAssignableFrom( x )
+               || typeof( IFontAutoResizeCommand ).IsAssignableFrom( x )
+               || typeof( IUGUI_LineSpacingCommand ).IsAssignableFrom( x )
+               || typeof( IUGUI_HorizontalOverflow ).IsAssignableFrom( x )
+               || typeof( IUGUI_VerticalOverflow ).IsAssignableFrom( x )
+               ) && !x.IsInterface && !x.IsAbstract )
                .ToList();
 
             foreach( var command in commands )
@@ -46,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       public Dictionary<int, UIResizeResult> ScopedResults { get; }
 
-      public UIResizeResult Result { get; }
+      public UIResizeResult Result { get; private set; }
 
       public bool AddResizeCommand( string path, string commands, int scope )
       {
@@ -85,10 +90,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                      result.IsAutoResizeCommandScoped = scope != TranslationScopes.None;
                   }
 
-                  if( resizeCommand is ILineSpacingCommand LineSpacingCommand )
+                  if( resizeCommand is IUGUI_LineSpacingCommand lineSpacingCommand )
                   {
-                     result.LineSpacingCommand = LineSpacingCommand;
+                     result.LineSpacingCommand = lineSpacingCommand;
                      result.IsLineSpacingCommandScoped = scope != TranslationScopes.None;
+                  }
+
+                  if( resizeCommand is IUGUI_HorizontalOverflow horizontalOverflowCommand )
+                  {
+                     result.HorizontalOverflowCommand = horizontalOverflowCommand;
+                     result.IsHorizontalOverflowCommandScoped = scope != TranslationScopes.None;
+                  }
+
+                  if( resizeCommand is IUGUI_VerticalOverflow verticalOverflowCommand )
+                  {
+                     result.VerticalOverflowCommand = verticalOverflowCommand;
+                     result.IsVerticalOverflowCommandScoped = scope != TranslationScopes.None;
                   }
                }
                else
@@ -134,6 +151,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          }
 
          return attachment;
+      }
+
+      public void Trim()
+      {
+         if( Result.IsEmpty() )
+         {
+            Result = null;
+
+            foreach( var descendant in Descendants.Values )
+            {
+               descendant.Trim();
+            }
+         }
       }
 
       public bool TryGetUIResize( string[] segments, int scope, out UIResizeResult result )

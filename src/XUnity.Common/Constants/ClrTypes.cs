@@ -50,6 +50,8 @@ namespace XUnity.Common.Constants
       public static readonly Type BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
       //public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
+      public static readonly Type HorizontalWrapMode = FindType( "UnityEngine.HorizontalWrapMode" );
+      public static readonly Type VerticalWrapMode = FindType( "UnityEngine.VerticalWrapMode" );
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );

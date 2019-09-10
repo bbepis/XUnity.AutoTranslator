@@ -2,6 +2,6 @@
 {
    interface IFontResizeCommand
    {
-      int GetSize( int currentSize );
+      int? GetSize( int currentSize );
    }
 }

@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          _perc = double.Parse( args[ 0 ], CultureInfo.InvariantCulture );
       }
 
-      public int GetSize( int currentSize )
+      public int? GetSize( int currentSize )
       {
          return (int)( currentSize * _perc );
       }

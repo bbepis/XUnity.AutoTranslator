@@ -10,9 +10,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          if( args.Length != 0 ) throw new ArgumentException( "IgnoreFontSize requires zero argument." );
       }
 
-      public int GetSize( int currentSize )
+      public int? GetSize( int currentSize )
       {
-         return currentSize;
+         return null;
       }
    }
 }
