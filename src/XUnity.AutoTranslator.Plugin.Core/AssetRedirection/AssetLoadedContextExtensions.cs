@@ -75,7 +75,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             throw new ArgumentException( "context" );
          }
 
-         return Path.Combine( Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, parentDirectory ), context.GetUniqueFileSystemAssetPath( asset ) ), fileName );
+         var path = Path.Combine( Path.Combine( Settings.RedirectedResourcesPath, parentDirectory ), context.GetUniqueFileSystemAssetPath( asset ) );
+         if( fileName != null )
+         {
+            path = Path.Combine( path, fileName );
+         }
+         return path;
       }
 
       /// <summary>
@@ -88,7 +93,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// <returns></returns>
       public static string GetPreferredFilePathWithCustomFileName( this IAssetOrResourceLoadedContext context, string parentDirectory, UnityEngine.Object asset, string fileName )
       {
-         return Path.Combine( Path.Combine( parentDirectory, context.GetUniqueFileSystemAssetPath( asset ) ), fileName );
+         var path = Path.Combine( parentDirectory, context.GetUniqueFileSystemAssetPath( asset ) );
+         if( fileName != null )
+         {
+            path = Path.Combine( path, fileName );
+         }
+         return path;
       }
    }
 }

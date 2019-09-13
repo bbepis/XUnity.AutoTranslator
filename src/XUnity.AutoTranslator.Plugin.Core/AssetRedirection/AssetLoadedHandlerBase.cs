@@ -24,6 +24,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       }
 
       /// <summary>
+      /// Gets or sets a boolean indicating if the calculated modification path should be checked
+      /// for a file or directory.
+      /// </summary>
+      protected bool CheckDirectory { get; set; }
+
+      /// <summary>
       /// Gets a bool indicating if resource dumping is enabled in the Auto Translator.
       /// </summary>
       protected bool IsDumpingEnabled => Settings.EnableDumping;
@@ -38,7 +44,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             var unqiuePath = context.GetUniqueFileSystemAssetPath( castedAsset );
             var modificationFilePath = CalculateModificationFilePath( castedAsset, context );
-            if( File.Exists( modificationFilePath ) ) // IO, ewww!
+            if( ( CheckDirectory && Directory.Exists( modificationFilePath ) ) || ( !CheckDirectory && File.Exists( modificationFilePath ) ) ) // IO, ewww!
             {
                try
                {

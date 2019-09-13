@@ -37,10 +37,33 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public SimpleTextTranslationCache( string file, bool loadTranslationsInFile )
       {
          LoadedFile = file;
+         IsDirectory = false;
 
          if( loadTranslationsInFile )
          {
-            LoadTranslationFiles();
+            LoadTranslationFiles( true );
+         }
+      }
+
+      /// <summary>
+      /// Creates a translation cache and loads the translations in the specified file.
+      /// </summary>
+      /// <param name="fileOrDirectory">This is the file containing the translations to be loaded.</param>
+      /// <param name="loadTranslationsInFile">This is a bool indicating if the translations in the file specified should be loaded if possible.</param>
+      /// <param name="isDirectory">This is a bool indicating if the first parameter is a directory.</param>
+      /// <param name="allowTranslationOverride">Indicates whether or not to allow translations read later to override translation read earlier during initialization.</param>
+      public SimpleTextTranslationCache(
+         string fileOrDirectory,
+         bool loadTranslationsInFile,
+         bool isDirectory,
+         bool allowTranslationOverride )
+      {
+         LoadedFile = fileOrDirectory;
+         IsDirectory = isDirectory;
+
+         if( loadTranslationsInFile )
+         {
+            LoadTranslationFiles( allowTranslationOverride );
          }
       }
 
@@ -49,11 +72,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public string LoadedFile { get; }
 
-      internal void LoadTranslationFiles()
+      /// <summary>
+      /// Gets a bool indicating if the LoadedFile is a directory.
+      /// </summary>
+      public bool IsDirectory { get; }
+
+      internal void LoadTranslationFiles( bool overrideLaterWithEarlier )
       {
          try
          {
-            LoadTranslationsInFile( LoadedFile );
+            if( IsDirectory )
+            {
+               var files = Directory.GetFiles( LoadedFile, "*.txt" ).OrderBy( x => x );
+               foreach( var file in files )
+               {
+                  LoadTranslationsInFile( file, overrideLaterWithEarlier );
+               }
+            }
+            else
+            {
+               LoadTranslationsInFile( LoadedFile, overrideLaterWithEarlier );
+            }
          }
          catch( Exception e )
          {
@@ -61,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void LoadTranslationsInFile( string fullFileName )
+      private void LoadTranslationsInFile( string fullFileName, bool allowOverride )
       {
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
@@ -94,7 +133,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         else
                         {
-                           AddTranslation( key, value );
+                           AddTranslation( key, value, allowOverride );
                         }
                      }
                   }
@@ -117,11 +156,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _translations.ContainsKey( key );
       }
 
-      private void AddTranslation( string key, string value )
+      private void AddTranslation( string key, string value, bool allowOverride )
       {
          if( key != null && value != null )
          {
-            _translations[ key ] = value;
+            if( allowOverride || !_translations.ContainsKey( key ) )
+            {
+               _translations[ key ] = value;
+            }
          }
       }
 
@@ -136,7 +178,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !hadTranslated )
          {
-            AddTranslation( key, value );
+            AddTranslation( key, value, false );
 
             QueueNewTranslationForDisk( key, value, hadTranslated );
          }

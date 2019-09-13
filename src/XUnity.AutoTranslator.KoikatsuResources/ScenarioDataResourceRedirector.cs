@@ -10,16 +10,22 @@ namespace KoikatsuTextResourceRedirector
 {
    public class ScenarioDataResourceRedirector : AssetLoadedHandlerBase<ScenarioData>
    {
+      public ScenarioDataResourceRedirector()
+      {
+         CheckDirectory = true;
+      }
+
       protected override string CalculateModificationFilePath( ScenarioData asset, IAssetOrResourceLoadedContext context )
       {
-         return context.GetPreferredFilePathWithCustomFileName( @"BepInEx\translation", asset, "translation.txt" )
+         return context.GetPreferredFilePathWithCustomFileName( @"BepInEx\translation", asset, null )
             .Replace( @"abdata\", "" )
             .Replace( ".unity3d", "" );
       }
 
       protected override bool DumpAsset( string calculatedModificationPath, ScenarioData asset, IAssetOrResourceLoadedContext context )
       {
-         var cache = new SimpleTextTranslationCache( calculatedModificationPath, false );
+         var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
+         var cache = new SimpleTextTranslationCache( defaultTranslationFile, false );
 
          foreach( var param in asset.list )
          {
@@ -42,7 +48,7 @@ namespace KoikatsuTextResourceRedirector
 
       protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref ScenarioData asset, IAssetOrResourceLoadedContext context )
       {
-         var cache = new SimpleTextTranslationCache( calculatedModificationPath, true );
+         var cache = new SimpleTextTranslationCache( calculatedModificationPath, true, true, false );
 
          foreach( var param in asset.list )
          {
