@@ -1,5 +1,6 @@
 ﻿### 4.3.0
- * FEATURE - Added UI resize functionality that enables resizing the font-size of translated text components manually
+ * FEATURE - Added UI resize functionality that enables resizing the font size and more of translated text components manually
+ * MISC - Obsoleted AssetLoadedHandlerBase<T>.IsDumpingEnabled. Replaced with AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled
 
 ### 4.2.0
  * CHANGE - Changed how splitting regexes are configured to supports scopes + more.

@@ -32,7 +32,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// <summary>
       /// Gets a bool indicating if resource dumping is enabled in the Auto Translator.
       /// </summary>
-      protected bool IsDumpingEnabled => Settings.EnableDumping;
+      [Obsolete( "Use AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled to obtain whether dumping is enabled instead." )]
+      protected bool IsDumpingEnabled => AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled;
 
       private void HandleAsset( AssetLoadedContext context ) => Handle( context );
 
@@ -66,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   XuaLogger.AutoTranslator.Error( e, $"An error occurred while replacing or updating resource file: '{unqiuePath}'." );
                }
             }
-            else if( Settings.EnableDumping )
+            else if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
             {
                try
                {

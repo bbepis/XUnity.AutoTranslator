@@ -386,7 +386,7 @@ The main reason that this type of handling can make or break a translation reall
 #### UI Resizing
 Often when performing a translation on a text component, the resulting text is larger than the original. This often means that there is not enough room in the text component for the result. This section describes ways to remedy that by changing important parameters of the text components.
 
-The important parameters in relation to this are `EnableUIResizing`, `ResizeUILineSpacingScale`, `ForceUIResizing`, `OverrideFont` and `OverrideFontTextMeshPro`.
+By default, the plugin will attempt some basic auto-resizing behaviour, which are controlled by the following parameters: `EnableUIResizing`, `ResizeUILineSpacingScale`, `ForceUIResizing`, `OverrideFont` and `OverrideFontTextMeshPro`.
  * `EnableUIResizing`: Resizes the components when a translation is performed.
  * `ForceUIResizing`: Resizes all components at all times, period.
  * `ResizeUILineSpacingScale`: Changes the line spacing of resized components. UGUI only.
@@ -394,6 +394,8 @@ The important parameters in relation to this are `EnableUIResizing`, `ResizeUILi
  * `OverrideFontTextMeshPro`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only. There is a fairly large restriction on the usage of this setting as fonts for TextMeshPro must be embedded in the game as resources. Therefore the selection is very limited. In most games you will probably only be able to get away with the default font, which often is `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
 
 Resizing of a UI component does not refer to changing of it's dimensions, but rather how the component handles overflow. The plugin changes the overflow parameters such that text is more likely to be displayed.
+
+The configuratiaon `EnableUIResizing` and `ForceUIResizing` also control whether or not manual UI resize behaviour is enabled. See [this section](#ui-font-resizing) for more information.
 
 #### Reducing Translation Requests
 The following aims at reducing the number of requests send to the translation endpoint:

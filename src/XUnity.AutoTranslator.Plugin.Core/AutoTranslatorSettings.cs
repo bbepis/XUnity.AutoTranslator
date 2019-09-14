@@ -21,5 +21,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Gets the configured destination language.
       /// </summary>
       public static string DestinationLanguage => Settings.Language;
+
+      /// <summary>
+      /// Gets a bool indicating if redirected resource dumping is enabled.
+      /// </summary>
+      public static bool IsDumpingRedirectedResourcesEnabled => Settings.EnableDumping;
+
+      /// <summary>
+      /// Gets the root of the default path to output redirected  resources to.
+      /// </summary>
+      public static string DefaultRedirectedResourcePath => Settings.RedirectedResourcesPath;
    }
 }
