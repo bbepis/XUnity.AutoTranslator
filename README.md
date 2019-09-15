@@ -303,6 +303,7 @@ GeneratePartialTranslations=False ;Indicates that the plugin should generate par
 EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' directives and scope translations based on these
 EnableSilentMode=False           ;Indicates the plugin should not print out success messages in relation to translations
 BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
+OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
 
 [Texture]
 TextureDirectory=Translation\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}
@@ -437,8 +438,9 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
  * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
- * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations
+ * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations.
  * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
+ * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. **Never redistribute the mod with this enabled.**
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
