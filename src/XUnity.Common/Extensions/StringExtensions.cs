@@ -21,6 +21,23 @@ namespace XUnity.Common.Extensions
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
+      /// <param name="value"></param>
+      /// <returns></returns>
+      public static bool IsNullOrWhiteSpace( this string value )
+      {
+         if( value == null ) return true;
+
+         for( int i = 0; i < value.Length; i++ )
+         {
+            if( !char.IsWhiteSpace( value[ i ] ) ) return false;
+         }
+
+         return true;
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
       /// <param name="fullOrRelativePath"></param>
       /// <param name="basePath"></param>
       /// <returns></returns>

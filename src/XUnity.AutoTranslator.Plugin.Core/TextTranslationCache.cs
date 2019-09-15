@@ -1252,7 +1252,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal bool IsTranslatable( string text, bool isToken, int scope )
       {
-         var translatable = LanguageHelper.IsTranslatable( text ) && !IsTranslation( text, scope );
+         var translatable = !IsTranslation( text, scope );
          if( isToken && translatable )
          {
             translatable = !IsTokenTranslation( text, scope );

@@ -250,7 +250,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public bool IsTranslatable( string text )
       {
-         return LanguageHelper.IsTranslatable( text ) && !IsTranslation( text );
+         return !IsTranslation( text );
       }
 
       private bool IsTranslation( string translation )
