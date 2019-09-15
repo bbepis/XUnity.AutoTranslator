@@ -1309,7 +1309,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
 
-                  if( Settings.IsShutdown )
+                  if( !LanguageHelper.IsTranslatable( text ) && !Settings.OutputUntranslatableText )
+                  {
+                     result.SetCompleted( text );
+                  }
+                  else if( Settings.IsShutdown )
                   {
                      result.SetErrorWithMessage( "The plugin is shutdown." );
                   }
@@ -1667,15 +1671,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                           }
                                        }
 
-                                       // Lets try not to spam a service that might not be there...
-                                       var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
-                                       if( endpoint != null )
+                                       if( !LanguageHelper.IsTranslatable( text ) && !Settings.OutputUntranslatableText )
                                        {
-                                          if( IsBelowMaxLength( stabilizedText ) )
+                                          // just return text... FIXME: SET TEXT????????? Set it to the same? Only impact is RESIZE behaviour!
+                                       }
+                                       else
+                                       {
+                                          // Lets try not to spam a service that might not be there...
+                                          var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
+                                          if( endpoint != null )
                                           {
-                                             if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+                                             if( IsBelowMaxLength( stabilizedText ) )
                                              {
-                                                CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context, true, true, true );
+                                                if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+                                                {
+                                                   CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context, true, true, true );
+                                                }
                                              }
                                           }
                                        }
@@ -1694,7 +1705,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( context != null )
                      {
                         // if there is a context, this is a part-translation, which means it is not a candidate for scrolling-in text
-                        var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
+                        var endpoint = context.Endpoint ?? TranslationManager.CurrentEndpoint;
                         if( endpoint != null )
                         {
                            if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
