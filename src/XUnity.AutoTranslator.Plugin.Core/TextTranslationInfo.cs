@@ -172,14 +172,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( resizeTextForBestFitValue != null )
                      {
+                        var resizeTextMinSizeProperty = type.CachedProperty( "resizeTextMinSize" );
+                        var resizeTextMinSizeValue = resizeTextMinSizeProperty?.Get( ui );
+
                         var shouldAutoResize = result.AutoResizeCommand.ShouldAutoResize();
                         resizeTextForBestFitProperty.Set( ui, shouldAutoResize );
+
+                        if( resizeTextMinSizeProperty != null )
+                        {
+                           resizeTextMinSizeProperty.Set( ui, 1 );
+                        }
 
                         if( isUntouched )
                         {
                            _unresizeFont += g =>
                            {
                               resizeTextForBestFitProperty.Set( g, resizeTextForBestFitValue );
+
+                              if( resizeTextMinSizeProperty != null )
+                              {
+                                 resizeTextMinSizeProperty.Set( ui, resizeTextMinSizeValue );
+                              }
                            };
                         }
                      }

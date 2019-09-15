@@ -1,4 +1,7 @@
-﻿### 4.3.0
+﻿### 4.3.1
+ * BUG FIX - Fixed rich text handling bug introduced in 4.3.0
+
+### 4.3.0
  * FEATURE - Added UI resize functionality that enables resizing the font size and more of translated text components manually
  * MISC - Obsoleted AssetLoadedHandlerBase<T>.IsDumpingEnabled. Replaced with AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled
 

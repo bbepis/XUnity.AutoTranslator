@@ -1526,7 +1526,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                      }
                   }
-                  else if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
+                  if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                   {
                      var result = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope );
                      if( result != null )
@@ -1539,7 +1539,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                      }
                   }
-                  else if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
+                  if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
                   {
                      var result = UnityTextParsers.RichTextParser.Parse( text, scope );
                      if( result != null )
@@ -1639,7 +1639,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                                 return;
                                              }
                                           }
-                                          else if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
+                                          if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                                           {
                                              var result = UnityTextParsers.RegexSplittingTextParser.Parse( stabilizedText, scope );
                                              if( result != null )
@@ -1652,7 +1652,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                                 return;
                                              }
                                           }
-                                          else if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
+                                          if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
                                           {
                                              var result = UnityTextParsers.RichTextParser.Parse( stabilizedText, scope );
                                              if( result != null )
@@ -2337,43 +2337,50 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            tti.UnresizeUI( ui );
                            SetTranslatedText( kvp.Key, key.Untemplate( translatedText ), null, tti ); // no need to untemplatize the translated text
+                           continue;
                         }
-                        else if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
+                        else
                         {
-                           var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope );
-                           if( result != null )
+                           if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                            {
-                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
-                              if( translation != null )
+                              var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope );
+                              if( result != null )
                               {
-                                 tti.UnresizeUI( ui );
-                                 SetTranslatedText( ui, translation, null, tti );
+                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
+                                 if( translation != null )
+                                 {
+                                    tti.UnresizeUI( ui );
+                                    SetTranslatedText( ui, translation, null, tti );
+                                    continue;
+                                 }
                               }
                            }
-                        }
-                        else if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
-                        {
-                           var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope );
-                           if( result != null )
+                           if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                            {
-                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
-                              if( translation != null )
+                              var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope );
+                              if( result != null )
                               {
-                                 tti.UnresizeUI( ui );
-                                 SetTranslatedText( ui, translation, null, tti );
+                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
+                                 if( translation != null )
+                                 {
+                                    tti.UnresizeUI( ui );
+                                    SetTranslatedText( ui, translation, null, tti );
+                                    continue;
+                                 }
                               }
                            }
-                        }
-                        else if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
-                        {
-                           var result = UnityTextParsers.RichTextParser.Parse( originalText, scope );
-                           if( result != null )
+                           if( UnityTextParsers.RichTextParser.CanApply( ui ) && isBelowMaxLength )
                            {
-                              var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
-                              if( translation != null )
+                              var result = UnityTextParsers.RichTextParser.Parse( originalText, scope );
+                              if( result != null )
                               {
-                                 tti.UnresizeUI( ui );
-                                 SetTranslatedText( ui, translation, null, tti );
+                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false );
+                                 if( translation != null )
+                                 {
+                                    tti.UnresizeUI( ui );
+                                    SetTranslatedText( ui, translation, null, tti );
+                                    continue;
+                                 }
                               }
                            }
                         }
