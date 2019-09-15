@@ -109,6 +109,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableSilentMode;
       public static HashSet<string> BlacklistedIMGUIPlugins;
       public static bool EnableTextPathLogging;
+      public static bool OutputUntranslatableText;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -193,6 +194,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                .Where( x => !string.IsNullOrEmpty( x ) )
                .ToHashSet( StringComparer.OrdinalIgnoreCase ) ?? new HashSet<string>( StringComparer.OrdinalIgnoreCase );
             EnableTextPathLogging = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTextPathLogging", false );
+            OutputUntranslatableText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputUntranslatableText", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\Texture" );
             EnableTextureTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "EnableTextureTranslation", false );

@@ -1,4 +1,7 @@
-﻿### 4.3.1
+﻿### 4.4.0
+ * FEATURE - Allow translation of any found texts. Whether or not text considered to be untranslatable should be output is controlled through configuration
+
+### 4.3.1
  * BUG FIX - Fixed rich text handling bug introduced in 4.3.0
 
 ### 4.3.0

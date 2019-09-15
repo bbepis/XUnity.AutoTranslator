@@ -162,6 +162,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return text;
       }
 
+      private bool? _isOnlyTemplate;
+
       public UntranslatedText( string originalText, bool isFromSpammingComponent, bool removeInternalWhitespace, bool whitespaceBetweenWords, bool enableTemplating = true )
       {
          IsFromSpammingComponent = isFromSpammingComponent;
@@ -315,6 +317,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public TemplatedString TemplatedText { get; }
 
       public bool IsTemplated => TemplatedText != null;
+
+      public bool IsOnlyTemplate
+      {
+         get
+         {
+            if( !_isOnlyTemplate.HasValue )
+            {
+               _isOnlyTemplate = IsTemplated && !TemplatingHelper.ContainsUntemplatedCharacters( TemplatedOriginal_Text_ExternallyTrimmed );
+            }
+
+            return _isOnlyTemplate.Value;
+         }
+      }
 
       public string Untemplate( string text )
       {

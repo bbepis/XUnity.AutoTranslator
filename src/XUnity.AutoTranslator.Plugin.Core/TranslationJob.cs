@@ -11,12 +11,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TranslationJob
    {
-      public TranslationJob( TranslationEndpointManager endpoint, UntranslatedText key, bool saveResult )
+      public TranslationJob( TranslationEndpointManager endpoint, UntranslatedText key, bool saveResult, bool isTranslatable )
       {
          Endpoint = endpoint;
          Key = key;
          SaveResultGlobally = saveResult;
-         IsTranslatable = LanguageHelper.IsTranslatable( key.TemplatedOriginal_Text );
+         IsTranslatable = isTranslatable;
 
          Components = new List<KeyAnd<object>>();
          Contexts = new HashSet<ParserTranslationContext>();

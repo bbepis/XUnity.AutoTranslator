@@ -57,6 +57,47 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          '.'
       };
 
+      public static bool ContainsUntemplatedCharacters( string text )
+      {
+         bool isParameter = false;
+         var len = text.Length;
+         for( int i = 0; i < len; i++ )
+         {
+            var c = text[ i ];
+
+            if( isParameter )
+            {
+               if( c == '}' )
+               {
+                  var nidx = i + 1;
+                  if( nidx < len && text[ nidx ] == '}' )
+                  {
+                     i++;
+                     isParameter = false;
+                  }
+               }
+            }
+            else if( c == '{' )
+            {
+               var nidx = i + 1;
+               if( nidx < len && text[ nidx ] == '{' )
+               {
+                  i++;
+                  isParameter = true;
+               }
+            }
+            else
+            {
+               if( !char.IsWhiteSpace( c ) )
+               {
+                  return true;
+               }
+            }
+         }
+
+         return false;
+      }
+
       public static TemplatedString TemplatizeByReplacements( this string str )
       {
          if( Settings.Replacements.Count == 0 ) return null;

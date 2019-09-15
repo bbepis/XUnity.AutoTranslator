@@ -22,6 +22,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          var untranslatedText = new UntranslatedText( input, false, true, false );
 
          Assert.Equal( expectedTemplate, untranslatedText.TemplatedOriginal_Text );
+         Assert.False( untranslatedText.IsOnlyTemplate );
+      }
+
+      [Theory( DisplayName = "Can_Substitute_Fully" )]
+      [InlineData( "遥 Haruka", "{{B}} {{A}}" )]
+      [InlineData( "遥", "{{A}}" )]
+      public void Can_Substitute_Fully( string input, string expectedTemplate )
+      {
+         Settings.Replacements[ "Haruka" ] = "Haruka";
+         Settings.Replacements[ "遥" ] = "Haruka";
+
+         var untranslatedText = new UntranslatedText( input, false, true, false );
+
+         Assert.Equal( expectedTemplate, untranslatedText.TemplatedOriginal_Text );
+         Assert.True( untranslatedText.IsOnlyTemplate );
       }
 
       [Theory( DisplayName = "Can_Trim_Surrounding_Whitespace" )]

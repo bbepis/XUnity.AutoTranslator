@@ -567,7 +567,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          InternalTranslationResult translationResult,
          ParserTranslationContext context,
          bool checkOtherEndpoints,
-         bool saveResultGlobally )
+         bool saveResultGlobally,
+         bool isTranslatable )
       {
          var added = AssociateWithExistingJobIfPossible( ui, key, translationResult, context, saveResultGlobally );
          if( added )
@@ -594,7 +595,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
 
-         var newJob = new TranslationJob( this, key, saveResultGlobally );
+         var newJob = new TranslationJob( this, key, saveResultGlobally, isTranslatable );
          newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
 
          return AddUnstartedJob( key, newJob );
