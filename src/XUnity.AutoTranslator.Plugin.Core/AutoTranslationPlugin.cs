@@ -1170,7 +1170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                translatedText = translation;
                return true;
             }
-            else
+            else if( LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text ) )
             {
                var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope ) ?? UnityTextParsers.RichTextParser.Parse( text, scope );
                if( parserResult != null )
@@ -1220,7 +1220,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  if( context == null )
+                  var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
+                  if( context == null && isTranslatable )
                   {
                      var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope ) ?? UnityTextParsers.RichTextParser.Parse( text, scope );
                      if( parserResult != null )
@@ -1237,7 +1238,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
 
-                  var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
                   if( !isTranslatable && !Settings.OutputUntranslatableText )
                   {
                      result.SetCompleted( text );
@@ -1294,7 +1294,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  if( context == null )
+                  var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
+                  if( context == null && isTranslatable )
                   {
                      var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, TranslationScopes.None ) ?? UnityTextParsers.RichTextParser.Parse( text, TranslationScopes.None );
                      if( parserResult != null )
@@ -1311,7 +1312,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
 
-                  var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
                   if( !isTranslatable && !Settings.OutputUntranslatableText )
                   {
                      result.SetCompleted( text );
@@ -1516,7 +1516,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               if( context == null )
+               var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
+               if( context == null && isTranslatable )
                {
                   var isBelowMaxLength = IsBelowMaxLength( text );
 
@@ -1561,7 +1562,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
                if( !isTranslatable && !Settings.OutputUntranslatableText )
                {
 #error This should be considered more heavily
@@ -1631,7 +1631,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                     }
                                     else
                                     {
-                                       if( context == null )
+                                       var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
+                                       if( context == null && isStabilizedTranslatable )
                                        {
                                           var isBelowMaxLength = IsBelowMaxLength( stabilizedText );
                                           if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
@@ -1675,7 +1676,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                           }
                                        }
 
-                                       var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
                                        if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText )
                                        {
                                           // just return text... FIXME: SET TEXT????????? Set it to the same? Only impact is RESIZE behaviour!
