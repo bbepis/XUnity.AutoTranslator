@@ -420,7 +420,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          bool saveResultGlobally )
       {
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context, checkOtherEndpoints, saveResultGlobally );
-         if( added && checkSpam )
+         if( added != null && added.IsTranslatable && checkSpam )
          {
             SpamChecker.PerformChecks( key.TemplatedOriginal_Text_FullyTrimmed );
          }
@@ -1573,6 +1573,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
+               // TODO: Continue IF: OutputUntranslatableText
+               if( !LanguageHelper.IsTranslatable( text ) && !Settings.OutputUntranslatableText )
+               {
+                  // just return text... FIXME: SET TEXT????????? Set it to the same? Only impact is RESIZE behaviour!
+                  return text;
+               }
+               else
+               {
+                  // Every below....
+               }
+
+
                if( supportsStabilization && context == null ) // never stabilize a text that is contextualized or that does not support stabilization
                {
                   // if we dont know what text to translate it to, we need to figure it out.
@@ -1774,9 +1786,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                   }
+                  else if( !LanguageHelper.IsTranslatable( untranslatedTextPart ) && !Settings.OutputUntranslatableText )
+                  {
+                     translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
+                  }
                   else if( allowStartJob )
                   {
-                     // incomplete, must start job
                      TranslateOrQueueWebJobImmediate( ui, untranslatedTextPart, scope, null, false, true, context );
                   }
                }
@@ -2248,6 +2263,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // might fail if compoent is no longer associated to game
             }
          }
+
+#error Use Settings.OutputUntranslatableText and job.IsTranslatable to indicate if texts should be added to the cache
 
          // handle each context
          foreach( var context in job.Contexts )

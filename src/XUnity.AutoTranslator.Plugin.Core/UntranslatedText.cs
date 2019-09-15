@@ -336,11 +336,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return text;
       }
 
-      public string FixTranslatedText( string text )
+      public string FixTranslatedText( string text, bool useTranslatorFriendlyArgs )
       {
          if( TemplatedText != null )
          {
-            return TemplatedText.FixTranslatedText( text );
+            return TemplatedText.FixTranslatedText( text, useTranslatorFriendlyArgs );
          }
 
          return text;

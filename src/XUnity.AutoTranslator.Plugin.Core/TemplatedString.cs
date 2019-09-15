@@ -35,12 +35,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return untranslatedText;
       }
 
-      public string FixTranslatedText( string translatedText )
+      public string FixTranslatedText( string translatedText, bool useTranslatorFriendlyArgs )
       {
          foreach( var kvp in Arguments )
          {
             var key = kvp.Key;
-            var translatorFriendlyKey = CreateTranslatorFriendlyKey( key );
+            var translatorFriendlyKey = useTranslatorFriendlyArgs ? CreateTranslatorFriendlyKey( key ) : key;
             translatedText = ReplaceApproximateMatches( translatedText, translatorFriendlyKey, key );
          }
          return translatedText;

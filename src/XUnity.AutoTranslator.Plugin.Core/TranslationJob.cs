@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -15,11 +16,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Endpoint = endpoint;
          Key = key;
          SaveResultGlobally = saveResult;
+         IsTranslatable = LanguageHelper.IsTranslatable( key.TemplatedOriginal_Text );
 
          Components = new List<KeyAnd<object>>();
          Contexts = new HashSet<ParserTranslationContext>();
          TranslationResults = new HashSet<KeyAnd<InternalTranslationResult>>();
       }
+
+      public bool IsTranslatable { get; }
 
       public bool SaveResultGlobally { get; private set; }
 
