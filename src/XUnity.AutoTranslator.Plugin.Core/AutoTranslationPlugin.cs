@@ -1095,11 +1095,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = GetCacheKey( ui, text, isSpammer );
+            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
+            {
+               return null;
+            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) && textKey.IsOnlyTemplate )
+            if( textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
+               var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text, scope );
+               SetTranslatedText( ui, untemplatedTranslation, !isPartial ? originalText : null, info );
                return untemplatedTranslation;
             }
 
@@ -1154,9 +1160,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
          {
             var textKey = GetCacheKey( null, text, false );
+            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
+            {
+               translatedText = null;
+               return false;
+            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) && textKey.IsOnlyTemplate )
+            if( textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                translatedText = untemplatedTranslation;
@@ -1202,9 +1213,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
             {
                var textKey = GetCacheKey( null, text, false );
+               if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
+               {
+                  result.SetErrorWithMessage( "This text is already considered a translation for something else." );
+                  return result;
+               }
 
                // potentially shortcircuit if fully templated
-               if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) && textKey.IsOnlyTemplate )
+               if( textKey.IsOnlyTemplate )
                {
                   var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                   result.SetCompleted( untemplatedTranslation );
@@ -1276,9 +1292,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             else if( !text.IsNullOrWhiteSpace() && endpoint.IsTranslatable( text ) && IsBelowMaxLength( text ) )
             {
                var textKey = GetCacheKey( null, text, false );
+               if( textKey.IsTemplated && !endpoint.IsTranslatable( textKey.TemplatedOriginal_Text ) )
+               {
+                  result.SetErrorWithMessage( "This text is already considered a translation for something else." );
+                  return result;
+               }
 
                // potentially shortcircuit if fully templated
-               if( textKey.IsTemplated && !endpoint.IsTranslatable( textKey.TemplatedOriginal_Text ) && textKey.IsOnlyTemplate )
+               if( textKey.IsOnlyTemplate )
                {
                   var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                   result.SetCompleted( untemplatedTranslation );
@@ -1484,10 +1505,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var isSpammer = ui.IsSpammingComponent();
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
 
+            // potentially shortcircuit if templated is a translation
             var textKey = GetCacheKey( ui, text, isSpammer );
+            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
+            {
+               return null;
+            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) && textKey.IsOnlyTemplate )
+            if( textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                if( context == null )
@@ -1564,8 +1590,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( !isTranslatable && !Settings.OutputUntranslatableText )
                {
-#error This should be considered more heavily
-                  // just return text... FIXME: SET TEXT????????? Set it to the same? Only impact is RESIZE behaviour!
+                  // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                   return text;
                }
                else
@@ -1611,10 +1636,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                                  if( !stabilizedText.IsNullOrWhiteSpace() && TextCache.IsTranslatable( stabilizedText, false, scope ) )
                                  {
+                                    // potentially shortcircuit if templated is a translation
                                     var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
+                                    if( stabilizedTextKey.IsTemplated && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) )
+                                    {
+                                       return;
+                                    }
 
                                     // potentially shortcircuit if fully templated
-                                    if( stabilizedTextKey.IsTemplated && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) && stabilizedTextKey.IsOnlyTemplate )
+                                    if( stabilizedTextKey.IsOnlyTemplate )
                                     {
                                        var untemplatedTranslation = stabilizedTextKey.Untemplate( stabilizedTextKey.TemplatedOriginal_Text );
                                        SetTranslatedText( ui, untemplatedTranslation, originalText, info );
@@ -1678,7 +1708,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                                        if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText )
                                        {
-                                          // just return text... FIXME: SET TEXT????????? Set it to the same? Only impact is RESIZE behaviour!
+                                          // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                                        }
                                        else
                                        {
