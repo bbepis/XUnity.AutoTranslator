@@ -440,7 +440,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
  * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations.
  * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
- * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. **Never redistribute the mod with this enabled.**
+ * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. Enabling this may also output a lot of garbage to the `OutputFile` that should be deleted before potential redistribution. **Never redistribute the mod with this enabled.**
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  

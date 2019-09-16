@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Constants
 {
@@ -52,6 +53,7 @@ namespace XUnity.Common.Constants
       //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
       public static readonly Type HorizontalWrapMode = FindType( "UnityEngine.HorizontalWrapMode" );
       public static readonly Type VerticalWrapMode = FindType( "UnityEngine.VerticalWrapMode" );
+      public static readonly Type Font = FindType( "UnityEngine.Font" );
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );
@@ -90,6 +92,30 @@ namespace XUnity.Common.Constants
       // Assets.System (what engine is this?)
       public static readonly Type TextWindow = FindType( "Assets.System.Text.TextWindow" );
 
+      public static class UILabel_Properties
+      {
+         public static CachedProperty MultiLine = ClrTypes.UILabel?.CachedProperty( "multiLine" );
+         public static CachedProperty OverflowMethod = ClrTypes.UILabel?.CachedProperty( "overflowMethod" );
+         public static CachedProperty SpacingX = ClrTypes.UILabel?.CachedProperty( "spacingX" );
+         public static CachedProperty UseFloatSpacing = ClrTypes.UILabel?.CachedProperty( "useFloatSpacing" );
+      }
+
+      public static class Text_Properties
+      {
+         public static CachedProperty Font = ClrTypes.Text?.CachedProperty( "font" );
+         public static CachedProperty FontSize = ClrTypes.Text?.CachedProperty( "fontSize" );
+
+         public static CachedProperty HorizontalOverflow = ClrTypes.Text?.CachedProperty( "horizontalOverflow" );
+         public static CachedProperty VerticalOverflow = ClrTypes.Text?.CachedProperty( "verticalOverflow" );
+         public static CachedProperty LineSpacing = ClrTypes.Text?.CachedProperty( "lineSpacing" );
+         public static CachedProperty ResizeTextForBestFit = ClrTypes.Text?.CachedProperty( "resizeTextForBestFit" );
+         public static CachedProperty ResizeTextMinSize = ClrTypes.Text?.CachedProperty( "resizeTextMinSize" );
+      }
+
+      public static class Font_Properties
+      {
+         public static CachedProperty FontSize = ClrTypes.Font?.CachedProperty( "fontSize" );
+      }
 
       private static Type FindType( string name )
       {
