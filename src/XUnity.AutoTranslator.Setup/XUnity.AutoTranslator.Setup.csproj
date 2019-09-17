@@ -10,19 +10,6 @@
    </PropertyGroup>
 
    <ItemGroup>
-      <COMReference Include="Shell32.dll">
-         <Guid>50a7e9b0-70ef-11d1-b75a-00a0c90564fe</Guid>
-         <VersionMajor>1</VersionMajor>
-         <VersionMinor>0</VersionMinor>
-         <WrapperTool>tlbimp</WrapperTool>
-         <Lcid>0</Lcid>
-         <Isolated>false</Isolated>
-         <EmbedInteropTypes>true</EmbedInteropTypes>
-         <Private>false</Private>
-      </COMReference>
-   </ItemGroup>
-
-   <ItemGroup>
       <Reference Include="Microsoft.CSharp" />
    </ItemGroup>
 
