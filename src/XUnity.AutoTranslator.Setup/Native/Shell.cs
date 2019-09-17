@@ -10,10 +10,10 @@ using System.Text;
 namespace Shell32
 {
    [ComImport, Guid( "286E6F1B-7113-4355-9562-96B7E9D64C54" ), CoClass( typeof( ShellClass ) )]
-   public interface Shell : IShellDispatch6 { }
+   public interface Shell : IShellDispatch4 { }
 
    [ComImport, TypeLibType( (short)2 ), ClassInterface( (short)0 ), Guid( "13709620-C279-11CE-A49E-444553540000" )]
-   public class ShellClass : IShellDispatch6, Shell
+   public class ShellClass : IShellDispatch4, Shell
    {
       [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60040000 )]
       public virtual extern void AddToRecent( [In, MarshalAs( UnmanagedType.Struct )] object varFile, [In, Optional, MarshalAs( UnmanagedType.BStr )] string bstrCategory );
@@ -63,8 +63,6 @@ namespace Shell32
       public virtual extern void Open( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
       [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020015 )]
       public virtual extern void RefreshMenu();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60070000 )]
-      public virtual extern void SearchCommand();
       [return: MarshalAs( UnmanagedType.Struct )]
       [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030004 )]
       public virtual extern object ServiceStart( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName, [In, MarshalAs( UnmanagedType.Struct )] object Persistent );
@@ -97,17 +95,15 @@ namespace Shell32
       public virtual extern object Windows();
       [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050000 )]
       public virtual extern void WindowsSecurity();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60060000 )]
-      public virtual extern void WindowSwitcher();
 
       [DispId( 0x60020000 )]
       public extern object Application { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020000 )] get; }
       [DispId( 0x60020001 )]
       public extern object Parent { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020001 )] get; }
       [DispId( 0x60020000 )]
-      extern object Shell32.IShellDispatch6.Application { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020000 )] get; }
+      extern object Shell32.IShellDispatch4.Application { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020000 )] get; }
       [DispId( 0x60020001 )]
-      extern object Shell32.IShellDispatch6.Parent { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020001 )] get; }
+      extern object Shell32.IShellDispatch4.Parent { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020001 )] get; }
    }
 
    [ComImport, TypeLibType( (short)0x1050 ), Guid( "D8F015C0-C278-11CE-A49E-444553540000" )]
@@ -409,190 +405,6 @@ namespace Shell32
       object ExplorerPolicy( [In, MarshalAs( UnmanagedType.BStr )] string bstrPolicyName );
       [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050003 )]
       bool GetSetting( [In] int lSetting );
-   }
-
-   [ComImport, Guid( "866738B9-6CF2-4DE8-8767-F794EBE74F4E" ), TypeLibType( (short)0x1050 )]
-   public interface IShellDispatch5 : IShellDispatch4
-   {
-      [DispId( 0x60020000 )]
-      object Application { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020000 )] get; }
-      [DispId( 0x60020001 )]
-      object Parent { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020001 )] get; }
-      [return: MarshalAs( UnmanagedType.Interface )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020002 )]
-      Folder NameSpace( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [return: MarshalAs( UnmanagedType.Interface )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020003 )]
-      Folder BrowseForFolder( [In] int Hwnd, [In, MarshalAs( UnmanagedType.BStr )] string Title, [In] int Options, [In, Optional, MarshalAs( UnmanagedType.Struct )] object RootFolder );
-      [return: MarshalAs( UnmanagedType.IDispatch )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020004 )]
-      object Windows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020005 )]
-      void Open( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020006 )]
-      void Explore( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020007 )]
-      void MinimizeAll();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020008 )]
-      void UndoMinimizeALL();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020009 )]
-      void FileRun();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000a )]
-      void CascadeWindows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000b )]
-      void TileVertically();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000c )]
-      void TileHorizontally();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000d )]
-      void ShutdownWindows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000e )]
-      void Suspend();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000f )]
-      void EjectPC();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020010 )]
-      void SetTime();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020011 )]
-      void TrayProperties();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020012 )]
-      void Help();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020013 )]
-      void FindFiles();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020014 )]
-      void FindComputer();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020015 )]
-      void RefreshMenu();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020016 )]
-      void ControlPanelItem( [In, MarshalAs( UnmanagedType.BStr )] string bstrDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030000 )]
-      int IsRestricted( [In, MarshalAs( UnmanagedType.BStr )] string Group, [In, MarshalAs( UnmanagedType.BStr )] string Restriction );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030001 )]
-      void ShellExecute( [In, MarshalAs( UnmanagedType.BStr )] string File, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vArgs, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vDir, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vOperation, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vShow );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030002 )]
-      void FindPrinter( [In, Optional, MarshalAs( UnmanagedType.BStr )] string Name, [In, Optional, MarshalAs( UnmanagedType.BStr )] string location, [In, Optional, MarshalAs( UnmanagedType.BStr )] string model );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030003 )]
-      object GetSystemInformation( [In, MarshalAs( UnmanagedType.BStr )] string Name );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030004 )]
-      object ServiceStart( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName, [In, MarshalAs( UnmanagedType.Struct )] object Persistent );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030005 )]
-      object ServiceStop( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName, [In, MarshalAs( UnmanagedType.Struct )] object Persistent );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030006 )]
-      object IsServiceRunning( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030007 )]
-      object CanStartStopService( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030008 )]
-      object ShowBrowserBar( [In, MarshalAs( UnmanagedType.BStr )] string bstrClsid, [In, MarshalAs( UnmanagedType.Struct )] object bShow );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60040000 )]
-      void AddToRecent( [In, MarshalAs( UnmanagedType.Struct )] object varFile, [In, Optional, MarshalAs( UnmanagedType.BStr )] string bstrCategory );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050000 )]
-      void WindowsSecurity();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050001 )]
-      void ToggleDesktop();
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050002 )]
-      object ExplorerPolicy( [In, MarshalAs( UnmanagedType.BStr )] string bstrPolicyName );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050003 )]
-      bool GetSetting( [In] int lSetting );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60060000 )]
-      void WindowSwitcher();
-   }
-
-   [ComImport, Guid( "286E6F1B-7113-4355-9562-96B7E9D64C54" ), TypeLibType( (short)0x1050 )]
-   public interface IShellDispatch6 : IShellDispatch5
-   {
-      [DispId( 0x60020000 )]
-      object Application { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020000 )] get; }
-      [DispId( 0x60020001 )]
-      object Parent { [return: MarshalAs( UnmanagedType.IDispatch )] [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020001 )] get; }
-      [return: MarshalAs( UnmanagedType.Interface )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020002 )]
-      Folder NameSpace( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [return: MarshalAs( UnmanagedType.Interface )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020003 )]
-      Folder BrowseForFolder( [In] int Hwnd, [In, MarshalAs( UnmanagedType.BStr )] string Title, [In] int Options, [In, Optional, MarshalAs( UnmanagedType.Struct )] object RootFolder );
-      [return: MarshalAs( UnmanagedType.IDispatch )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020004 )]
-      object Windows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020005 )]
-      void Open( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020006 )]
-      void Explore( [In, MarshalAs( UnmanagedType.Struct )] object vDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020007 )]
-      void MinimizeAll();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020008 )]
-      void UndoMinimizeALL();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020009 )]
-      void FileRun();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000a )]
-      void CascadeWindows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000b )]
-      void TileVertically();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000c )]
-      void TileHorizontally();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000d )]
-      void ShutdownWindows();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000e )]
-      void Suspend();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x6002000f )]
-      void EjectPC();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020010 )]
-      void SetTime();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020011 )]
-      void TrayProperties();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020012 )]
-      void Help();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020013 )]
-      void FindFiles();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020014 )]
-      void FindComputer();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020015 )]
-      void RefreshMenu();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60020016 )]
-      void ControlPanelItem( [In, MarshalAs( UnmanagedType.BStr )] string bstrDir );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030000 )]
-      int IsRestricted( [In, MarshalAs( UnmanagedType.BStr )] string Group, [In, MarshalAs( UnmanagedType.BStr )] string Restriction );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030001 )]
-      void ShellExecute( [In, MarshalAs( UnmanagedType.BStr )] string File, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vArgs, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vDir, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vOperation, [In, Optional, MarshalAs( UnmanagedType.Struct )] object vShow );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030002 )]
-      void FindPrinter( [In, Optional, MarshalAs( UnmanagedType.BStr )] string Name, [In, Optional, MarshalAs( UnmanagedType.BStr )] string location, [In, Optional, MarshalAs( UnmanagedType.BStr )] string model );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030003 )]
-      object GetSystemInformation( [In, MarshalAs( UnmanagedType.BStr )] string Name );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030004 )]
-      object ServiceStart( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName, [In, MarshalAs( UnmanagedType.Struct )] object Persistent );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030005 )]
-      object ServiceStop( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName, [In, MarshalAs( UnmanagedType.Struct )] object Persistent );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030006 )]
-      object IsServiceRunning( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030007 )]
-      object CanStartStopService( [In, MarshalAs( UnmanagedType.BStr )] string ServiceName );
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60030008 )]
-      object ShowBrowserBar( [In, MarshalAs( UnmanagedType.BStr )] string bstrClsid, [In, MarshalAs( UnmanagedType.Struct )] object bShow );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60040000 )]
-      void AddToRecent( [In, MarshalAs( UnmanagedType.Struct )] object varFile, [In, Optional, MarshalAs( UnmanagedType.BStr )] string bstrCategory );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050000 )]
-      void WindowsSecurity();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050001 )]
-      void ToggleDesktop();
-      [return: MarshalAs( UnmanagedType.Struct )]
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050002 )]
-      object ExplorerPolicy( [In, MarshalAs( UnmanagedType.BStr )] string bstrPolicyName );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60050003 )]
-      bool GetSetting( [In] int lSetting );
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60060000 )]
-      void WindowSwitcher();
-      [MethodImpl( MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime ), DispId( 0x60070000 )]
-      void SearchCommand();
    }
 
    [ComImport, Guid( "BBCBDE60-C3FF-11CE-8350-444553540000" ), TypeLibType( (short)0x1040 ), DefaultMember( "Title" )]
