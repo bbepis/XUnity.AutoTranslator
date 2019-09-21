@@ -1,6 +1,7 @@
 ﻿### 4.4.0
  * FEATURE - Allow translation of any found texts. Whether or not text considered to be untranslatable should be output is controlled through configuration
  * BUG FIX - Fixed a bug in the 'ReiPatcher' standalone installer that caused installation to fail on Windows 7 and below
+ * MISC - Reduced batch error re-enable cooldown from 240 seconds to 60 seconds
 
 ### 4.3.1
  * BUG FIX - Fixed rich text handling bug introduced in 4.3.0

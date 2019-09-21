@@ -554,7 +554,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private IEnumerator EnableBatchingAfterDelay()
       {
-         yield return new WaitForSeconds( 240 );
+         yield return new WaitForSeconds( 60 );
 
          HasBatchLogicFailed = false;
 

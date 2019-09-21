@@ -1254,7 +1254,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
 
                   var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
-                  if( !isTranslatable && !Settings.OutputUntranslatableText )
+                  if( !isTranslatable && !Settings.OutputUntranslatableText && !textKey.IsTemplated )
                   {
                      result.SetCompleted( text );
                   }
@@ -1333,7 +1333,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
 
                   var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
-                  if( !isTranslatable && !Settings.OutputUntranslatableText )
+                  if( !isTranslatable && !Settings.OutputUntranslatableText && !textKey.IsTemplated )
                   {
                      result.SetCompleted( text );
                   }
@@ -1385,7 +1385,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         translations.Add( variableName, textKey.Untemplate( partTranslation ) );
                      }
-                     else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text ) ) || textKey.IsOnlyTemplate )
+                     else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text ) && !textKey.IsTemplated ) || textKey.IsOnlyTemplate )
                      {
                         translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                      }
@@ -1439,7 +1439,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         translations.Add( variableName, textKey.Untemplate( partTranslation ) );
                      }
-                     else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text ) ) || textKey.IsOnlyTemplate )
+                     else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text ) && !textKey.IsTemplated ) || textKey.IsOnlyTemplate )
                      {
                         translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                      }
@@ -1588,7 +1588,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
-               if( !isTranslatable && !Settings.OutputUntranslatableText )
+               if( !isTranslatable && !Settings.OutputUntranslatableText && !textKey.IsTemplated )
                {
                   // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                   return text;
@@ -1706,7 +1706,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                        }
 
                                        var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
-                                       if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText )
+                                       if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
                                        {
                                           // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                                        }
@@ -1803,7 +1803,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      translations.Add( variableName, textKey.Untemplate( partTranslation ) );
                   }
-                  else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( untranslatedTextPart ) ) || textKey.IsOnlyTemplate )
+                  else if( allowPartial || ( !Settings.OutputUntranslatableText && !LanguageHelper.IsTranslatable( untranslatedTextPart ) && !textKey.IsTemplated ) || textKey.IsOnlyTemplate )
                   {
                      translations.Add( variableName, textKey.Untemplate( textKey.TemplatedOriginal_Text ) );
                   }
