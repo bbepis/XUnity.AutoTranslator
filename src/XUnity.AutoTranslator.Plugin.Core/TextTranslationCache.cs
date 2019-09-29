@@ -84,8 +84,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                var mainTranslationFile = Settings.AutoTranslationsFilePath;
                var substitutionFile = Settings.SubstitutionFilePath;
-               LoadTranslationsInFile( mainTranslationFile, false, true );
                LoadTranslationsInFile( substitutionFile, true, false );
+               LoadTranslationsInFile( mainTranslationFile, false, true );
                foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile } ) )
                {
                   LoadTranslationsInFile( fullFileName, false, false );

@@ -155,14 +155,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       public void Trim()
       {
-         if( Result.IsEmpty() )
+         if( Result != null && Result.IsEmpty() )
          {
             Result = null;
+         }
 
-            foreach( var descendant in Descendants.Values )
-            {
-               descendant.Trim();
-            }
+         foreach( var descendant in Descendants.Values )
+         {
+            descendant.Trim();
          }
       }
 

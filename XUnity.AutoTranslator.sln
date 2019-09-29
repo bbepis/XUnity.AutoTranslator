@@ -116,9 +116,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.Common.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup.Build-net45", "src\XUnity.AutoTranslator.Setup.Build-net45\XUnity.AutoTranslator.Setup.Build-net45.csproj", "{B3A3D3E7-A8F1-4110-8151-E674947CB8FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.ResourceRedirector.BepIn-5x", "src\XUnity.ResourceRedirector.BepIn-5x\XUnity.ResourceRedirector.BepIn-5x.csproj", "{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.BepIn-5x", "src\XUnity.ResourceRedirector.BepIn-5x\XUnity.ResourceRedirector.BepIn-5x.csproj", "{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.ResourceRedirector.BepIn", "src\XUnity.ResourceRedirector.BepIn\XUnity.ResourceRedirector.BepIn.csproj", "{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.BepIn", "src\XUnity.ResourceRedirector.BepIn\XUnity.ResourceRedirector.BepIn.csproj", "{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.TextureHashGenerator", "src\XUnity.TextureHashGenerator\XUnity.TextureHashGenerator.csproj", "{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -424,6 +426,14 @@ Global
 		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.ActiveCfg = Release|Any CPU
 		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.Build.0 = Release|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|x86.Build.0 = Debug|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -467,6 +477,7 @@ Global
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
+		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}
