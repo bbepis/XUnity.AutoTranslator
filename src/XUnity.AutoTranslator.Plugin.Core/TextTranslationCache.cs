@@ -55,7 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize(), $"*.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Settings.TranslationsPath, $"*.txt", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) )
             .Where( x => !x.EndsWith( "resizer.txt", true, CultureInfo.InvariantCulture ) );
       }
@@ -67,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var startTime = Time.realtimeSinceStartup;
             lock( _writeToFileSync )
             {
-               Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize() );
+               Directory.CreateDirectory( Settings.TranslationsPath );
                Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
                _registeredRegexes.Clear();

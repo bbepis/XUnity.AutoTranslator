@@ -12,7 +12,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          if( Settings.ApplicationName != null )
          {
-            return path.Replace( "{GameExeName}", Settings.ApplicationName );
+            return path
+               .Replace( "{lang}", Settings.Language )
+               .Replace( "{Lang}", Settings.Language )
+               .Replace( "{GameExeName}", Settings.ApplicationName );
          }
          return path;
       }

@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       private static IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize(), $"*.resizer.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Settings.TranslationsPath, $"*.resizer.txt", SearchOption.AllDirectories )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
       {
          try
          {
-            Directory.CreateDirectory( Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize() );
+            Directory.CreateDirectory( Settings.TranslationsPath );
             Directory.CreateDirectory( Path.GetDirectoryName( Settings.AutoTranslationsFilePath ) );
 
             _root = new UIResizeAttachment();

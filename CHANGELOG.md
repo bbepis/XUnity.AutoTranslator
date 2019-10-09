@@ -1,4 +1,8 @@
-﻿### 4.4.0
+﻿### 4.5.0
+ * CHANGE - Warning! All default directory paths have been changed when a new configuration file is generated!
+ * FEATURE {Lang} / {lang} parameter can now be used in any path specified in the configuration file. This will allow more clean seperation between translations to different languages without needing to modify/move any files.
+
+### 4.4.0
  * FEATURE - Allow translation of any found texts. Whether or not text considered to be untranslatable should be output is controlled through configuration
  * BUG FIX - Fixed a bug in the 'ReiPatcher' standalone installer that caused installation to fail on Windows 7 and below
  * MISC - Reduced batch error re-enable cooldown from 240 seconds to 60 seconds

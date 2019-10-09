@@ -648,7 +648,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var path = ui.GetPath();
                   if( path != null )
                   {
-                     XuaLogger.AutoTranslator.Info( path + ": " + text );
+                     var scope = TranslationScopeProvider.GetScope( ui );
+                     XuaLogger.AutoTranslator.Info( $"Setting text on '{ui.GetType().FullName}' to '{text}'" );
+                     XuaLogger.AutoTranslator.Info( "Path : " + path );
+                     XuaLogger.AutoTranslator.Info( "Level: " + scope );
                   }
                }
 
