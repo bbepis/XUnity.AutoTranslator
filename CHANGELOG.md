@@ -1,6 +1,8 @@
 ﻿### 4.5.0
- * CHANGE - Warning! All default directory paths have been changed when a new configuration file is generated!
- * FEATURE {Lang} / {lang} parameter can now be used in any path specified in the configuration file. This will allow more clean seperation between translations to different languages without needing to modify/move any files.
+ * CHANGE - Warning! All default directory paths have been changed in new configuration files
+ * FEATURE - {Lang} / {lang} parameter can now be used in any path specified in the configuration file. This will allow more clean seperation between translations to different languages without needing to modify/move any files
+ * FEATURE - Support ZIP files for translation, resize and texture files
+ * MISC - Reduced number of static translations significantly
 
 ### 4.4.0
  * FEATURE - Allow translation of any found texts. Whether or not text considered to be untranslatable should be output is controlled through configuration

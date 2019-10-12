@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -25,7 +26,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private IEnumerable<string> GetTextureFiles()
       {
-         return Directory.GetFiles( Settings.TexturesPath, $"*.png", SearchOption.AllDirectories )
+         return Directory.GetFiles( Settings.TexturesPath, $"*.*", SearchOption.AllDirectories )
+            .Where( x => x.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -57,7 +59,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void RegisterImageFromFile( string fullFileName )
+      private static byte[] ReadFully( Stream input )
+      {
+         byte[] buffer = new byte[ 16 * 1024 ];
+         using( MemoryStream ms = new MemoryStream() )
+         {
+            int read;
+            while( ( read = input.Read( buffer, 0, buffer.Length ) ) > 0 )
+            {
+               ms.Write( buffer, 0, read );
+            }
+            return ms.ToArray();
+         }
+      }
+
+      private void RegisterImageFromStream( Stream stream, string fullFileName )
       {
          try
          {
@@ -89,7 +105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   return;
                }
 
-               var data = File.ReadAllBytes( fullFileName );
+               var data = ReadFully( stream );
                var currentHash = HashHelper.Compute( data );
                var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
 
@@ -115,6 +131,33 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while loading texture file: " + fullFileName );
+         }
+      }
+
+      private void RegisterImageFromFile( string fullFileName )
+      {
+         var fileExists = File.Exists( fullFileName );
+         if( fileExists )
+         {
+            if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+            {
+               ZipFile zf = new ZipFile( fullFileName );
+               foreach( ZipEntry entry in zf )
+               {
+                  if( entry.IsFile && entry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
+                  {
+                     RegisterImageFromStream( zf.GetInputStream( entry ), fullFileName + '\\' + entry.Name );
+                  }
+               }
+               zf.Close();
+            }
+            else
+            {
+               using( var stream = File.OpenRead( fullFileName ) )
+               {
+                  RegisterImageFromStream( stream, fullFileName );
+               }
+            }
          }
       }
 

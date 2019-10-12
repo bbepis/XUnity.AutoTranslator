@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,7 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       private static IEnumerable<string> GetTranslationFiles()
       {
-         return Directory.GetFiles( Settings.TranslationsPath, $"*.resizer.txt", SearchOption.AllDirectories )
+         return Directory.GetFiles( Settings.TranslationsPath, $"*.*", SearchOption.AllDirectories )
+            .Where( x => x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
             .Select( x => x.Replace( "/", "\\" ) );
       }
 
@@ -38,6 +41,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                LoadResizeCommandsInFile( fullFileName );
             }
 
+            _root.Trim();
+
             XuaLogger.AutoTranslator.Info( $"Loaded resize command text files." );
 
          }
@@ -47,16 +52,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          }
       }
 
-      private void LoadResizeCommandsInFile( string fullFileName )
+      private void LoadResizeCommandsInStream( Stream stream, string fullFileName )
       {
-         var fileExists = File.Exists( fullFileName );
-         if( fileExists )
-         {
-            XuaLogger.AutoTranslator.Debug( $"Loading resize commands: {fullFileName}." );
+         XuaLogger.AutoTranslator.Debug( $"Loading resize commands: {fullFileName}." );
 
+         using( var reader = new StreamReader( stream, Encoding.UTF8 ) )
+         {
             var context = new TranslationFileLoadingContext();
 
-            string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
+            string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translatioOrDirective in translations )
             {
                if( Settings.EnableTranslationScoping )
@@ -97,8 +101,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                   }
                }
             }
+         }
+      }
 
-            _root.Trim();
+      private void LoadResizeCommandsInFile( string fullFileName )
+      {
+         var fileExists = File.Exists( fullFileName );
+         if( fileExists )
+         {
+            if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+            {
+               ZipFile zf = new ZipFile( fullFileName );
+               foreach( ZipEntry entry in zf )
+               {
+                  if( entry.IsFile && entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                  {
+                     LoadResizeCommandsInStream( zf.GetInputStream( entry ), fullFileName + '\\' + entry.Name );
+                  }
+               }
+               zf.Close();
+            }
+            else
+            {
+               using( var stream = File.OpenRead( fullFileName ) )
+               {
+                  LoadResizeCommandsInStream( stream, fullFileName );
+               }
+            }
          }
       }
 
