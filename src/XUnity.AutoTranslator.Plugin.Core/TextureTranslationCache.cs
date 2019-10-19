@@ -139,21 +139,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
          {
-            if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+            using( var stream = File.OpenRead( fullFileName ) )
             {
-               ZipFile zf = new ZipFile( fullFileName );
-               foreach( ZipEntry entry in zf )
+               // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
+               if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                {
-                  if( entry.IsFile && entry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
+                  using( var zipInputStream = new ZipInputStream( stream ) )
                   {
-                     RegisterImageFromStream( zf.GetInputStream( entry ), fullFileName + '\\' + entry.Name );
+                     while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                     {
+                        if( entry.IsFile && entry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
+                        {
+                           RegisterImageFromStream( zipInputStream, fullFileName + '\\' + entry.Name );
+                        }
+                     }
                   }
                }
-               zf.Close();
-            }
-            else
-            {
-               using( var stream = File.OpenRead( fullFileName ) )
+               else
                {
                   RegisterImageFromStream( stream, fullFileName );
                }

@@ -212,6 +212,8 @@ The supported translators are:
      * Url=http://my-custom-translation-service.net/translate
    * Example Request: GET http://my-custom-translation-service.net/translate?from=ja&to=en&text=こんにちは
    * Example Response (only body): Hello
+   * Known implementations that can be used with CustomTranslate:
+     * ezTrans: https://github.com/HelloKS/ezTransWeb
  
 *NOTE: If you use any of the online translators that does not require some form of authentication, that this plugin may break at any time.*
 
@@ -275,7 +277,7 @@ EnableIMGUI=False                ;Enable or disable IMGUI translation
 AllowPluginHookOverride=True     ;Allow other text translation plugins to override this plugin's hooks
 
 [Behaviour]
-MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 500.
+MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 1000.
 IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
 IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
 MinDialogueChars=20              ;The length of the text for it to be considered a dialogue
@@ -402,7 +404,7 @@ The configuratiaon `EnableUIResizing` and `ForceUIResizing` also control whether
 The following aims at reducing the number of requests send to the translation endpoint:
  * `EnableBatching`: Batches several translation requests into a single with supported endpoints.
  * `UseStaticTranslations`: Enables usage of internal lookup dictionary of various english-to-japanese terms.
- * `MaxCharactersPerTranslation`: Specifies the maximum length of a text to translate. Any texts longer than this is ignored by the plugin. Cannot be greater than 500.
+ * `MaxCharactersPerTranslation`: Specifies the maximum length of a text to translate. Any texts longer than this is ignored by the plugin. Cannot be greater than 1000. **Never redistribute this mod with this value greater than 400**
 
 #### Romaji 'translation'
 One of the possible values as output `Language` is 'romaji'. If you choose this as language, you will find that games often has problems showing the translations because the font does not understand the special characters used, for example the [macron diacritic](https://en.wikipedia.org/wiki/Macron_(diacritic)).

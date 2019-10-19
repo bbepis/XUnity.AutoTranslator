@@ -1,4 +1,10 @@
-﻿### 4.5.0
+﻿### 4.5.1
+ * MISC - Improved ZIP archive performance (probably)
+ * MISC - Disabled HTTPS certificate checks by default for all runtimes because default value generation was incorrect
+ * MISC - Added built-in 'Passthrough' endpoint that does not perform any translations, but allows dumping texts and process texts through substitutions, etc.
+ * MISC - Increased max value of 'MaxCharactersPerTranslation' from 500 to 1000
+
+### 4.5.0
  * CHANGE - Warning! All default directory paths have been changed in new configuration files
  * FEATURE - {Lang} / {lang} parameter can now be used in any path specified in the configuration file. This will allow more clean seperation between translations to different languages without needing to modify/move any files
  * FEATURE - Support ZIP files for translation, resize and texture files

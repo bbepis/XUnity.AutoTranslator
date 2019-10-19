@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
       public static readonly string TranslatorsFolder = "Translators";
-      public static readonly int MaxMaxCharactersPerTranslation = 500;
+      public static readonly int MaxMaxCharactersPerTranslation = 1000;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
       public static readonly string EnglishLanguage = "en";
@@ -225,7 +225,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             }
 
             UserAgent = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "UserAgent", string.Empty );
-            DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", GetInitialDisableCertificateChecks() );
+            DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", true );
 
 
             Width = PluginEnvironment.Current.Preferences.GetOrDefault( "TranslationAggregator", "Width", 400.0f );

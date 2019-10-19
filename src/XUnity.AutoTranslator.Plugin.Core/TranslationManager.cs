@@ -104,6 +104,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var pluginFolder = Path.Combine( PluginEnvironment.Current.PluginPath, Settings.TranslatorsFolder );
          var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
 
+         // add built-in endpoint
+         dynamicTypes.Add( typeof( PassthroughTranslateEndpoint ) );
+
          foreach( var type in dynamicTypes )
          {
             AddEndpoint( go, context, type );

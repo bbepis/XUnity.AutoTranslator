@@ -319,7 +319,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
 
-         using( var reader = new StreamReader( stream, Encoding.UTF8 ) )
+         var reader = new StreamReader( stream, Encoding.UTF8 );
          {
             var context = new TranslationFileLoadingContext();
             var set = new HashSet<string>();
@@ -433,21 +433,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( fileExists )
             {
-               if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+               using( var stream = File.OpenRead( fullFileName ) )
                {
-                  ZipFile zf = new ZipFile( fullFileName );
-                  foreach( ZipEntry entry in zf )
+                  // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
+                  if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                   {
-                     if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                     using( var zipInputStream = new ZipInputStream( stream ) )
                      {
-                        LoadTranslationsInStream( zf.GetInputStream( entry ), fullFileName + '\\' + entry.Name, isSubstitutionFile, isOutputFile );
+                        while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                        {
+                           if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                           {
+                              LoadTranslationsInStream( zipInputStream, fullFileName + '\\' + entry.Name, isSubstitutionFile, isOutputFile );
+                           }
+                        }
                      }
                   }
-                  zf.Close();
-               }
-               else
-               {
-                  using( var stream = File.OpenRead( fullFileName ) )
+                  else
                   {
                      LoadTranslationsInStream( stream, fullFileName, isSubstitutionFile, isOutputFile );
                   }

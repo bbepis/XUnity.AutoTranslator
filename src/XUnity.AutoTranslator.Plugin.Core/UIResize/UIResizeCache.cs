@@ -56,7 +56,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
       {
          XuaLogger.AutoTranslator.Debug( $"Loading resize commands: {fullFileName}." );
 
-         using( var reader = new StreamReader( stream, Encoding.UTF8 ) )
+         var reader = new StreamReader( stream, Encoding.UTF8 );
          {
             var context = new TranslationFileLoadingContext();
 
@@ -109,21 +109,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
          {
-            if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+            using( var stream = File.OpenRead( fullFileName ) )
             {
-               ZipFile zf = new ZipFile( fullFileName );
-               foreach( ZipEntry entry in zf )
+               // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
+               if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                {
-                  if( entry.IsFile && entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                  using( var zipInputStream = new ZipInputStream( stream ) )
                   {
-                     LoadResizeCommandsInStream( zf.GetInputStream( entry ), fullFileName + '\\' + entry.Name );
+                     while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                     {
+                        if( entry.IsFile && entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                        {
+                           LoadResizeCommandsInStream( zipInputStream, fullFileName + '\\' + entry.Name );
+                        }
+                     }
                   }
                }
-               zf.Close();
-            }
-            else
-            {
-               using( var stream = File.OpenRead( fullFileName ) )
+               else
                {
                   LoadResizeCommandsInStream( stream, fullFileName );
                }
