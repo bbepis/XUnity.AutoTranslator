@@ -2451,7 +2451,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   TranslateTexture( ui, context );
                }
             }
-            catch( Exception e )
+            catch( Exception )
             {
                // not super pretty, no...
                ExtensionDataHelper.Remove( ui );
@@ -2781,6 +2781,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       void OnApplicationQuit()
       {
+         try
+         {
+            RedirectedDirectory.Uninitialize();
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while uninitializing redirected directory cache." );
+         }
+
          foreach( var ce in TranslationManager.AllEndpoints )
          {
             try

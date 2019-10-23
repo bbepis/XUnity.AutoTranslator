@@ -17,10 +17,4 @@
      </Reference>
    </ItemGroup>
 
-   <ItemGroup>
-     <None Update="RedirectedResources\resources.zip">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     </None>
-   </ItemGroup>
-
 </Project>

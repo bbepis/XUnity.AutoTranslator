@@ -47,7 +47,7 @@ namespace KoikatsuTextResourceRedirector
       protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref ExcelData asset, IAssetOrResourceLoadedContext context )
       {
          var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
-         var redirectedResources = RedirectedDirectory.GetFiles( calculatedModificationPath, ".txt" );
+         var redirectedResources = RedirectedDirectory.GetFilesInDirectory( calculatedModificationPath, ".txt" );
          var streams = redirectedResources.Select( x => x.OpenStream() );
          var cache = new SimpleTextTranslationCache(
             outputFile: defaultTranslationFile,

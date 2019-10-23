@@ -6,8 +6,17 @@ using System.Text;
 
 namespace XUnity.Common.Extensions
 {
+   /// <summary>
+   /// Simple extensions to the Stream class.
+   /// </summary>
    public static class StreamExtensions
    {
+      /// <summary>
+      /// Reads all data in the stream into a buffer. If possible specify the length of the stream as the initialLength.
+      /// </summary>
+      /// <param name="stream">The stream to read from.</param>
+      /// <param name="initialLength">The initial length of the buffer.</param>
+      /// <returns>All the data in the stream.</returns>
       public static byte[] ReadFully( this Stream stream, int initialLength )
       {
          // https://jonskeet.uk/csharp/readbinary.html
