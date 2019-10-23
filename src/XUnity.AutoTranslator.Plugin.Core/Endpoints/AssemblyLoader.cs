@@ -16,8 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          var files = Directory.GetFiles( directory, "*.dll" );
          var allTypes = new HashSet<Type>();
-
-         var currentDirectory = Environment.CurrentDirectory;
+         
          foreach( var relativeFilePath in files )
          {
             LoadAssembliesInFile<TService>( relativeFilePath, allTypes );

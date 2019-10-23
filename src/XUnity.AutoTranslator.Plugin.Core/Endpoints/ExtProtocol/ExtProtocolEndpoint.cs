@@ -10,6 +10,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
+using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
@@ -88,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             if( _process == null )
             {
                _process = new Process();
-               _process.StartInfo.FileName = Path.Combine( Environment.CurrentDirectory, ExecutablePath );
+               _process.StartInfo.FileName = Path.Combine( Paths.GameRoot, ExecutablePath );
                _process.StartInfo.Arguments = Arguments;
                _process.StartInfo.WorkingDirectory = new FileInfo( ExecutablePath ).Directory.FullName;
                _process.EnableRaisingEvents = false;

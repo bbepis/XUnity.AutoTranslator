@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.AssetRedirection;
@@ -8,7 +9,7 @@ using XUnity.ResourceRedirector;
 
 namespace KoikatsuTextResourceRedirector
 {
-   public class ExcelDataResourceRedirector : AssetLoadedHandlerBase<ExcelData>
+   public class ExcelDataResourceRedirector : AssetLoadedHandlerBaseV2<ExcelData>
    {
       public ExcelDataResourceRedirector()
       {
@@ -17,15 +18,16 @@ namespace KoikatsuTextResourceRedirector
 
       protected override string CalculateModificationFilePath( ExcelData asset, IAssetOrResourceLoadedContext context )
       {
-         return context.GetPreferredFilePathWithCustomFileName( @"BepInEx\translation", asset, null )
-            .Replace( @"abdata\", "" )
+         return context.GetPreferredFilePathWithCustomFileName( asset, null )
             .Replace( ".unity3d", "" );
       }
 
       protected override bool DumpAsset( string calculatedModificationPath, ExcelData asset, IAssetOrResourceLoadedContext context )
       {
          var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
-         var cache = new SimpleTextTranslationCache( defaultTranslationFile, false );
+         var cache = new SimpleTextTranslationCache(
+            file: defaultTranslationFile,
+            loadTranslationsInFile: false );
 
          foreach( var param in asset.list )
          {
@@ -44,7 +46,14 @@ namespace KoikatsuTextResourceRedirector
 
       protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref ExcelData asset, IAssetOrResourceLoadedContext context )
       {
-         var cache = new SimpleTextTranslationCache( calculatedModificationPath, true, true, false );
+         var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
+         var redirectedResources = RedirectedDirectory.GetFiles( calculatedModificationPath, ".txt" );
+         var streams = redirectedResources.Select( x => x.OpenStream() );
+         var cache = new SimpleTextTranslationCache(
+            outputFile: defaultTranslationFile,
+            inputStreams: streams,
+            allowTranslationOverride: false,
+            closeStreams: true );
 
          foreach( var param in asset.list )
          {
@@ -57,7 +66,7 @@ namespace KoikatsuTextResourceRedirector
                   {
                      param.list[ i ] = translated;
                   }
-                  else if( IsDumpingEnabled && LanguageHelper.IsTranslatable( key ) )
+                  else if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled && LanguageHelper.IsTranslatable( key ) )
                   {
                      cache.AddTranslationToCache( key, key );
                   }

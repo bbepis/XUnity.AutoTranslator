@@ -1,4 +1,7 @@
-﻿### 4.5.1
+﻿### 4.6.0
+ * FEATURE - Support for ZIP files in redirected resource directory
+
+### 4.5.1
  * MISC - Improved ZIP archive performance (probably)
  * MISC - Disabled HTTPS certificate checks by default for all runtimes because default value generation was incorrect
  * MISC - Added built-in 'Passthrough' endpoint that does not perform any translations, but allows dumping texts and process texts through substitutions, etc.

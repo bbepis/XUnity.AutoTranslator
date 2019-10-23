@@ -129,6 +129,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableDumping;
       public static bool EnableTextAssetRedirector;
       public static bool LogAllLoadedResources;
+      public static bool CacheMetadataForAllFiles;
 
 
       public static float Height;
@@ -215,6 +216,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextAssetRedirector = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableTextAssetRedirector", false );
             LogAllLoadedResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "LogAllLoadedResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
+            CacheMetadataForAllFiles = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "CacheMetadataForAllFiles", true );
+
+            if( CacheMetadataForAllFiles && EnableDumping )
+            {
+               XuaLogger.AutoTranslator.Warn( "'EnableDumping' and 'CacheMetadataForAllOnStartup' cannot be enabled at the same time. Disabling 'CacheMetadataForAllOnStartup'..." );
+
+               CacheMetadataForAllFiles = false;
+            }
 
             RedirectedResourcesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, PreferredStoragePath ).Replace( "/", "\\" ).Parameterize();
 

@@ -59,20 +59,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private static byte[] ReadFully( Stream input )
-      {
-         byte[] buffer = new byte[ 16 * 1024 ];
-         using( MemoryStream ms = new MemoryStream() )
-         {
-            int read;
-            while( ( read = input.Read( buffer, 0, buffer.Length ) ) > 0 )
-            {
-               ms.Write( buffer, 0, read );
-            }
-            return ms.ToArray();
-         }
-      }
-
       private void RegisterImageFromStream( Stream stream, string fullFileName )
       {
          try
@@ -105,7 +91,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   return;
                }
 
-               var data = ReadFully( stream );
+               var data = stream.ReadFully( 16 * 1024 );
                var currentHash = HashHelper.Compute( data );
                var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
 

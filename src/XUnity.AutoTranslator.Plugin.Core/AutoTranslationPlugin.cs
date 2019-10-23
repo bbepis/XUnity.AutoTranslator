@@ -2626,7 +2626,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void PrintObjects()
       {
 
-         using( var stream = File.Open( Path.Combine( Environment.CurrentDirectory, "hierarchy.txt" ), FileMode.Create ) )
+         using( var stream = File.Open( Path.Combine( Paths.GameRoot, "hierarchy.txt" ), FileMode.Create ) )
          using( var writer = new StreamWriter( stream ) )
          {
             foreach( var root in GetAllRoots() )

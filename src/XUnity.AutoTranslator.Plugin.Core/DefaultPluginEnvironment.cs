@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ExIni;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -15,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public DefaultPluginEnvironment()
       {
-         _dataFolder = "AutoTranslator";
+         _dataFolder = Path.Combine( Paths.GameRoot, "AutoTranslator" );
          _configPath = Path.Combine( _dataFolder, "Config.ini" );
       }
 

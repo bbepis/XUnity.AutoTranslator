@@ -68,6 +68,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
       }
 
       /// <summary>
+      /// Creates a translation cache, using the specified file as an output file, but without loading the file. This constructor
+      /// will only read the input streams.
+      /// </summary>
+      /// <param name="outputFile">This is the output file.</param>
+      /// <param name="inputStreams">This is the input streams with translations that will populate the cache.</param>
+      /// <param name="allowTranslationOverride">Indicates whether or not to allow translations read later to override translation read earlier during initialization.</param>
+      /// <param name="closeStreams">Indicates if the input streams should be closed after use.</param>
+      public SimpleTextTranslationCache(
+         string outputFile,
+         IEnumerable<Stream> inputStreams,
+         bool allowTranslationOverride,
+         bool closeStreams )
+      {
+         LoadedFile = outputFile;
+         IsDirectory = false;
+
+         if( inputStreams != null )
+         {
+            LoadTranslationStreams( inputStreams, allowTranslationOverride, closeStreams );
+         }
+      }
+
+      /// <summary>
       /// Gets the file that was used to initialize the SimpleTextTranslationCache.
       /// </summary>
       public string LoadedFile { get; }
@@ -100,14 +123,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      internal void LoadTranslationStreams( IEnumerable<Stream> streams, bool overrideLaterWithEarlier, bool closeStreams )
+      {
+         foreach( var stream in streams )
+         {
+            try
+            {
+               LoadTranslationsInStream( stream, overrideLaterWithEarlier, closeStreams );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while loading translations." );
+            }
+         }
+      }
+
       private void LoadTranslationsInFile( string fullFileName, bool allowOverride )
       {
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
          {
-            if( fileExists )
+            LoadTranslationsInStream( File.OpenRead( fullFileName ), allowOverride, true );
+         }
+      }
+
+      private void LoadTranslationsInStream( Stream stream, bool allowOverride, bool closeStream )
+      {
+         using( stream )
+         {
+            var reader = new StreamReader( stream, Encoding.UTF8 );
             {
-               string[] translations = File.ReadAllLines( fullFileName, Encoding.UTF8 );
+               string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
                foreach( string translatioOrDirective in translations )
                {
                   string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
