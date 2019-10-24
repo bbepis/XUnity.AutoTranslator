@@ -149,7 +149,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void LoadTranslationsInStream( Stream stream, bool allowOverride, bool closeStream )
       {
-         using( stream )
+         try
          {
             var reader = new StreamReader( stream, Encoding.UTF8 );
             {
@@ -184,6 +184,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
                }
+            }
+         }
+         finally
+         {
+            if( closeStream )
+            {
+               stream.Dispose();
             }
          }
       }

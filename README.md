@@ -325,6 +325,7 @@ PreferredStoragePath=Translation\{Lang}\RedirectedResources ;Indicates the prefe
 EnableTextAssetRedirector=False  ;Indicates if TextAssets should be redirected
 LogAllLoadedResources=False      ;Indicates if the plugin should log to the console all loaded assets. Useful to determine what can be hooked
 EnableDumping=False              ;Indicates if translatable resources that are found should be dumped
+CacheMetadataForAllFiles=True    ;When files are in ZIP files in the PreferredStoragePath, these files are indexed in memory to avoid performing file check IO when loading them. Enabling this option will do the same for physical files
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
@@ -666,6 +667,9 @@ The Auto Translator has the following Resource Redirector-specific configuration
  * `EnableTextAssetRedirector`: Indicates if the TextAsset redirector is enabled.
  * `LogAllLoadedResources`: Indicates if Resource Redirector should log all resources to the console (can also be controlled through Resource Redirector API surface).
  * `EnableDumping`: Indicates if resources redirected to the Auto Translator should be dumped for overwriting if possible.
+ * `CacheMetadataForAllFiles`: When files are in ZIP files in the PreferredStoragePath, these files are indexed in memory to avoid performing file check IO when loading them. Enabling this option will do the same for physical files
+
+ZIP files that are placed in the `PreferredStoragePath` will be indexed during startup, allowing redirected resources to be compressed and zipped. When files are placed in a zip file, the zip file is simply treated as not existing during file lookup.
 
 ## Regarding Redistribution
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:
@@ -2266,14 +2270,9 @@ This class simply hooks the postfix to the load of assets from the `AssetBundle`
 /// resource redirector that is interested in either updating or dumping redirected resources.
 /// </summary>
 /// <typeparam name="TAsset">The type of asset being redirected.</typeparam>
-public abstract class AssetLoadedHandlerBase<TAsset>
+public abstract class AssetLoadedHandlerBaseV2<TAsset>
     where TAsset : UnityEngine.Object
 {
-    /// <summary>
-    /// Gets a bool indicating if resource dumping is enabled in the Auto Translator.
-    /// </summary>
-    protected bool IsDumpingEnabled { get; }
-
     /// <summary>
     /// Method invoked when an asset should be updated or replaced.
     /// </summary>
@@ -2313,7 +2312,7 @@ public abstract class AssetLoadedHandlerBase<TAsset>
 The Auto Translation includes one default implementation of this class for TextAssets. It looks like this:
 
 ```C#
-internal class TextAssetLoadedHandler : AssetLoadedHandlerBase<TextAsset>
+internal class TextAssetLoadedHandler : AssetLoadedHandlerBaseV2<TextAsset>
 {
     protected override string CalculateModificationFilePath( TextAsset asset, IAssetOrResourceLoadedContext context )
     {
@@ -2330,14 +2329,38 @@ internal class TextAssetLoadedHandler : AssetLoadedHandlerBase<TextAsset>
 
     protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref TextAsset asset, IAssetOrResourceLoadedContext context )
     {
-        var data = File.ReadAllBytes( calculatedModificationPath );
-        var text = Encoding.UTF8.GetString( data );
-         
-        var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
-        ext.Data = data;
-        ext.Text = text;
+        RedirectedResource file;
 
-        return true;
+        var files = RedirectedDirectory.GetFile( calculatedModificationPath ).ToList();
+        if( files.Count == 0 )
+        {
+		    return false;
+        }
+        else
+        {
+            if( files.Count > 1 )
+            {
+                XuaLogger.AutoTranslator.Warn( "Found more than one resource file in the same path: " + calculatedModificationPath );
+            }
+		    
+            file = files.FirstOrDefault();
+        }
+
+        if( file != null )
+        {
+            using( var stream = file.OpenStream() )
+            {
+                var data = stream.ReadFully( (int)stream.Length );
+                var text = Encoding.UTF8.GetString( data );
+		    
+                var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
+                ext.Data = data;
+                ext.Text = text;
+		    
+                return true;
+            }
+        }
+        return false;
     }
 
     protected override bool ShouldHandleAsset( TextAsset asset, IAssetOrResourceLoadedContext context )
@@ -2347,73 +2370,90 @@ internal class TextAssetLoadedHandler : AssetLoadedHandlerBase<TextAsset>
 }
 ```
 
+Note that when accessing the resource file, we do not use the standard file API to obtain a stream to get the data in the file. Instead we use the RedirectedDirectory facade. This will also look in ZIP files and simply treat a ZIP file as a directory when making the lookup.
+
 Another examples of an implementation of this class would be for Koikatsu that enables replacing its custom resources:
 
 ```C#
-public class ScenarioDataResourceRedirector : AssetLoadedHandlerBase<ScenarioData>
+public class ScenarioDataResourceRedirector : AssetLoadedHandlerBaseV2<ScenarioData>
 {
-    protected override string CalculateModificationFilePath(ScenarioData asset, IAssetOrResourceLoadedContext context)
-    {
-        return context.GetPreferredFilePathWithCustomFileName(@"BepInEx\translation", asset, "translation.txt")
-            .Replace(".unity3d", "");
-    }
+   public ScenarioDataResourceRedirector()
+   {
+      CheckDirectory = true;
+   }
 
-    protected override bool DumpAsset(string calculatedModificationPath, ScenarioData asset, IAssetOrResourceLoadedContext context)
-    {
-        var cache = new SimpleTextTranslationCache(calculatedModificationPath, false);
+   protected override string CalculateModificationFilePath( ScenarioData asset, IAssetOrResourceLoadedContext context )
+   {
+      return context.GetPreferredFilePathWithCustomFileName( asset, null )
+         .Replace( ".unity3d", "" );
+   }
 
-        foreach (var param in asset.list)
-        {
-            if (param.Command == Command.Text)
+   protected override bool DumpAsset( string calculatedModificationPath, ScenarioData asset, IAssetOrResourceLoadedContext context )
+   {
+      var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
+      var cache = new SimpleTextTranslationCache(
+         file: defaultTranslationFile,
+         loadTranslationsInFile: false );
+
+      foreach( var param in asset.list )
+      {
+         if( param.Command == Command.Text )
+         {
+            for( int i = 0; i < param.Args.Length; i++ )
             {
-                for (int i = 0; i < param.Args.Length; i++)
-                {
-                    var key = param.Args[i];
+               var key = param.Args[ i ];
 
-                    if (!string.IsNullOrEmpty(key) && LanguageHelper.IsTranslatable(key))
-                    {
-                        cache.AddTranslationToCache(key, key);
-                    }
-                }
+               if( !string.IsNullOrEmpty( key ) && LanguageHelper.IsTranslatable( key ) )
+               {
+                  cache.AddTranslationToCache( key, key );
+               }
             }
-        }
+         }
+      }
 
-        return true;
-    }
+      return true;
+   }
 
-    protected override bool ReplaceOrUpdateAsset(string calculatedModificationPath, ref ScenarioData asset, IAssetOrResourceLoadedContext context)
-    {
-        var cache = new SimpleTextTranslationCache(calculatedModificationPath, true);
+   protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref ScenarioData asset, IAssetOrResourceLoadedContext context )
+   {
+      var defaultTranslationFile = Path.Combine( calculatedModificationPath, "translation.txt" );
+      var redirectedResources = RedirectedDirectory.GetFilesInDirectory( calculatedModificationPath, ".txt" );
+      var streams = redirectedResources.Select( x => x.OpenStream() );
+      var cache = new SimpleTextTranslationCache(
+         outputFile: defaultTranslationFile,
+         inputStreams: streams,
+         allowTranslationOverride: false,
+         closeStreams: true );
 
-        foreach (var param in asset.list)
-        {
-            if (param.Command == Command.Text)
+      foreach( var param in asset.list )
+      {
+         if( param.Command == Command.Text )
+         {
+            for( int i = 0; i < param.Args.Length; i++ )
             {
-                for (int i = 0; i < param.Args.Length; i++)
-                {
-                    var key = param.Args[i];
-                    if (!string.IsNullOrEmpty(key))
-                    {
-                        if (cache.TryGetTranslation(key, true, out var translated))
-                        {
-                            param.Args[i] = translated;
-                        }
-                        else if (IsDumpingEnabled && LanguageHelper.IsTranslatable(key))
-                        {
-                            cache.AddTranslationToCache(key, key);
-                        }
-                    }
-                }
+               var key = param.Args[ i ];
+               if( !string.IsNullOrEmpty( key ) )
+               {
+                  if( cache.TryGetTranslation( key, true, out var translated ) )
+                  {
+                     param.Args[ i ] = translated;
+                  }
+                  else if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled && LanguageHelper.IsTranslatable( key ) )
+                  {
+                     cache.AddTranslationToCache( key, key );
+                  }
+               }
             }
-        }
+         }
+      }
 
-        return true;
-    }
+      return true;
+   }
 
-    protected override bool ShouldHandleAsset(ScenarioData asset, IAssetOrResourceLoadedContext context)
-    {
-        return !context.HasReferenceBeenRedirectedBefore(asset);
-    }
+   protected override bool ShouldHandleAsset( ScenarioData asset, IAssetOrResourceLoadedContext context )
+   {
+      return !context.HasReferenceBeenRedirectedBefore( asset );
+   }
 }
 ```
 

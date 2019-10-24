@@ -75,9 +75,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   .MakeRelativePath( _root );
             }
 
-            var entries = _rootZipDir.GetEntries( path, extensions, true )
+            var entries = _rootZipDir.GetEntries( path, null, true )
                .OrderBy( x => x.IsZipped )
-               .ThenBy( x => x.FullPath );
+               .ThenBy( x => x.ContainerFile )
+               .ThenBy( x => x.FullPath )
+               .ToList();
 
             foreach( var entry in entries )
             {
@@ -114,8 +116,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
             var entries = _rootZipDir.GetEntries( path, null, false )
                .OrderBy( x => x.IsZipped )
+               .ThenBy( x => x.ContainerFile )
                .ThenBy( x => x.FullPath );
-
+            
             foreach( var entry in entries )
             {
                if( entry.IsZipped )
@@ -168,10 +171,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
       private void Initialize()
       {
-         var fullPath = Path.Combine( _loweredCurrentDirectory, _root );
-         if( Directory.Exists( fullPath ) )
+         if( Directory.Exists( _root ) )
          {
-            var files = Directory.GetFiles( fullPath, "*", SearchOption.AllDirectories );
+            var files = Directory.GetFiles( _root, "*", SearchOption.AllDirectories );
 
             if( files.Length > 0 )
             {
@@ -199,20 +201,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                      if( part.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                      {
                         // this is the zip file, read the metadata!
-                        part = Path.GetFileNameWithoutExtension( part );
-                        current = current.GetOrCreateChildPath( part );
                         var start = current;
 
-                        var zf = new ZipFile( file ); // TODO: Keep reference!!!
-                                                      //var initialOffset = (long)zf.GetType().GetField( "offsetOfFirstEntry", BindingFlags.Instance | BindingFlags.NonPublic ).GetValue( zf );
+                        var zf = new ZipFile( file );
+                        _zipFiles.Add( zf );
+
                         foreach( ZipEntry entry in zf )
                         {
-                           //if( entry.CompressionMethod != CompressionMethod.Stored )
-                           //{
-                           //   XuaLogger.AutoTranslator.Warn( "Found .zip file in RedirectedResources directory that is not using 'Stored' compression: " + file );
-                           //   break;
-                           //}
-
                            current = start;
                            var internalPath = entry.Name.Replace( '/', '\\' ).ToLowerInvariant();
                            var internalParts = internalPath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
@@ -387,15 +382,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             if( index < parts.Length )
             {
                var part = parts[ index ];
-               if( _subPaths.TryGetValue( part, out var subPath ) )
+               if( !findAllByExtensionInLastDirectory && index == parts.Length - 1 )
                {
-                  subPath.FillEntries( parts, index + 1, extensions, findAllByExtensionInLastDirectory, entries );
+                  // find the files with part name....
+                  if( _files.TryGetValue( part, out var files ) )
+                  {
+                     entries.AddRange( files );
+                  }
                }
-
-               // find the files with part name....
-               if( _files.TryGetValue( part, out var files ) )
+               else
                {
-                  entries.AddRange( files );
+                  if( _subPaths.TryGetValue( part, out var subPath ) )
+                  {
+                     subPath.FillEntries( parts, index + 1, extensions, findAllByExtensionInLastDirectory, entries );
+                  }
                }
             }
             else if( findAllByExtensionInLastDirectory )

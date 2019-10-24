@@ -16,7 +16,6 @@ namespace XUnity.RuntimeHooker.ConsoleTests
    {
       static void Main( string[] args )
       {
-
       }
    }
 }
