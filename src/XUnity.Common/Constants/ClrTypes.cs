@@ -54,6 +54,8 @@ namespace XUnity.Common.Constants
       public static readonly Type HorizontalWrapMode = FindType( "UnityEngine.HorizontalWrapMode" );
       public static readonly Type VerticalWrapMode = FindType( "UnityEngine.VerticalWrapMode" );
       public static readonly Type Font = FindType( "UnityEngine.Font" );
+      public static readonly Type WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
+
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );

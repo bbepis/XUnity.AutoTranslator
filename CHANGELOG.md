@@ -1,5 +1,6 @@
 ﻿### 4.6.0
  * FEATURE - Support for ZIP files in redirected resource directory
+ * BUG FIX - Fixed bug where you somtimes had to close dialogues before translations would appear
  * BUG FIX - Fixed bug where plugin would not function if a game is launched through a custom launcher not located in the game directory
  * MISC - Automatically enable texture translations if a texture directory is present during initial startup
 

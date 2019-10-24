@@ -1860,7 +1860,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
          while( currentTries < maxTries ) // shortcircuit
          {
             var beforeText = ui.GetText();
-            yield return new WaitForSeconds( delay );
+
+            var instruction = Features.GetWaitForSecondsRealtime( delay );
+            if( instruction != null )
+            {
+               yield return instruction;
+            }
+            else
+            {
+               float start = Time.realtimeSinceStartup;
+               var end = start + delay;
+               while( Time.realtimeSinceStartup < end )
+               {
+                  yield return null;
+               }
+            }
+
             var afterText = ui.GetText();
 
             if( beforeText == afterText )
@@ -1895,7 +1910,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _immediatelyTranslating.Add( text );
             try
             {
-               yield return new WaitForSeconds( delay );
+               var instruction = Features.GetWaitForSecondsRealtime( delay );
+               if( instruction != null )
+               {
+                  yield return instruction;
+               }
+               else
+               {
+                  float start = Time.realtimeSinceStartup;
+                  var end = start + delay;
+                  while( Time.realtimeSinceStartup < end )
+                  {
+                     yield return null;
+                  }
+               }
 
                bool succeeded = true;
                foreach( var otherImmediatelyTranslating in _immediatelyTranslating )
@@ -1924,12 +1952,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _immediatelyTranslating.Remove( text );
             }
          }
-      }
-
-      private IEnumerator DelayForSeconds( float delay, Action onContinue )
-      {
-         yield return new WaitForSeconds( delay );
-         onContinue();
       }
 
       void Awake()

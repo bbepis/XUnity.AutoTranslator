@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -33,6 +34,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Gets a bool indicating if this game is running in a .NET 4.x runtime.
       /// </summary>
       public static bool SupportsNet4x { get; } = false;
+
+      /// <summary>
+      /// Gets a bool indicating if the WaitForSecondsRealtime class is supported.
+      /// </summary>
+      public static bool SupportsWaitForSecondsRealtime { get; } = false;
 
       static Features()
       {
@@ -83,6 +89,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
+            SupportsWaitForSecondsRealtime = ClrTypes.WaitForSecondsRealtime != null;
+         }
+         catch( Exception )
+         {
+
+         }
+
+         try
+         {
             TestReflectionEmit();
 
             SupportsReflectionEmit = true;
@@ -98,6 +113,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
          MethodToken t1 = default( MethodToken );
          MethodToken t2 = default( MethodToken );
          var ok = t1 == t2;
+      }
+
+      /// <summary>
+      /// Gets the WaitForSecondsRealtime CustomYieldInstruction if supported.
+      /// </summary>
+      /// <param name="delay"></param>
+      /// <returns></returns>
+      public static IEnumerator GetWaitForSecondsRealtime( float delay )
+      {
+         if( SupportsWaitForSecondsRealtime )
+         {
+            return GetWaitForSecondsRealtimeInternal( delay );
+         }
+         return null;
+      }
+
+      private static IEnumerator GetWaitForSecondsRealtimeInternal( float delay )
+      {
+         return new WaitForSecondsRealtime( delay );
       }
    }
 }
