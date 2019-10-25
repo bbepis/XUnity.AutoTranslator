@@ -363,12 +363,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public override bool Equals( object obj )
       {
-         return obj is UntranslatedText ut && TemplatedOriginal_Text == ut.TemplatedOriginal_Text;
+         return obj is UntranslatedText ut && TemplatedOriginal_Text_InternallyTrimmed == ut.TemplatedOriginal_Text_InternallyTrimmed;
       }
 
       public override int GetHashCode()
       {
-         return TemplatedOriginal_Text.GetHashCode();
+         return TemplatedOriginal_Text_InternallyTrimmed.GetHashCode();
       }
    }
 }

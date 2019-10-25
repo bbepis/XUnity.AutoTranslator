@@ -1,4 +1,7 @@
-﻿### 4.6.0
+﻿### 4.6.1
+ * BUG FIX - Fixed a bug where in some situations a line may be sent for translation twice due to whitespace differences
+
+### 4.6.0
  * FEATURE - Support for ZIP files in redirected resource directory
  * BUG FIX - Fixed bug where you somtimes had to close dialogues before translations would appear
  * BUG FIX - Fixed bug where plugin would not function if a game is launched through a custom launcher not located in the game directory
