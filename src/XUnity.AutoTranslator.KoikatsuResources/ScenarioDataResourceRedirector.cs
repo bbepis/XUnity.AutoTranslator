@@ -40,6 +40,13 @@ namespace KoikatsuTextResourceRedirector
                   if( !string.IsNullOrEmpty( key ) && LanguageHelper.IsTranslatable( key ) )
                   {
                      cache.AddTranslationToCache( key, key );
+                     //AutoTranslator.Default.TranslateAsync( key, result =>
+                     //{
+                     //   if( result.Succeeded )
+                     //   {
+                     //      cache.AddTranslationToCache( key, result.TranslatedText );
+                     //   }
+                     //} );
                   }
                }
             }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using SimpleJSON;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
@@ -20,6 +22,7 @@ namespace BaiduTranslate
 
       private string _appId;
       private string _appSecret;
+      private float _delay;
 
       public override string Id => "BaiduTranslate";
 
@@ -29,12 +32,21 @@ namespace BaiduTranslate
       {
          _appId = context.GetOrCreateSetting( "Baidu", "BaiduAppId", "" );
          _appSecret = context.GetOrCreateSetting( "Baidu", "BaiduAppSecret", "" );
+         _delay = context.GetOrCreateSetting( "Baidu", "DelaySeconds", 1.0f );
          if( string.IsNullOrEmpty( _appId ) ) throw new EndpointInitializationException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
          if( string.IsNullOrEmpty( _appSecret ) ) throw new EndpointInitializationException( "The BaiduTranslate endpoint requires an App Secret which has not been provided." );
 
          context.DisableCertificateChecksFor( "api.fanyi.baidu.com" );
 
          // frankly, I have no idea what languages this does, or does not support...
+      }
+
+      public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
+      {
+         if( _delay > 0 )
+         {
+            yield return new WaitForSeconds( _delay );
+         }
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
