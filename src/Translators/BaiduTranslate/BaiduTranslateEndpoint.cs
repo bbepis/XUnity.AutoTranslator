@@ -23,6 +23,7 @@ namespace BaiduTranslate
       private string _appId;
       private string _appSecret;
       private float _delay;
+      private float _lastRequestTimestamp;
 
       public override string Id => "BaiduTranslate";
 
@@ -43,10 +44,28 @@ namespace BaiduTranslate
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
       {
-         if( _delay > 0 )
+         var timeSinceLast = Time.realtimeSinceStartup - _lastRequestTimestamp;
+         if( timeSinceLast < 1.0f )
          {
-            yield return new WaitForSeconds( _delay );
+            var delay = 1.0f - timeSinceLast;
+
+            var instruction = Features.GetWaitForSecondsRealtime( delay );
+            if( instruction != null )
+            {
+               yield return instruction;
+            }
+            else
+            {
+               float start = Time.realtimeSinceStartup;
+               var end = start + delay;
+               while( Time.realtimeSinceStartup < end )
+               {
+                  yield return null;
+               }
+            }
          }
+
+         _lastRequestTimestamp = Time.realtimeSinceStartup;
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
@@ -77,7 +96,7 @@ namespace BaiduTranslate
          {
             return;
          }
-         
+
          var obj = JSON.Parse( data );
          var lineBuilder = new StringBuilder( data.Length );
 
@@ -102,7 +121,7 @@ namespace BaiduTranslate
          byte[] hashBytes = HashMD5.ComputeHash( inputBytes );
 
          StringBuilder sb = new StringBuilder();
-         for( int i = 0 ; i < hashBytes.Length ; i++ )
+         for( int i = 0; i < hashBytes.Length; i++ )
          {
             sb.Append( hashBytes[ i ].ToString( "X2" ) );
          }

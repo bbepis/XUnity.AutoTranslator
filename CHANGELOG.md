@@ -1,4 +1,8 @@
-﻿### 4.6.1
+﻿### 4.6.2
+ * BUG FIX - Fixed a bug where redirected resources could not be located under certain circumstances
+ * BUG FIX - Added throttling logic to Baidu translate to ensure the plugin never exceeds one query per second
+
+### 4.6.1
  * BUG FIX - Fixed a bug where in some situations a line may be sent for translation twice due to whitespace differences
 
 ### 4.6.0

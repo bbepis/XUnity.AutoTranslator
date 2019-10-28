@@ -71,9 +71,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
             {
-               path = Path.Combine( _loweredCurrentDirectory, path )
-                  .MakeRelativePath( _root );
+               path = Path.Combine( _loweredCurrentDirectory, path );
             }
+            path = path.MakeRelativePath( _root );
 
             var entries = _rootZipDir.GetEntries( path, null, true )
                .OrderBy( x => x.IsZipped )
@@ -110,9 +110,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
             {
-               path = Path.Combine( _loweredCurrentDirectory, path )
-                  .MakeRelativePath( _root );
+               path = Path.Combine( _loweredCurrentDirectory, path );
             }
+            path = path.MakeRelativePath( _root );
 
             var entries = _rootZipDir.GetEntries( path, null, false )
                .OrderBy( x => x.IsZipped )
@@ -141,9 +141,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
             {
-               path = Path.Combine( _loweredCurrentDirectory, path )
-                  .MakeRelativePath( _root );
+               path = Path.Combine( _loweredCurrentDirectory, path );
             }
+            path = path.MakeRelativePath( _root );
 
             exists = _rootZipDir.DirectoryExists( path );
          }
@@ -159,9 +159,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
             {
-               path = Path.Combine( _loweredCurrentDirectory, path )
-                  .MakeRelativePath( _root );
+               path = Path.Combine( _loweredCurrentDirectory, path );
             }
+            path = path.MakeRelativePath( _root );
 
             exists = _rootZipDir.FileExists( path );
          }
