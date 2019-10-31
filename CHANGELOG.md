@@ -1,4 +1,7 @@
-﻿### 4.6.2
+﻿### 4.6.3
+ * MISC - Disable all translator endpoints if output language is the same as the source language
+
+### 4.6.2
  * BUG FIX - Fixed a bug where redirected resources could not be located under certain circumstances
  * BUG FIX - Added throttling logic to Baidu translate to ensure the plugin never exceeds one query per second
 

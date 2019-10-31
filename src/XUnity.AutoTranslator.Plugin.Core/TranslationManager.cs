@@ -101,15 +101,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void CreateEndpoints( GameObject go, InitializationContext context )
       {
-         var pluginFolder = Path.Combine( PluginEnvironment.Current.PluginPath, Settings.TranslatorsFolder );
-         var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
-
-         // add built-in endpoint
-         dynamicTypes.Add( typeof( PassthroughTranslateEndpoint ) );
-
-         foreach( var type in dynamicTypes )
+         if( Settings.FromLanguage != Settings.Language )
          {
-            AddEndpoint( go, context, type );
+            var pluginFolder = Path.Combine( PluginEnvironment.Current.PluginPath, Settings.TranslatorsFolder );
+            var dynamicTypes = AssemblyLoader.GetAllTypesOf<ITranslateEndpoint>( pluginFolder );
+
+            // add built-in endpoint
+            dynamicTypes.Add( typeof( PassthroughTranslateEndpoint ) );
+
+            foreach( var type in dynamicTypes )
+            {
+               AddEndpoint( go, context, type );
+            }
+         }
+         else
+         {
+            XuaLogger.AutoTranslator.Warn( "AutoTranslator has been configured to use same destination language as source language. All translators will be disabled!" );
          }
       }
 
