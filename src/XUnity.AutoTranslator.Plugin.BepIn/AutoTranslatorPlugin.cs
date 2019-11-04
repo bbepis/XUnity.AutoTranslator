@@ -20,7 +20,8 @@ namespace XUnity.AutoTranslator.Plugin.BepIn
 
       public AutoTranslatorPlugin()
       {
-         _dataPath = "BepInEx";
+         // BepInEx 4.x paths cannot be trusted!
+         _dataPath = Path.Combine( Common.Constants.Paths.GameRoot, "BepInEx" );
          _configPath = Path.Combine( _dataPath, "AutoTranslatorConfig.ini" );
          //XuaLogger.Current = new BepInLogger();
       }

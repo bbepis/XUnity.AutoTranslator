@@ -1,4 +1,8 @@
-﻿### 4.6.3
+﻿### 4.6.4
+ * BUG FIX - Fixed bug where the OutputFile was not always loaded with lowest priority during initialization
+ * BUG FIX - Fixed a bug where redirected resources could not be located under certain circumstances (again)
+
+### 4.6.3
  * MISC - Disable all translator endpoints if output language is the same as the source language
 
 ### 4.6.2

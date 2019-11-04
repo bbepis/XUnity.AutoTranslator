@@ -21,6 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
       public UnzippedDirectory( string root, bool cacheNormalFiles )
       {
+         _cacheNormalFiles = cacheNormalFiles;
          _zipFiles = new List<ZipFile>();
 
          Directory.CreateDirectory( root );
@@ -33,9 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             _root = Path.Combine( _loweredCurrentDirectory, root.ToLowerInvariant() );
          }
-
          Initialize();
-         _cacheNormalFiles = cacheNormalFiles;
       }
 
       public IEnumerable<RedirectedResource> GetFiles( string path, params string[] extensions )
@@ -44,23 +43,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             if( Directory.Exists( path ) )
             {
-               if( extensions == null || extensions.Length == 0 )
+               var noExtensions = extensions == null || extensions.Length == 0;
+               var files = Directory.GetFiles( path, "*", SearchOption.TopDirectoryOnly );
+               foreach( var file in files )
                {
-                  var files = Directory.GetFiles( path, "*", SearchOption.TopDirectoryOnly );
-                  foreach( var file in files )
+                  if( noExtensions || extensions.Any( x => file.EndsWith( x, StringComparison.OrdinalIgnoreCase ) ) )
                   {
                      yield return new RedirectedResource( () => File.OpenRead( file ), null, file );
-                  }
-               }
-               else
-               {
-                  foreach( var extension in extensions )
-                  {
-                     var files = Directory.GetFiles( path, "*" + extension, SearchOption.TopDirectoryOnly );
-                     foreach( var file in files )
-                     {
-                        yield return new RedirectedResource( () => File.OpenRead( file ), null, file );
-                     }
                   }
                }
             }
@@ -118,7 +107,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                .OrderBy( x => x.IsZipped )
                .ThenBy( x => x.ContainerFile )
                .ThenBy( x => x.FullPath );
-            
+
             foreach( var entry in entries )
             {
                if( entry.IsZipped )
@@ -135,6 +124,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
       public bool DirectoryExists( string path )
       {
+         var originalPath = path;
+
          var exists = false;
          if( _rootZipDir != null )
          {
@@ -148,11 +139,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             exists = _rootZipDir.DirectoryExists( path );
          }
 
-         return exists || ( !_cacheNormalFiles && Directory.Exists( path ) );
+         return exists || ( !_cacheNormalFiles && Directory.Exists( originalPath ) );
       }
 
       public bool FileExists( string path )
       {
+         var originalPath = path;
+
          var exists = false;
          if( _rootZipDir != null )
          {
@@ -166,7 +159,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             exists = _rootZipDir.FileExists( path );
          }
 
-         return exists || ( !_cacheNormalFiles && File.Exists( path ) );
+         return exists || ( !_cacheNormalFiles && File.Exists( originalPath ) );
       }
 
       private void Initialize()
@@ -182,65 +175,64 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
             foreach( var file in files )
             {
-               if( !_cacheNormalFiles && !file.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+               var isZip = file.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase );
+
+               if( isZip || ( _cacheNormalFiles && !isZip ) )
                {
-                  // skip any files that are not .zip files if we do not cache them all
-                  continue;
-               }
+                  var current = _rootZipDir;
+                  var relativePath = file.ToLowerInvariant().MakeRelativePath( _root );
+                  var parts = relativePath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
 
-               var current = _rootZipDir;
-               var relativePath = file.ToLowerInvariant().MakeRelativePath( _root );
-               var parts = relativePath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
-
-               for( int i = 0; i < parts.Length; i++ )
-               {
-                  var part = parts[ i ];
-
-                  if( i == parts.Length - 1 )
+                  for( int i = 0; i < parts.Length; i++ )
                   {
-                     if( part.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+                     var part = parts[ i ];
+
+                     if( i == parts.Length - 1 )
                      {
-                        // this is the zip file, read the metadata!
-                        var start = current;
-
-                        var zf = new ZipFile( file );
-                        _zipFiles.Add( zf );
-
-                        foreach( ZipEntry entry in zf )
+                        if( part.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                         {
-                           current = start;
-                           var internalPath = entry.Name.Replace( '/', '\\' ).ToLowerInvariant();
-                           var internalParts = internalPath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
-                           for( int j = 0; j < internalParts.Length; j++ )
+                           // this is the zip file, read the metadata!
+                           var start = current;
+
+                           var zf = new ZipFile( file );
+                           _zipFiles.Add( zf );
+
+                           foreach( ZipEntry entry in zf )
                            {
-                              var internalPart = internalParts[ j ];
-                              if( j == internalParts.Length - 1 )
+                              current = start;
+                              var internalPath = entry.Name.Replace( '/', '\\' ).ToLowerInvariant();
+                              var internalParts = internalPath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
+                              for( int j = 0; j < internalParts.Length; j++ )
                               {
-                                 if( entry.IsFile )
+                                 var internalPart = internalParts[ j ];
+                                 if( j == internalParts.Length - 1 )
                                  {
-                                    current.AddFile( internalPart, new FileEntry( internalPath, file, zf, entry ) );
+                                    if( entry.IsFile )
+                                    {
+                                       current.AddFile( internalPart, new FileEntry( internalPath, file, zf, entry ) );
+                                    }
+                                    else
+                                    {
+                                       current = current.GetOrCreateChildPath( internalPart );
+                                    }
                                  }
                                  else
                                  {
                                     current = current.GetOrCreateChildPath( internalPart );
                                  }
                               }
-                              else
-                              {
-                                 current = current.GetOrCreateChildPath( internalPart );
-                              }
-                           }
 
+                           }
+                        }
+                        else
+                        {
+                           current.AddFile( part, new FileEntry( file ) );
                         }
                      }
                      else
                      {
-                        current.AddFile( part, new FileEntry( file ) );
+                        current = current.GetOrCreateChildPath( part );
                      }
-                  }
-                  else
-                  {
-                     current = current.GetOrCreateChildPath( part );
                   }
                }
             }

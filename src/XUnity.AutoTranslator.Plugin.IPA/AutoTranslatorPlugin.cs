@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.IPA
 
       public AutoTranslatorPlugin()
       {
-         _dataPath = "Plugins";
+         _dataPath = Path.Combine( Common.Constants.Paths.GameRoot, "Plugins" );
          _configPath = Path.Combine( _dataPath, "AutoTranslatorConfig.ini" );
       }
 

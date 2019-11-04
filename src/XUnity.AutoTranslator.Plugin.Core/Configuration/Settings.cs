@@ -219,7 +219,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             LogAllLoadedResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "LogAllLoadedResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
             CacheMetadataForAllFiles = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "CacheMetadataForAllFiles", true );
-
+            
             if( CacheMetadataForAllFiles && EnableDumping )
             {
                XuaLogger.AutoTranslator.Warn( "'EnableDumping' and 'CacheMetadataForAllOnStartup' cannot be enabled at the same time. Disabling 'CacheMetadataForAllOnStartup'..." );

@@ -59,7 +59,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return Directory.GetFiles( Settings.TranslationsPath, $"*", SearchOption.AllDirectories )
             .Where( x => x.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
             .Select( x => x.Replace( "/", "\\" ) )
-            .Where( x => !x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) );
+            .Where( x => !x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+            .Select( x => new FileInfo( x ).FullName );
       }
 
       internal void LoadTranslationFiles()
@@ -84,11 +85,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _scopedTranslations.Clear();
                Settings.Replacements.Clear();
 
-               var mainTranslationFile = Settings.AutoTranslationsFilePath;
-               var substitutionFile = Settings.SubstitutionFilePath;
+               var mainTranslationFile = new FileInfo( Settings.AutoTranslationsFilePath ).FullName;
+               var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
                LoadTranslationsInFile( substitutionFile, true, false );
                LoadTranslationsInFile( mainTranslationFile, false, true );
-               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile } ) )
+               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile }, StringComparer.OrdinalIgnoreCase ) )
                {
                   LoadTranslationsInFile( fullFileName, false, false );
                }
