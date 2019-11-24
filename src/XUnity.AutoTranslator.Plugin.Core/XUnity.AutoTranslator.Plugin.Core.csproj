@@ -7,7 +7,7 @@
     <PackageTags>unity;xunity;machine translation</PackageTags>
     <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TargetFramework>net35</TargetFramework>
     <Version>4.7.0</Version>
