@@ -1,4 +1,8 @@
-﻿### 4.6.4
+﻿### 4.7.0
+ * FEATURE - Text preprocessors that allows applying text replacements before a text is sent for translation
+ * MISC - Changed a lot of logging levels and changed SilentMode to default to true
+
+### 4.6.4
  * BUG FIX - Fixed bug where the OutputFile was not always loaded with lowest priority during initialization
  * BUG FIX - Fixed a bug where redirected resources could not be located under certain circumstances (again)
 

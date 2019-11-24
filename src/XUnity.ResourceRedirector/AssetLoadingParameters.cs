@@ -29,5 +29,10 @@ namespace XUnity.ResourceRedirector
       /// multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
       /// </summary>
       public AssetLoadType LoadType { get; }
+
+      internal AssetLoadedParameters ToAssetLoadedParameters()
+      {
+         return new AssetLoadedParameters( Name, Type, LoadType );
+      }
    }
 }

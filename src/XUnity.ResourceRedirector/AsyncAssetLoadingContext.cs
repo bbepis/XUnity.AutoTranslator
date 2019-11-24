@@ -14,9 +14,9 @@ namespace XUnity.ResourceRedirector
       private UnityEngine.Object[] _assets;
       private AssetBundleRequest _request;
 
-      internal AsyncAssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
+      internal AsyncAssetLoadingContext( AssetLoadingParameters parameters, AssetBundle bundle )
       {
-         Parameters = new AssetLoadingParameters( assetName, assetType, loadType );
+         Parameters = parameters;
          Bundle = bundle;
       }
 

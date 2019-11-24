@@ -270,14 +270,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          var removeInternalWhitespace = ( Settings.IgnoreWhitespaceInDialogue && job.Key.Original_Text.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && isNgui );
 
+         string text;
          if( removeInternalWhitespace )
          {
-            return job.Key.TemplatedOriginal_Text_FullyTrimmed;
+            text = job.Key.TemplatedOriginal_Text_FullyTrimmed;
          }
          else
          {
-            return job.Key.TemplatedOriginal_Text_ExternallyTrimmed;
+            text = job.Key.TemplatedOriginal_Text_ExternallyTrimmed;
          }
+
+         text = PreProcessUntranslatedText( text );
+
+         return text;
       }
 
       public void HandleNextBatch()
@@ -487,6 +492,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          }
 
          return translatedText;
+      }
+
+      private string PreProcessUntranslatedText( string text )
+      {
+         if( Settings.Preprocessors.Count == 0 ) return text;
+
+         foreach( var kvp in Settings.Preprocessors )
+         {
+            text = text.Replace( kvp.Key, kvp.Value );
+         }
+
+         return text;
       }
 
       private void OnTranslationFailed( TranslationJob[] jobs, string error, Exception e )

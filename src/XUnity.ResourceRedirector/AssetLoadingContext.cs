@@ -12,9 +12,9 @@ namespace XUnity.ResourceRedirector
       private AssetBundleExtensionData _ext;
       private bool _lookedForExt = false;
 
-      internal AssetLoadingContext( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle )
+      internal AssetLoadingContext( AssetLoadingParameters parameters, AssetBundle bundle )
       {
-         Parameters = new AssetLoadingParameters( assetName, assetType, loadType );
+         Parameters = parameters;
          Bundle = bundle;
       }
 

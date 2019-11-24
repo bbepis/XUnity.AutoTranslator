@@ -4,16 +4,19 @@ namespace XUnity.ResourceRedirector
 {
    internal class AsyncAssetBundleLoadInfo
    {
-      public AsyncAssetBundleLoadInfo( AssetBundle bundle, string path, AsyncAssetBundleLoadingResolve resolveType )
+      public AsyncAssetBundleLoadInfo( AssetBundleLoadingParameters parameters, AssetBundle bundle, bool skipAllPostfixes, AsyncAssetBundleLoadingResolve resolveType )
       {
+         Parameters = parameters;
          Bundle = bundle;
-         Path = path;
+         SkipAllPostfixes = skipAllPostfixes;
          ResolveType = resolveType;
       }
 
+      public AssetBundleLoadingParameters Parameters { get; }
+
       public AssetBundle Bundle { get; }
 
-      public string Path { get; }
+      public bool SkipAllPostfixes { get; }
 
       public AsyncAssetBundleLoadingResolve ResolveType { get; }
    }

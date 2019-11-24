@@ -1,7 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Title>XUnity AutoTranslator ExtProtocol</Title>
+    <Description>Package that contains a simple inter-process protocol format used in XUnity.</Description>
+    <Authors>gravydevsupreme</Authors>
+    <PackageTags>unity;xunity</PackageTags>
+    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/LICENSE</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TargetFramework>net35</TargetFramework>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

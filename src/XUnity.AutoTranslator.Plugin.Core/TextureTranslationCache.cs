@@ -50,7 +50,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                var endTime = Time.realtimeSinceStartup;
-               XuaLogger.AutoTranslator.Info( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.AutoTranslator.Debug( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             }
          }
          catch( Exception e )
@@ -101,7 +101,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( Settings.LoadUnmodifiedTextures || isModified )
                {
                   RegisterTranslatedImage( key, data );
-                  XuaLogger.AutoTranslator.Debug( $"Image loaded: {fullFileName}." );
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Image loaded: {fullFileName}." );
                }
                else
                {

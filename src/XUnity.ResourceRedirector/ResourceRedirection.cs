@@ -35,10 +35,17 @@ namespace XUnity.ResourceRedirector
       private static readonly List<PrioritizedCallback<Delegate>> PrefixRedirectionsForAssetBundles = new List<PrioritizedCallback<Delegate>>();
       private static readonly List<PrioritizedCallback<Delegate>> PrefixRedirectionsForAsyncAssetBundles = new List<PrioritizedCallback<Delegate>>();
 
+      private static readonly List<PrioritizedCallback<Action<AssetBundleLoadedContext>>> PostfixRedirectionsForAssetBundles = new List<PrioritizedCallback<Action<AssetBundleLoadedContext>>>();
+
       private static Action<AssetBundleLoadingContext> _emulateAssetBundles;
       private static Action<AsyncAssetBundleLoadingContext> _emulateAssetBundlesAsync;
       private static Action<AssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmpty;
       private static Action<AsyncAssetBundleLoadingContext> _redirectionMissingAssetBundlesToEmptyAsync;
+
+      private static bool _enabledRandomizeCabIfConflict = false;
+      private static Action<AssetBundleLoadingContext> _enableCabRandomizationPrefix;
+      private static Action<AsyncAssetBundleLoadingContext> _enableCabRandomizationPrefixAsync;
+      private static Action<AssetBundleLoadedContext> _enableCabRandomizationPostfix;
 
       private static bool _initialized = false;
       private static bool _initializedSyncOverAsyncEnabled = false;
@@ -371,6 +378,127 @@ namespace XUnity.ResourceRedirector
       }
 
       /// <summary>
+      /// Enables CAB randomization of loaded asset bundles if a conflict is detected.
+      /// </summary>
+      /// <param name="priority">Priority of the hook.</param>
+      /// <param name="forceRandomizeWhenInMemory">Indicates whether to force all asset bundles already in memory to have their CAB randomized regardless of whether there is a conflict.</param>
+      public static void EnableRandomizeCabIfConflict( int priority, bool forceRandomizeWhenInMemory )
+      {
+         if( !_enabledRandomizeCabIfConflict )
+         {
+            _enabledRandomizeCabIfConflict = true;
+
+            if( forceRandomizeWhenInMemory )
+            {
+               _enableCabRandomizationPrefix = ctx => HandleCabRandomizePrefix( ctx );
+               _enableCabRandomizationPrefixAsync = ctx => HandleCabRandomizePrefix( ctx );
+
+               RegisterAssetBundleLoadingHook( priority, _enableCabRandomizationPrefix );
+               RegisterAsyncAssetBundleLoadingHook( priority, _enableCabRandomizationPrefixAsync );
+            }
+
+            _enableCabRandomizationPostfix = ctx => HandleCabRandomizePostfix( ctx );
+
+            RegisterAssetBundleLoadedHook( priority, _enableCabRandomizationPostfix );
+
+            // define base callback
+            void HandleCabRandomizePrefix( IAssetBundleLoadingContext context )
+            {
+               if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromMemory )
+               {
+                  CabHelper.RandomizeCabWithAnyLength( context.Parameters.Binary );
+
+                  // NOTE: Since we let the original call handle the invokation, we do not complete at all
+               }
+            }
+
+            void HandleCabRandomizePostfix( AssetBundleLoadedContext context )
+            {
+               if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromFile )
+               {
+                  // we did not load any bundle, but the file exists, lets try from in-memory!
+                  if( context.Bundle == null && File.Exists( context.Parameters.Path ) )
+                  {
+                     XuaLogger.ResourceRedirector.Warn( $"The asset bundle '{context.Parameters.Path}' could not be loaded likely due to conflicting CAB-string. Retrying in-memory with randomized CAB-string." );
+
+                     byte[] buffer;
+                     using( var stream = new FileStream( context.Parameters.Path, FileMode.Open, FileAccess.Read ) )
+                     {
+                        var fullLength = stream.Length;
+                        var offset = (long)context.Parameters.Offset;
+                        var lengthToRead = fullLength - offset;
+                        stream.Seek( offset, SeekOrigin.Begin );
+                        buffer = stream.ReadFully( (int)lengthToRead );
+                     }
+
+                     // only need to randomize in case we are not forcing the randomization due to recursion
+                     if( !forceRandomizeWhenInMemory )
+                     {
+                        CabHelper.RandomizeCabWithAnyLength( buffer );
+                     }
+
+                     var bundle = AssetBundle.LoadFromMemory( buffer, 0 ); // dont pass crc, since we modified the bundle!
+                     if( bundle != null )
+                     {
+                        context.Bundle = bundle;
+                        context.Complete(
+                           skipRemainingPostfixes: true );
+                     }
+                  }
+               }
+               else if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromMemory )
+               {
+                  if( context.Bundle == null && !forceRandomizeWhenInMemory )
+                  {
+                     var name = AssetBundleHelper.PathForLoadedInMemoryBundle ?? "Unnamed";
+
+                     XuaLogger.ResourceRedirector.Warn( $"Could not load an in-memory asset bundle ({name}) likely due to conflicting CAB-string. Retrying with randomized CAB-string." );
+
+                     CabHelper.RandomizeCabWithAnyLength( context.Parameters.Binary );
+
+                     var bundle = AssetBundle.LoadFromMemory( context.Parameters.Binary, 0 ); // dont pass crc, since we modified the bundle!
+                     if( bundle != null )
+                     {
+                        context.Bundle = bundle;
+                        context.Complete(
+                           skipRemainingPostfixes: true );
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Disables CAB randomization if it was previously enabled.
+      /// </summary>
+      public static void DisableRandomizeCabIfConflict()
+      {
+         if( _enabledRandomizeCabIfConflict )
+         {
+            _enabledRandomizeCabIfConflict = false;
+
+            if( _enableCabRandomizationPrefix != null )
+            {
+               UnregisterAssetBundleLoadingHook( _enableCabRandomizationPrefix );
+               _enableCabRandomizationPrefix = null;
+            }
+
+            if( _enableCabRandomizationPrefixAsync != null )
+            {
+               UnregisterAsyncAssetBundleLoadingHook( _enableCabRandomizationPrefixAsync );
+               _enableCabRandomizationPrefixAsync = null;
+            }
+
+            if( _enableCabRandomizationPostfix != null )
+            {
+               UnregisterAssetBundleLoadedHook( _enableCabRandomizationPostfix );
+               _enableCabRandomizationPostfix = null;
+            }
+         }
+      }
+
+      /// <summary>
       /// Disable a previously enabled redirect missing asset bundles to empty asset bundle.
       /// </summary>
       public static void DisableRedirectMissingAssetBundlesToEmptyAssetBundle()
@@ -420,9 +548,9 @@ namespace XUnity.ResourceRedirector
             );
       }
 
-      internal static AssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundle bundle )
+      internal static AssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( AssetBundleLoadingParameters parameters, out AssetBundle bundle )
       {
-         var context = new AssetBundleLoadingContext( path, crc, offset, loadType );
+         var context = new AssetBundleLoadingContext( parameters );
 
          if( _isFiringAssetBundle && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
          {
@@ -485,9 +613,62 @@ namespace XUnity.ResourceRedirector
          return context;
       }
 
-      internal static AsyncAssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( string path, uint crc, ulong offset, AssetBundleLoadType loadType, out AssetBundleCreateRequest request )
+      internal static AssetBundleLoadedContext Hook_AssetBundleLoaded_Postfix( AssetBundleLoadingParameters parameters, ref AssetBundle bundle )
       {
-         var context = new AsyncAssetBundleLoadingContext( path, crc, offset, loadType );
+         var context = new AssetBundleLoadedContext( parameters, bundle );
+
+         if( _isFiringAssetBundle && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
+         {
+            bundle = null;
+            return context;
+         }
+
+         try
+         {
+            _isFiringAssetBundle = true;
+
+            var list2 = PostfixRedirectionsForAssetBundles;
+            var len2 = list2.Count;
+            for( int i = 0; i < len2; i++ )
+            {
+               var redirection = list2[ i ];
+               if( !redirection.IsBeingCalled )
+               {
+                  try
+                  {
+                     redirection.IsBeingCalled = true;
+                     redirection.Callback( context );
+
+                     if( context.SkipRemainingPostfixes ) break;
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.ResourceRedirector.Error( ex, "An error occurred while invoking AssetBundleLoaded event." );
+                  }
+                  finally
+                  {
+                     RecursionEnabled = true;
+                     redirection.IsBeingCalled = false;
+                  }
+               }
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.ResourceRedirector.Error( e, "An error occurred while invoking AssetBundleLoaded event." );
+         }
+         finally
+         {
+            _isFiringAssetBundle = false;
+         }
+
+         bundle = context.Bundle;
+         return context;
+      }
+
+      internal static AsyncAssetBundleLoadingContext Hook_AssetBundleLoading_Prefix( AssetBundleLoadingParameters parameters, out AssetBundleCreateRequest request )
+      {
+         var context = new AsyncAssetBundleLoadingContext( parameters );
 
          if( _isFiringAssetBundle && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
          {
@@ -575,18 +756,35 @@ namespace XUnity.ResourceRedirector
             if( request != null )
             {
                AssetBundleCreateRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo(
+                  context.Parameters,
                   context.Bundle,
-                  context.Parameters.Path,
+                  context.SkipAllPostfixes,
                   context.ResolveType );
             }
          }
       }
 
-      internal static AssetLoadingContext Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, ref UnityEngine.Object asset )
+      internal static void Hook_AssetLoading_Postfix( AsyncAssetLoadingContext context, AssetBundleRequest request )
+      {
+         lock( Sync )
+         {
+            if( request != null )
+            {
+               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetLoadInfo(
+                  context.Parameters,
+                  context.Bundle,
+                  context.SkipAllPostfixes,
+                  context.ResolveType,
+                  context.Assets );
+            }
+         }
+      }
+
+      internal static AssetLoadingContext Hook_AssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle parentBundle, ref UnityEngine.Object asset )
       {
          UnityEngine.Object[] arr = null;
 
-         var intention = Hook_AssetLoading_Prefix( assetName, assetType, loadType, parentBundle, ref arr );
+         var intention = Hook_AssetLoading_Prefix( parameters, parentBundle, ref arr );
 
          if( arr == null || arr.Length == 0 )
          {
@@ -605,9 +803,9 @@ namespace XUnity.ResourceRedirector
          return intention;
       }
 
-      internal static AssetLoadingContext Hook_AssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref UnityEngine.Object[] assets )
+      internal static AssetLoadingContext Hook_AssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnityEngine.Object[] assets )
       {
-         var context = new AssetLoadingContext( assetName, assetType, loadType, bundle );
+         var context = new AssetLoadingContext( parameters, bundle );
          try
          {
             if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
@@ -665,9 +863,9 @@ namespace XUnity.ResourceRedirector
          return context;
       }
 
-      internal static AsyncAssetLoadingContext Hook_AsyncAssetLoading_Prefix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, ref AssetBundleRequest request )
+      internal static AsyncAssetLoadingContext Hook_AsyncAssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle bundle, ref AssetBundleRequest request )
       {
-         var context = new AsyncAssetLoadingContext( assetName, assetType, loadType, bundle );
+         var context = new AsyncAssetLoadingContext( parameters, bundle );
          try
          {
             if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
@@ -742,7 +940,7 @@ namespace XUnity.ResourceRedirector
          return context;
       }
 
-      internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle parentBundle, AssetBundleRequest request, ref UnityEngine.Object asset )
+      internal static void Hook_AssetLoaded_Postfix( AssetLoadingParameters parameters, AssetBundle parentBundle, ref UnityEngine.Object asset )
       {
          UnityEngine.Object[] arr;
          if( asset == null )
@@ -754,7 +952,7 @@ namespace XUnity.ResourceRedirector
             arr = new[] { asset };
          }
 
-         Hook_AssetLoaded_Postfix( assetName, assetType, loadType, parentBundle, request, ref arr );
+         Hook_AssetLoaded_Postfix( parameters, parentBundle, ref arr );
 
          if( arr == null || arr.Length == 0 )
          {
@@ -771,51 +969,12 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_AssetLoaded_Postfix( string assetName, Type assetType, AssetLoadType loadType, AssetBundle bundle, AssetBundleRequest request, ref UnityEngine.Object[] assets )
+      internal static void Hook_AssetLoaded_Postfix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnityEngine.Object[] assets )
       {
-         lock( Sync )
-         {
-            if( bundle == null )
-            {
-               if( !AssetBundleRequestToAssetBundle.TryGetValue( request, out var loadInfo ) )
-               {
-                  XuaLogger.ResourceRedirector.Error( "Could not find asset bundle from request object!" );
-                  return;
-               }
-               else
-               {
-                  bundle = loadInfo.Bundle;
-                  assetName = loadInfo.AssetName;
-                  assetType = loadInfo.AssetType;
-                  loadType = loadInfo.LoadType;
-               }
-            }
-         }
-
-         FireAssetLoadedEvent( assetName, assetType, bundle, loadType, ref assets );
+         FireAssetLoadedEvent( parameters.ToAssetLoadedParameters(), bundle, ref assets );
       }
 
-      internal static void Hook_AssetLoading_Postfix( AsyncAssetLoadingContext context, AssetBundleRequest request )
-      {
-         lock( Sync )
-         {
-            if( request != null )
-            {
-               var p = context.Parameters;
-
-               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetLoadInfo(
-                  p.Name,
-                  p.Type,
-                  p.LoadType,
-                  context.Bundle,
-                  context.SkipAllPostfixes,
-                  context.ResolveType,
-                  context.Assets );
-            }
-         }
-      }
-
-      internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object asset )
+      internal static void Hook_ResourceLoaded_Postfix( ResourceLoadedParameters parameters, ref UnityEngine.Object asset )
       {
          UnityEngine.Object[] arr;
          if( asset == null )
@@ -827,7 +986,7 @@ namespace XUnity.ResourceRedirector
             arr = new[] { asset };
          }
 
-         Hook_ResourceLoaded_Postfix( assetPath, assetType, loadType, ref arr );
+         Hook_ResourceLoaded_Postfix( parameters, ref arr );
 
          if( arr == null || arr.Length == 0 )
          {
@@ -844,17 +1003,17 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void Hook_ResourceLoaded_Postfix( string assetPath, Type assetType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
+      internal static void Hook_ResourceLoaded_Postfix( ResourceLoadedParameters parameters, ref UnityEngine.Object[] assets )
       {
-         FireResourceLoadedEvent( assetPath, assetType, loadType, ref assets );
+         FireResourceLoadedEvent( parameters, ref assets );
       }
 
-      internal static void FireAssetLoadedEvent( string assetLoadName, Type assetLoadType, AssetBundle assetBundle, AssetLoadType loadType, ref UnityEngine.Object[] assets )
+      internal static void FireAssetLoadedEvent( AssetLoadedParameters parameters, AssetBundle assetBundle, ref UnityEngine.Object[] assets )
       {
          var originalAssets = assets?.ToArray();
          try
          {
-            var contextPerCall = new AssetLoadedContext( assetLoadName, assetLoadType, loadType, assetBundle, assets );
+            var contextPerCall = new AssetLoadedContext( parameters, assetBundle, assets );
 
             if( _isFiringAsset && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
             {
@@ -871,7 +1030,7 @@ namespace XUnity.ResourceRedirector
                   if( asset != null )
                   {
                      var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
                   }
                }
             }
@@ -913,7 +1072,7 @@ namespace XUnity.ResourceRedirector
                   var asset = new[] { assets[ j ] };
                   if( asset != null )
                   {
-                     var contextPerResource = new AssetLoadedContext( assetLoadName, assetLoadType, loadType, assetBundle, asset );
+                     var contextPerResource = new AssetLoadedContext( parameters, assetBundle, asset );
 
                      var list2 = PostfixRedirectionsForAssetsPerResource;
                      var len2 = list2.Count;
@@ -976,12 +1135,12 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      internal static void FireResourceLoadedEvent( string resourceLoadPath, Type resourceLoadType, ResourceLoadType loadType, ref UnityEngine.Object[] assets )
+      internal static void FireResourceLoadedEvent( ResourceLoadedParameters parameters, ref UnityEngine.Object[] assets )
       {
          var originalAssets = assets?.ToArray();
          try
          {
-            var contextPerCall = new ResourceLoadedContext( resourceLoadPath, resourceLoadType, loadType, assets );
+            var contextPerCall = new ResourceLoadedContext( parameters, assets );
 
             if( _isFiringResource && ( _isRecursionDisabledPermanently || !RecursionEnabled ) )
             {
@@ -998,7 +1157,7 @@ namespace XUnity.ResourceRedirector
                   if( asset != null )
                   {
                      var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{loadType.ToString()}', Unique Path: ({uniquePath})." );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
                   }
                }
             }
@@ -1040,7 +1199,7 @@ namespace XUnity.ResourceRedirector
                   var asset = new[] { assets[ j ] };
                   if( asset != null )
                   {
-                     var contextPerResource = new ResourceLoadedContext( resourceLoadPath, resourceLoadType, loadType, asset );
+                     var contextPerResource = new ResourceLoadedContext( parameters, asset );
 
                      var list2 = PostfixRedirectionsForResourcesPerResource;
                      var len2 = list2.Count;
@@ -1122,6 +1281,47 @@ namespace XUnity.ResourceRedirector
          {
             XuaLogger.ResourceRedirector.Debug( redirection.ToString() );
          }
+      }
+
+      /// <summary>
+      /// Register an AssetBundleLoaded hook (postfix to loading an asset bundle).
+      /// </summary>
+      /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAssetBundleLoadedHook( int priority, Action<AssetBundleLoadedContext> action )
+      {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         var item = PrioritizedCallback.Create( action, priority );
+         if( PostfixRedirectionsForAssetBundles.Contains( item ) )
+         {
+            throw new ArgumentException( "This callback has already been registered.", "action" );
+         }
+
+         Initialize();
+
+         PostfixRedirectionsForAssetBundles.BinarySearchInsert( item );
+
+         LogEventRegistration( "AssetBundleLoaded", PostfixRedirectionsForAssetBundles );
+      }
+
+      /// <summary>
+      /// Register an AssetBundleLoaded hook (postfix to loading an asset bundle).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void RegisterAssetBundleLoadedHook( Action<AssetBundleLoadedContext> action ) => RegisterAssetBundleLoadedHook( CallbackPriority.Default, action );
+
+      /// <summary>
+      /// Unregister an AssetBundleLoaded hook (postfix to loading an asset bundle).
+      /// </summary>
+      /// <param name="action">The callback.</param>
+      public static void UnregisterAssetBundleLoadedHook( Action<AssetBundleLoadedContext> action )
+      {
+         if( action == null ) throw new ArgumentNullException( "action" );
+
+         PostfixRedirectionsForAssetBundles.RemoveAll( x => Equals( x.Callback, action ) );
+
+         LogEventUnregistration( "AssetBundleLoaded", PostfixRedirectionsForAssetBundles );
       }
 
       /// <summary>

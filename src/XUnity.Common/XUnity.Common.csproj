@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Title>XUnity Common</Title>
+    <Description>Common dependencies shared between XUnity Auto Translator and Resource Redirector.</Description>
+    <Authors>gravydevsupreme</Authors>
+    <PackageTags>unity;xunity</PackageTags>
+    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/LICENSE</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TargetFramework>net35</TargetFramework>
   </PropertyGroup>
 

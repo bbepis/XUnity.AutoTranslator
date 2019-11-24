@@ -84,18 +84,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _splitterRegexes.Clear();
                _scopedTranslations.Clear();
                Settings.Replacements.Clear();
+               Settings.Preprocessors.Clear();
 
                var mainTranslationFile = new FileInfo( Settings.AutoTranslationsFilePath ).FullName;
                var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
-               LoadTranslationsInFile( substitutionFile, true, false );
-               LoadTranslationsInFile( mainTranslationFile, false, true );
-               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile }, StringComparer.OrdinalIgnoreCase ) )
+               var preprocessorsFile = new FileInfo( Settings.PreprocessorsFilePath ).FullName;
+               LoadTranslationsInFile( substitutionFile, true, false, false );
+               LoadTranslationsInFile( preprocessorsFile, false, true, true );
+               LoadTranslationsInFile( mainTranslationFile, false, false, true );
+               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
                {
-                  LoadTranslationsInFile( fullFileName, false, false );
+                  LoadTranslationsInFile( fullFileName, false, false, false );
                }
             }
             var endTime = Time.realtimeSinceStartup;
-            XuaLogger.AutoTranslator.Info( $"Loaded translation text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            XuaLogger.AutoTranslator.Debug( $"Loaded translation text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
 
             // generate variations of created translations
             {
@@ -137,7 +140,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               XuaLogger.AutoTranslator.Info( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.AutoTranslator.Debug( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
                endTime = Time.realtimeSinceStartup;
             }
 
@@ -152,7 +155,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
 
-               XuaLogger.AutoTranslator.Info( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+               XuaLogger.AutoTranslator.Debug( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
                endTime = Time.realtimeSinceStartup;
             }
 
@@ -204,26 +207,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            XuaLogger.AutoTranslator.Info( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
+            XuaLogger.AutoTranslator.Debug( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             endTime = Time.realtimeSinceStartup;
 
-            XuaLogger.AutoTranslator.Info( $"Global translations generated: {_translations.Count}" );
-            XuaLogger.AutoTranslator.Info( $"Global regex translations generated: {_defaultRegexes.Count}" );
-            XuaLogger.AutoTranslator.Info( $"Global regex splitters generated: {_splitterRegexes.Count}" );
-            XuaLogger.AutoTranslator.Info( $"Global token translations generated: {_tokenTranslations.Count}" );
+            if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Global translations generated: {_translations.Count}" );
+            if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Global regex translations generated: {_defaultRegexes.Count}" );
+            if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Global regex splitters generated: {_splitterRegexes.Count}" );
+            if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Global token translations generated: {_tokenTranslations.Count}" );
             if( Settings.GeneratePartialTranslations )
             {
-               XuaLogger.AutoTranslator.Info( $"Global partial translations generated: {_partialTranslations.Count}" );
+               XuaLogger.AutoTranslator.Debug( $"Global partial translations generated: {_partialTranslations.Count}" );
             }
             foreach( var kvp in _scopedTranslations.OrderBy( x => x.Key ) )
             {
                var scope = kvp.Key;
                var dicts = kvp.Value;
 
-               XuaLogger.AutoTranslator.Info( $"Scene {scope} translations generated: {dicts.Translations.Count}" );
-               XuaLogger.AutoTranslator.Info( $"Scene {scope} regex translations generated: {dicts.DefaultRegexes.Count}" );
-               XuaLogger.AutoTranslator.Info( $"Scene {scope} regex splitter generated: {dicts.SplitterRegexes.Count}" );
-               XuaLogger.AutoTranslator.Info( $"Scene {scope} token translations generated: {dicts.TokenTranslations.Count}" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Scene {scope} translations generated: {dicts.Translations.Count}" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Scene {scope} regex translations generated: {dicts.DefaultRegexes.Count}" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Scene {scope} regex splitter generated: {dicts.SplitterRegexes.Count}" );
+               if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Scene {scope} token translations generated: {dicts.TokenTranslations.Count}" );
             }
          }
          catch( Exception e )
@@ -316,9 +319,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public bool IsVariable { get; set; }
       }
 
-      private void LoadTranslationsInStream( Stream stream, string fullFileName, bool isSubstitutionFile, bool isOutputFile )
+      private void LoadTranslationsInStream( Stream stream, string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile, bool isOutputFile )
       {
-         XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
+         if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
 
          var reader = new StreamReader( stream, Encoding.UTF8 );
          {
@@ -335,7 +338,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      context.Apply( directive );
 
-                     XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
                      continue;
                   }
                }
@@ -353,6 +356,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( isSubstitutionFile )
                         {
                            Settings.Replacements[ key ] = value;
+                        }
+                        else if( isPreprocessorFile )
+                        {
+                           Settings.Preprocessors[ key ] = value;
                         }
                         else
                         {
@@ -427,10 +434,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isOutputFile )
+      private void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile, bool isOutputFile )
       {
          var fileExists = File.Exists( fullFileName );
-         if( fileExists || isSubstitutionFile )
+         if( fileExists || isSubstitutionFile || isPreprocessorFile )
          {
             if( fileExists )
             {
@@ -445,18 +452,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
                            {
-                              LoadTranslationsInStream( zipInputStream, fullFileName + '\\' + entry.Name, isSubstitutionFile, isOutputFile );
+                              LoadTranslationsInStream( zipInputStream, fullFileName + '\\' + entry.Name, isSubstitutionFile, isPreprocessorFile, isOutputFile );
                            }
                         }
                      }
                   }
                   else
                   {
-                     LoadTranslationsInStream( stream, fullFileName, isSubstitutionFile, isOutputFile );
+                     LoadTranslationsInStream( stream, fullFileName, isSubstitutionFile, isPreprocessorFile, isOutputFile );
                   }
                }
             }
-            else if( isSubstitutionFile )
+            else if( isSubstitutionFile || isPreprocessorFile )
             {
                using( var stream = File.Create( fullFileName ) )
                {

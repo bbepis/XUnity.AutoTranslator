@@ -69,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( Settings.DisableCertificateValidation )
             {
-               XuaLogger.AutoTranslator.Info( $"Disabling certificate checks for endpoints because of configuration." );
+               XuaLogger.AutoTranslator.Debug( $"Disabling certificate checks for endpoints because of configuration." );
 
                ServicePointManager.ServerCertificateValidationCallback += ( a1, a2, a3, a4 ) => true;
             }
@@ -78,13 +78,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var callback = httpSecurity.GetCertificateValidationCheck();
                if( callback != null && !Features.SupportsNet4x )
                {
-                  XuaLogger.AutoTranslator.Info( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
+                  XuaLogger.AutoTranslator.Debug( $"Disabling certificate checks for endpoints because a .NET 3.x runtime is used." );
 
                   ServicePointManager.ServerCertificateValidationCallback += callback;
                }
                else
                {
-                  XuaLogger.AutoTranslator.Info( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
+                  XuaLogger.AutoTranslator.Debug( $"Not disabling certificate checks for endpoints because a .NET 4.x runtime is used." );
                }
             }
 

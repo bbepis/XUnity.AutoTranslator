@@ -346,15 +346,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
-            XuaLogger.AutoTranslator.Info( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
+            XuaLogger.AutoTranslator.Debug( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
             if( Features.SupportsSceneManager )
             {
                EnableSceneLoadScanInternal();
-               XuaLogger.AutoTranslator.Info( "SceneManager is supported in this version of Unity." );
+               XuaLogger.AutoTranslator.Debug( "SceneManager is supported in this version of Unity." );
             }
             else
             {
-               XuaLogger.AutoTranslator.Info( "SceneManager is not supported in this version of Unity. Falling back to OnLevelWasLoaded and Application level API." );
+               XuaLogger.AutoTranslator.Debug( "SceneManager is not supported in this version of Unity. Falling back to OnLevelWasLoaded and Application level API." );
             }
          }
          catch( Exception e )

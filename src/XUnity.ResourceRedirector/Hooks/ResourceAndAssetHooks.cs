@@ -21,8 +21,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          typeof( AssetBundle_LoadFromFileAsync_Hook ),
          typeof( AssetBundle_LoadFromFile_Hook ),
-         //typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
-         //typeof( AssetBundle_LoadFromMemory_Hook ), // Cannot be hooked! Missing path
+         typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
+         typeof( AssetBundle_LoadFromMemory_Hook ),
 
          typeof( AssetBundle_mainAsset_Hook ),
          typeof( AssetBundle_returnMainAsset_Hook ),
@@ -85,10 +85,10 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static AssetBundle MM_Detour( AssetBundleCreateRequest self )
       {
-         AssetBundle bundle;
-
          if( ResourceRedirection.TryGetAssetBundle( self, out var info ) )
          {
+            AssetBundle bundle;
+
             if( info.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
             {
                bundle = info.Bundle;
@@ -97,19 +97,28 @@ namespace XUnity.ResourceRedirector.Hooks
             {
                bundle = _original( self );
             }
+
+            if( !info.SkipAllPostfixes )
+            {
+               ResourceRedirection.Hook_AssetBundleLoaded_Postfix( info.Parameters, ref bundle );
+            }
+
+            if( bundle != null && info != null ) // should only be null if loaded through non-hooked methods
+            {
+               var path = info.Parameters.Path;
+               if( path != null )
+               {
+                  var ext = bundle.GetOrCreateExtensionData<AssetBundleExtensionData>();
+                  ext.Path = path;
+               }
+            }
+
+            return bundle;
          }
          else
          {
-            bundle = _original( self );
+            return _original( self );
          }
-
-         if( bundle != null && info != null && info.Path != null ) // should only be null if loaded through non-hooked methods
-         {
-            var ext = bundle.GetOrCreateExtensionData<AssetBundleExtensionData>();
-            ext.Path = info.Path;
-         }
-
-         return bundle;
       }
    }
 
@@ -201,7 +210,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, AssetBundleLoadType.LoadFromFile );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          if( !context.SkipOriginalCall )
          {
@@ -241,12 +251,18 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( path, crc, offset, AssetBundleLoadType.LoadFromFile, out result );
+         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, AssetBundleLoadType.LoadFromFile );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
          {
             result = _original( p.Path, p.Crc, p.Offset );
+         }
+
+         if( !context.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
          }
 
          if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
@@ -259,67 +275,122 @@ namespace XUnity.ResourceRedirector.Hooks
       }
    }
 
-   //internal static class AssetBundle_LoadFromMemoryAsync_Hook
-   //{
-   //   static bool Prepare( object instance )
-   //   {
-   //      return true;
-   //   }
 
-   //   static MethodBase TargetMethod( object instance )
-   //   {
-   //      return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
-   //   }
 
-   //   delegate AssetBundleCreateRequest OriginalMethod( string path, uint crc );
 
-   //   static OriginalMethod _original;
 
-   //   static void MM_Init( object detour )
-   //   {
-   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
-   //   }
 
-   //   static AssetBundleCreateRequest MM_Detour( byte[] binary, uint crc )
-   //   {
-   //      var result = _original( null, crc );
 
-   //      ResourceRedirectionManager.Hook_AssetBundleLoading_Postfix( null, result );
 
-   //      return result;
-   //   }
-   //}
 
-   //internal static class AssetBundle_LoadFromMemory_Hook
-   //{
-   //   static bool Prepare( object instance )
-   //   {
-   //      return true;
-   //   }
 
-   //   static MethodBase TargetMethod( object instance )
-   //   {
-   //      return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemory", typeof( byte[] ), typeof( uint ) );
-   //   }
 
-   //   delegate AssetBundle OriginalMethod( byte[] binary, uint crc );
 
-   //   static OriginalMethod _original;
 
-   //   static void MM_Init( object detour )
-   //   {
-   //      _original = detour.GenerateTrampolineEx<OriginalMethod>();
-   //   }
+   internal static class AssetBundle_LoadFromMemoryAsync_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
 
-   //   static AssetBundle MM_Detour( byte[] binary, uint crc )
-   //   {
-   //      var result = _original( binary, crc );
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemoryAsync_Internal", typeof( byte[] ), typeof( uint ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
+      }
 
-   //      ResourceRedirectionManager.Hook_AssetBundleLoaded_Postfix( null, result, null );
+      delegate AssetBundleCreateRequest OriginalMethod( byte[] binary, uint crc );
 
-   //      return result;
-   //   }
-   //}
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static AssetBundleCreateRequest MM_Detour( byte[] binary, uint crc )
+      {
+         AssetBundleCreateRequest result;
+
+         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, AssetBundleLoadType.LoadFromMemory );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
+
+         if( !context.SkipOriginalCall )
+         {
+            var p = context.Parameters;
+            result = _original( p.Binary, p.Crc );
+         }
+
+         ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
+
+         return result;
+      }
+   }
+
+   internal static class AssetBundle_LoadFromMemory_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemory_Internal", typeof( byte[] ), typeof( uint ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromMemory", typeof( byte[] ), typeof( uint ) );
+      }
+
+      delegate AssetBundle OriginalMethod( byte[] binary, uint crc );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static AssetBundle MM_Detour( byte[] binary, uint crc )
+      {
+         AssetBundle result;
+
+         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, AssetBundleLoadType.LoadFromMemory );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
+
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
+         {
+            result = _original( p.Binary, p.Crc );
+         }
+
+         if( !context.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
+         }
+
+         if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
+         {
+            var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
+            ext.Path = p.Path;
+         }
+
+         return result;
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    internal static class AssetBundle_mainAsset_Hook
@@ -348,7 +419,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
+         var parameters = new AssetLoadingParameters( null, null, AssetLoadType.LoadMainAsset );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
          if( !context.SkipOriginalCall )
          {
@@ -357,7 +429,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( !context.SkipAllPostfixes )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
+            ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
          }
 
          return result;
@@ -390,7 +462,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, null, AssetLoadType.LoadMainAsset, self, ref result );
+         var parameters = new AssetLoadingParameters( null, null, AssetLoadType.LoadMainAsset );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
          if( !context.SkipOriginalCall )
          {
@@ -399,7 +472,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( !context.SkipAllPostfixes )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, AssetLoadType.LoadMainAsset, self, null, ref result );
+            ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
          }
 
          return result;
@@ -431,7 +504,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
@@ -441,7 +515,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( !context.SkipAllPostfixes )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, null, ref result );
+            ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
          }
 
          return result;
@@ -473,7 +547,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleRequest result = null;
 
-         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
+         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, self, ref result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
@@ -512,7 +587,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object[] result = null;
 
-         var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+         var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
@@ -522,7 +598,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( !context.SkipAllPostfixes )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( null, p.Type, AssetLoadType.LoadByType, self, null, ref result );
+            ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
          }
 
          return result;
@@ -554,7 +630,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          UnityEngine.Object result = null;
 
-         var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
+         var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
@@ -564,7 +641,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( !context.SkipAllPostfixes )
          {
-            ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamed, self, null, ref result );
+            ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
          }
 
          return result;
@@ -596,7 +673,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleRequest result = null;
 
-         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamed, self, ref result );
+         var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
+         var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, self, ref result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
@@ -637,7 +715,8 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( name == string.Empty )
          {
-            var context = ResourceRedirection.Hook_AssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+            var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
+            var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
             var p = context.Parameters;
             if( !context.SkipOriginalCall )
@@ -647,12 +726,13 @@ namespace XUnity.ResourceRedirector.Hooks
 
             if( !context.SkipAllPostfixes )
             {
-               ResourceRedirection.Hook_AssetLoaded_Postfix( null, p.Type, AssetLoadType.LoadByType, self, null, ref result );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
             }
          }
          else
          {
-            var context = ResourceRedirection.Hook_AssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+            var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamedWithSubAssets );
+            var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, self, ref result );
 
             var p = context.Parameters;
             if( !context.SkipOriginalCall )
@@ -662,7 +742,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
             if( !context.SkipAllPostfixes )
             {
-               ResourceRedirection.Hook_AssetLoaded_Postfix( p.Name, p.Type, AssetLoadType.LoadNamedWithSubAssets, self, null, ref result );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, self, ref result );
             }
          }
 
@@ -697,7 +777,8 @@ namespace XUnity.ResourceRedirector.Hooks
 
          if( name == string.Empty )
          {
-            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( null, type, AssetLoadType.LoadByType, self, ref result );
+            var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
+            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, self, ref result );
 
             var p = context.Parameters;
             if( !context.SkipOriginalCall )
@@ -709,7 +790,8 @@ namespace XUnity.ResourceRedirector.Hooks
          }
          else
          {
-            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( name, type, AssetLoadType.LoadNamedWithSubAssets, self, ref result );
+            var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamedWithSubAssets );
+            var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, self, ref result );
 
             var p = context.Parameters;
             if( !context.SkipOriginalCall )
@@ -766,7 +848,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
             if( !info.SkipAllPostfixes )
             {
-               ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( info.Parameters, info.Bundle, ref result );
             }
 
             return result;
@@ -816,7 +898,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
             if( !info.SkipAllPostfixes )
             {
-               ResourceRedirection.Hook_AssetLoaded_Postfix( null, null, 0, null, self, ref result );
+               ResourceRedirection.Hook_AssetLoaded_Postfix( info.Parameters, info.Bundle, ref result );
             }
 
             return result;
@@ -884,7 +966,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirection.Hook_ResourceLoaded_Postfix( path, systemTypeInstance, ResourceLoadType.LoadNamed, ref result );
+         var parameters = new ResourceLoadedParameters( path, systemTypeInstance, ResourceLoadType.LoadNamed );
+         ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref result );
 
          return result;
       }
@@ -915,7 +998,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirection.Hook_ResourceLoaded_Postfix( path, systemTypeInstance, ResourceLoadType.LoadByType, ref result );
+         var parameters = new ResourceLoadedParameters( path, systemTypeInstance, ResourceLoadType.LoadByType );
+         ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref result );
 
          return result;
       }
@@ -946,7 +1030,8 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          var result = _original( path, systemTypeInstance );
 
-         ResourceRedirection.Hook_ResourceLoaded_Postfix( path, systemTypeInstance, ResourceLoadType.LoadNamedBuiltIn, ref result );
+         var parameters = new ResourceLoadedParameters( path, systemTypeInstance, ResourceLoadType.LoadNamedBuiltIn );
+         ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref result );
 
          return result;
       }

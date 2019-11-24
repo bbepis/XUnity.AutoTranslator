@@ -5,8 +5,9 @@
    /// </summary>
    public class AssetBundleLoadingParameters
    {
-      internal AssetBundleLoadingParameters( string path, uint crc, ulong offset, AssetBundleLoadType loadType )
+      internal AssetBundleLoadingParameters( byte[] data, string path, uint crc, ulong offset, AssetBundleLoadType loadType )
       {
+         Binary = data;
          Path = path;
          Crc = crc;
          Offset = offset;
@@ -19,7 +20,7 @@
       public string Path { get; set; }
 
       /// <summary>
-      /// Gets or sets the crc. Only relevant for 'LoadFromFile'.
+      /// Gets or sets the crc. Only relevant for 'LoadFromFile' and 'LoadFromMemory'.
       /// </summary>
       public uint Crc { get; set; }
 
@@ -27,6 +28,11 @@
       /// Gets or sets the offset. Only relevant for 'LoadFromFile'.
       /// </summary>
       public ulong Offset { get; set; }
+
+      /// <summary>
+      /// Gets or sets the binary data. Only relevant for 'LoadFromMemory'.
+      /// </summary>
+      public byte[] Binary { get; set; }
 
       /// <summary>
       /// Gets the type of call that is loading this asset bundle.

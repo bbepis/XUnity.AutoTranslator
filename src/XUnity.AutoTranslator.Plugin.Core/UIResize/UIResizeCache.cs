@@ -43,7 +43,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
             _root.Trim();
 
-            XuaLogger.AutoTranslator.Info( $"Loaded resize command text files." );
+            XuaLogger.AutoTranslator.Debug( $"Loaded resize command text files." );
 
          }
          catch( Exception e )
@@ -54,7 +54,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       private void LoadResizeCommandsInStream( Stream stream, string fullFileName )
       {
-         XuaLogger.AutoTranslator.Debug( $"Loading resize commands: {fullFileName}." );
+         if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Loading resize commands: {fullFileName}." );
 
          var reader = new StreamReader( stream, Encoding.UTF8 );
          {
@@ -70,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                   {
                      context.Apply( directive );
 
-                     XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
+                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
                      continue;
                   }
                }

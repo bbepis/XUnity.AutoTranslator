@@ -10,9 +10,9 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class ResourceLoadedContext : IAssetOrResourceLoadedContext
    {
-      internal ResourceLoadedContext( string assetPath, Type assetType, ResourceLoadType loadType, UnityEngine.Object[] assets )
+      internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnityEngine.Object[] assets )
       {
-         Parameters = new ResourceLoadedParameters( assetPath, assetType, loadType );
+         Parameters = parameters;
          Assets = assets;
       }
 

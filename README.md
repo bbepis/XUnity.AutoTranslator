@@ -449,6 +449,12 @@ If MonoMod hooks are not forced they are only used if available and a given meth
 > **Q: Why doesn't this plugin work in game X?**  
 A: If the plugin does not work in a game, you can try to set the following configuration parameter `DisableCertificateValidation=True`. If it still does not work, it likely uses a technique to display text that this plugin is not aware of. In that case you can make an issue and maybe it will get fixed in a later version.
 
+> **Q: How do I disable auto translations?**  
+A: Select the empty endpoint when you press ALT+0 or set the configuration parameter `Endpoint=` to empty.
+
+> **Q: How do I disable the plugin entirely?**  
+A: You can do so by deleting the "XUnity.AutoTranslator" directory in the "{GameDirectory}\BepInEx\plugins" directory. Avoid deleting the "XUnity.ResourceRedirector" directory as other plugins may depend on it.
+
 > **Q: The game stops working when this plugin applies translations.**  
 A: Try setting the following configuration parameter `TextGetterCompatibilityMode=True`.
 

@@ -105,7 +105,7 @@ namespace XUnity.Common.Utilities
                         hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
-                        XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
+                        XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
                      }
                      else
                      {
@@ -133,7 +133,7 @@ namespace XUnity.Common.Utilities
                            PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
                         }
 
-                        XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+                        XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
                      }
                      catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                      {
@@ -157,7 +157,7 @@ namespace XUnity.Common.Utilities
                               hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
-                              XuaLogger.Common.Info( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
+                              XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
                            }
                            else
                            {

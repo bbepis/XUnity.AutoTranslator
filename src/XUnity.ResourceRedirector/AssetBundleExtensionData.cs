@@ -10,6 +10,7 @@ namespace XUnity.ResourceRedirector
    internal class AssetBundleExtensionData
    {
       private string _normalizedPath;
+      private string _path;
 
       public string NormalizedPath
       {
@@ -23,6 +24,20 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      public string Path { get; set; }
+      public string Path
+      {
+         get
+         {
+            return _path;
+         }
+         set
+         {
+            if( _path != value )
+            {
+               _path = value;
+               _normalizedPath = null;
+            }
+         }
+      }
    }
 }

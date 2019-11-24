@@ -9,7 +9,11 @@
       /// Indicates that the asset bundle is being loaded through a call to 'LoadFromFile' or 'LoadFromFileAsync'.
       /// </summary>
       LoadFromFile = 1,
-      //LoadFromMemory,
+
+      /// <summary>
+      /// Indicates that the asset bundle is being loaded through a call to 'LoadFromMemory' or 'LoadFromMemoryAsync'.
+      /// </summary>
+      LoadFromMemory,
 
       // other places, online resource, etc.
    }
