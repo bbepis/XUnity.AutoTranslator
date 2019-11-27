@@ -27,9 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return ( _file ?? ( _file = ReloadConfig() ) ); ;
          }
       }
-
-      public string PluginPath => _dataFolder;
-
+      
       public string TranslationPath => _dataFolder;
 
       public string ConfigPath => _dataFolder;

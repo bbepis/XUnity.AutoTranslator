@@ -30,8 +30,6 @@ namespace XUnity.AutoTranslator.Setup
          var reiPath = Path.Combine( gamePath, "ReiPatcher" );
          var patchesPath = Path.Combine( reiPath, "Patches" );
          var autoTranslatorPath = Path.Combine( gamePath, "AutoTranslator" );
-         var translatorsPath = Path.Combine( autoTranslatorPath, "Translators" );
-         var fullNetPath = Path.Combine( translatorsPath, "FullNET" );
 
          // lets add any missing files
          AddFile( Path.Combine( reiPath, "ExIni.dll" ), Resources.ExIni );
@@ -42,21 +40,6 @@ namespace XUnity.AutoTranslator.Setup
          AddFile( Path.Combine( reiPath, "Mono.Cecil.Rocks.dll" ), Resources.Mono_Cecil_Rocks );
          AddFile( Path.Combine( reiPath, "ReiPatcher.exe" ), Resources.ReiPatcher );
          AddFile( Path.Combine( patchesPath, "XUnity.AutoTranslator.Patcher.dll" ), Resources.XUnity_AutoTranslator_Patcher, true );
-         AddFile( Path.Combine( translatorsPath, "BaiduTranslate.dll" ), Resources.BaiduTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "BingTranslate.dll" ), Resources.BingTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "BingLegitimateTranslate.dll" ), Resources.BingTranslateLegitimate, true );
-         AddFile( Path.Combine( translatorsPath, "CustomTranslate.dll" ), Resources.CustomTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "GoogleTranslate.dll" ), Resources.GoogleTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "GoogleTranslateLegitimate.dll" ), Resources.GoogleTranslateLegitimate, true );
-         AddFile( Path.Combine( translatorsPath, "LecPowerTranslator15.dll" ), Resources.LecPowerTranslator15, true );
-         AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.WatsonTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "YandexTranslate.dll" ), Resources.YandexTranslate, true );
-         AddFile( Path.Combine( translatorsPath, "PapagoTranslate.dll" ), Resources.PapagoTranslate, true );
-         AddFile( Path.Combine( fullNetPath, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
-         AddFile( Path.Combine( fullNetPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
-         AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.exe" ), Resources.Common_ExtProtocol, true );
-         AddFile( Path.Combine( fullNetPath, "Http.ExtProtocol.exe" ), Resources.Http_ExtProtocol, true );
-         AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.Executor.exe" ), Resources.Common_ExtProtocol_Executor, true );
 
          foreach( var launcher in launchers )
          {
@@ -71,6 +54,24 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "XUnity.ResourceRedirector.dll" ), Resources.XUnity_ResourceRedirector, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
+
+            var translatorsPath = Path.Combine( managedDir, "Translators" );
+            var fullNetPath = Path.Combine( translatorsPath, "FullNET" );
+            AddFile( Path.Combine( translatorsPath, "BaiduTranslate.dll" ), Resources.BaiduTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "BingTranslate.dll" ), Resources.BingTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "BingLegitimateTranslate.dll" ), Resources.BingTranslateLegitimate, true );
+            AddFile( Path.Combine( translatorsPath, "CustomTranslate.dll" ), Resources.CustomTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "GoogleTranslate.dll" ), Resources.GoogleTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "GoogleTranslateLegitimate.dll" ), Resources.GoogleTranslateLegitimate, true );
+            AddFile( Path.Combine( translatorsPath, "LecPowerTranslator15.dll" ), Resources.LecPowerTranslator15, true );
+            AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.WatsonTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "YandexTranslate.dll" ), Resources.YandexTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "PapagoTranslate.dll" ), Resources.PapagoTranslate, true );
+            AddFile( Path.Combine( fullNetPath, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.exe" ), Resources.Common_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Http.ExtProtocol.exe" ), Resources.Http_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.Executor.exe" ), Resources.Common_ExtProtocol_Executor, true );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );

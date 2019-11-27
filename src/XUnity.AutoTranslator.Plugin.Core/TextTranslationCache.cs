@@ -443,7 +443,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                using( var stream = File.OpenRead( fullFileName ) )
                {
-                  // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
                   if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                   {
                      using( var zipInputStream = new ZipInputStream( stream ) )
@@ -465,6 +464,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else if( isSubstitutionFile || isPreprocessorFile )
             {
+               var fi = new FileInfo( fullFileName );
+               Directory.CreateDirectory( fi.Directory.FullName );
+
                using( var stream = File.Create( fullFileName ) )
                {
                   stream.Write( new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3 ); // UTF-8 BOM

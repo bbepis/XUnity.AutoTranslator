@@ -1,4 +1,9 @@
-﻿### 4.7.0
+﻿### 4.7.1
+ * BUG FIX - Development-time fix to the nuget package
+ * BUG FIX - The 'Translators' directory must now be placed in the same directory that the XUnity.AutoTranslator.Plugin.Core.dll is placed in. This allows moving around the plugin as you see fit in BepInEx 5.0. For the ReiPatcher installer, the Translators are now found in the Managed directory of the game. For UnityInjector the Translators directory has been moved out of the Config directory
+ * BUG FIX - Minor bug fix where in some cases the plugin could not create the initial translation files on startup
+
+### 4.7.0
  * FEATURE - Text preprocessors that allows applying text replacements before a text is sent for translation
  * MISC - Changed a lot of logging levels and changed SilentMode to default to true
 

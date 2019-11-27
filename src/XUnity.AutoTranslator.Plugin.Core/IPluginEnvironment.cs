@@ -15,11 +15,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
    public interface IPluginEnvironment
    {
       /// <summary>
-      /// Gets the path the plugin is located at.
-      /// </summary>
-      string PluginPath { get; }
-
-      /// <summary>
       /// Gets or sets the path representing the root of the translations.
       /// </summary>
       string TranslationPath { get; }

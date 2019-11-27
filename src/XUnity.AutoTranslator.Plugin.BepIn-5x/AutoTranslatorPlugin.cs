@@ -19,7 +19,6 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
 
       public AutoTranslatorPlugin()
       {
-         PluginPath = Path.Combine( Paths.PluginPath, "XUnity.AutoTranslator" );
          ConfigPath = Paths.ConfigPath;
          TranslationPath = Paths.BepInExRootPath;
 
@@ -34,8 +33,6 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
             return ( _file ?? ( _file = ReloadConfig() ) );
          }
       }
-
-      public string PluginPath { get; }
 
       public string ConfigPath { get; }
 

@@ -32,8 +32,6 @@ namespace XUnity.AutoTranslator.Plugin.IPA
          }
       }
 
-      public string PluginPath => _dataPath;
-
       public string TranslationPath => _dataPath;
 
       public string ConfigPath => _dataPath;

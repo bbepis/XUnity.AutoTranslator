@@ -68,7 +68,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string OutputFile;
       public static string SubstitutionFile;
       public static string PreprocessorsFile;
-      //public static string PatternFile;
       public static string TranslationDirectory;
       public static int MaxCharactersPerTranslation;
       public static bool EnableConsole;
@@ -77,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string PreprocessorsFilePath;
       public static string TranslationsPath;
       public static string TexturesPath;
-      //public static string PatternFilePath;
+      public static string TranslatorsPath;
       public static bool EnableIMGUI;
       public static bool EnableUGUI;
       public static bool EnableNGUI;
@@ -146,6 +145,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       {
          try
          {
+            var fi = new FileInfo( typeof( TranslationManager ).Assembly.Location );
+            var di = fi.Directory;
+            TranslatorsPath = Path.Combine( di.FullName, TranslatorsFolder );
+
             ApplicationName = Path.GetFileNameWithoutExtension( ApplicationInformation.StartupPath );
 
             ServiceEndpoint = PluginEnvironment.Current.Preferences.GetOrDefault( "Service", "Endpoint", KnownTranslateEndpointNames.GoogleTranslate );

@@ -2,11 +2,12 @@
 
    <PropertyGroup>
       <TargetFramework>net35</TargetFramework>
-      <Version>4.7.0</Version>
+      <Version>4.7.1</Version>
    </PropertyGroup>
 
    <ItemGroup>
       <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+      <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
    </ItemGroup>
 
    <ItemGroup>

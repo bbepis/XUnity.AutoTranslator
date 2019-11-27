@@ -1,4 +1,6 @@
-﻿namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
+﻿using System;
+
+namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    /// <summary>
    /// Interface used in context of initializing a translator plugin.
@@ -8,7 +10,13 @@
       /// <summary>
       /// Gets the directory where the configuration file and translations are stored.
       /// </summary>
+      [Obsolete( "This property is not reliable.", true )]
       string PluginDirectory { get; }
+
+      /// <summary>
+      /// Gets the directory where the translators are placed in.
+      /// </summary>
+      string TranslatorDirectory { get; }
 
       /// <summary>
       /// Gets or creates the specified setting.

@@ -9,8 +9,14 @@
     <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DevelopmentDependency>True</DevelopmentDependency>
     <TargetFramework>net35</TargetFramework>
+    <Version>1.0.1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
