@@ -116,6 +116,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          else
          {
             XuaLogger.AutoTranslator.Warn( "AutoTranslator has been configured to use same destination language as source language. All translators will be disabled!" );
+
+            //// add built-in endpoint
+            //AddEndpoint( go, context, typeof( PassthroughTranslateEndpoint ) );
          }
       }
 

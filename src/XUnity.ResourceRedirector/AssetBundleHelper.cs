@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using UnityEngine;
+using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
@@ -95,7 +96,16 @@ namespace XUnity.ResourceRedirector
          var bundle = AssetBundle.LoadFromFile( path, crc, offset );
          if( bundle == null && ( !confirmFileExists || File.Exists( path ) ) )
          {
-            var buffer = File.ReadAllBytes( path );
+            byte[] buffer;
+            using( var stream = new FileStream( path, FileMode.Open, FileAccess.Read ) )
+            {
+               var fullLength = stream.Length;
+               var longOffset = (long)offset;
+               var lengthToRead = fullLength - longOffset;
+               stream.Seek( longOffset, SeekOrigin.Begin );
+               buffer = stream.ReadFully( (int)lengthToRead );
+            }
+
             CabHelper.RandomizeCabWithAnyLength( buffer );
 
             XuaLogger.ResourceRedirector.Warn( $"Randomized CAB for '{path}' in order to load it because another asset bundle already uses its CAB-string. You can ignore the previous error message, but this is likely caused by two mods incorrectly using the same CAB-string." );
