@@ -21,7 +21,7 @@ namespace XUnity.Common.Utilities
       /// <param name="type"></param>
       /// <param name="name"></param>
       /// <returns></returns>
-      public static CachedMethod CachedMethod( this Type type, string name )
+      public static CachedMethod CachedMethod( this Type type, string name, params Type[] types )
       {
          var key = new MemberLookupKey( type, name );
          if( !Methods.TryGetValue( key, out var cachedMember ) )
@@ -31,7 +31,14 @@ namespace XUnity.Common.Utilities
 
             while( method == null && currentType != null )
             {
-               method = currentType.GetMethod( name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
+               if( types == null || types.Length == 0 )
+               {
+                  method = currentType.GetMethod( name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
+               }
+               else
+               {
+                  method = currentType.GetMethod( name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, types, null );
+               }
                currentType = currentType.BaseType;
             }
 

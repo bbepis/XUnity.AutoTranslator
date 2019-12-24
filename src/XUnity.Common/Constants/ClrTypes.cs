@@ -14,6 +14,8 @@ namespace XUnity.Common.Constants
       public static readonly Type TMP_Text = FindType( "TMPro.TMP_Text" );
       public static readonly Type TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
       public static readonly Type TextMeshPro = FindType( "TMPro.TextMeshPro" );
+      public static readonly Type FontAsset = FindType( "TMPro.TMP_FontAsset" );
+      public static readonly Type AssetBundle = FindType( "UnityEngine.AssetBundle" );
 
       // NGUI
       public static readonly Type UILabel = FindType( "UILabel" );
@@ -117,6 +119,15 @@ namespace XUnity.Common.Constants
       public static class Font_Properties
       {
          public static CachedProperty FontSize = ClrTypes.Font?.CachedProperty( "fontSize" );
+      }
+
+      public static class AssetBundle_Methods
+      {
+         public static CachedMethod LoadAll = ClrTypes.AssetBundle?.CachedMethod( "LoadAll", typeof( Type ) );
+         public static CachedMethod LoadAllAssets = ClrTypes.AssetBundle?.CachedMethod( "LoadAllAssets", typeof( Type ) );
+
+         public static CachedMethod LoadFromFile = ClrTypes.AssetBundle?.CachedMethod( "LoadFromFile", typeof( string ) );
+         public static CachedMethod CreateFromFile = ClrTypes.AssetBundle?.CachedMethod( "CreateFromFile", typeof( string ) );
       }
 
       private static Type FindType( string name )

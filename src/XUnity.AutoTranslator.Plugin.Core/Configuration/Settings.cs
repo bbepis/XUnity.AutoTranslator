@@ -229,7 +229,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             
             if( CacheMetadataForAllFiles && EnableDumping )
             {
-               XuaLogger.AutoTranslator.Warn( "'EnableDumping' and 'CacheMetadataForAllOnStartup' cannot be enabled at the same time. Disabling 'CacheMetadataForAllOnStartup'..." );
+               XuaLogger.AutoTranslator.Warn( "'EnableDumping' and 'CacheMetadataForAllFiles' cannot be enabled at the same time. Disabling 'CacheMetadataForAllFiles'..." );
 
                CacheMetadataForAllFiles = false;
             }

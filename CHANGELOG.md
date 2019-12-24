@@ -1,4 +1,11 @@
-﻿### 4.7.1
+﻿### 4.8.0
+ * FEATURE - Changed the way TextMesh Pro fonts can be changed. Fonts can now be loaded through external asset bundles
+ * CHANGE - Removed BepInEx 4.x package to remove confusion about which package to download
+ * BUG FIX - Fixed a bug that could cause a crash in Unity games using a very old version of the engine
+ * BUG FIX - Fixed a bug where substitutions could sometimes cause texts not to be translated
+ * BUG FIX - Fixed a bug that could cause redirected resources not to be loaded if dumping was enabled
+
+### 4.7.1
  * BUG FIX - Development-time fix to the nuget package
  * BUG FIX - The 'Translators' directory must now be placed in the same directory that the XUnity.AutoTranslator.Plugin.Core.dll is placed in. This allows moving around the plugin as you see fit in BepInEx 5.0. For the ReiPatcher installer, the Translators are now found in the Managed directory of the game. For UnityInjector the Translators directory has been moved out of the Config directory
  * BUG FIX - Minor bug fix where in some cases the plugin could not create the initial translation files on startup

@@ -7,13 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0F9B38FC-4E5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core", "src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj", "{718A3B1D-A5E5-4223-AD53-45C60C874150}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BepIn", "src\XUnity.AutoTranslator.Plugin.BepIn\XUnity.AutoTranslator.Plugin.BepIn.csproj", "{5442ED94-2800-47A4-BBAC-C00FBA676D02}"
-	ProjectSection(ProjectDependencies) = postProject
-		{848D741E-A4F2-4680-AFD2-74C8723CE3C4} = {848D741E-A4F2-4680-AFD2-74C8723CE3C4}
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985} = {E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}
-		{1C574D77-FCC8-4249-8890-0B00EF092705} = {1C574D77-FCC8-4249-8890-0B00EF092705}
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.IPA", "src\XUnity.AutoTranslator.Plugin.IPA\XUnity.AutoTranslator.Plugin.IPA.csproj", "{C749698C-9E49-4CC3-8B45-62AE3AD0C938}"
 	ProjectSection(ProjectDependencies) = postProject
 		{848D741E-A4F2-4680-AFD2-74C8723CE3C4} = {848D741E-A4F2-4680-AFD2-74C8723CE3C4}
@@ -120,7 +113,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.BepIn", "src\XUnity.ResourceRedirector.BepIn\XUnity.ResourceRedirector.BepIn.csproj", "{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.TextureHashGenerator", "src\XUnity.TextureHashGenerator\XUnity.TextureHashGenerator.csproj", "{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.TextureHashGenerator", "src\XUnity.TextureHashGenerator\XUnity.TextureHashGenerator.csproj", "{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,14 +131,6 @@ Global
 		{718A3B1D-A5E5-4223-AD53-45C60C874150}.Release|Any CPU.Build.0 = Release|Any CPU
 		{718A3B1D-A5E5-4223-AD53-45C60C874150}.Release|x86.ActiveCfg = Release|Any CPU
 		{718A3B1D-A5E5-4223-AD53-45C60C874150}.Release|x86.Build.0 = Release|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Debug|x86.Build.0 = Debug|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Release|x86.ActiveCfg = Release|Any CPU
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02}.Release|x86.Build.0 = Release|Any CPU
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -440,7 +425,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
-		{5442ED94-2800-47A4-BBAC-C00FBA676D02} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{86BF1F46-44C1-4301-8314-6EC32F74575F} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}

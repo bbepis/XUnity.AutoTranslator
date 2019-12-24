@@ -18,6 +18,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          FullName = fullName;
       }
 
+      internal RedirectedResource( string fullName )
+      {
+         FullName = fullName;
+         _streamFactory = () => File.OpenRead( FullName );
+      }
+
       /// <summary>
       /// Gets a bool indicating if this redirected resource was zipped.
       /// </summary>

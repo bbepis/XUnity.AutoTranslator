@@ -49,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                {
                   if( noExtensions || extensions.Any( x => file.EndsWith( x, StringComparison.OrdinalIgnoreCase ) ) )
                   {
-                     yield return new RedirectedResource( () => File.OpenRead( file ), null, file );
+                     yield return new RedirectedResource( file );
                   }
                }
             }
@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                else
                {
-                  yield return new RedirectedResource( () => File.OpenRead( entry.FileName ), null, entry.FullPath );
+                  yield return new RedirectedResource( entry.FileName );
                }
             }
          }
@@ -90,7 +90,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             if( File.Exists( path ) )
             {
-               yield return new RedirectedResource( () => File.OpenRead( path ), null, path );
+               yield return new RedirectedResource( path );
             }
          }
 
@@ -116,7 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                else
                {
-                  yield return new RedirectedResource( () => File.OpenRead( entry.FileName ), null, entry.FullPath );
+                  yield return new RedirectedResource( entry.FileName );
                }
             }
          }

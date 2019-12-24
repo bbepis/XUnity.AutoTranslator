@@ -572,31 +572,38 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal void Hook_HandleComponent( object ui )
       {
-         if( _hasValidOverrideFont )
+         try
          {
-            var info = ui.GetOrCreateTextTranslationInfo();
-            if( _hasOverridenFont )
+            if( _hasValidOverrideFont )
             {
-               info?.ChangeFont( ui );
-            }
-            else
-            {
-               info?.UnchangeFont( ui );
-            }
-         }
-
-         if( Settings.ForceUIResizing )
-         {
-            var info = ui.GetOrCreateTextTranslationInfo();
-            if( info?.IsCurrentlySettingText == false )
-            {
-               // force UI resizing is highly problematic for NGUI because text should somehow
-               // be set after changing "resize" properties... brilliant stuff
-               if( ui.GetType() != ClrTypes.UILabel )
+               var info = ui.GetOrCreateTextTranslationInfo();
+               if( _hasOverridenFont )
                {
-                  info?.ResizeUI( ui, ResizeCache );
+                  info?.ChangeFont( ui );
+               }
+               else
+               {
+                  info?.UnchangeFont( ui );
                }
             }
+
+            if( Settings.ForceUIResizing )
+            {
+               var info = ui.GetOrCreateTextTranslationInfo();
+               if( info?.IsCurrentlySettingText == false )
+               {
+                  // force UI resizing is highly problematic for NGUI because text should somehow
+                  // be set after changing "resize" properties... brilliant stuff
+                  if( ui.GetType() != ClrTypes.UILabel )
+                  {
+                     info?.ResizeUI( ui, ResizeCache );
+                  }
+               }
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while handling the UI resize/font0 hooks." );
          }
       }
 
@@ -1098,13 +1105,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var isSpammer = ui.IsSpammingComponent();
             var textKey = GetCacheKey( ui, text, isSpammer );
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
-            {
-               return null;
-            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsOnlyTemplate )
+            if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                var isPartial = TextCache.IsPartial( textKey.TemplatedOriginal_Text, scope );
@@ -1163,14 +1166,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
          {
             var textKey = GetCacheKey( null, text, false );
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
-            {
-               translatedText = null;
-               return false;
-            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsOnlyTemplate )
+            if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                translatedText = untemplatedTranslation;
@@ -1216,14 +1214,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
             {
                var textKey = GetCacheKey( null, text, false );
-               if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
-               {
-                  result.SetErrorWithMessage( "This text is already considered a translation for something else." );
-                  return result;
-               }
 
                // potentially shortcircuit if fully templated
-               if( textKey.IsOnlyTemplate )
+               if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
                {
                   var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                   result.SetCompleted( untemplatedTranslation );
@@ -1510,13 +1503,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             // potentially shortcircuit if templated is a translation
             var textKey = GetCacheKey( ui, text, isSpammer );
-            if( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) )
-            {
-               return null;
-            }
 
             // potentially shortcircuit if fully templated
-            if( textKey.IsOnlyTemplate )
+            if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
             {
                var untemplatedTranslation = textKey.Untemplate( textKey.TemplatedOriginal_Text );
                if( context == null )
@@ -1633,13 +1622,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               // potentially shortcircuit if templated is a translation
                               var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
-                              if( stabilizedTextKey.IsTemplated && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) )
-                              {
-                                 return;
-                              }
 
                               // potentially shortcircuit if fully templated
-                              if( stabilizedTextKey.IsOnlyTemplate )
+                              if( ( stabilizedTextKey.IsTemplated && !TextCache.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) ) || stabilizedTextKey.IsOnlyTemplate )
                               {
                                  var untemplatedTranslation = stabilizedTextKey.Untemplate( stabilizedTextKey.TemplatedOriginal_Text );
                                  SetTranslatedText( ui, untemplatedTranslation, originalText, info );
