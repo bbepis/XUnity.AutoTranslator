@@ -379,8 +379,7 @@ By default, the plugin will attempt some basic auto-resizing behaviour, which ar
  * `OverrideFont`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. UGUI only.
  * `OverrideFontTextMeshPro`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only. This option is able to load a font in two different ways. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle (requires Unity 2018 or greater (or alternatively a custom asset bundle built specifically for the targeted game)). If not, it will be attempted to be loaded through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
 
-
- There is a fairly large restriction on the usage of this setting as fonts for TextMeshPro must be embedded in the game as resources. Therefore the selection is very limited. In most games you will probably only be able to get away with the default font, which often is `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
+An additional note on changing the font of TextMeshPro: You can download some pre-built asset bundles for Unity 2018 and 2019 in the release tab, but for now, they are not particularly well tested. If you want to try them out, simply download the .zip folder and put one of the font assets into the game folder. Then configure it up by writing the name of the file in the configuration file in `OverrideFontTextMeshPro`.
 
 Resizing of a UI component does not refer to changing of it's dimensions, but rather how the component handles overflow. The plugin changes the overflow parameters such that text is more likely to be displayed.
 
