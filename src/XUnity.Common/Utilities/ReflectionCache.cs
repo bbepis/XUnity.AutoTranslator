@@ -21,6 +21,18 @@ namespace XUnity.Common.Utilities
       /// <param name="type"></param>
       /// <param name="name"></param>
       /// <returns></returns>
+      public static CachedMethod CachedMethod( this Type type, string name )
+      {
+         return CachedMethod( type, name, null );
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="type"></param>
+      /// <param name="name"></param>
+      /// <param name="types"></param>
+      /// <returns></returns>
       public static CachedMethod CachedMethod( this Type type, string name, params Type[] types )
       {
          var key = new MemberLookupKey( type, name );
