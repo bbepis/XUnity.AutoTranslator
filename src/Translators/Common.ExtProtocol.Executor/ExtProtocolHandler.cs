@@ -1,5 +1,6 @@
 ﻿using Common.ExtProtocol;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
@@ -17,6 +18,8 @@ namespace Http.ExtProtocol.Executor
 
       public async Task RunAsync()
       {
+         var untranslatedTexts = new HashSet<string>();
+
          using( var stdout = Console.OpenStandardOutput() )
          using( var writer = new StreamWriter( stdout ) )
          using( var stdin = Console.OpenStandardInput() )
@@ -32,6 +35,12 @@ namespace Http.ExtProtocol.Executor
                var message = ExtProtocolConvert.Decode( receivedPayload ) as TranslationRequest;
                if( message == null ) return;
 
+               // never allow the same text to be translated twice
+               foreach( var untranslatedText in message.UntranslatedTexts )
+               {
+                  if( !untranslatedTexts.Add( untranslatedText ) ) return;
+               }
+               
                var context = new TranslationContext( message.UntranslatedTexts, message.SourceLanguage, message.DestinationLanguage );
                try
                {

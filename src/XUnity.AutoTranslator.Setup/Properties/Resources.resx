@@ -181,6 +181,9 @@
   <data name="GoogleTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\GoogleTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="GoogleTranslateCompat" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\GoogleTranslateCompat.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="GoogleTranslateLegitimate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\GoogleTranslateLegitimate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -198,6 +201,9 @@
   </data>
   <data name="Lec_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build-x86\bin\net35\Lec.ExtProtocol.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="GoogleTranslateCompat_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build-net45\bin\net45\GoogleTranslateCompat.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Common_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build-net45\bin\net45\Common.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

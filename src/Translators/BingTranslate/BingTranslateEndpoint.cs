@@ -77,6 +77,8 @@ namespace BingTranslate
          if( !_hasSetup || _translationCount % _resetAfter == 0 )
          {
             _resetAfter = RandomNumbers.Next( 75, 125 );
+            _translationCount = 0;
+
             _hasSetup = true;
 
             // Setup TKK and cookies
@@ -186,7 +188,6 @@ namespace BingTranslate
          XUnityWebResponse response = null;
 
          _cookieContainer = new CookieContainer();
-         _translationCount = 0;
 
          try
          {

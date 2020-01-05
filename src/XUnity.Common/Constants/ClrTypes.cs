@@ -116,6 +116,16 @@ namespace XUnity.Common.Constants
          public static CachedProperty ResizeTextMinSize = ClrTypes.Text?.CachedProperty( "resizeTextMinSize" );
       }
 
+      public static class InputField_Properties
+      {
+         public static CachedProperty Placeholder = ClrTypes.InputField?.CachedProperty( "placeholder" );
+      }
+
+      public static class TMP_InputField_Properties
+      {
+         public static CachedProperty Placeholder = ClrTypes.TMP_InputField?.CachedProperty( "placeholder" );
+      }
+
       public static class Font_Properties
       {
          public static CachedProperty FontSize = ClrTypes.Font?.CachedProperty( "fontSize" );

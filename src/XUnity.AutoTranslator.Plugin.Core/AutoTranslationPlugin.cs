@@ -166,6 +166,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             //ResourceRedirection.Whatever();
 
+            //XuaLogger.AutoTranslator.Info( "Creating bundle" );
+            //var bundle = AssetBundleHelper.CreateEmptyAssetBundle();
+            //XuaLogger.AutoTranslator.Info( "Is instance: " + ( bundle != null ) );
+            //XuaLogger.AutoTranslator.Info( "Created bundle" );
+
             //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
             //var bundle = AssetBundle.LoadFromFile( "idont/really/exist.unity3d" );
             //var asset = bundle.LoadAsset( "oops" );
@@ -740,9 +745,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            var inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField )
-               ?? go.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField )
-               ?? go.GetFirstComponentInSelfOrAncestor( ClrTypes.UIInput );
+            var inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField );
+            if( inputField != null )
+            {
+               if( ClrTypes.InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = ClrTypes.InputField_Properties.Placeholder.Get( inputField );
+                  return ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField );
+            if( inputField != null )
+            {
+               if( ClrTypes.TMP_InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = ClrTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
+                  return ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.UIInput );
 
             return inputField == null;
          }
@@ -1580,7 +1603,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
-               if( !isTranslatable && !Settings.OutputUntranslatableText && !textKey.IsTemplated )
+               if( !isTranslatable && !Settings.OutputUntranslatableText && ( !textKey.IsTemplated || isSpammer ) )
                {
                   // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                   return text;

@@ -1,4 +1,11 @@
-﻿### 4.8.0
+﻿### 4.8.1
+ * MISC - Experimental Google! Translate compatibility endpoint that services requests out-of-process
+ * MISC - Updated default user agents
+ * MISC - Minor changes to Google! translate TKK timing logic
+ * MISC - Allow translation of placeholder text with UGUI and TextMesh Pro texts
+ * BUG FIX - Disallow outputting of IMGUI templated texts that are not considered translatable
+
+### 4.8.0
  * FEATURE - Changed the way TextMesh Pro fonts can be changed. Fonts can now be loaded through external asset bundles
  * CHANGE - Removed BepInEx 4.x package to remove confusion about which package to download
  * BUG FIX - Fixed a bug that could cause a crash in Unity games using a very old version of the engine

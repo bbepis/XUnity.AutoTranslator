@@ -62,6 +62,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( translatorsPath, "BingLegitimateTranslate.dll" ), Resources.BingTranslateLegitimate, true );
             AddFile( Path.Combine( translatorsPath, "CustomTranslate.dll" ), Resources.CustomTranslate, true );
             AddFile( Path.Combine( translatorsPath, "GoogleTranslate.dll" ), Resources.GoogleTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "GoogleTranslateCompat.dll" ), Resources.GoogleTranslateCompat, true );
             AddFile( Path.Combine( translatorsPath, "GoogleTranslateLegitimate.dll" ), Resources.GoogleTranslateLegitimate, true );
             AddFile( Path.Combine( translatorsPath, "LecPowerTranslator15.dll" ), Resources.LecPowerTranslator15, true );
             AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.WatsonTranslate, true );
@@ -69,6 +70,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( translatorsPath, "PapagoTranslate.dll" ), Resources.PapagoTranslate, true );
             AddFile( Path.Combine( fullNetPath, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "GoogleTranslateCompat.ExtProtocol.dll" ), Resources.GoogleTranslateCompat_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.exe" ), Resources.Common_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Http.ExtProtocol.exe" ), Resources.Http_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.Executor.exe" ), Resources.Common_ExtProtocol_Executor, true );
