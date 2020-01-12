@@ -18,7 +18,7 @@ namespace Http.ExtProtocol.Executor
 
       public async Task RunAsync()
       {
-         var untranslatedTexts = new HashSet<string>();
+         var usedIds = new HashSet<Guid>();
 
          using( var stdout = Console.OpenStandardOutput() )
          using( var writer = new StreamWriter( stdout ) )
@@ -35,12 +35,8 @@ namespace Http.ExtProtocol.Executor
                var message = ExtProtocolConvert.Decode( receivedPayload ) as TranslationRequest;
                if( message == null ) return;
 
-               // never allow the same text to be translated twice
-               foreach( var untranslatedText in message.UntranslatedTexts )
-               {
-                  if( !untranslatedTexts.Add( untranslatedText ) ) return;
-               }
-               
+               if( !usedIds.Add( message.Id ) ) return;
+
                var context = new TranslationContext( message.UntranslatedTexts, message.SourceLanguage, message.DestinationLanguage );
                try
                {

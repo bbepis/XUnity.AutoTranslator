@@ -1183,8 +1183,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       bool ITranslator.TryTranslate( string text, out string translatedText )
       {
-         var bestFrame = Time.frameCount;
-
          var scope = TranslationScopeProvider.GetScope( null );
          if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
          {
@@ -1224,8 +1222,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private InternalTranslationResult Translate( string text, int scope, TranslationEndpointManager endpoint, ParserTranslationContext context, Action<TranslationResult> onCompleted, bool isGlobal )
       {
-         var bestFrame = Time.frameCount;
-
          var result = new InternalTranslationResult( isGlobal, onCompleted );
          if( isGlobal )
          {

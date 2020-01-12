@@ -36,8 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( Settings.EnableUGUI && ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && ClrTypes.UILabel != null && ClrTypes.UILabel.IsAssignableFrom( type ) )
             || ( Settings.EnableTextMesh && ClrTypes.TextMesh != null && ClrTypes.TextMesh.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
-            /*|| ( ClrTypes.AdvCommand != null && ClrTypes.AdvCommand.IsAssignableFrom( type ) )*/;
+            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) );
       }
 
       public static bool IsKnownTextMeshProType( Type type )

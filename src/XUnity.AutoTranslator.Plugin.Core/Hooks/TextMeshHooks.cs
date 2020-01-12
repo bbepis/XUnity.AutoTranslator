@@ -76,12 +76,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          {
             if( active )
             {
-               var ownTm = __instance.GetComponent( ClrTypes.TextMesh );
-               if( ownTm != null )
-               {
-                  AutoTranslationPlugin.Current.Hook_TextChanged( ownTm, true );
-               }
-
                var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
                foreach( var tm in tms )
                {
@@ -125,12 +119,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          {
             if( active )
             {
-               var ownTm = __instance.GetComponent( ClrTypes.TextMesh );
-               if( ownTm != null )
-               {
-                  AutoTranslationPlugin.Current.Hook_TextChanged( ownTm, true );
-               }
-
                var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
                foreach( var tm in tms )
                {

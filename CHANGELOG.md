@@ -1,4 +1,9 @@
-﻿### 4.8.1
+﻿### 4.8.2
+ * MISC - Bundle Harmony 2.0-beta (custom build) with UnityInjector package instead of 1.2.0.1 to be more compatible with i18nEx
+ * BUG FIX - Fixed bug that could cause out-of-process requests to stop working in certain situations
+ * BUG FIX - Fixed a "performance" bug in TextMesh hooks
+
+### 4.8.1
  * MISC - Experimental Google! Translate compatibility endpoint that services requests out-of-process
  * MISC - Updated default user agents
  * MISC - Minor changes to Google! translate TKK timing logic
