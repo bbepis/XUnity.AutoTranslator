@@ -58,6 +58,8 @@ namespace XUnity.Common.Constants
       public static readonly Type Font = FindType( "UnityEngine.Font" );
       public static readonly Type WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
 
+      // Shimeji Engine
+      public static readonly Type TextExpansion = FindType( "UnityEngine.UI.TextExpansion" );
 
       // Something...
       public static readonly Type Typewriter = FindType( "Typewriter" );
@@ -138,6 +140,12 @@ namespace XUnity.Common.Constants
 
          public static CachedMethod LoadFromFile = ClrTypes.AssetBundle?.CachedMethod( "LoadFromFile", typeof( string ) );
          public static CachedMethod CreateFromFile = ClrTypes.AssetBundle?.CachedMethod( "CreateFromFile", typeof( string ) );
+      }
+
+      public static class TextExpansion_Methods
+      {
+         public static CachedMethod SetMessageType = ClrTypes.TextExpansion?.CachedMethod( "SetMessageType" );
+         public static CachedMethod SkipTypeWriter = ClrTypes.TextExpansion?.CachedMethod( "SkipTypeWriter" );
       }
 
       private static Type FindType( string name )

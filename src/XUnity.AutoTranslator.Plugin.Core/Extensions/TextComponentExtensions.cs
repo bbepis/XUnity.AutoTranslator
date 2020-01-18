@@ -321,6 +321,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   maxVisibleCharactersProperty.Set( ui, 99999 );
                }
             }
+
+            if( ClrTypes.TextExpansion_Methods.SetMessageType != null && ClrTypes.TextExpansion_Methods.SkipTypeWriter != null )
+            {
+               if( ClrTypes.TextExpansion.IsAssignableFrom( type ) )
+               {
+                  ClrTypes.TextExpansion_Methods.SetMessageType.Invoke( ui, 1 );
+                  ClrTypes.TextExpansion_Methods.SkipTypeWriter.Invoke( ui );
+               }
+            }
          }
       }
    }

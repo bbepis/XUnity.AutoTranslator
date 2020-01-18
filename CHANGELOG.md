@@ -1,4 +1,8 @@
-﻿### 4.8.2
+﻿### 4.8.3
+ * MISC - Added support for ShimejiEngine.dll
+ * BUG FIX - Fixed a NullReferenceException that could cause the plugin to stop working
+
+### 4.8.2
  * MISC - Bundle Harmony 2.0-beta (custom build) with UnityInjector package instead of 1.2.0.1 to be more compatible with i18nEx
  * BUG FIX - Fixed bug that could cause out-of-process requests to stop working in certain situations
  * BUG FIX - Fixed a "performance" bug in TextMesh hooks

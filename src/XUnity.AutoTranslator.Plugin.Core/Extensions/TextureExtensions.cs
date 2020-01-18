@@ -15,8 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextureExtensions
    {
-      private static readonly MethodInfo LoadImage = AccessToolsShim.Method( ClrTypes.ImageConversion, "LoadImage", new[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) } );
-      private static readonly MethodInfo EncodeToPNG = AccessToolsShim.Method( ClrTypes.ImageConversion, "EncodeToPNG", new[] { typeof( Texture2D ) } );
+      private static readonly MethodInfo LoadImage = ClrTypes.ImageConversion != null ? AccessToolsShim.Method( ClrTypes.ImageConversion, "LoadImage", new[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) } ) : null;
+      private static readonly MethodInfo EncodeToPNG = ClrTypes.ImageConversion != null ? AccessToolsShim.Method( ClrTypes.ImageConversion, "EncodeToPNG", new[] { typeof( Texture2D ) } ) : null;
 
       //public static bool IsNonReadable( this Texture2D texture )
       //{
