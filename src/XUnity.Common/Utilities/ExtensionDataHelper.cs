@@ -38,7 +38,6 @@ namespace XUnity.Common.Utilities
       /// <param name="obj"></param>
       /// <param name="t"></param>
       public static void SetExtensionData<T>( this object obj, T t )
-         where T : new()
       {
          lock( Sync )
          {

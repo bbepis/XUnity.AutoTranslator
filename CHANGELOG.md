@@ -1,4 +1,8 @@
-﻿### 4.8.3
+﻿### 4.9.0
+ * FEATURE - API to support easier translations of TextAsset resources
+ * MISC - Support for older versions of UTAGE
+
+### 4.8.3
  * MISC - Added support for ShimejiEngine.dll
  * BUG FIX - Fixed a NullReferenceException that could cause the plugin to stop working
 

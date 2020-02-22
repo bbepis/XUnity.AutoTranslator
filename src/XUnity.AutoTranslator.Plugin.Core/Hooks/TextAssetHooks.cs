@@ -43,13 +43,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static byte[] MM_Detour( TextAsset self )
       {
-         var result = _original( self );
-
          var ext = self.GetExtensionData<TextAssetExtensionData>();
          if( ext != null )
          {
             return ext.Data;
          }
+
+         var result = _original( self );
 
          return result;
       }
@@ -78,13 +78,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static string MM_Detour( TextAsset self )
       {
-         var result = _original( self );
-
          var ext = self.GetExtensionData<TextAssetExtensionData>();
          if( ext != null )
          {
             return ext.Text;
          }
+
+         var result = _original( self );
 
          return result;
       }

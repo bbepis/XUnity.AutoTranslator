@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
@@ -12,6 +14,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    internal class TextAssetLoadedHandler : AssetLoadedHandlerBaseV2<TextAsset>
    {
+      public TextAssetLoadedHandler()
+      {
+         HooksSetup.InstallTextAssetHooks();
+      }
+
       protected override string CalculateModificationFilePath( TextAsset asset, IAssetOrResourceLoadedContext context )
       {
          return context.GetPreferredFilePath( asset, ".txt" );

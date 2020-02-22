@@ -10,6 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
@@ -170,59 +171,78 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             var uguiMessageWindow = GameObject.FindObjectOfType( ClrTypes.AdvUguiMessageWindow );
             if( uguiMessageWindow != null )
             {
-               var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
-               var uguiNovelText = uguiMessageWindow.GetType().GetProperty( "Text" ).GetValue( uguiMessageWindow, null );
+               var uguiNovelText = ClrTypes.AdvUguiMessageWindow_Properties.Text?.Get( uguiMessageWindow )
+                  ?? ClrTypes.AdvUguiMessageWindow_Fields.text?.GetValue( uguiMessageWindow );
+
+
                if( Equals( uguiNovelText, ui ) )
                {
                   string previousNameText = null;
-                  var nameText = (UnityEngine.Object)uguiMessageWindow.GetType().GetField( "nameText", flags ).GetValue( uguiMessageWindow );
+                  var nameText = ClrTypes.AdvUguiMessageWindow_Fields.nameText.GetValue( uguiMessageWindow ) as UnityEngine.Object;
                   if( nameText )
                   {
                      previousNameText = (string)ClrTypes.Text.CachedProperty( TextPropertyName ).Get( nameText );
                   }
 
-                  var engine = uguiMessageWindow.GetType().GetProperty( "Engine", flags ).GetValue( uguiMessageWindow, null );
-                  var page = engine.GetType().GetProperty( "Page", flags ).GetValue( engine, null );
-                  var textData = ClrTypes.TextData.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
-                  var length = (int)textData.GetType().GetProperty( "Length", flags ).GetValue( textData, null );
+                  var engine = ClrTypes.AdvUguiMessageWindow_Properties.Engine?.Get( uguiMessageWindow )
+                     ?? ClrTypes.AdvUguiMessageWindow_Fields.engine.GetValue( uguiMessageWindow );
+                  var page = ClrTypes.AdvEngine_Properties.Page.Get( engine );
 
-                  var remakeTextData = page.GetType().GetMethod( "RemakeTextData", flags );
-                  if( remakeTextData == null )
+                  var remakeTextData = ClrTypes.AdvPage_Methods.RemakeTextData;
+                  var remakeText = ClrTypes.AdvPage_Methods.RemakeText;
+                  var changeMessageWindowText = ClrTypes.AdvPage_Methods.ChangeMessageWindowText;
+
+                  if( changeMessageWindowText != null )
                   {
-                     try
-                     {
-                        Settings.InvokeEvents = false;
+                     var nameText0 = (string)page.GetType().GetProperty( "NameText" )?.GetValue( page, null );
+                     var characterLabel0 = (string)page.GetType().GetProperty( "CharacterLabel" )?.GetValue( page, null );
+                     var windowType0 = (string)page.GetType().GetProperty( "WindowType" )?.GetValue( page, null );
 
-                        page.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
-                        page.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
-                        page.GetType().GetProperty( "Status", flags ).GetSetMethod( true ).Invoke( page, new object[] { 1 /*SendChar*/ } );
-
-                        var messageWindowManager = engine.GetType().GetProperty( "MessageWindowManager", flags ).GetValue( engine, null );
-                        messageWindowManager.GetType().GetMethod( "OnPageTextChange", flags ).Invoke( messageWindowManager, new object[] { page } );
-                     }
-                     finally
-                     {
-                        Settings.InvokeEvents = true;
-                     }
+                     changeMessageWindowText.Invoke( page, new object[] { nameText0, characterLabel0, text, windowType0 } );
                   }
                   else
                   {
-                     try
-                     {
-                        Settings.InvokeEvents = false;
-                        Settings.RemakeTextData = advPage =>
-                        {
-                           advPage.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
-                           advPage.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
-                        };
+                     var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+                     var textData = ClrTypes.TextData.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
+                     var length = (int)textData.GetType().GetProperty( "Length", flags ).GetValue( textData, null );
 
-                        page.GetType().GetMethod( "RemakeText" ).Invoke( page, null );
-                     }
-                     finally
+                     if( remakeTextData == null )
                      {
-                        Settings.InvokeEvents = true;
-                        Settings.RemakeTextData = null;
+                        try
+                        {
+                           Settings.InvokeEvents = false;
+
+                           page.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
+                           page.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
+                           page.GetType().GetProperty( "Status", flags ).GetSetMethod( true ).Invoke( page, new object[] { 1 /*SendChar*/ } );
+
+                           var messageWindowManager = engine.GetType().GetProperty( "MessageWindowManager", flags ).GetValue( engine, null );
+                           messageWindowManager.GetType().GetMethod( "OnPageTextChange", flags ).Invoke( messageWindowManager, new object[] { page } );
+                        }
+                        finally
+                        {
+                           Settings.InvokeEvents = true;
+                        }
+                     }
+                     else
+                     {
+                        try
+                        {
+                           Settings.InvokeEvents = false;
+                           Settings.RemakeTextData = advPage =>
+                           {
+                              advPage.GetType().GetProperty( "TextData", flags ).SetValue( page, textData, null );
+                              advPage.GetType().GetProperty( "CurrentTextLengthMax", flags ).GetSetMethod( true ).Invoke( page, new object[] { length } );
+                           };
+
+                           remakeText.Invoke( page );
+                        }
+                        finally
+                        {
+                           Settings.InvokeEvents = true;
+                           Settings.RemakeTextData = null;
+                        }
                      }
                   }
 

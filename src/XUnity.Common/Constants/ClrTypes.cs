@@ -70,7 +70,7 @@ namespace XUnity.Common.Constants
       public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
       public static readonly Type AdvPage = FindType( "Utage.AdvPage" );
       public static readonly Type TextData = FindType( "Utage.TextData" );
-      public static readonly Type AdvUguiMessageWindow = FindType( "Utage.AdvUguiMessageWindow" );
+      public static readonly Type AdvUguiMessageWindow = FindType( "Utage.AdvUguiMessageWindow" ) ?? FindType( "AdvUguiMessageWindow" );
       public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
       public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
@@ -97,6 +97,31 @@ namespace XUnity.Common.Constants
 
       // Assets.System (what engine is this?)
       public static readonly Type TextWindow = FindType( "Assets.System.Text.TextWindow" );
+
+      public static class AdvUguiMessageWindow_Properties
+      {
+         public static CachedProperty Text = ClrTypes.AdvUguiMessageWindow?.CachedProperty( "Text" );
+         public static CachedProperty Engine = ClrTypes.AdvUguiMessageWindow?.CachedProperty( "Engine" );
+      }
+
+      public static class AdvUguiMessageWindow_Fields
+      {
+         public static FieldInfo text = ClrTypes.AdvUguiMessageWindow?.GetField( "text", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance );
+         public static FieldInfo nameText = ClrTypes.AdvUguiMessageWindow?.GetField( "nameText", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance );
+         public static FieldInfo engine = ClrTypes.AdvUguiMessageWindow?.GetField( "engine", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance );
+      }
+
+      public static class AdvEngine_Properties
+      {
+         public static CachedProperty Page = ClrTypes.AdvEngine?.CachedProperty( "Page" );
+      }
+
+      public static class AdvPage_Methods
+      {
+         public static CachedMethod RemakeTextData = ClrTypes.AdvPage?.CachedMethod( "RemakeTextData" );
+         public static CachedMethod RemakeText = ClrTypes.AdvPage?.CachedMethod( "RemakeText" );
+         public static CachedMethod ChangeMessageWindowText = ClrTypes.AdvPage?.CachedMethod( "ChangeMessageWindowText", new Type[] { typeof( string ), typeof( string ), typeof( string ), typeof( string ) } );
+      }
 
       public static class UILabel_Properties
       {

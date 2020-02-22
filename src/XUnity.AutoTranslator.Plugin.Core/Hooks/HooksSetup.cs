@@ -18,7 +18,6 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
-
    internal static class HooksSetup
    {
       public static void InstallOverrideTextHooks()
@@ -80,11 +79,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
+      private static bool _textAssetHooksInstalled = false;
       public static void InstallTextAssetHooks()
       {
          try
          {
-            HookingHelper.PatchAll( TextAssetHooks.All, Settings.ForceMonoModHooks );
+            if( !_textAssetHooksInstalled )
+            {
+               _textAssetHooksInstalled = true;
+               HookingHelper.PatchAll( TextAssetHooks.All, Settings.ForceMonoModHooks );
+            }
          }
          catch( Exception e )
          {

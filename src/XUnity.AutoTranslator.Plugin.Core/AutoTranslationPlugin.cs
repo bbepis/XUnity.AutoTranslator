@@ -160,7 +160,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( Settings.EnableTextAssetRedirector )
             {
-               HooksSetup.InstallTextAssetHooks();
                new TextAssetLoadedHandler();
             }
 
