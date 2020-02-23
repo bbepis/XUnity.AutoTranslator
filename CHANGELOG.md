@@ -5,6 +5,7 @@
  * FEATURE - Better support for variations of Chinese as input language. Plugin wont complain if 'zh-Hans', 'zh-Hant' or 'zh' is used
  * MISC - Support for older versions of UTAGE
  * BUG FIX - Potential errors caused by using weak references incorrectly causing a race condition
+ * BUG FIX - Potential error during initialization if Resource Redirector is not present
 
 ### 4.8.3
  * MISC - Added support for ShimejiEngine.dll

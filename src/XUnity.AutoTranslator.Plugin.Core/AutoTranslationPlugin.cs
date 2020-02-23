@@ -149,13 +149,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
+      private static void EnableLogAllLoadedResources()
+      {
+         ResourceRedirection.LogAllLoadedResources = true;
+      }
+
       private void InitializeResourceRedirector()
       {
          try
          {
             if( Settings.LogAllLoadedResources )
             {
-               ResourceRedirection.LogAllLoadedResources = true;
+               EnableLogAllLoadedResources();
             }
 
             if( Settings.EnableTextAssetRedirector )

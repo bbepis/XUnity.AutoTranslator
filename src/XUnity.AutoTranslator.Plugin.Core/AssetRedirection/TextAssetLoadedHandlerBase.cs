@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
@@ -28,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// <param name="asset">The text asset with the original content.</param>
       /// <param name="context">This is the context containing all relevant information for the resource redirection event.</param>
       /// <returns>A TextAndEncoding indicating the text that should replace with TextAsset. Return null to not handle.</returns>
-      public abstract TextAndEncoding PerformTranslation( string calculatedModificationPath, TextAsset asset, IAssetOrResourceLoadedContext context );
+      public abstract TextAndEncoding TranslateTextAsset( string calculatedModificationPath, TextAsset asset, IAssetOrResourceLoadedContext context );
 
       /// <summary>
       /// Method invoked when an asset should be updated or replaced.
@@ -39,13 +40,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// <returns>A bool indicating if the event should be considered handled.</returns>
       protected override sealed bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref TextAsset asset, IAssetOrResourceLoadedContext context )
       {
-         var info = PerformTranslation( calculatedModificationPath, asset, context );
+         var info = TranslateTextAsset( calculatedModificationPath, asset, context );
 
          if( info != null )
          {
             var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
+
+            // Using a StreamWriter rather than just encoding.GetBytes() will also allow it to output BOM, if required by the game
+            var stream = new MemoryStream();
+            using( var writer = new StreamWriter( stream, info.Encoding ) )
+            {
+               writer.Write( info.Text );
+               writer.Flush();
+            }
+
             ext.Text = info.Text;
-            ext.Data = info.Encoding.GetBytes( info.Text );
+            ext.Data = stream.ToArray();
 
             return true;
          }
