@@ -26,6 +26,18 @@ namespace YandexTranslate
 
       public override string FriendlyName => "Yandex Translate";
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-CN":
+            case "zh-Hans":
+               return "zh";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "Yandex", "YandexAPIKey", "" );
@@ -33,8 +45,8 @@ namespace YandexTranslate
 
          // if the plugin cannot be enabled, simply throw so the user cannot select the plugin
          if( string.IsNullOrEmpty( _key ) ) throw new EndpointInitializationException( "The YandexTranslate endpoint requires an API key which has not been provided." );
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
@@ -42,8 +54,8 @@ namespace YandexTranslate
          var request = new XUnityWebRequest(
             string.Format(
                HttpsServicePointTemplateUrl,
-               context.SourceLanguage,
-               context.DestinationLanguage,
+               FixLanguage( context.SourceLanguage ),
+               FixLanguage( context.DestinationLanguage ),
                WwwHelper.EscapeUrl( context.UntranslatedText ),
                _key ) );
          

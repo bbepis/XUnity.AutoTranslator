@@ -63,13 +63,27 @@ namespace BingTranslate
 
       public override string FriendlyName => "Bing Translator";
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-CN":
+            case "zh":
+               return "zh-Hans";
+            case "zh-TW":
+               return "zh-Hant";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          // Configure service points / service point manager
          context.DisableCertificateChecksFor( "www.bing.com" );
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
@@ -104,8 +118,8 @@ namespace BingTranslate
          var data = string.Format(
             RequestTemplate,
             Uri.EscapeDataString( context.UntranslatedText ),
-            context.SourceLanguage,
-            context.DestinationLanguage );
+            FixLanguage( context.SourceLanguage ),
+            FixLanguage( context.DestinationLanguage ) );
 
          var request = new XUnityWebRequest( "POST", address, data );
 

@@ -29,6 +29,20 @@ namespace WatsonTranslate
 
       public override int MaxTranslationsPerRequest => 10;
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-CN":
+            case "zh-Hans":
+               return "zh";
+            case "zh-Hant":
+               return "zh-TW";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          _url = context.GetOrCreateSetting( "Watson", "Url", "" );
@@ -38,7 +52,7 @@ namespace WatsonTranslate
 
          _fullUrl = _url.TrimEnd( '/' ) + "/v3/translate?version=2018-05-01";
 
-         var model = context.SourceLanguage + "-" + context.DestinationLanguage;
+         var model = FixLanguage( context.SourceLanguage ) + "-" + FixLanguage( context.DestinationLanguage );
          if( !SupportedLanguagePairs.Contains( model ) ) throw new EndpointInitializationException( $"The language model '{model}' is not supported." );
       }
 
@@ -57,9 +71,9 @@ namespace WatsonTranslate
             }
          }
          data.Append( "],\"model_id\":\"" )
-            .Append( context.SourceLanguage )
+            .Append( FixLanguage( context.SourceLanguage ) )
             .Append( "-" )
-            .Append( context.DestinationLanguage )
+            .Append( FixLanguage( context.DestinationLanguage ) )
             .Append( "\"}" );
 
          var request = new WwwRequestInfo(

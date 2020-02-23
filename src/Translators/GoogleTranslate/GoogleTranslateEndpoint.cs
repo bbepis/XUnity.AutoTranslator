@@ -61,6 +61,20 @@ namespace GoogleTranslate
 
       public override int MaxTranslationsPerRequest => _translationsPerRequest;
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-Hans":
+            case "zh":
+               return "zh-CN";
+            case "zh-Hant":
+               return "zh-TW";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          context.DisableCertificateChecksFor( "translate.google.com", "translate.googleapis.com" );
@@ -70,8 +84,8 @@ namespace GoogleTranslate
             _translationsPerRequest = 1;
          }
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
@@ -104,7 +118,7 @@ namespace GoogleTranslate
             request = new XUnityWebRequest(
                string.Format(
                   HttpsServicePointRomanizeTemplateUrl,
-                  context.SourceLanguage,
+                  FixLanguage( context.SourceLanguage ),
                   Tk( allUntranslatedText ),
                   Uri.EscapeDataString( allUntranslatedText ) ) );
          }
@@ -113,8 +127,8 @@ namespace GoogleTranslate
             request = new XUnityWebRequest(
                string.Format(
                   HttpsServicePointTranslateTemplateUrl,
-                  context.SourceLanguage,
-                  context.DestinationLanguage,
+                  FixLanguage( context.SourceLanguage ),
+                  FixLanguage( context.DestinationLanguage ),
                   Tk( allUntranslatedText ),
                   Uri.EscapeDataString( allUntranslatedText ) ) );
          }

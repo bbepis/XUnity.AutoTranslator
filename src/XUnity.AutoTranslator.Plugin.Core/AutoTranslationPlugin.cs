@@ -939,9 +939,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           if( Settings.EnableLegacyTextureLoading && tti.Original.IsAlive )
+                           var original = tti.Original.Target;
+                           if( Settings.EnableLegacyTextureLoading && original != null )
                            {
-                              source.SetTexture( tti.Original.Target );
+                              source.SetTexture( original );
                            }
 
                            if( !isPrefixHooked )
@@ -991,9 +992,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           if( Settings.EnableLegacyTextureLoading && tti.Original.IsAlive )
+                           var original = tti.Original.Target;
+                           if( Settings.EnableLegacyTextureLoading && original != null )
                            {
-                              source.SetTexture( tti.Original.Target );
+                              source.SetTexture( original );
                            }
 
                            if( !isPrefixHooked )
@@ -1025,9 +1027,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  if( tti.Original.IsAlive )
+                  var original = tti.Original.Target;
+                  if( original != null )
                   {
-                     texture = tti.Original.Target;
+                     texture = original;
                   }
                }
             }
@@ -2328,7 +2331,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   var text = context.Component.GetText();
                   var result = context.Result;
-                  Dictionary<string, string> translations = new Dictionary<string, string>();
 
                   string translatedText;
                   if( context.TranslationResult == null )

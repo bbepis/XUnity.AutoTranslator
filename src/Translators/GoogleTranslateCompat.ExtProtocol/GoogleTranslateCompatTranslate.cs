@@ -43,6 +43,20 @@ namespace GoogleTranslateCompat.ExtProtocol
          _cookieContainer = new CookieContainer();
       }
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-Hans":
+            case "zh":
+               return "zh-CN";
+            case "zh-Hant":
+               return "zh-TW";
+            default:
+               return lang;
+         }
+      }
+
       public override async Task OnBeforeTranslate( IHttpTranslationContext context )
       {
          if( !_hasSetup || _translationCount % _resetAfter == 0 )
@@ -67,8 +81,8 @@ namespace GoogleTranslateCompat.ExtProtocol
          request = new XUnityWebRequest(
             string.Format(
                HttpsServicePointTranslateTemplateUrl,
-               context.SourceLanguage,
-               context.DestinationLanguage,
+               FixLanguage( context.SourceLanguage ),
+               FixLanguage( context.DestinationLanguage ),
                Tk( allUntranslatedText ),
                Uri.EscapeDataString( allUntranslatedText ) ) );
 

@@ -439,7 +439,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
-A: If the plugin does not work in a game, you can try to set the following configuration parameter `DisableCertificateValidation=True`. If it still does not work, it likely uses a technique to display text that this plugin is not aware of. In that case you can make an issue and maybe it will get fixed in a later version.
+A: There can be a host of reasons. If the game is AOT compiled with IL2CPP it will not work (check _Data directory). If you see translations being queued (ALT+0) but never completing, a potential solution is to select a compatibility endpoint from the dropdown.
 
 > **Q: How do I disable auto translations?**  
 A: Select the empty endpoint when you press ALT+0 or set the configuration parameter `Endpoint=` to empty.

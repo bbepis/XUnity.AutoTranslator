@@ -31,6 +31,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ACADAE2C-1642-428A-84D4-CC53E24F1348}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		CHANGELOG - ResourceRedirector.md = CHANGELOG - ResourceRedirector.md
+		CHANGELOG.md = CHANGELOG.md
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Translators", "Translators", "{7A01BA34-3B96-4910-AC70-462BA59417CB}"
@@ -115,9 +119,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.TextureHashGenerator", "src\XUnity.TextureHashGenerator\XUnity.TextureHashGenerator.csproj", "{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleTranslateCompat", "src\Translators\GoogleTranslateCompat\GoogleTranslateCompat.csproj", "{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat", "src\Translators\GoogleTranslateCompat\GoogleTranslateCompat.csproj", "{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

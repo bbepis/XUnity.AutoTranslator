@@ -33,11 +33,25 @@ namespace PapagoTranslate
 
       public override int MaxTranslationsPerRequest => 10;
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-Hans":
+            case "zh":
+               return "zh-CN";
+            case "zh-Hant":
+               return "zh-TW";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          context.DisableCertificateChecksFor( "papago.naver.com" );
 
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
@@ -65,7 +79,7 @@ namespace PapagoTranslate
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
          var fullTranslationText = string.Join( "\n", context.UntranslatedTexts );
-         var jsonString = string.Format( JsonTemplate, _deviceId, context.SourceLanguage, context.DestinationLanguage, JsonHelper.Escape( fullTranslationText ) );
+         var jsonString = string.Format( JsonTemplate, _deviceId, FixLanguage( context.SourceLanguage ), FixLanguage( context.DestinationLanguage ), JsonHelper.Escape( fullTranslationText ) );
          var base64 = Convert.ToBase64String( Encoding.UTF8.GetBytes( jsonString ) );
          var obfuscatedBase64 = Obfuscate( 16, base64 );
          var data = string.Format( FormUrlEncodedTemplate, Uri.EscapeDataString( obfuscatedBase64 ) );

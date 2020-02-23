@@ -300,10 +300,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public string TrailingWhitespace { get; }
 
-      //public string TranslatableText { get; }
-
-      //public string TrimmedTranslatableText { get; }
-
       public string Original_Text { get; }
       public string Original_Text_ExternallyTrimmed { get; }
       public string Original_Text_InternallyTrimmed { get; }

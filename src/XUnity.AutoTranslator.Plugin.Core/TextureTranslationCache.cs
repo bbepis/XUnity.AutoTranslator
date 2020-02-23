@@ -10,12 +10,123 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   interface ITranslatedImageSource
+   {
+      byte[] GetData();
+   }
+
+   class ZipFileTranslatedImageSource : ITranslatedImageSource
+   {
+      private readonly ZipFile _zipFile;
+      private readonly ZipEntry _zipEntry;
+
+      public ZipFileTranslatedImageSource( ZipFile zipFile, ZipEntry zipEntry )
+      {
+         _zipFile = zipFile;
+         _zipEntry = zipEntry;
+      }
+
+      public byte[] GetData()
+      {
+         using( var stream = _zipFile.GetInputStream( _zipEntry ) )
+         {
+            return stream.ReadFully( 16 * 1024 );
+         }
+      }
+   }
+
+   class FileSystemTranslatedImageSource : ITranslatedImageSource
+   {
+      private readonly string _fileName;
+
+      public FileSystemTranslatedImageSource( string fileName )
+      {
+         _fileName = fileName;
+      }
+
+      public byte[] GetData()
+      {
+         using( var stream = File.OpenRead( _fileName ) )
+         {
+            return stream.ReadFully( 16 * 1024 );
+         }
+      }
+   }
+
+   class TranslatedImage
+   {
+      private readonly ITranslatedImageSource _source;
+      private WeakReference<byte[]> _weakData;
+      private byte[] _data;
+
+      public TranslatedImage( string fileName, byte[] data, ITranslatedImageSource source )
+      {
+         _source = source;
+
+         FileName = fileName;
+         Data = data;
+      }
+
+      public string FileName { get; }
+
+      private byte[] Data
+      {
+         set
+         {
+            if( _source == null )
+            {
+               _data = value;
+            }
+            else
+            {
+               _weakData = WeakReference<byte[]>.Create( value );
+            }
+         }
+         get
+         {
+            if( _source == null )
+            {
+               return _data;
+            }
+            else
+            {
+               var target = _weakData.Target;
+               if( target != null )
+               {
+                  return target;
+               }
+               return null;
+            }
+         }
+      }
+
+      public byte[] GetData()
+      {
+         var data = Data;
+         if( data != null )
+         {
+            return data;
+         }
+
+         if( _source != null )
+         {
+            data = _source.GetData();
+            Data = data;
+
+            if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Image loaded: {FileName}." );
+         }
+
+         return data;
+      }
+   }
+
    class TextureTranslationCache
    {
-      private Dictionary<string, byte[]> _translatedImages = new Dictionary<string, byte[]>( StringComparer.InvariantCultureIgnoreCase );
+      private Dictionary<string, TranslatedImage> _translatedImages = new Dictionary<string, TranslatedImage>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
       private Dictionary<string, string> _keyToFileName = new Dictionary<string, string>();
 
@@ -59,7 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void RegisterImageFromStream( Stream stream, string fullFileName )
+      private void RegisterImageFromStream( string fullFileName, ITranslatedImageSource source )
       {
          try
          {
@@ -91,7 +202,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   return;
                }
 
-               var data = stream.ReadFully( 16 * 1024 );
+               var data = source.GetData();
                var currentHash = HashHelper.Compute( data );
                var isModified = StringComparer.InvariantCultureIgnoreCase.Compare( originalHash, currentHash ) != 0;
 
@@ -100,7 +211,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                // only load images that someone has modified!
                if( Settings.LoadUnmodifiedTextures || isModified )
                {
-                  RegisterTranslatedImage( key, data );
+                  RegisterTranslatedImage( fullFileName, key, data, source );
+
                   if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Image loaded: {fullFileName}." );
                }
                else
@@ -125,26 +237,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
          {
-            using( var stream = File.OpenRead( fullFileName ) )
+            // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
+            if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
             {
-               // Perhaps use this instead???? https://github.com/icsharpcode/SharpZipLib/wiki/Unpack-a-zip-using-ZipInputStream
-               if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
+               var zf = new ZipFile( fullFileName );
+               try
                {
-                  using( var zipInputStream = new ZipInputStream( stream ) )
+                  foreach( var entry in zf )
                   {
-                     while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                     if( entry is ZipEntry zipEntry )
                      {
-                        if( entry.IsFile && entry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
+                        if( zipEntry.IsFile && zipEntry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
                         {
-                           RegisterImageFromStream( zipInputStream, fullFileName + '\\' + entry.Name );
+                           var source = new ZipFileTranslatedImageSource( zf, zipEntry );
+                           RegisterImageFromStream( fullFileName + '\\' + zipEntry.Name, source );
                         }
                      }
                   }
                }
-               else
+               finally
                {
-                  RegisterImageFromStream( stream, fullFileName );
+                  if( Settings.CacheTexturesInMemory )
+                  {
+                     zf.Close();
+                  }
                }
+            }
+            else
+            {
+               var source = new FileSystemTranslatedImageSource( fullFileName );
+               RegisterImageFromStream( fullFileName, source );
             }
          }
       }
@@ -198,7 +320,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( Settings.LoadUnmodifiedTextures )
          {
-            RegisterTranslatedImage( key, data );
+            var source = new FileSystemTranslatedImageSource( fullName );
+            RegisterTranslatedImage( fullName, key, data, source );
          }
          else
          {
@@ -206,9 +329,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void RegisterTranslatedImage( string key, byte[] data )
+      private void RegisterTranslatedImage( string fileName, string key, byte[] data, ITranslatedImageSource source )
       {
-         _translatedImages[ key ] = data;
+         _translatedImages[ key ] = new TranslatedImage( fileName, data, Settings.CacheTexturesInMemory ? null : source );
       }
 
       private void RegisterUntranslatedImage( string key )
@@ -223,7 +346,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal bool TryGetTranslatedImage( string key, out byte[] data )
       {
-         return _translatedImages.TryGetValue( key, out data );
+         if( _translatedImages.TryGetValue( key, out var translatedImage ) )
+         {
+            try
+            {
+               data = translatedImage.GetData();
+
+               return data != null;
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurrd while attempting to load image: " + translatedImage.FileName );
+
+               // clear the image???
+               _translatedImages.Remove( key );
+            }
+         }
+
+         data = null;
+         return false;
       }
    }
 }

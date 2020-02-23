@@ -29,6 +29,18 @@ namespace BaiduTranslate
 
       public override string FriendlyName => "Baidu Translator";
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-Hans":
+            case "zh-CN":
+               return "zh";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          _appId = context.GetOrCreateSetting( "Baidu", "BaiduAppId", "" );
@@ -77,8 +89,8 @@ namespace BaiduTranslate
             string.Format(
                HttpServicePointTemplateUrl,
                WwwHelper.EscapeUrl( context.UntranslatedText ),
-               context.SourceLanguage,
-               context.DestinationLanguage,
+               FixLanguage( context.SourceLanguage ),
+               FixLanguage( context.DestinationLanguage ),
                _appId,
                salt,
                md5 ) );

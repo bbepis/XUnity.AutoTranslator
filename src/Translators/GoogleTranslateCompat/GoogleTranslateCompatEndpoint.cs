@@ -35,10 +35,24 @@ namespace GoogleTranslateCompat
 
       public override int MaxTranslationsPerRequest => 10;
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-Hans":
+            case "zh":
+               return "zh-CN";
+            case "zh-Hant":
+               return "zh-TW";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
 
          var exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\Common.ExtProtocol.Executor.exe" );
 

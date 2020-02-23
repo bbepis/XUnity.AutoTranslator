@@ -20,6 +20,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          { "ru", ContainsRussianSymbols },
          { "zh-CN", ContainsChineseSymbols },
          { "zh-TW", ContainsChineseSymbols },
+         { "zh-Hans", ContainsChineseSymbols },
+         { "zh-Hant", ContainsChineseSymbols },
+         { "zh", ContainsChineseSymbols },
          { "ko", ContainsKoreanSymbols },
          { "en", ContainsStandardLatinSymbols },
       };

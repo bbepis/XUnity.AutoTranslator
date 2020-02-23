@@ -1,6 +1,10 @@
 ﻿### 4.9.0
  * FEATURE - API to support easier translations of TextAsset resources
+ * FEATURE - Support for not loading every translated image into memory permanently, but instead loading them on demand (new configuration option)
+ * FEATURE - Better support for variations of Chinese as output language. 'zh-CN', 'zh-TW', 'zh-Hans', 'zh-Hant', 'zh' can now all be used by all translators if supported
+ * FEATURE - Better support for variations of Chinese as input language. Plugin wont complain if 'zh-Hans', 'zh-Hant' or 'zh' is used
  * MISC - Support for older versions of UTAGE
+ * BUG FIX - Potential errors caused by using weak references incorrectly causing a race condition
 
 ### 4.8.3
  * MISC - Added support for ShimejiEngine.dll

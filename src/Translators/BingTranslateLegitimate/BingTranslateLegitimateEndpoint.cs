@@ -42,6 +42,20 @@ namespace BingTranslateLegitimate
 
       public override int MaxTranslationsPerRequest => 10;
 
+      private string FixLanguage( string lang )
+      {
+         switch( lang )
+         {
+            case "zh-CN":
+            case "zh":
+               return "zh-Hans";
+            case "zh-TW":
+               return "zh-Hant";
+            default:
+               return lang;
+         }
+      }
+
       public override void Initialize( IInitializationContext context )
       {
          _key = context.GetOrCreateSetting( "BingLegitimate", "OcpApimSubscriptionKey", "" );
@@ -50,8 +64,8 @@ namespace BingTranslateLegitimate
          // Configure service points / service point manager
          context.DisableCertificateChecksFor( "api.cognitive.microsofttranslator.com" );
 
-         if( !SupportedLanguages.Contains( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
@@ -75,7 +89,7 @@ namespace BingTranslateLegitimate
 
          var request = new XUnityWebRequest(
             "POST",
-            string.Format( HttpsServicePointTemplateUrl, context.SourceLanguage, context.DestinationLanguage ),
+            string.Format( HttpsServicePointTemplateUrl, FixLanguage( context.SourceLanguage ), FixLanguage( context.DestinationLanguage ) ),
             data.ToString() );
 
          if( Accept != null )
