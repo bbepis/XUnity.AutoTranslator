@@ -83,7 +83,7 @@ namespace KoikatsuTextResourceRedirector
 
       protected override bool DumpAsset( string calculatedModificationPath, TextAsset asset, IAssetOrResourceLoadedContext context )
       {
-         if( !!textAssetHelper.IsTable( asset ) )
+         if( !textAssetHelper.IsTable( asset ) )
          {
             return false;
          }

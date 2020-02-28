@@ -72,7 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             return ClrTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
          }
-         else 
+         else
          {
             return ( ClrTypes.TextMeshPro?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
                || ( ClrTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
@@ -98,7 +98,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             //}
             //return true;
          }
-         
+
          return true;
       }
 
@@ -329,7 +329,32 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          else
          {
             // fallback to reflective approach
-            type.CachedProperty( TextPropertyName )?.Set( ui, text );
+            var textProperty = type.CachedProperty( TextPropertyName );
+            if( textProperty != null )
+            {
+               textProperty.Set( ui, text );
+
+               if( Settings.IgnoreVirtualTextSetterCallingRules )
+               {
+                  var newText = (string)textProperty.Get( ui );
+                  Type currentType = type;
+                  while( text != newText && currentType != null )
+                  {
+                     var typeAndMethod = GetTextPropertySetterInParent( currentType );
+                     if( typeAndMethod != null )
+                     {
+                        currentType = typeAndMethod.Type;
+
+                        typeAndMethod.SetterInvoker( ui, text );
+                        newText = (string)textProperty.Get( ui );
+                     }
+                     else
+                     {
+                        currentType = null;
+                     }
+                  }
+               }
+            }
 
             // TMPro
             var maxVisibleCharactersProperty = type.CachedProperty( "maxVisibleCharacters" );
@@ -349,6 +374,56 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                   ClrTypes.TextExpansion_Methods.SetMessageType.Invoke( ui, 1 );
                   ClrTypes.TextExpansion_Methods.SkipTypeWriter.Invoke( ui );
                }
+            }
+         }
+      }
+
+      private static Dictionary<Type, TypeAndMethod> _textSetters = new Dictionary<Type, TypeAndMethod>();
+
+      private static TypeAndMethod GetTextPropertySetterInParent( Type type )
+      {
+         var current = type.BaseType;
+         while( current != null )
+         {
+            if( _textSetters.TryGetValue( type, out var typeAndMethod ) )
+            {
+               return typeAndMethod;
+            }
+            else
+            {
+               var property = current.GetProperty( "text", BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
+
+               if( property != null && property.CanWrite )
+               {
+                  var tam = new TypeAndMethod( current, property.GetSetMethod() );
+                  _textSetters[ current ] = tam;
+                  return tam;
+               }
+
+               current = current.BaseType;
+            }
+         }
+
+         return null;
+      }
+
+      private class TypeAndMethod
+      {
+         Action<object, object> _setterInvoker;
+
+         public TypeAndMethod( Type type, MethodBase method )
+         {
+            Type = type;
+            SetterMethod = method;
+         }
+
+         public Type Type { get; }
+         public MethodBase SetterMethod { get; }
+         public Action<object, object> SetterInvoker
+         {
+            get
+            {
+               return _setterInvoker ?? (_setterInvoker = (Action<object, object>)VirtcallRuleBreaker.GenerateDelegate( SetterMethod, false ) );
             }
          }
       }

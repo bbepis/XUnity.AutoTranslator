@@ -114,6 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static HashSet<string> BlacklistedIMGUIPlugins;
       public static bool EnableTextPathLogging;
       public static bool OutputUntranslatableText;
+      public static bool IgnoreVirtualTextSetterCallingRules;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -206,7 +207,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                .ToHashSet( StringComparer.OrdinalIgnoreCase ) ?? new HashSet<string>( StringComparer.OrdinalIgnoreCase );
             EnableTextPathLogging = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTextPathLogging", false );
             OutputUntranslatableText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputUntranslatableText", false );
+            IgnoreVirtualTextSetterCallingRules = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreVirtualTextSetterCallingRules", false );
 
+            
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", @"Translation\{Lang}\Texture" );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();
 

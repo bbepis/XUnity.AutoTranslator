@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       private static readonly HashSet<string> LanguagesNotUsingWhitespaceBetweenWords = new HashSet<string>
       {
-         "ja", "zh", "zh-Hans", "zh-Hant", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant"
+         "ja", "zh", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant"
       };
 
       internal static bool IsFromLanguageSupported( string code )

@@ -1,9 +1,11 @@
 ﻿### 4.9.0
- * FEATURE - API to support easier translations of TextAsset resources
+ * FEATURE - API to support easier manual translations of TextAsset resources
  * FEATURE - Support for not loading every translated image into memory permanently, but instead loading them on demand (new configuration option)
  * FEATURE - Better support for variations of Chinese as output language. 'zh-CN', 'zh-TW', 'zh-Hans', 'zh-Hant', 'zh' can now all be used by all translators if supported
  * FEATURE - Better support for variations of Chinese as input language. Plugin wont complain if 'zh-Hans', 'zh-Hant' or 'zh' is used
  * MISC - Support for older versions of UTAGE
+ * MISC - New option that enables ignoring rules for calling virtual methods when setting the text of a text component: 'IgnoreVirtualTextSetterCallingRules'
+ * MISC - Updated version of MonoMod distributed with the plugin
  * BUG FIX - Potential errors caused by using weak references incorrectly causing a race condition
  * BUG FIX - Potential error during initialization if Resource Redirector is not present
 

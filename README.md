@@ -291,6 +291,7 @@ EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' direc
 EnableSilentMode=False           ;Indicates the plugin should not print out success messages in relation to translations
 BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
 OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
+IgnoreVirtualTextSetterCallingRules; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -304,6 +305,7 @@ TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pi
 DuplicateTextureNames=           ;Indicates specific texture names that are duplicated in the game. List is separated by ';'.
 DetectDuplicateTextureNames=False;Indicates if the plugin should detect duplicate texture names.
 EnableLegacyTextureLoading=False ;Indicates the plugin should use a different strategy to load images, that may be relevant if the game engine is old
+CacheTexturesInMemory=True       ;Indicates that all textures loaded should be kept in memory for optimal performance. Disable to decrease memory usage
 
 [ResourceRedirector]
 PreferredStoragePath=Translation\{Lang}\RedirectedResources ;Indicates the preferred storage for redirected resources in relation to the Auto Translator. Can use placeholder: {GameExeName}, {Lang}
@@ -436,6 +438,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations.
  * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
  * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. Enabling this may also output a lot of garbage to the `OutputFile` that should be deleted before potential redistribution. **Never redistribute the mod with this enabled.**
+ * `IgnoreVirtualTextSetterCallingRules`: Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components.
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
@@ -696,6 +699,7 @@ TextureHashGenerationStrategy=FromImageName
 DuplicateTextureNames=
 DetectDuplicateTextureNames=False
 EnableLegacyTextureLoading=False
+CacheTexturesInMemory=True
 ```
 
 `TextureDirectory` specifies the directory where textures are dumped to and loaded from. Loading will happen from all subdirectories of the specified directory as well, so you can move dumped images to whatever folder structure you desire.
@@ -716,7 +720,9 @@ EnableLegacyTextureLoading=False
 
 `DetectDuplicateTextureNames` specifies that the plugin should identify which image names are duplicated and update the configuration with these names automatically. **Never redistribute the mod with this enabled.**
 
-`EnableLegacyTextureLoading` specifies that the plugin should use attempt to load images differently, which may be relevant if the unity engine is old (verified with versions less than 5.3). This should be used unless the images that are loaded are not the ones that you expected.
+`EnableLegacyTextureLoading` specifies that the plugin should use attempt to load images differently, which may be relevant if the unity engine is old (verified with versions less than 5.3). This should not be used unless the images that are loaded are not the ones that you expected.
+
+`CacheTexturesInMemory` specifies that all translation textures should be kept in memory to optimize performance. Can be disabled to improve performance
 
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:
