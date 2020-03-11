@@ -1,0 +1,1094 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>XUnity.ResourceRedirector</name>
+    </assembly>
+    <members>
+        <member name="T:XUnity.ResourceRedirector.AssetBundleHelper">
+            <summary>
+            Utility methods for AssetBundles.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleHelper.CreateEmptyAssetBundle">
+            <summary>
+            Creates an empty AssetBundle with a randomly generated CAB identifier.
+            </summary>
+            <returns>The empty asset bundle with a random CAB identifier.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleHelper.CreateEmptyAssetBundleRequest">
+            <summary>
+            Creates an empty AssetBundle request with a randomly generated CAB identifier.
+            </summary>
+            <returns>The asset bundle request with a random CAB identifier.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleHelper.LoadFromMemory(System.String,System.Byte[],System.UInt32)">
+            <summary>
+            Convenience method to maintain a name of an asset bundle being loaded through
+            memory for logging purposes.
+            </summary>
+            <param name="path">Path to the asset bundle being loaded. Only used for logging.</param>
+            <param name="binary">Binary data of the asset bundle being loaded.</param>
+            <param name="crc">Crc of the asset bundle.</param>
+            <returns>The loaded asset bundle.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleHelper.LoadFromMemoryAsync(System.String,System.Byte[],System.UInt32)">
+            <summary>
+            Convenience method to maintain a name of an asset bundle being loaded through
+            memory for logging purposes.
+            </summary>
+            <param name="path">Path to the asset bundle being loaded. Only used for logging.</param>
+            <param name="binary">Binary data of the asset bundle being loaded.</param>
+            <param name="crc">Crc of the asset bundle.</param>
+            <returns>The request.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleHelper.LoadFromFileWithRandomizedCabIfRequired(System.String,System.UInt32,System.UInt64)">
+            <summary>
+            Loads an asset bundle from a file. If loading fails, randomize the CAB and try again from memory.
+            </summary>
+            <param name="path"></param>
+            <param name="crc"></param>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetBundleLoadedContext">
+            <summary>
+            The operation context surrounding the AssetBundleLoaded hook (both asynchronous and synchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadedContext.GetNormalizedPath">
+            <summary>
+            Gets a normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadedContext.Complete(System.Boolean)">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPostfixes">Indicate if the remaining postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadedContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadedContext.Parameters">
+            <summary>
+            Gets the parameters of the call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadedContext.Bundle">
+            <summary>
+            Gets or sets the AssetBundle being loaded.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetBundleLoadingContext">
+            <summary>
+            The operation context surrounding the AssetBundleLoading hook (synchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadingContext.GetNormalizedPath">
+            <summary>
+            Gets a normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadingContext.Complete">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset bundle, you likely want to set this to true.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if all the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetBundleLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingContext.Parameters">
+            <summary>
+            Gets the parameters of the call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingContext.Bundle">
+            <summary>
+            Gets or sets the AssetBundle being loaded.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetBundleLoadingParameters">
+            <summary>
+            Class representing the parameters of the load call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingParameters.Path">
+            <summary>
+            Gets or sets the loaded path. Only relevant for 'LoadFromFile'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingParameters.Crc">
+            <summary>
+            Gets or sets the crc. Only relevant for 'LoadFromFile' and 'LoadFromMemory'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingParameters.Offset">
+            <summary>
+            Gets or sets the offset. Only relevant for 'LoadFromFile'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingParameters.Binary">
+            <summary>
+            Gets or sets the binary data. Only relevant for 'LoadFromMemory'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetBundleLoadingParameters.LoadType">
+            <summary>
+            Gets the type of call that is loading this asset bundle.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetBundleLoadType">
+            <summary>
+            Enum representing the different ways an asset bundle may be loaded.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetBundleLoadType.LoadFromFile">
+            <summary>
+            Indicates that the asset bundle is being loaded through a call to 'LoadFromFile' or 'LoadFromFileAsync'.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetBundleLoadType.LoadFromMemory">
+            <summary>
+            Indicates that the asset bundle is being loaded through a call to 'LoadFromMemory' or 'LoadFromMemoryAsync'.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetLoadedContext">
+            <summary>
+            The operation context surrounding the AssetLoaded hook.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.HasReferenceBeenRedirectedBefore(UnityEngine.Object)">
+            <summary>
+            Gets a bool indicating if this resource has already been redirected before.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.GetUniqueFileSystemAssetPath(UnityEngine.Object)">
+            <summary>
+            Gets a file system path for the specfic asset that should be unique.
+            </summary>
+            <param name="asset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.GetAssetBundlePath">
+            <summary>
+            Gets the original path the asset bundle was loaded with.
+            </summary>
+            <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.GetNormalizedAssetBundlePath">
+            <summary>
+            Gets the normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.Complete(System.Boolean)">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadedContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedContext.Parameters">
+            <summary>
+            Gets the parameters the asset load call was called with.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedContext.Bundle">
+            <summary>
+            Gets the AssetBundle associated with the loaded assets.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedContext.Assets">
+             <summary>
+             Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+            
+             Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets' and you subscribed with 'OneCallbackPerLoadCall'.
+             </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedContext.Asset">
+            <summary>
+            Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetLoadedParameters">
+            <summary>
+            Class representing the parameters of the load call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedParameters.Name">
+            <summary>
+            Gets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedParameters.Type">
+            <summary>
+            Gets the type that passed to the asset load call. 
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadedParameters.LoadType">
+            <summary>
+            Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
+            multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetLoadingContext">
+            <summary>
+            The operation context surrounding the AssetLoading hook (synchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadingContext.GetAssetBundlePath">
+            <summary>
+            Gets the original path the asset bundle was loaded with.
+            </summary>
+            <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadingContext.GetNormalizedAssetBundlePath">
+            <summary>
+            Gets the normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AssetLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingContext.Parameters">
+            <summary>
+            Gets the parameters the asset load call was called with.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingContext.Bundle">
+            <summary>
+            Gets the AssetBundle associated with the loaded assets.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingContext.Assets">
+             <summary>
+             Gets or sets the loaded assets.
+            
+             Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+             </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingContext.Asset">
+            <summary>
+            Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetLoadingParameters">
+            <summary>
+            Class representing the parameters of the load call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingParameters.Name">
+            <summary>
+            Gets or sets the name of the asset being loaded. Will be null if loaded through 'LoadMainAsset' or 'LoadByType'.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingParameters.Type">
+            <summary>
+            Gets or sets the type that passed to the asset load call. 
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AssetLoadingParameters.LoadType">
+            <summary>
+            Gets or sets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified
+            multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AssetLoadType">
+            <summary>
+            Enum representing the different ways an asset may be loaded.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetLoadType.LoadMainAsset">
+            <summary>
+            Indicates that this asset has been loaded as the 'mainAsset' in the AssetBundle API.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetLoadType.LoadByType">
+            <summary>
+            Indicates that this call is loading all assets of a specific type in an AssetBundle API.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetLoadType.LoadNamed">
+            <summary>
+            Indicates that this call is loading a specific named asset in the AssetBundle API.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AssetLoadType.LoadNamedWithSubAssets">
+            <summary>
+            Indicates that this call is loading a specific named asset and all those below it in the AssetBundle API.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext">
+            <summary>
+            The operation context surrounding the AsyncAssetBundleLoading hook (asynchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.GetNormalizedPath">
+            <summary>
+            Gets a normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Complete">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the request, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if all the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Parameters">
+            <summary>
+            Gets the parameters of the call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Request">
+            <summary>
+            Gets or sets the AssetBundleCreateRequest being used to load the AssetBundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.Bundle">
+            <summary>
+            Gets or sets the AssetBundle being loaded.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext.ResolveType">
+            <summary>
+            Gets or sets how this load operation should be resolved.
+            Setting the Bundle/Request property will automatically update this value.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AsyncAssetBundleLoadingResolve">
+            <summary>
+            Enum indicating how an asset bundle load operation should be resolved.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AsyncAssetBundleLoadingResolve.ThroughRequest">
+            <summary>
+            Indicates it should happen asynchronously through the Request property.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AsyncAssetBundleLoadingResolve.ThroughBundle">
+            <summary>
+            Indicates it should happen synchronously through the Bundle property.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AsyncAssetLoadingContext">
+            <summary>
+            The operation context surrounding the AsyncAssetLoading hook (asynchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetLoadingContext.GetAssetBundlePath">
+            <summary>
+            Gets the original path the asset bundle was loaded with.
+            </summary>
+            <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetLoadingContext.GetNormalizedAssetBundlePath">
+            <summary>
+            Gets the normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.AsyncAssetLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Parameters">
+            <summary>
+            Gets the parameters the asset load call was called with.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Bundle">
+            <summary>
+            Gets the AssetBundle associated with the loaded assets.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Request">
+            <summary>
+            Gets or sets the AssetBundleRequest used to load assets.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Assets">
+             <summary>
+             Gets or sets the loaded assets.
+            
+             Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+             </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.Asset">
+            <summary>
+            Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.AsyncAssetLoadingContext.ResolveType">
+            <summary>
+            Gets or sets how this load operation should be resolved.
+            Setting the Asset/Assets/Request property will automatically update this value.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.AsyncAssetLoadingResolve">
+            <summary>
+            Enum indicating how an asset load operation should be resolved.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AsyncAssetLoadingResolve.ThroughRequest">
+            <summary>
+            Indicates it should happen asynchronously through the Request property.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.AsyncAssetLoadingResolve.ThroughAssets">
+            <summary>
+            Indicates it should happen synchronously through the Asset/Assets property.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.CallbackPriority">
+            <summary>
+            Class containing pre-defined callback priorities.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.CallbackPriority.Default">
+            <summary>
+            Get the callback priority used if none is specified.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.Constants.PluginData">
+            <summary>
+            Class containing information about the resource redirector when used as a plugin.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.Constants.PluginData.Identifier">
+            <summary>
+            Gets a globally unique identifier.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.Constants.PluginData.Name">
+            <summary>
+            Gets a friendly name for the plugin.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.Constants.PluginData.Version">
+            <summary>
+            Gets the version of the plugin.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.HookBehaviour">
+            <summary>
+            Enum indicating how the resource redirector should treat the callback.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.HookBehaviour.OneCallbackPerLoadCall">
+            <summary>
+            Specifies that exactly one callback should be received per call to asset/resource load method.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.HookBehaviour.OneCallbackPerResourceLoaded">
+            <summary>
+            Specifies that exactly one callback should be received per loaded asset/resources. This means
+            that the 'Asset' property should be used over the 'Assets' property on the context object.
+            Do note that when using this option, if no resources are returned by a load call, no callbacks
+            will be received.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.IAssetBundleLoadingContext">
+            <summary>
+            The operation context surrounding the AssetBundleLoading hook (synchronous) and AsyncAssetBundleLoading hook (asynchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetBundleLoadingContext.GetNormalizedPath">
+            <summary>
+            Gets a normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetBundleLoadingContext.Complete">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            Defaults all parameters to true.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset bundle, you likely want to set this to true.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetBundleLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset bundle load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset bundle, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if all the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetBundleLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetBundleLoadingContext.Parameters">
+            <summary>
+            Gets the parameters of the call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetBundleLoadingContext.Bundle">
+            <summary>
+            Gets or sets the AssetBundle being loaded.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.IAssetLoadingContext">
+            <summary>
+            The operation context surrounding the AssetLoading hook (synchronous) or the AsyncAssetLoading hook (asynchronous).
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetLoadingContext.GetAssetBundlePath">
+            <summary>
+            Gets the original path the asset bundle was loaded with.
+            </summary>
+            <returns>The unmodified, original path the asset bundle was loaded with.</returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetLoadingContext.GetNormalizedAssetBundlePath">
+            <summary>
+            Gets the normalized path to the asset bundle that is:
+             * Relative to the current directory
+             * Lower-casing
+             * Uses '\' as separators.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetLoadingContext.Complete(System.Boolean,System.Nullable{System.Boolean},System.Nullable{System.Boolean})">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPrefixes">Indicate if the remaining prefixes should be skipped.</param>
+            <param name="skipOriginalCall">Indicate if the original call should be skipped. If you set the asset, you likely want to set this to true.</param>
+            <param name="skipAllPostfixes">Indicate if the postfixes should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetLoadingContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetLoadingContext.Parameters">
+            <summary>
+            Gets the parameters the asset load call was called with.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetLoadingContext.Bundle">
+            <summary>
+            Gets the AssetBundle associated with the loaded assets.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetLoadingContext.Assets">
+             <summary>
+             Gets or sets the loaded assets.
+            
+             Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
+             </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetLoadingContext.Asset">
+            <summary>
+            Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext">
+            <summary>
+            Shared interface between AssetLoadedContext and ResourceLoadedContext.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.HasReferenceBeenRedirectedBefore(UnityEngine.Object)">
+            <summary>
+            Gets a bool indicating if this resource has already been redirected before.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.GetUniqueFileSystemAssetPath(UnityEngine.Object)">
+            <summary>
+            Gets a file system path for the specfic asset that should be unique.
+            </summary>
+            <param name="asset"></param>
+            <returns></returns>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.Assets">
+            <summary>
+            Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.Asset">
+            <summary>
+            Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.Complete(System.Boolean)">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.IAssetOrResourceLoadedContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.Properties.Resources.empty">
+            <summary>
+              Looks up a localized resource of type System.Byte[].
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.ResourceLoadedContext">
+            <summary>
+            The operation context surrounding the ResourceLoaded hook.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceLoadedContext.HasReferenceBeenRedirectedBefore(UnityEngine.Object)">
+            <summary>
+            Gets a bool indicating if this resource has already been redirected before.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceLoadedContext.GetUniqueFileSystemAssetPath(UnityEngine.Object)">
+            <summary>
+            Gets a file system path for the specfic asset that should be unique.
+            </summary>
+            <param name="asset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceLoadedContext.Complete(System.Boolean)">
+            <summary>
+            Indicate your work is done and if any other hooks to this asset/resource load should be called.
+            </summary>
+            <param name="skipRemainingPostfixes">Indicate if any other hooks should be skipped.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceLoadedContext.DisableRecursion">
+            <summary>
+            Disables recursive calls if you make an asset/asset bundle load call
+            from within your callback. If you want to prevent recursion this should
+            be called before you load the asset/asset bundle.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedContext.Parameters">
+            <summary>
+            Gets the parameters the asset load call was called with.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedContext.Assets">
+             <summary>
+             Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
+            
+             Consider using this if the load type is 'LoadByType' and you subscribed with 'OneCallbackPerLoadCall'.
+             </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedContext.Asset">
+            <summary>
+            Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
+            additional null guards to prevent NullReferenceExceptions when using it.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.ResourceLoadedParameters">
+            <summary>
+            Class representing the parameters of the load call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedParameters.Path">
+            <summary>
+            Gets the name of the resource being loaded. Will not be the complete resource path if 'LoadByType' is used.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedParameters.Type">
+            <summary>
+            Gets the type that passed to the resource load call.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceLoadedParameters.LoadType">
+            <summary>
+            Gets the type of call that loaded this asset. If 'LoadByType' is specified
+            multiple assets may be returned if subscribed as 'OneCallbackPerLoadCall'.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.ResourceLoadType">
+            <summary>
+            Enum representing the different ways a resource may be loaded.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.ResourceLoadType.LoadByType">
+            <summary>
+            Indicates that this call is loading all assets of a specific type (below a specific path) in the Resources API.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.ResourceLoadType.LoadNamed">
+            <summary>
+            Indicates that this call is loading a single named asset in the Resources API.
+            </summary>
+        </member>
+        <member name="F:XUnity.ResourceRedirector.ResourceLoadType.LoadNamedBuiltIn">
+            <summary>
+            Indicates that this call is loading a single named built-in asset in the Resources API.
+            </summary>
+        </member>
+        <member name="T:XUnity.ResourceRedirector.ResourceRedirection">
+            <summary>
+            Entrypoint to the resource redirection API.
+            </summary>
+        </member>
+        <member name="P:XUnity.ResourceRedirector.ResourceRedirection.LogAllLoadedResources">
+            <summary>
+            Gets or sets a bool indicating if the resource redirector
+            should log all loaded resources/assets to the console.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.Initialize">
+            <summary>
+            Initializes the Resource Redirector.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.EnableSyncOverAsyncAssetLoads">
+            <summary>
+            Enables experimental hooks that allows returning an Asset instead of a Request from async prefix
+            asset load operations.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.DisableRecursionPermanently">
+             <summary>
+             Disables all recursive behaviour in the plugin. This means that trying to load an asset
+             using the hooked APIs will not trigger a callback back into the callback chain. This makes
+             setting the correct priorities on callbacks much more important.
+            
+             This method should not be called lightly. It should not be something a single plugin randomly
+             decides to call, but rather decision for how to use the ResourceRedirection API on a game-wide basis.
+             </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.EnableEmulateAssetBundles(System.Int32,System.String)">
+            <summary>
+            Creates an asset bundle hook that attempts to load asset bundles in the emulation directory
+            over the default asset bundles if they exist.
+            </summary>
+            <param name="priority">Priority of the hook.</param>
+            <param name="emulationDirectory">The directory to look for the asset bundles in.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.DisableEmulateAssetBundles">
+            <summary>
+            Disable a previously enabled asset bundle emulation.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle(System.Int32)">
+            <summary>
+            Creates an asset bundle hook that redirects asset bundles loads to an empty
+            asset bundle if the file that is being loaded does not exist.
+            </summary>
+            <param name="priority">Priority of the hook.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.EnableRandomizeCabIfConflict(System.Int32,System.Boolean)">
+            <summary>
+            Enables CAB randomization of loaded asset bundles if a conflict is detected.
+            </summary>
+            <param name="priority">Priority of the hook.</param>
+            <param name="forceRandomizeWhenInMemory">Indicates whether to force all asset bundles already in memory to have their CAB randomized regardless of whether there is a conflict.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.DisableRandomizeCabIfConflict">
+            <summary>
+            Disables CAB randomization if it was previously enabled.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.DisableRedirectMissingAssetBundlesToEmptyAssetBundle">
+            <summary>
+            Disable a previously enabled redirect missing asset bundles to empty asset bundle.
+            </summary>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetBundleLoadedHook(System.Int32,System.Action{XUnity.ResourceRedirector.AssetBundleLoadedContext})">
+            <summary>
+            Register an AssetBundleLoaded hook (postfix to loading an asset bundle).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetBundleLoadedHook(System.Action{XUnity.ResourceRedirector.AssetBundleLoadedContext})">
+            <summary>
+            Register an AssetBundleLoaded hook (postfix to loading an asset bundle).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAssetBundleLoadedHook(System.Action{XUnity.ResourceRedirector.AssetBundleLoadedContext})">
+            <summary>
+            Unregister an AssetBundleLoaded hook (postfix to loading an asset bundle).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.AssetLoadingContext})">
+            <summary>
+            Register an AssetLoading hook (prefix to loading an asset from an asset bundle).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetLoadingHook(System.Action{XUnity.ResourceRedirector.AssetLoadingContext})">
+            <summary>
+            Register an AssetLoading hook (prefix to loading an asset from an asset bundle).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAssetLoadingHook(System.Action{XUnity.ResourceRedirector.AssetLoadingContext})">
+            <summary>
+            Unregister an AssetLoading hook (prefix to loading an asset from an asset bundle).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAssetLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.AsyncAssetLoadingContext})">
+            <summary>
+            Register an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAssetLoadingHook(System.Action{XUnity.ResourceRedirector.AsyncAssetLoadingContext})">
+            <summary>
+            Register an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAsyncAssetLoadingHook(System.Action{XUnity.ResourceRedirector.AsyncAssetLoadingContext})">
+            <summary>
+            Unregister an AsyncAssetLoading hook (prefix to loading an asset from an asset bundle asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAndSyncAssetLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.IAssetLoadingContext})">
+            <summary>
+            Register an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAndSyncAssetLoadingHook(System.Action{XUnity.ResourceRedirector.IAssetLoadingContext})">
+            <summary>
+            Register an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAsyncAndSyncAssetLoadingHook(System.Action{XUnity.ResourceRedirector.IAssetLoadingContext})">
+            <summary>
+            Unregister an AsyncAssetLoading hook and AssetLoading hook (prefix to loading an asset from an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetLoadedHook(XUnity.ResourceRedirector.HookBehaviour,System.Int32,System.Action{XUnity.ResourceRedirector.AssetLoadedContext})">
+            <summary>
+            Register an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
+            </summary>
+            <param name="behaviour">The behaviour of the callback.</param>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetLoadedHook(XUnity.ResourceRedirector.HookBehaviour,System.Action{XUnity.ResourceRedirector.AssetLoadedContext})">
+            <summary>
+            Register an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
+            </summary>
+            <param name="behaviour">The behaviour of the callback.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAssetLoadedHook(System.Action{XUnity.ResourceRedirector.AssetLoadedContext})">
+            <summary>
+            Unregister an AssetLoaded hook (postfix to loading an asset from an asset bundle (both synchronous and asynchronous)).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetBundleLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.AssetBundleLoadingContext})">
+            <summary>
+            Register an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.AssetBundleLoadingContext})">
+            <summary>
+            Register an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.AssetBundleLoadingContext})">
+            <summary>
+            Unregister an AssetBundleLoading hook (prefix to loading an asset bundle synchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAssetBundleLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext})">
+            <summary>
+            Register an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext})">
+            <summary>
+            Register an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAsyncAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.AsyncAssetBundleLoadingContext})">
+            <summary>
+            Unregister an AsyncAssetBundleLoading hook (prefix to loading an asset bundle asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(System.Int32,System.Action{XUnity.ResourceRedirector.IAssetBundleLoadingContext})">
+            <summary>
+            Register an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterAsyncAndSyncAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.IAssetBundleLoadingContext})">
+            <summary>
+            Register an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterAsyncAndSyncAssetBundleLoadingHook(System.Action{XUnity.ResourceRedirector.IAssetBundleLoadingContext})">
+            <summary>
+            Unregister an AsyncAssetBundleLoading hook and AssetBundleLoading hook (prefix to loading an asset bundle synchronously/asynchronously).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterResourceLoadedHook(XUnity.ResourceRedirector.HookBehaviour,System.Int32,System.Action{XUnity.ResourceRedirector.ResourceLoadedContext})">
+            <summary>
+            Register a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+            </summary>
+            <param name="behaviour">The behaviour of the callback.</param>
+            <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.RegisterResourceLoadedHook(XUnity.ResourceRedirector.HookBehaviour,System.Action{XUnity.ResourceRedirector.ResourceLoadedContext})">
+            <summary>
+            Register a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+            </summary>
+            <param name="behaviour">The behaviour of the callback.</param>
+            <param name="action">The callback.</param>
+        </member>
+        <member name="M:XUnity.ResourceRedirector.ResourceRedirection.UnregisterResourceLoadedHook(System.Action{XUnity.ResourceRedirector.ResourceLoadedContext})">
+            <summary>
+            Unregister a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+            </summary>
+            <param name="action">The callback.</param>
+        </member>
+    </members>
+</doc>

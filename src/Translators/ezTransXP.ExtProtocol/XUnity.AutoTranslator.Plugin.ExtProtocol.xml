@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>XUnity.AutoTranslator.Plugin.ExtProtocol</name>
+    </assembly>
+    <members>
+        <member name="T:XUnity.AutoTranslator.Plugin.ExtProtocol.ExtProtocolConvert">
+            <summary>
+            Class used to encode and decode 'Ext' protocol messages.
+            </summary>
+        </member>
+        <member name="M:XUnity.AutoTranslator.Plugin.ExtProtocol.ExtProtocolConvert.Register(System.String,System.Type)">
+            <summary>
+            Register a message type.
+            </summary>
+            <param name="id"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:XUnity.AutoTranslator.Plugin.ExtProtocol.ExtProtocolConvert.Encode(XUnity.AutoTranslator.Plugin.ExtProtocol.ProtocolMessage)">
+            <summary>
+            Encode a message to a string.
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:XUnity.AutoTranslator.Plugin.ExtProtocol.ExtProtocolConvert.Decode(System.String)">
+            <summary>
+            Decode a message from a string.
+            </summary>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="T:XUnity.AutoTranslator.Plugin.ExtProtocol.ProtocolMessage">
+            <summary>
+            Base-class for all protocol messages.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.ProtocolMessage.Id">
+            <summary>
+            Gets or sets the Id of the message.
+            </summary>
+        </member>
+        <member name="T:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationError">
+            <summary>
+            Protocol message returned to a translator if an error occured.
+            </summary>
+        </member>
+        <member name="F:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationError.Type">
+            <summary>
+            Gets the type used by the message.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationError.Reason">
+            <summary>
+            Gets or sets the reason for the failure.
+            </summary>
+        </member>
+        <member name="T:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationRequest">
+            <summary>
+            Protocol message supplied to the external process to indicate
+            a translation is requested.
+            </summary>
+        </member>
+        <member name="F:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationRequest.Type">
+            <summary>
+            Gets the type used by the message.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationRequest.SourceLanguage">
+            <summary>
+            Gets or sets the source language.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationRequest.DestinationLanguage">
+            <summary>
+            Gets or sets the destination language.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationRequest.UntranslatedTexts">
+            <summary>
+            Gets or sets the untranslated text.
+            </summary>
+        </member>
+        <member name="T:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationResponse">
+            <summary>
+            Protocol message returned to a translator when a translation completed.
+            </summary>
+        </member>
+        <member name="F:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationResponse.Type">
+            <summary>
+            Gets the type used by the message.
+            </summary>
+        </member>
+        <member name="P:XUnity.AutoTranslator.Plugin.ExtProtocol.TranslationResponse.TranslatedTexts">
+            <summary>
+            Gets or sets the translated text.
+            </summary>
+        </member>
+    </members>
+</doc>
