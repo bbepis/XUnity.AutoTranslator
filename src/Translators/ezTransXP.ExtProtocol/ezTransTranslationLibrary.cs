@@ -16,8 +16,6 @@ namespace ezTransXP.ExtProtocol
       [UnmanagedFunctionPointer( CallingConvention.Cdecl )]
       private delegate void J2K_StopTranslation();
 
-      private string libraryPath;
-
       protected UnmanagedLibraryLoader Loader = new UnmanagedLibraryLoader();
 
       private J2K_InitializeEx _init;
@@ -26,8 +24,6 @@ namespace ezTransXP.ExtProtocol
 
       public ezTransTranslationLibrary( string libraryPath )
       {
-         this.libraryPath = libraryPath;
-
          if( !File.Exists( libraryPath ) ) throw new FileNotFoundException( "Could not find file.", libraryPath );
 
          Loader.LoadLibrary( libraryPath );
@@ -38,15 +34,67 @@ namespace ezTransXP.ExtProtocol
       {
          return _init( username, datpath );
       }
+      private string PreprocessString( string str )
+      {
+         var builder = new StringBuilder( str.Length );
+
+         foreach( var c in str )
+         {
+            switch( c )
+            {
+               case '『':
+                  builder.Append( '"' );
+                  break;
+               case '｢':
+               case '「':
+                  builder.Append( '\'' );
+                  break;
+               case '』':
+                  builder.Append( '"' );
+                  break;
+               case '｣':
+               case '」':
+                  builder.Append( '\'' );
+                  break;
+               case '≪':
+                  builder.Append( '<' );
+                  break;
+               case '（':
+                  builder.Append( '(' );
+                  break;
+               case '≫':
+                  builder.Append( '>' );
+                  break;
+               case '）':
+                  builder.Append( ')' );
+                  break;
+               case '…':
+                  builder.Append( "..." );
+                  break;
+               case '：':
+                  builder.Append( '￤' );
+                  break;
+               case '・':
+                  builder.Append( '-' );
+                  break;
+               default:
+                  builder.Append( c );
+                  break;
+            }
+         }
+
+         return builder.ToString();
+      }
 
       public string Translate( string toTranslate )
       {
+         toTranslate = PreprocessString( toTranslate );
          try
          {
             string result = Marshal.PtrToStringAuto( _translate( 0, toTranslate ) );
             return result;
          }
-         catch( Exception e )
+         catch( Exception )
          {
             //Failed to Translate
             return toTranslate;

@@ -124,6 +124,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP", "src\Translators\ezTransXP\ezTransXP.csproj", "{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {718A3B1D-A5E5-4223-AD53-45C60C874150}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP.ExtProtocol", "src\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj", "{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}"
 EndProject

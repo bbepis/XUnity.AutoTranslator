@@ -74,7 +74,7 @@ namespace ezTransXP.ExtProtocol
                }
             }
          }
-         catch( Exception e )
+         catch( Exception )
          {
             // "Graceful shutdown"
          }
