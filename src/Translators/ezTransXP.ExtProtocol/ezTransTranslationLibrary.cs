@@ -41,7 +41,6 @@ namespace ezTransXP.ExtProtocol
 
       public string Translate( string toTranslate )
       {
-         //toTranslate = PreprocessString( toTranslate );
          try
          {
             string result = Marshal.PtrToStringAuto( _translate( 0, toTranslate ) );

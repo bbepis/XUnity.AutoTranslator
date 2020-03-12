@@ -33,12 +33,15 @@ namespace ezTransXP
             path = defaultPath;
          }
 
+         //subprocess path
          var exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\ezTransXP.ExtProtocol.exe" );
 
          var fileExists = File.Exists( exePath );
          if( !fileExists ) throw new EndpointInitializationException( $"Could not find any executable at '{exePath}'" );
 
          ExecutablePath = exePath;
+
+         //argument is ezTrans installation path
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( path ) );
 
          if( context.SourceLanguage != "ja" ) throw new EndpointInitializationException( "Current implementation only supports japanese-to-korean." );

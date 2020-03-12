@@ -29,12 +29,13 @@ namespace ezTransXP.ExtProtocol
             var powerTranslatorPathPayload = args[ 0 ];
             var powerTranslatorPath = Encoding.UTF8.GetString( Convert.FromBase64String( powerTranslatorPathPayload ) );
 
-            var datPath = Path.Combine( powerTranslatorPath, @"Dat" );
-            var dllPath = Path.Combine( powerTranslatorPath, @"J2KEngineH.dll" );
+            var datPath = Path.Combine( powerTranslatorPath, @"Dat" );  //initialize path
+
+            var dllPath = Path.Combine( powerTranslatorPath, @"J2KEngineH.dll" );   //Ehnd engine path
 
             using( var translator = new ezTransTranslationLibrary( dllPath ) )
             {
-               if( !translator.InitEx( "CSUSER123455", datPath ) )
+               if( !translator.InitEx( "CSUSER123455", datPath ) )  //initialize ezTrans
                {
                   throw new Exception( "J2K_InitializeEx Failed." );
                }
@@ -57,9 +58,7 @@ namespace ezTransXP.ExtProtocol
                      for( int i = 0; i < message.UntranslatedTexts.Length; i++ )
                      {
                         var untranslatedText = message.UntranslatedTexts[ i ];
-                        //OutputFile( untranslatedText );
                         var translatedText = translator.Translate( untranslatedText );
-                        //OutputFile( translatedText );
                         translatedTexts[ i ] = translatedText;
                      }
 
@@ -77,7 +76,6 @@ namespace ezTransXP.ExtProtocol
          }
          catch( Exception e )
          {
-            //OutputFile( e.Message );
             // "Graceful shutdown"
          }
       }
