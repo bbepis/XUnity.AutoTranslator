@@ -7,16 +7,8 @@ namespace ezTransXP.ExtProtocol
 {
    class Program
    {
-      /*static void OutputFile(string text)
-      {
-         StreamWriter output = new StreamWriter( "output2.txt", append: true );
-         output.WriteLine( text );
-         output.Close();
-      }*/
       static void Main( string[] args )
       {
-         // Implementation of this is based off of texel-sensei's LEC implementation
-
          try
          {
             if( args.Length == 0 )
@@ -79,7 +71,7 @@ namespace ezTransXP.ExtProtocol
                }
             }
          }
-         catch( Exception e )
+         catch( Exception )
          {
             // "Graceful shutdown"
          }

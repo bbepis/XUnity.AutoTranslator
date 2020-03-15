@@ -58,7 +58,8 @@ namespace ezTransXP
             }
             else // 32-bit
             {
-               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_CURRENT_USER\SOFTWARE\ChangShin\ezTrans", "FilePath", null );
+               // not sure where to look for this...
+               return @"C:\Program Files (x86)\ChangShinSoft\ezTrans XP";
             }
          }
          catch
