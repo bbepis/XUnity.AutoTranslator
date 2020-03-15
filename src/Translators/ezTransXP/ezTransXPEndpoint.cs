@@ -48,19 +48,12 @@ namespace ezTransXP
          if( context.DestinationLanguage != "ko" ) throw new EndpointInitializationException( "Current implementation only supports japanese-to-korean." );
 
       }
+
       public static string GetDefaultInstallationPath()
       {
          try
          {
-            if( IntPtr.Size == 8 ) // 64-bit
-            {
-               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\ChangShin\ezTrans", "FilePath", null );
-            }
-            else // 32-bit
-            {
-               // not sure where to look for this...
-               return @"C:\Program Files (x86)\ChangShinSoft\ezTrans XP";
-            }
+            return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_CURRENT_USER\SOFTWARE\ChangShin\ezTrans", "FilePath", null );
          }
          catch
          {
