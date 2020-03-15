@@ -5,6 +5,19 @@ VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0F9B38FC-4E57-4B83-AF0B-0993B8470823}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ACADAE2C-1642-428A-84D4-CC53E24F1348}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		CHANGELOG - ResourceRedirector.md = CHANGELOG - ResourceRedirector.md
+		CHANGELOG.md = CHANGELOG.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Translators", "Translators", "{7A01BA34-3B96-4910-AC70-462BA59417CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2A4A3DDF-338C-40C0-8E26-2A810BAAADD6}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core", "src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj", "{718A3B1D-A5E5-4223-AD53-45C60C874150}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.IPA", "src\XUnity.AutoTranslator.Plugin.IPA\XUnity.AutoTranslator.Plugin.IPA.csproj", "{C749698C-9E49-4CC3-8B45-62AE3AD0C938}"
@@ -27,17 +40,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugi
 		{848D741E-A4F2-4680-AFD2-74C8723CE3C4} = {848D741E-A4F2-4680-AFD2-74C8723CE3C4}
 		{1C574D77-FCC8-4249-8890-0B00EF092705} = {1C574D77-FCC8-4249-8890-0B00EF092705}
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ACADAE2C-1642-428A-84D4-CC53E24F1348}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		CHANGELOG - ResourceRedirector.md = CHANGELOG - ResourceRedirector.md
-		CHANGELOG.md = CHANGELOG.md
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Translators", "Translators", "{7A01BA34-3B96-4910-AC70-462BA59417CB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReverseTranslator", "src\Translators\ReverseTranslator\ReverseTranslator.csproj", "{7493BA4A-C688-4103-B161-7E578FBB6C0E}"
 EndProject
@@ -72,8 +74,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup.Build-x86", "src\XUnity.AutoTranslator.Setup.Build-x86\XUnity.AutoTranslator.Setup.Build-x86.csproj", "{1C574D77-FCC8-4249-8890-0B00EF092705}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2A4A3DDF-338C-40C0-8E26-2A810BAAADD6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.RuntimeHooker", "src\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj", "{15A1D255-25F3-4D10-8053-F24B32C1CB7B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -122,6 +122,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat", "src\Translators\GoogleTranslateCompat\GoogleTranslateCompat.csproj", "{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP", "src\Translators\ezTransXP\ezTransXP.csproj", "{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {718A3B1D-A5E5-4223-AD53-45C60C874150}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP.ExtProtocol", "src\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj", "{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -443,17 +450,33 @@ Global
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|x86.Build.0 = Release|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Debug|x86.Build.0 = Debug|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Release|x86.ActiveCfg = Release|Any CPU
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}.Release|x86.Build.0 = Release|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|x86.Build.0 = Debug|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{7A01BA34-3B96-4910-AC70-462BA59417CB} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{C749698C-9E49-4CC3-8B45-62AE3AD0C938} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{0A2A6B66-91D4-4A4E-AC77-80C6DD748FCD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{86BF1F46-44C1-4301-8314-6EC32F74575F} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{12F1D16B-B8E1-4A9D-B65A-044650F15440} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
-		{7A01BA34-3B96-4910-AC70-462BA59417CB} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{7493BA4A-C688-4103-B161-7E578FBB6C0E} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{5D9A4F4D-D2D2-4D2B-A58A-F7529DDAF1D0} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{95C83913-8D7F-4FA1-877E-288251A2A461} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
@@ -488,6 +511,8 @@ Global
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
+		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}

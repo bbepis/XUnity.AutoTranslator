@@ -1,17 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
     <RootNamespace>XUnity.AutoTranslator.Setup.Build_x86</RootNamespace>
     <Platforms>AnyCPU;x86</Platforms>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\Users\wldnj\Source\Repos\XUnity.AutoTranslator\Backup1\</UpgradeBackupLocation>
+    <OldToolsVersion>Current</OldToolsVersion>
   </PropertyGroup>
-
-   <PropertyGroup>
-      <OutputPath>bin</OutputPath>
-   </PropertyGroup>
-
-   <ItemGroup>
-     <ProjectReference Include="..\Translators\Lec.ExtProtocol\Lec.ExtProtocol.csproj" />
-   </ItemGroup>
-
+  <PropertyGroup>
+    <OutputPath>bin</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj" />
+    <ProjectReference Include="..\Translators\Lec.ExtProtocol\Lec.ExtProtocol.csproj" />
+  </ItemGroup>
 </Project>
