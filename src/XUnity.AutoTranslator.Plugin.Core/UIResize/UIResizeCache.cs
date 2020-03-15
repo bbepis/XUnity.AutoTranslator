@@ -8,6 +8,7 @@ using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UIResize
@@ -23,8 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
       private static IEnumerable<string> GetTranslationFiles()
       {
          return Directory.GetFiles( Settings.TranslationsPath, $"*.*", SearchOption.AllDirectories )
-            .Where( x => x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
-            .Select( x => x.Replace( "/", "\\" ) );
+            .Where( x => x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) );
       }
 
       internal void LoadResizeCommandsInFiles()
@@ -120,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                      {
                         if( entry.IsFile && entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
                         {
-                           LoadResizeCommandsInStream( zipInputStream, fullFileName + '\\' + entry.Name );
+                           LoadResizeCommandsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name );
                         }
                      }
                   }

@@ -138,8 +138,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private IEnumerable<string> GetTextureFiles()
       {
          return Directory.GetFiles( Settings.TexturesPath, $"*.*", SearchOption.AllDirectories )
-            .Where( x => x.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
-            .Select( x => x.Replace( "/", "\\" ) );
+            .Where( x => x.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) );
       }
 
       public void LoadTranslationFiles()
@@ -250,7 +249,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( zipEntry.IsFile && zipEntry.Name.EndsWith( ".png", StringComparison.OrdinalIgnoreCase ) )
                         {
                            var source = new ZipFileTranslatedImageSource( zf, zipEntry );
-                           RegisterImageFromStream( fullFileName + '\\' + zipEntry.Name, source );
+                           RegisterImageFromStream( fullFileName + Path.DirectorySeparatorChar + zipEntry.Name, source );
                         }
                      }
                   }

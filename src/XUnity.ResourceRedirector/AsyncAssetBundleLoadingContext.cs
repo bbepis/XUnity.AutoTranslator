@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 using XUnity.Common.Extensions;
 using XUnity.ResourceRedirector.Constants;
@@ -32,7 +33,7 @@ namespace XUnity.ResourceRedirector
          {
             _normalizedPath = Parameters.Path
                .ToLowerInvariant()
-               .Replace( '/', '\\' )
+               .UseCorrectDirectorySeparators()
                .MakeRelativePath( EnvironmentEx.LoweredCurrentDirectory );
          }
          return _normalizedPath;

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "XZipper": {
+      "commandName": "Project",
+      "commandLineArgs": "\"this is a test\" Hello \"What are you doing\" \"Haha\""
+    }
+  }
+}

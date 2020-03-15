@@ -183,7 +183,7 @@ namespace Lec.ExtProtocol
             }
          }
 
-         var directory = Path.GetDirectoryName( libraryPath ) + '\\';
+         var directory = Path.GetDirectoryName( libraryPath ) + Path.DirectorySeparatorChar;
 
          var initializationCode = _init2?.Invoke( directory, 0 );
          if( initializationCode == null )

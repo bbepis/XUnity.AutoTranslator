@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using XUnity.Common.Extensions;
 using XUnity.Common.Utilities;
 
 namespace XUnity.ResourceRedirector
@@ -77,7 +78,7 @@ namespace XUnity.ResourceRedirector
                path = Path.Combine( path, Parameters.LoadType == AssetLoadType.LoadMainAsset ? "main_asset" : "unnamed_asset" + suffix );
             }
 
-            path = path.Replace( '/', '\\' );
+            path = path.UseCorrectDirectorySeparators();
 
             ext.FullFileSystemAssetPath = path;
          }

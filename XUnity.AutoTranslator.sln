@@ -123,6 +123,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XZipper", "src\XZipper\XZipper.csproj", "{70A12896-52AF-444C-99EE-7D8E779741CA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{3E70DF54-72CA-4874-9EFE-6EA2F43FD7AC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -443,6 +447,14 @@ Global
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|x86.ActiveCfg = Release|Any CPU
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF}.Release|x86.Build.0 = Release|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Debug|x86.Build.0 = Debug|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Release|x86.ActiveCfg = Release|Any CPU
+		{70A12896-52AF-444C-99EE-7D8E779741CA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -488,6 +500,7 @@ Global
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
+		{70A12896-52AF-444C-99EE-7D8E779741CA} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}

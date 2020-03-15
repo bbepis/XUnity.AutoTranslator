@@ -291,7 +291,7 @@ EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' direc
 EnableSilentMode=False           ;Indicates the plugin should not print out success messages in relation to translations
 BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
 OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
-IgnoreVirtualTextSetterCallingRules; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
+IgnoreVirtualTextSetterCallingRules=False; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -722,7 +722,7 @@ CacheTexturesInMemory=True
 
 `EnableLegacyTextureLoading` specifies that the plugin should use attempt to load images differently, which may be relevant if the unity engine is old (verified with versions less than 5.3). This should not be used unless the images that are loaded are not the ones that you expected.
 
-`CacheTexturesInMemory` specifies that all translation textures should be kept in memory to optimize performance. Can be disabled to improve performance
+`CacheTexturesInMemory` specifies that all translation textures should be kept in memory to optimize performance. Can be disabled to reduce memory usage.
 
 `TextureHashGenerationStrategy` specifies how images are identified. When images are stored, the game will need some way of associating them with the image that it has to replace.
 This is done through a hash-value that is stored in square brackets in each image file name, like this: `file_name [0223B639A2-6E698E9272].png`. This configuration specifies how these hash-values are generated:

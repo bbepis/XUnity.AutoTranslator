@@ -12,6 +12,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
@@ -58,7 +59,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          return Directory.GetFiles( Settings.TranslationsPath, $"*", SearchOption.AllDirectories )
             .Where( x => x.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
-            .Select( x => x.Replace( "/", "\\" ) )
             .Where( x => !x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
             .Select( x => new FileInfo( x ).FullName );
       }
@@ -451,7 +451,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
                            {
-                              LoadTranslationsInStream( zipInputStream, fullFileName + '\\' + entry.Name, isSubstitutionFile, isPreprocessorFile, isOutputFile );
+                              LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isSubstitutionFile, isPreprocessorFile, isOutputFile );
                            }
                         }
                      }

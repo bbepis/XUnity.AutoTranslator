@@ -14,9 +14,24 @@ namespace XUnity.Common.Extensions
    {
 
       private static readonly HashSet<char> InvalidFileNameChars = new HashSet<char>( Path.GetInvalidFileNameChars() );
-      private static readonly string[] NewlinesCharacters = new string[] { "\r\n", "\n" };
-      private static readonly char[] WhitespacesAndNewlines = new char[] { '\r', '\n', ' ', '　' };
-      private static readonly char[] Spaces = new char[] { ' ', '　' };
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="path"></param>
+      /// <returns></returns>
+      public static string UseCorrectDirectorySeparators( this string path )
+      {
+         if( Path.DirectorySeparatorChar == '\\' )
+         {
+            return path.Replace( '/', Path.DirectorySeparatorChar );
+         }
+         else if( Path.DirectorySeparatorChar == '/' )
+         {
+            return path.Replace( '\\', Path.DirectorySeparatorChar );
+         }
+         return path;
+      }
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
@@ -95,7 +110,7 @@ namespace XUnity.Common.Extensions
             // back out of the working directory
             for( int i = 0; i < ( baseDirs.Length - offset ); i++ )
             {
-               builder.Append( "..\\" );
+               builder.Append( ".." + Path.DirectorySeparatorChar );
             }
          }
 
@@ -104,7 +119,7 @@ namespace XUnity.Common.Extensions
          {
             var dir = fileDirs[ i ];
             builder.Append( dir )
-               .Append( '\\' );
+               .Append( Path.DirectorySeparatorChar );
          }
 
          var lastIndex = fileDirs.Count - 1;

@@ -24,7 +24,7 @@ namespace Lec.ExtProtocol
 
             var powerTranslatorPathPayload = args[ 0 ];
             var powerTranslatorPath = Encoding.UTF8.GetString( Convert.FromBase64String( powerTranslatorPathPayload ) );
-            var dllPath = Path.Combine( powerTranslatorPath, @"Nova\JaEn\EngineDll_je.dll" );
+            var dllPath = Path.Combine( powerTranslatorPath, Path.Combine( "Nova", Path.Combine( "JaEn", "EngineDll_je.dll" ) ) );
 
             using( var translator = new LecTranslationLibrary( dllPath ) )
             {

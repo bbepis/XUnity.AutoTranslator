@@ -67,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             {
                HookingHelper.PatchAll( ImageHooks.All, Settings.ForceMonoModHooks );
 
-               if( Settings.EnableLegacyTextureLoading )
+               if( Settings.EnableLegacyTextureLoading || Settings.EnableSpriteHooking )
                {
                   HookingHelper.PatchAll( ImageHooks.Sprite, Settings.ForceMonoModHooks );
                }

@@ -32,7 +32,7 @@ namespace LecPowerTranslator15
 
          if( string.IsNullOrEmpty( pathToLec ) ) throw new EndpointInitializationException( "The LecPowerTranslator15 requires the path to the installation folder." );
 
-         var exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\Lec.ExtProtocol.exe" );
+         var exePath = Path.Combine( context.TranslatorDirectory, Path.Combine( "FullNET", "Lec.ExtProtocol.exe" ) );
 
          var fileExists = File.Exists( exePath );
          if( !fileExists ) throw new EndpointInitializationException( $"Could not find any executable at '{exePath}'" );

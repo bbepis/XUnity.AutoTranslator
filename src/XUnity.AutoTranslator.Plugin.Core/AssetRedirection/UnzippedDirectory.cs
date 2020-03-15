@@ -16,13 +16,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       private static readonly string _loweredCurrentDirectory = Paths.GameRoot.ToLowerInvariant();
       private readonly string _root;
       private readonly bool _cacheNormalFiles;
-      private PathReference _rootZipDir;
-      private List<ZipFile> _zipFiles;
+      private DirectoryEntry _rootDirectory;
+      private List<ZipFile> _allZipFiles;
 
       public UnzippedDirectory( string root, bool cacheNormalFiles )
       {
          _cacheNormalFiles = cacheNormalFiles;
-         _zipFiles = new List<ZipFile>();
+         _allZipFiles = new List<ZipFile>();
 
          Directory.CreateDirectory( root );
 
@@ -55,7 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
          }
 
-         if( _rootZipDir != null )
+         if( _rootDirectory != null )
          {
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
@@ -64,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
             path = path.MakeRelativePath( _root );
 
-            var entries = _rootZipDir.GetEntries( path, null, true )
+            var entries = _rootDirectory.GetFiles( path, null, true )
                .OrderBy( x => x.IsZipped )
                .ThenBy( x => x.ContainerFile )
                .ThenBy( x => x.FullPath )
@@ -94,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
          }
 
-         if( _rootZipDir != null )
+         if( _rootDirectory != null )
          {
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
@@ -103,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
             path = path.MakeRelativePath( _root );
 
-            var entries = _rootZipDir.GetEntries( path, null, false )
+            var entries = _rootDirectory.GetFiles( path, null, false )
                .OrderBy( x => x.IsZipped )
                .ThenBy( x => x.ContainerFile )
                .ThenBy( x => x.FullPath );
@@ -127,7 +127,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          var originalPath = path;
 
          var exists = false;
-         if( _rootZipDir != null )
+         if( _rootDirectory != null )
          {
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
@@ -136,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
             path = path.MakeRelativePath( _root );
 
-            exists = _rootZipDir.DirectoryExists( path );
+            exists = _rootDirectory.DirectoryExists( path );
          }
 
          return exists || ( !_cacheNormalFiles && Directory.Exists( originalPath ) );
@@ -147,7 +147,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          var originalPath = path;
 
          var exists = false;
-         if( _rootZipDir != null )
+         if( _rootDirectory != null )
          {
             path = path.ToLowerInvariant();
             if( !Path.IsPathRooted( path ) )
@@ -156,7 +156,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             }
             path = path.MakeRelativePath( _root );
 
-            exists = _rootZipDir.FileExists( path );
+            exists = _rootDirectory.FileExists( path );
          }
 
          return exists || ( !_cacheNormalFiles && File.Exists( originalPath ) );
@@ -170,7 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
             if( files.Length > 0 )
             {
-               _rootZipDir = new PathReference();
+               _rootDirectory = new DirectoryEntry();
             }
 
             foreach( var file in files )
@@ -179,7 +179,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
                if( isZip || ( _cacheNormalFiles && !isZip ) )
                {
-                  var current = _rootZipDir;
+                  var current = _rootDirectory;
                   var relativePath = file.ToLowerInvariant().MakeRelativePath( _root );
                   var parts = relativePath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
 
@@ -195,12 +195,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                            var start = current;
 
                            var zf = new ZipFile( file );
-                           _zipFiles.Add( zf );
+                           _allZipFiles.Add( zf );
 
                            foreach( ZipEntry entry in zf )
                            {
                               current = start;
-                              var internalPath = entry.Name.Replace( '/', '\\' ).ToLowerInvariant();
+                              var internalPath = entry.Name.UseCorrectDirectorySeparators().ToLowerInvariant();
                               var internalParts = internalPath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
                               for( int j = 0; j < internalParts.Length; j++ )
                               {
@@ -213,12 +213,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                                     }
                                     else
                                     {
-                                       current = current.GetOrCreateChildPath( internalPart );
+                                       current = current.GetOrCreateDirectory( internalPart );
                                     }
                                  }
                                  else
                                  {
-                                    current = current.GetOrCreateChildPath( internalPart );
+                                    current = current.GetOrCreateDirectory( internalPart );
                                  }
                               }
 
@@ -231,7 +231,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                      }
                      else
                      {
-                        current = current.GetOrCreateChildPath( part );
+                        current = current.GetOrCreateDirectory( part );
                      }
                   }
                }
@@ -286,25 +286,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          }
       }
 
-      private class PathReference
+      private class DirectoryEntry
       {
-         private Dictionary<string, PathReference> _subPaths = new Dictionary<string, PathReference>( StringComparer.OrdinalIgnoreCase );
+         private Dictionary<string, DirectoryEntry> _directories = new Dictionary<string, DirectoryEntry>( StringComparer.OrdinalIgnoreCase );
          private Dictionary<string, List<FileEntry>> _files = new Dictionary<string, List<FileEntry>>( StringComparer.OrdinalIgnoreCase );
 
-         public PathReference GetOrCreateChildPath( string name )
+         public DirectoryEntry GetOrCreateDirectory( string name )
          {
-            if( !_subPaths.TryGetValue( name, out var zpr ) )
+            if( !_directories.TryGetValue( name, out var zpr ) )
             {
-               zpr = new PathReference();
-               _subPaths.Add( name, zpr );
+               zpr = new DirectoryEntry();
+               _directories.Add( name, zpr );
             }
 
             return zpr;
          }
 
-         public PathReference GetChildPath( string name )
+         public DirectoryEntry GetDirectory( string name )
          {
-            _subPaths.TryGetValue( name, out var zpr );
+            _directories.TryGetValue( name, out var zpr );
             return zpr;
          }
 
@@ -318,7 +318,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             files.Add( entry );
          }
 
-         public List<FileEntry> GetEntries( string fullPath, string[] extensions, bool findAllByExtensionInLastDirectory )
+         public List<FileEntry> GetFiles( string fullPath, string[] extensions, bool findAllByExtensionInLastDirectory )
          {
             var entries = new List<FileEntry>();
             var parts = fullPath.Split( PathSeparators, StringSplitOptions.RemoveEmptyEntries );
@@ -337,7 +337,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             {
                var part = parts[ i ];
 
-               current = current.GetChildPath( part );
+               current = current.GetDirectory( part );
 
                if( current == null ) return false;
             }
@@ -360,7 +360,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                else
                {
-                  current = current.GetChildPath( part );
+                  current = current.GetDirectory( part );
 
                   if( current == null ) return false;
                }
@@ -384,7 +384,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
                else
                {
-                  if( _subPaths.TryGetValue( part, out var subPath ) )
+                  if( _directories.TryGetValue( part, out var subPath ) )
                   {
                      subPath.FillEntries( parts, index + 1, extensions, findAllByExtensionInLastDirectory, entries );
                   }
@@ -426,7 +426,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                // TODO: dispose managed state (managed objects).
             }
 
-            foreach( var zf in _zipFiles )
+            foreach( var zf in _allZipFiles )
             {
                zf.Close();
             }

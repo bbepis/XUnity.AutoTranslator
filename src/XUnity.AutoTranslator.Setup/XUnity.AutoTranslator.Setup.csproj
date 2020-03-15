@@ -35,7 +35,7 @@
       <ItemGroup>
          <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
       </ItemGroup>
-      <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\ReiPatcher\&quot;&#xD;&#xA;   powershell -command &quot;Start-Sleep -s 1&quot;&#xD;&#xA;   powershell Compress-Archive -Path '$(SolutionDir)dist\ReiPatcher\$(TargetName)$(TargetExt)' -DestinationPath '$(SolutionDir)dist\ReiPatcher\XUnity.AutoTranslator-ReiPatcher-@(VersionNumber).zip' -Force)&#xD;&#xA;)" />
+      <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\ReiPatcher\&quot;&#xD;&#xA;   powershell -command &quot;Start-Sleep -s 1&quot;&#xD;&#xA;   &quot;$(SolutionDir)tools\xzip.exe&quot; &quot;$(SolutionDir)dist\ReiPatcher&quot; &quot;$(SolutionDir)dist\XUnity.AutoTranslator-ReiPatcher-@(VersionNumber).zip&quot;&#xD;&#xA;)" />
    </Target>
 
 </Project>

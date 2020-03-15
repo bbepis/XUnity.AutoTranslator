@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using XUnity.Common.Extensions;
 using XUnity.Common.Utilities;
 
 namespace XUnity.ResourceRedirector
@@ -69,7 +70,7 @@ namespace XUnity.ResourceRedirector
             }
 
 
-            path = path.Replace( '/', '\\' );
+            path = path.UseCorrectDirectorySeparators();
 
             ext.FullFileSystemAssetPath = path;
          }
