@@ -32,6 +32,11 @@ namespace ezTransXP.ExtProtocol
             var datPath = Path.Combine( powerTranslatorPath, @"Dat" );  //initialize path
 
             var dllPath = Path.Combine( powerTranslatorPath, @"J2KEngineH.dll" );   //Ehnd engine path
+            if( !File.Exists( dllPath ) )
+            {
+               dllPath = Path.Combine( powerTranslatorPath, @"J2KEngine.dll" );
+            }
+
 
             using( var translator = new ezTransTranslationLibrary( dllPath ) )
             {
@@ -74,7 +79,7 @@ namespace ezTransXP.ExtProtocol
                }
             }
          }
-         catch( Exception )
+         catch( Exception e )
          {
             // "Graceful shutdown"
          }

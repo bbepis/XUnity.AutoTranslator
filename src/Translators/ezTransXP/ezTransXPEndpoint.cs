@@ -50,13 +50,20 @@ namespace ezTransXP
       }
       public static string GetDefaultInstallationPath()
       {
-         if( IntPtr.Size == 8 ) // 64-bit
+         try
          {
-            return @"C:\Program Files (x86)\ChangShinSoft\ezTrans XP";
+            if( IntPtr.Size == 8 ) // 64-bit
+            {
+               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\ChangShin\ezTrans", "FilePath", null );
+            }
+            else // 32-bit
+            {
+               return (string)Microsoft.Win32.Registry.GetValue( @"HKEY_CURRENT_USER\SOFTWARE\ChangShin\ezTrans", "FilePath", null );
+            }
          }
-         else // 32-bit
+         catch
          {
-            return @"C:\Program Files\ChangShinSoft\ezTrans XP";
+            return null;
          }
       }
    }
