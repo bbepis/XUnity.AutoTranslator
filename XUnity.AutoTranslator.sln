@@ -123,15 +123,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat.ExtProtocol", "src\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj", "{6DC48447-D7DC-45F6-B830-35A0F916C7BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XZipper", "src\XZipper\XZipper.csproj", "{70A12896-52AF-444C-99EE-7D8E779741CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XZipper", "src\XZipper\XZipper.csproj", "{70A12896-52AF-444C-99EE-7D8E779741CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{3E70DF54-72CA-4874-9EFE-6EA2F43FD7AC}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP", "src\Translators\ezTransXP\ezTransXP.csproj", "{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{718A3B1D-A5E5-4223-AD53-45C60C874150} = {718A3B1D-A5E5-4223-AD53-45C60C874150}
-	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP.ExtProtocol", "src\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj", "{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}"
+Project("{9A19103F-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP", "src\Translators\ezTransXP\ezTransXP.csproj", "{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1}"
+EndProject
+Project("{9A19103F-301F-11D3-BF4B-00C04F79EFBC}") = "ezTransXP.ExtProtocol", "src\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj", "{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -473,8 +471,8 @@ Global
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Debug|x86.Build.0 = Debug|Any CPU
-		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.ActiveCfg = Release|x86
+		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.Build.0 = Release|x86
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.ActiveCfg = Release|Any CPU
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
