@@ -1,4 +1,7 @@
-﻿### 1.1.1
+﻿### 1.1.2
+ * MISC - Internal API changes - some code moved to XUnity.Common
+
+### 1.1.1
  * BUG FIX - Development-time fix to the nuget package
  * BUG FIX - Fixed bug in method 'LoadFromFileWithRandomizedCabIfRequired' where offset was ignored if the initial load attempt failed
 
