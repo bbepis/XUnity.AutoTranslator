@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                args.Add( groupName, value );
             }
 
-            return new ParserResult( input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, args );
+            return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, args );
          }
 
          return null;

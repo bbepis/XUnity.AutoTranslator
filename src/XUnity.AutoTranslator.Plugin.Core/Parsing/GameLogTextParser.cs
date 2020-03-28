@@ -68,7 +68,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          if( !containsTranslatable ) return null;
 
          if( !input.EndsWith( "\r\n" ) && !input.EndsWith( "\n" ) ) template.Remove( template.Length - 1, 1 );
-         return new ParserResult( input, template.ToString(), false, false, false, true, args );
+
+         if( args.Count > 1 )
+         {
+            return new ParserResult( ParserResultOrigin.GameLogTextParser, input, template.ToString(), false, false, false, true, args );
+         }
+
+         return null;
       }
    }
 }

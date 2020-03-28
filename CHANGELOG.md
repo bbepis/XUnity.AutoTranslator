@@ -1,4 +1,8 @@
-﻿### 4.10.0
+﻿### 4.11.0
+ * FEATURE - Enabled text parsing recursion. Disabled by default
+ * MISC - Removed strict text length restriction on IMGUI translations
+
+### 4.10.0
  * FEATURE - Native ezTransXP support through Ehnd - Thanks to Jiwon-Park on Github
  * MISC - Improved linux support. Plugin should now function as expected when used with BepInEx 5.x on linux (resource redirection may still have problems with case-sensitivity and path separators). Other installation methods may not yield similar results
  * MISC - Fixed .zip release files so they use correct directory separators

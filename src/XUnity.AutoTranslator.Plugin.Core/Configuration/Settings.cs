@@ -116,6 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextPathLogging;
       public static bool OutputUntranslatableText;
       public static bool IgnoreVirtualTextSetterCallingRules;
+      public static int MaxTextParserRecursion = 6;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -219,8 +220,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextPathLogging = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTextPathLogging", false );
             OutputUntranslatableText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputUntranslatableText", false );
             IgnoreVirtualTextSetterCallingRules = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreVirtualTextSetterCallingRules", false );
+            MaxTextParserRecursion = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxTextParserRecursion", 1 );
 
-            
+
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();
 

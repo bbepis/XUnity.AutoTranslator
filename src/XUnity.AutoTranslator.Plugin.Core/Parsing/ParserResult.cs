@@ -6,8 +6,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    internal class ParserResult
    {
-      public ParserResult( string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
+      public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
       {
+         Origin = origin;
          OriginalText = originalText;
          Template = template;
          AllowPartialTranslation = allowPartialTranslation;
@@ -17,6 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          Arguments = args;
       }
 
+      public ParserResultOrigin Origin { get; }
       public string OriginalText { get; }
 
       public string Template { get; }
