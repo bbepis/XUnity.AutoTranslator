@@ -423,17 +423,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          bool saveResultGlobally,
          bool isTranslatable )
       {
-         if( key.TemplatedOriginal_Text_FullyTrimmed == "でも大丈夫、今なら大チャンス、オマエの" )
-         {
-            XuaLogger.AutoTranslator.Warn( Environment.NewLine + new StackTrace().ToString() );
-         }
-         //else
-         //{
-         //   XuaLogger.AutoTranslator.Error( "Queued different text!" );
-         //}
-
-
-
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context, checkOtherEndpoints, saveResultGlobally, isTranslatable );
          if( added != null && isTranslatable && checkSpam && !( endpoint.Endpoint is PassthroughTranslateEndpoint ) )
          {
@@ -1577,7 +1566,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var result = UnityTextParsers.GameLogTextParser.Parse( text, scope );
                         if( result != null )
                         {
-                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater, context );
+                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater && !allowStabilizationOnTextComponent, context );
                            if( translation != null )
                            {
                               if( context == null )
@@ -1598,7 +1587,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var result = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope );
                         if( result != null )
                         {
-                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater, context );
+                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater && !allowStabilizationOnTextComponent, context );
                            if( translation != null )
                            {
                               if( context == null )
@@ -1619,7 +1608,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         var result = UnityTextParsers.RichTextParser.Parse( text, scope );
                         if( result != null )
                         {
-                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater, context );
+                           translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater && !allowStabilizationOnTextComponent, context );
                            if( translation != null )
                            {
                               if( context == null )
@@ -1813,7 +1802,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         info.IsStabilizingText = false;
                      }
                   }
-                  else if( allowStartTranslationLater )
+                  else if( allowStartTranslationLater ) // this should only be called for immediate UI translation, theoreticalaly
                   {
                      StartCoroutine(
                         WaitForTextStablization(
@@ -1821,16 +1810,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            delay: 0.9f,
                            onTextStabilized: () =>
                            {
-                              // Lets try not to spam a service that might not be there...
-                              var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
-                              if( endpoint != null )
+                              // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+                              string translation;
+                              if( TextCache.TryGetTranslation( textKey, !isSpammer, false, scope, out translation ) )
                               {
-                                 // once the text has stabilized, attempt to look it up
-                                 if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+                                 // no need to do anything !
+                              }
+                              else
+                              {
+                                 // Lets try not to spam a service that might not be there...
+                                 var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
+                                 if( endpoint != null )
                                  {
-                                    if( !TextCache.TryGetTranslation( textKey, true, false, scope, out translation ) )
+                                    // once the text has stabilized, attempt to look it up
+                                    if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
                                     {
-                                       CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable );
+                                       if( !TextCache.TryGetTranslation( textKey, true, false, scope, out translation ) )
+                                       {
+                                          CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable );
+                                       }
                                     }
                                  }
                               }
