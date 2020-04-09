@@ -8,6 +8,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat;
@@ -41,6 +42,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          if( Settings.EnableTextMesh )
          {
             TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMesh, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
+         }
+         if( Settings.EnableFairyGUI )
+         {
+            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateFairyGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
          }
       }
 
@@ -166,6 +171,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for TextMesh." );
+         }
+
+         try
+         {
+            if( Settings.EnableFairyGUI )
+            {
+               HookingHelper.PatchAll( FairyGUIHooks.All, Settings.ForceMonoModHooks );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for FairyGUI." );
          }
       }
 

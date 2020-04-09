@@ -6,6 +6,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
+using XUnity.AutoTranslator.Plugin.Core.Shim;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Extensions;
@@ -496,6 +497,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private string PreProcessUntranslatedText( string text )
       {
+         if( Settings.HtmlEntityPreprocessing )
+         {
+            text = WebUtility.HtmlDecode( text );
+         }
+
          if( Settings.Preprocessors.Count == 0 ) return text;
 
          foreach( var kvp in Settings.Preprocessors )

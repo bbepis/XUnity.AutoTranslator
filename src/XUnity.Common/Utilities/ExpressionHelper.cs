@@ -111,6 +111,36 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="field"></param>
+      /// <returns></returns>
+      public static Func<object, object> CreateFastInvoke( FieldInfo field )
+      {
+         var instanceParameterExpression = Expression.Parameter( typeof( object ), "instance" );
+
+         var fieldExpression = field.IsStatic
+            ? Expression.Field( null, field )
+            : Expression.Field(
+               Expression.Convert(
+                  instanceParameterExpression,
+                  field.DeclaringType
+               ),
+               field
+            );
+
+         var finalExpression = Expression.Convert( fieldExpression, typeof( object ) );
+
+         var lambdaExpression = Expression.Lambda<Func<object, object>>(
+            finalExpression,
+            instanceParameterExpression
+         );
+
+         var compiledLambda = lambdaExpression.Compile();
+         return compiledLambda;
+      }
+
       private static Func<object, object[], object> ConvertToFunc( Action<object, object[]> action )
       {
          return ( instance, args ) =>

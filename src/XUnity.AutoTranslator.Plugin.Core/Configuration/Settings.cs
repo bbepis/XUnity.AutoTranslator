@@ -83,6 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
       public static bool EnableTextMesh;
+      public static bool EnableFairyGUI;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static bool IgnoreWhitespaceInNGUI;
@@ -116,7 +117,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextPathLogging;
       public static bool OutputUntranslatableText;
       public static bool IgnoreVirtualTextSetterCallingRules;
-      public static int MaxTextParserRecursion = 6;
+      public static int MaxTextParserRecursion;
+      public static bool HtmlEntityPreprocessing;
+      public static bool HandleRichText;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -180,6 +183,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableNGUI", true );
             EnableTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMeshPro", true );
             EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
+            EnableFairyGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableFairyGUI", true );
             AllowPluginHookOverride = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "AllowPluginHookOverride", true );
 
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
@@ -221,6 +225,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             OutputUntranslatableText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputUntranslatableText", false );
             IgnoreVirtualTextSetterCallingRules = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreVirtualTextSetterCallingRules", false );
             MaxTextParserRecursion = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxTextParserRecursion", 1 );
+            HtmlEntityPreprocessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HtmlEntityPreprocessing", true );
+            HandleRichText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HandleRichText", true );
 
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );

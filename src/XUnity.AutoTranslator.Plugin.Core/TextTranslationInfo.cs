@@ -17,6 +17,18 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+   internal static class TextTranslationInfoExtensions
+   {
+      public static bool GetIsKnownTextComponent( this TextTranslationInfo info )
+      {
+         return info != null && info.IsKnownTextComponent;
+      }
+
+      public static bool GetSupportsStabilization( this TextTranslationInfo info )
+      {
+         return info != null && info.SupportsStabilization;
+      }
+   }
 
    internal class TextTranslationInfo
    {
@@ -30,14 +42,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int? _alteredFontSize;
       private float? _alteredLineSpacing;
+      private bool _initialized = false;
 
       public string OriginalText { get; set; }
-
       public string TranslatedText { get; set; }
-
       public bool IsTranslated { get; set; }
+      public bool IsCurrentlySettingText { get; set; } // TODO: REMOVE; Why is this even here?
 
-      public bool IsCurrentlySettingText { get; set; }
+      public bool IsStabilizingText { get; set; }
+      public bool IsKnownTextComponent { get; set; }
+      public bool SupportsStabilization { get; set; }
+
+      public void Initialize( object ui )
+      {
+         if( !_initialized )
+         {
+            _initialized = true;
+
+            IsKnownTextComponent = ui.IsKnownTextType();
+            SupportsStabilization = ui.SupportsStabilization();
+         }
+      }
 
       public void ResetScrollIn( object graphic )
       {

@@ -33,8 +33,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             var originalAssembly = instance.GetType().Assembly;
             if( callingAssembly != originalAssembly )
             {
-               //XuaLogger.Current.Warn( "5: changing text: " + __result + " => " + tti.OriginalText );
-
                // if the assembly is not the same, it may be call from the game or another mod, so replace
                __result = tti.OriginalText;
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Utilities
@@ -14,6 +15,7 @@ namespace XUnity.Common.Utilities
    {
       private static Dictionary<MemberLookupKey, CachedMethod> Methods = new Dictionary<MemberLookupKey, CachedMethod>();
       private static Dictionary<MemberLookupKey, CachedProperty> Properties = new Dictionary<MemberLookupKey, CachedProperty>();
+      private static Dictionary<MemberLookupKey, CachedField> Fields = new Dictionary<MemberLookupKey, CachedField>();
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
@@ -96,6 +98,62 @@ namespace XUnity.Common.Utilities
          }
 
          return cachedMember;
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="type"></param>
+      /// <param name="name"></param>
+      /// <returns></returns>
+      public static CachedField CachedField( this Type type, string name )
+      {
+         var key = new MemberLookupKey( type, name );
+         if( !Fields.TryGetValue( key, out var cachedMember ) )
+         {
+            var currentType = type;
+            FieldInfo field = null;
+
+            while( field == null && currentType != null )
+            {
+               field = currentType.GetField( name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
+               currentType = currentType.BaseType;
+            }
+
+            if( field != null )
+            {
+               cachedMember = new CachedField( field );
+            }
+
+            // also cache nulls!
+            Fields[ key ] = cachedMember;
+         }
+
+         return cachedMember;
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="type"></param>
+      /// <param name="index"></param>
+      /// <param name="fieldType"></param>
+      /// <param name="flags"></param>
+      /// <returns></returns>
+      public static CachedField CachedFieldByIndex( this Type type, int index, Type fieldType, BindingFlags flags )
+      {
+         var fields = type.GetFields( flags )
+            .Where( x => x.FieldType == fieldType )
+            .ToArray();
+
+         if(index < fields.Length)
+         {
+            var field = fields[ index ];
+
+            return new CachedField( field );
+         }
+
+         return null;
       }
 
       private struct MemberLookupKey
@@ -293,6 +351,51 @@ namespace XUnity.Common.Utilities
          if( _get == null ) return null;
 
          return _get( instance, Args0 );
+      }
+   }
+
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
+   public class CachedField
+   {
+      //private Func<object, object[], object> _set;
+      private Func<object, object> _get;
+
+      internal CachedField( FieldInfo fieldInfo )
+      {
+         _get = ExpressionHelper.CreateFastInvoke( fieldInfo );
+
+         PropertyType = fieldInfo.FieldType;
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      public Type PropertyType { get; }
+
+      ///// <summary>
+      ///// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      ///// </summary>
+      ///// <param name="instance"></param>
+      ///// <param name="arguments"></param>
+      //public void Set( object instance, object[] arguments )
+      //{
+      //   if( _set == null ) return;
+
+      //   _set( instance, arguments );
+      //}
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="instance"></param>
+      /// <returns></returns>
+      public object Get( object instance )
+      {
+         if( _get == null ) return null;
+
+         return _get( instance );
       }
    }
 }

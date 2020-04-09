@@ -12,9 +12,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    {
       public static TextTranslationInfo GetOrCreateTextTranslationInfo( this object ui )
       {
-         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
+         if( !ui.IsSpammingComponent() )
          {
             var info = ui.GetOrCreateExtensionData<TextTranslationInfo>();
+            info.Initialize( ui );
 
             return info;
          }
@@ -24,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       public static TextTranslationInfo GetTextTranslationInfo( this object ui )
       {
-         if( ui.SupportsStabilization() && ui.IsKnownTextType() )
+         if( !ui.IsSpammingComponent() )
          {
             var info = ui.GetExtensionData<TextTranslationInfo>();
 

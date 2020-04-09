@@ -1,6 +1,9 @@
 ﻿### 4.11.0
  * FEATURE - Enabled text parsing recursion. Disabled by default
+ * FEATURE - Support for  FairyGUI
+ * MISC - New setting to toggle handling of rich text
  * MISC - Removed strict text length restriction on IMGUI translations
+ * MISC - General performance improvements
 
 ### 4.10.0
  * FEATURE - Native ezTransXP support through Ehnd - Thanks to Jiwon-Park on Github

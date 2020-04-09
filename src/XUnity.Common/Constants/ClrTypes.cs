@@ -29,6 +29,9 @@ namespace XUnity.Common.Constants
       public static readonly Type UIRect = FindType( "UIRect" );
       public static readonly Type UIInput = FindType( "UIInput" );
 
+      // FairyGUI
+      public static readonly Type TextField = FindType( "FairyGUI.TextField" );
+
       // Unity
       public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );

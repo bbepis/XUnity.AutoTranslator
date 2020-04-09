@@ -236,6 +236,7 @@ The following text frameworks are supported.
  * [IMGUI](https://docs.unity3d.com/Manual/GUIScriptingGuide.html) (disabled by default)
  * [TextMeshPro](http://digitalnativestudios.com/textmeshpro/docs/)
  * [TextMesh](https://docs.unity3d.com/Manual/class-TextMesh.html) (disabled by default, often text float in 3D space)
+ * [FairyGUI for Unity](https://github.com/fairygui/FairyGUI-unity)
  * [Utage (VN Game Engine)](http://madnesslabo.net/utage/?lang=en)
 
 ## Configuration
@@ -294,6 +295,8 @@ EnableSilentMode=False           ;Indicates the plugin should not print out succ
 BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
 OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
 IgnoreVirtualTextSetterCallingRules=False; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
+MaxTextParserRecursion=1         ;Indicates how many levels of recursion are allowed when text is parsed so it can be translated in different parts. This can be used with splitter-regexes in advanced scenarios. The default value of one essentially means that recursion is disabled.
+HtmlEntityPreprocessing=True     ;Will preprocess and decode html entities before they are send for translation. Some translators will fail when html entities are sent.
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -527,6 +530,8 @@ sr:"^([0-9]{2}) ([\S\s]+)$"=$1 $2
 This will split up the text to be translated into two parts, translate them individually and put them back together.
 
 These are identified by the untranslated text starting with 'sr:'.
+
+It is also worth noting that this methodology can be used recursively, if configured. This means that it allows the individual strings that were split for translations by a regex, to flow into another splitter regex, and so on.
 
 ### UI Font Resizing
 It is also possible to manually control the font size of text components. This is useful when the translated text uses more space than the untranslated text.

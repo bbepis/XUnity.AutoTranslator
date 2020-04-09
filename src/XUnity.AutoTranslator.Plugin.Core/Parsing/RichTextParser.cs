@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
@@ -20,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return ui.SupportsRichText();
+         return Settings.HandleRichText && ui.SupportsRichText();
       }
 
       private static bool IsAllLatin( string value, int endIdx )
@@ -44,6 +45,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public ParserResult Parse( string input, int scope )
       {
+         if( !Settings.HandleRichText ) return null;
+
          var matches = TagRegex.Matches( input );
 
          var accumulation = new StringBuilder();

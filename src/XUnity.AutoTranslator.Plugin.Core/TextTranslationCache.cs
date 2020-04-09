@@ -1209,7 +1209,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var match = regex.CompiledRegex.Match( key.TemplatedOriginal_Text );
                      if( !match.Success ) continue;
 
-                     value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
+                     value = match.Result( regex.Translation );
 
                      if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, value, false, TranslationType.Full, scope );
@@ -1233,7 +1233,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var match = regex.CompiledRegex.Match( key.TemplatedOriginal_Text );
                   if( !match.Success ) continue;
 
-                  value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
+                  value = match.Result( regex.Translation );
 
                   if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                   AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheRegexLookups, TranslationType.Full, TranslationScopes.None );

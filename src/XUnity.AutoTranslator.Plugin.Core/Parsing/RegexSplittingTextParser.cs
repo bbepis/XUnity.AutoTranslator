@@ -23,19 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       {
          if( _cache.TryGetTranslationSplitter( input, scope, out var match, out var splitter ) )
          {
-            var args = new Dictionary<string, string>();
-
-            var groups = match.Groups;
-            var len = groups.Count;
-            for( int j = 1; j < len; j++ )
-            {
-               var group = groups[ j ];
-               var groupName = "$" + j;
-               var value = group.Value;
-               args.Add( groupName, value );
-            }
-
-            return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, args );
+            return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, match );
          }
 
          return null;
