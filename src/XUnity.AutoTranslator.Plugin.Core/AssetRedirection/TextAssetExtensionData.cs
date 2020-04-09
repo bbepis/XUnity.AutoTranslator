@@ -17,7 +17,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             if( _data == null && _text != null )
             {
                var stream = new MemoryStream();
-               using( var writer = new StreamWriter( stream, Encoding ) )
+               using( var writer = new StreamWriter( stream, Encoding ?? System.Text.Encoding.UTF8 ) )
                {
                   writer.Write( _text );
                   writer.Flush();
@@ -40,8 +40,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             if( _text == null && _data != null )
             {
-               var stream = new MemoryStream();
-               using( var reader = new StreamReader( stream, Encoding ) )
+               var stream = new MemoryStream( _data );
+               using( var reader = new StreamReader( stream, Encoding ?? System.Text.Encoding.UTF8 ) )
                {
                   _text = reader.ReadToEnd();
                }

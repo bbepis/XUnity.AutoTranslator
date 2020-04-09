@@ -56,11 +56,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
             using( var stream = file.OpenStream() )
             {
                var data = stream.ReadFully( (int)stream.Length );
-               var text = Encoding.UTF8.GetString( data );
 
                var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
+               ext.Encoding = Encoding.UTF8;
                ext.Data = data;
-               ext.Text = text;
 
                return true;
             }

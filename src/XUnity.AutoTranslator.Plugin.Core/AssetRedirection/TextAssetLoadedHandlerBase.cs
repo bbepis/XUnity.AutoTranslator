@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.Common.Utilities;
@@ -45,7 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          if( info != null )
          {
             var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
-
+            ext.Encoding = info.Encoding;
             ext.Text = info.Text;
             ext.Data = info.Bytes;
 
