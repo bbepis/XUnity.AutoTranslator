@@ -46,16 +46,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          {
             var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
 
-            // Using a StreamWriter rather than just encoding.GetBytes() will also allow it to output BOM, if required by the game
-            var stream = new MemoryStream();
-            using( var writer = new StreamWriter( stream, info.Encoding ) )
-            {
-               writer.Write( info.Text );
-               writer.Flush();
-            }
-
             ext.Text = info.Text;
-            ext.Data = stream.ToArray();
+            ext.Data = info.Bytes;
 
             return true;
          }

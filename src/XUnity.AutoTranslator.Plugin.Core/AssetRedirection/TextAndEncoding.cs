@@ -19,9 +19,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       }
 
       /// <summary>
+      /// Constructs a new text with encoding.
+      /// </summary>
+      /// <param name="bytes"></param>
+      /// <param name="encoding"></param>
+      public TextAndEncoding( byte[] bytes, Encoding encoding )
+      {
+         Bytes = bytes;
+         Encoding = encoding;
+      }
+
+      /// <summary>
       /// Gets the text.
       /// </summary>
       public string Text { get; }
+
+      /// <summary>
+      /// Gets the bytes.
+      /// </summary>
+      public byte[] Bytes { get; }
 
       /// <summary>
       /// Gets the encoding the text is supposed to be stored with.

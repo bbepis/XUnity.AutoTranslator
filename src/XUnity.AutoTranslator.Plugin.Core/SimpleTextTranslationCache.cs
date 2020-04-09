@@ -100,6 +100,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public bool IsDirectory { get; }
 
+      /// <summary>
+      /// Indicates if the translation cache is empty.
+      /// </summary>
+      public bool IsEmpty => ( _translations.Count + _defaultRegexes.Count ) == 0;
+
       internal void LoadTranslationFiles( bool overrideLaterWithEarlier )
       {
          try
