@@ -4,6 +4,7 @@
  * MISC - New setting to toggle handling of rich text
  * MISC - Removed strict text length restriction on IMGUI translations
  * MISC - General performance improvements
+ * MISC - API improvements for TextAsset resource redirection handling
 
 ### 4.10.0
  * FEATURE - Native ezTransXP support through Ehnd - Thanks to Jiwon-Park on Github
