@@ -4,7 +4,10 @@
  * MISC - New setting to toggle handling of rich text
  * MISC - Removed strict text length restriction on IMGUI translations
  * MISC - General performance improvements
- * MISC - API improvements for TextAsset resource redirection handling
+ * MISC - API improvements for TextAsset resource redirection handling - Thanks to GeBo1 on Github
+ * MISC - Additional API surface to check if SimpleTextTranslationCache is empty
+ * BUG FIX - Fixed bug where translations could not be loaded if they included only whitespace
+ * BUG FIX - Fixed bug where the plugin could cause an internal exception if found text included only whitespace
 
 ### 4.10.0
  * FEATURE - Native ezTransXP support through Ehnd - Thanks to Jiwon-Park on Github

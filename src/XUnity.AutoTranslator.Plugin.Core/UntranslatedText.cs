@@ -152,7 +152,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                builder.Append( leadingWhitespace );
             }
             builder.Append( text );
-            if(trailingWhitespace != null )
+            if( trailingWhitespace != null )
             {
                builder.Append( trailingWhitespace );
             }
@@ -215,22 +215,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
             LeadingWhitespace = leadingBuilder?.ToString();
          }
 
-         i = originalText.Length - 1;
          StringBuilder trailingBuilder = leadingBuilder;
-         if( trailingBuilder != null ) trailingBuilder.Length = 0;
-
-         while( i > -1 && char.IsWhiteSpace( originalText[ i ] ) )
+         if( i != originalText.Length )
          {
-            if( trailingBuilder == null ) trailingBuilder = new StringBuilder( 64 );
+            i = originalText.Length - 1;
+            if( trailingBuilder != null ) trailingBuilder.Length = 0;
 
-            trailingBuilder.Append( originalText[ i ] );
-            i--;
-         }
-         lastNonWhitespace = i;
+            while( i > -1 && char.IsWhiteSpace( originalText[ i ] ) )
+            {
+               if( trailingBuilder == null ) trailingBuilder = new StringBuilder( 64 );
 
-         if( lastNonWhitespace != originalText.Length - 1 )
-         {
-            TrailingWhitespace = trailingBuilder?.Reverse().ToString();
+               trailingBuilder.Append( originalText[ i ] );
+               i--;
+            }
+            lastNonWhitespace = i;
+
+            if( lastNonWhitespace != originalText.Length - 1 )
+            {
+               TrailingWhitespace = trailingBuilder?.Reverse().ToString();
+            }
          }
 
          //  Calculate externally trimmed texts

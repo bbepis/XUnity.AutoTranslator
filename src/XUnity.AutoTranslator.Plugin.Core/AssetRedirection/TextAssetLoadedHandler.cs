@@ -27,9 +27,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       protected override bool DumpAsset( string calculatedModificationPath, TextAsset asset, IAssetOrResourceLoadedContext context )
       {
          Directory.CreateDirectory( new FileInfo( calculatedModificationPath ).Directory.FullName );
-         File.WriteAllBytes( calculatedModificationPath, asset.bytes );
 
-         return true;
+         var bytes = asset.bytes;
+         if( bytes != null )
+         {
+            File.WriteAllBytes( calculatedModificationPath, bytes );
+            return true;
+         }
+         else
+         {
+            var text = asset.text;
+            if( text != null )
+            {
+               File.WriteAllText( calculatedModificationPath, text, Encoding.UTF8 );
+               return true;
+            }
+         }
+         return false;
       }
 
       protected override bool ReplaceOrUpdateAsset( string calculatedModificationPath, ref TextAsset asset, IAssetOrResourceLoadedContext context )

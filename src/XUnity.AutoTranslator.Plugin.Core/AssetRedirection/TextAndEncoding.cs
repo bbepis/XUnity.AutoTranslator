@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       }
 
       /// <summary>
-      /// Constructs a new text with encoding.
+      /// Constructs a text with encoding from a byte array.
       /// </summary>
       /// <param name="bytes"></param>
       /// <param name="encoding"></param>
@@ -27,6 +27,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       {
          Bytes = bytes;
          Encoding = encoding;
+      }
+
+      /// <summary>
+      /// Constructs a TextAndEncoding representing a binary piece of data with
+      /// no encoding.
+      /// </summary>
+      /// <param name="bytes"></param>
+      public TextAndEncoding( byte[] bytes )
+      {
+         Bytes = bytes;
       }
 
       /// <summary>
