@@ -1,36 +1,44 @@
 ﻿using System.IO;
 using System.Text;
+using System.Xml.Schema;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    internal class TextAssetExtensionData
    {
-      private string _text;
       private byte[] _data;
+      private bool roundTripText = false;
+      private Encoding _encoding;
 
-      public Encoding Encoding { get; set; }
+      public Encoding Encoding
+      {
+         get
+         {
+            return _encoding ?? Encoding.UTF8;
+         }
+         set
+         {
+            _encoding = value;
+         }
+      }
 
       public byte[] Data
       {
          get
          {
-            if( _data == null && _text != null )
-            {
-               var stream = new MemoryStream();
-               using( var writer = new StreamWriter( stream, Encoding ?? System.Text.Encoding.UTF8 ) )
-               {
-                  writer.Write( _text );
-                  writer.Flush();
-
-                  _data = stream.ToArray();
-               }
-            }
-
             return _data;
          }
          set
          {
             _data = value;
+            try
+            {
+               roundTripText = _data != null && _data == Encoding.GetBytes( Encoding.GetString( _data ) );
+            }
+            catch( DecoderFallbackException )
+            {
+               roundTripText = false;
+            }
          }
       }
 
@@ -38,20 +46,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       {
          get
          {
-            if( _text == null && _data != null )
+            if( roundTripText && _data?.Length > 0 )
             {
-               var stream = new MemoryStream( _data );
-               using( var reader = new StreamReader( stream, Encoding ?? System.Text.Encoding.UTF8 ) )
+               try
                {
-                  _text = reader.ReadToEnd();
+                  return Encoding.GetString( _data );
                }
+               catch( DecoderFallbackException ) { }
             }
-
-            return _text;
+            return null;
          }
          set
          {
-            _text = value;
+            roundTripText = true;
+            if( value is null )
+            {
+               _data = null;
+            }
+            else
+            {
+               var stream = new MemoryStream();
+               using( var writer = new StreamWriter( stream, Encoding ) )
+               {
+                  writer.Write( value );
+                  writer.Flush();
+
+                  _data = stream.ToArray();
+               }
+            }
          }
       }
    }

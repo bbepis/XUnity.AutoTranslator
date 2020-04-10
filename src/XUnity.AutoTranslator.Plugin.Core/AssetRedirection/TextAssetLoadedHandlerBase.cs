@@ -46,10 +46,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
          if( info != null )
          {
             var ext = asset.GetOrCreateExtensionData<TextAssetExtensionData>();
-            ext.Encoding = info.Encoding;
-            ext.Text = info.Text;
+            ext.Encoding = info.Encoding ?? Encoding.UTF8;
             ext.Data = info.Bytes;
-
             return true;
          }
 
