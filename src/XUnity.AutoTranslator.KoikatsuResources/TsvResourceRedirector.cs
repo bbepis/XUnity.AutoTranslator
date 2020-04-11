@@ -45,22 +45,26 @@ namespace KoikatsuTextResourceRedirector
             allowTranslationOverride: false,
             closeStreams: true );
 
-         return Translate( cache, ref asset );
+         return Translate( cache, calculatedModificationPath, ref asset );
       }
 
-      private TextAndEncoding Translate( SimpleTextTranslationCache cache, ref TextAsset textAsset )
+      private TextAndEncoding Translate( SimpleTextTranslationCache cache, string calculatedModificationPath, ref TextAsset textAsset )
       {
          string TranslateCell( string cellText )
          {
             if( cache.TryGetTranslation( cellText, false, out string newText ) )
             {
+               TranslatorHelper.RegisterRedirectedResourceTextToPath( newText, calculatedModificationPath );
                return newText;
             }
             else
             {
-               if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
+
+               if( !string.IsNullOrEmpty( cellText ) && LanguageHelper.IsTranslatable( cellText ) )
                {
-                  if( !string.IsNullOrEmpty( cellText ) && LanguageHelper.IsTranslatable( cellText ) )
+                  TranslatorHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
+
+                  if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
                   {
                      cache.AddTranslationToCache( cellText, cellText );
                   }
@@ -101,6 +105,8 @@ namespace KoikatsuTextResourceRedirector
          {
             if( !string.IsNullOrEmpty( cellText ) && LanguageHelper.IsTranslatable( cellText ) )
             {
+               TranslatorHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
+
                cache.AddTranslationToCache( cellText, cellText );
                return true;
             }

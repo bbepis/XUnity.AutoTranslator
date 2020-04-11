@@ -26,5 +26,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          return hashSet;
       }
+
+      public static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> values )
+      {
+         foreach( var value in values )
+         {
+            collection.Add( value );
+         }
+      }
    }
 }

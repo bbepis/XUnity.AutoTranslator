@@ -685,9 +685,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                info?.ResetScrollIn( ui );
 
-               if( originalText != null && TranslationAggregatorWindow != null && ui != null && !ui.IsSpammingComponent() && info.GetIsKnownTextComponent() )
+               if( originalText != null && ui != null && !ui.IsSpammingComponent() && info.GetIsKnownTextComponent() )
                {
-                  TranslationAggregatorWindow.OnNewTranslationAdded( originalText, text );
+                  if( _isInTranslatedMode && isTranslated )
+                     TranslatorHelper.DisplayTranslationInfo( originalText, text );
+
+                  if( TranslationAggregatorWindow != null )
+                  {
+                     TranslationAggregatorWindow.OnNewTranslationAdded( originalText, text );
+                  }
                }
             }
             catch( TargetInvocationException )
@@ -1637,6 +1643,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
                if( !isTranslatable && !Settings.OutputUntranslatableText && ( !textKey.IsTemplated || isSpammer ) )
                {
+                  if( _isInTranslatedMode )
+                     TranslatorHelper.DisplayTranslationInfo( originalText, null );
+
                   // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                   return text;
                }
@@ -1686,8 +1695,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            if( info?.IsTranslated == true ) return;
 
                            info?.Reset( originalText );
-
-                           //XuaLogger.Current.Warn( "2: " + originalText + " - " + ui.GetHashCode() );
 
                            if( !stabilizedText.IsNullOrWhiteSpace() && TextCache.IsTranslatable( stabilizedText, false, scope ) )
                            {
@@ -1758,6 +1765,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
                                  if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
                                  {
+                                    if( _isInTranslatedMode )
+                                       TranslatorHelper.DisplayTranslationInfo( originalText, null );
+
                                     // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                                  }
                                  else

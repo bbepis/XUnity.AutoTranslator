@@ -120,6 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int MaxTextParserRecursion;
       public static bool HtmlEntityPreprocessing;
       public static bool HandleRichText;
+      public static bool EnableTranslationHelper;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -227,6 +228,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             MaxTextParserRecursion = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxTextParserRecursion", 1 );
             HtmlEntityPreprocessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HtmlEntityPreprocessing", true );
             HandleRichText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HandleRichText", true );
+            EnableTranslationHelper = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationHelper", false );
 
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );

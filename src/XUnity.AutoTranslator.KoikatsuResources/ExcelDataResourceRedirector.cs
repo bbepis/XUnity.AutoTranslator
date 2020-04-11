@@ -36,6 +36,7 @@ namespace KoikatsuTextResourceRedirector
                var key = param.list[ i ];
                if( !string.IsNullOrEmpty( key ) && LanguageHelper.IsTranslatable( key ) )
                {
+                  TranslatorHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
                   cache.AddTranslationToCache( key, key );
                }
             }
@@ -64,11 +65,17 @@ namespace KoikatsuTextResourceRedirector
                {
                   if( cache.TryGetTranslation( key, true, out var translated ) )
                   {
+                     TranslatorHelper.RegisterRedirectedResourceTextToPath( translated, calculatedModificationPath );
                      param.list[ i ] = translated;
                   }
-                  else if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled && LanguageHelper.IsTranslatable( key ) )
+                  else if( LanguageHelper.IsTranslatable( key ) )
                   {
-                     cache.AddTranslationToCache( key, key );
+                     TranslatorHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
+
+                     if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
+                     {
+                        cache.AddTranslationToCache( key, key );
+                     }
                   }
                }
             }
