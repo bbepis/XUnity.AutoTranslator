@@ -12,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// <summary>
    /// Class used to map redirected resource translations to a source file.
    /// </summary>
-   public static class TranslatorHelper
+   public static class TranslationHelper
    {
       private static Dictionary<string, HashSet<string>> _registrations = new Dictionary<string, HashSet<string>>();
 

@@ -39,7 +39,7 @@ namespace KoikatsuTextResourceRedirector
 
                   if( !string.IsNullOrEmpty( key ) && LanguageHelper.IsTranslatable( key ) )
                   {
-                     TranslatorHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
+                     TranslationHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
                      cache.AddTranslationToCache( key, key );
                      //AutoTranslator.Default.TranslateAsync( key, result =>
                      //{
@@ -78,12 +78,12 @@ namespace KoikatsuTextResourceRedirector
                   {
                      if( cache.TryGetTranslation( key, true, out var translated ) )
                      {
-                        TranslatorHelper.RegisterRedirectedResourceTextToPath( translated, calculatedModificationPath );
+                        TranslationHelper.RegisterRedirectedResourceTextToPath( translated, calculatedModificationPath );
                         param.Args[ i ] = translated;
                      }
                      else if( LanguageHelper.IsTranslatable( key ) )
                      {
-                        TranslatorHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
+                        TranslationHelper.RegisterRedirectedResourceTextToPath( key, calculatedModificationPath );
 
                         if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
                         {

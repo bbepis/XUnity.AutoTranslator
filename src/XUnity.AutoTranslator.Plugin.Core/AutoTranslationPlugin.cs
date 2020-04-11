@@ -688,7 +688,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( originalText != null && ui != null && !ui.IsSpammingComponent() && info.GetIsKnownTextComponent() )
                {
                   if( _isInTranslatedMode && isTranslated )
-                     TranslatorHelper.DisplayTranslationInfo( originalText, text );
+                     TranslationHelper.DisplayTranslationInfo( originalText, text );
 
                   if( TranslationAggregatorWindow != null )
                   {
@@ -1644,7 +1644,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( !isTranslatable && !Settings.OutputUntranslatableText && ( !textKey.IsTemplated || isSpammer ) )
                {
                   if( _isInTranslatedMode )
-                     TranslatorHelper.DisplayTranslationInfo( originalText, null );
+                     TranslationHelper.DisplayTranslationInfo( originalText, null );
 
                   // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                   return text;
@@ -1766,7 +1766,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
                                  {
                                     if( _isInTranslatedMode )
-                                       TranslatorHelper.DisplayTranslationInfo( originalText, null );
+                                       TranslationHelper.DisplayTranslationInfo( originalText, null );
 
                                     // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
                                  }

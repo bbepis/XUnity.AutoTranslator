@@ -54,7 +54,7 @@ namespace KoikatsuTextResourceRedirector
          {
             if( cache.TryGetTranslation( cellText, false, out string newText ) )
             {
-               TranslatorHelper.RegisterRedirectedResourceTextToPath( newText, calculatedModificationPath );
+               TranslationHelper.RegisterRedirectedResourceTextToPath( newText, calculatedModificationPath );
                return newText;
             }
             else
@@ -62,7 +62,7 @@ namespace KoikatsuTextResourceRedirector
 
                if( !string.IsNullOrEmpty( cellText ) && LanguageHelper.IsTranslatable( cellText ) )
                {
-                  TranslatorHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
+                  TranslationHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
 
                   if( AutoTranslatorSettings.IsDumpingRedirectedResourcesEnabled )
                   {
@@ -105,7 +105,7 @@ namespace KoikatsuTextResourceRedirector
          {
             if( !string.IsNullOrEmpty( cellText ) && LanguageHelper.IsTranslatable( cellText ) )
             {
-               TranslatorHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
+               TranslationHelper.RegisterRedirectedResourceTextToPath( cellText, calculatedModificationPath );
 
                cache.AddTranslationToCache( cellText, cellText );
                return true;
