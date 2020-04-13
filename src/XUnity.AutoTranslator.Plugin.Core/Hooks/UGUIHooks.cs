@@ -75,6 +75,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
+         // NOTE: Has function, but overridden
+
          if( !UGUIHooks.HooksOverriden )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );

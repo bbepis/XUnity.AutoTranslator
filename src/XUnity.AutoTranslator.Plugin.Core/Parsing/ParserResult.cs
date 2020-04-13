@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +9,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
    internal class ParserResult
    {
+      private static readonly string IgnoredNameEnding = "_i";
+
       public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
       {
          Origin = origin;
@@ -20,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          Arguments = args;
       }
 
-      public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Match match )
+      public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Regex regex, Match match )
       {
          Origin = origin;
          OriginalText = originalText;
@@ -30,6 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          PersistCombinedResult = persistCombinedResult;
          PersistTokenResult = persistTokenResult;
          Match = match;
+         Regex = regex;
       }
 
       public ParserResultOrigin Origin { get; }
@@ -38,6 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       public string TranslationTemplate { get; }
       public Dictionary<string, string> Arguments { get; }
       public Match Match { get; }
+      public Regex Regex { get; }
 
       public bool AllowPartialTranslation { get; }
 
@@ -54,20 +59,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          if( Match != null )
          {
             var groups = Match.Groups;
-            var len = groups.Count;
+            var groupNames = Regex.GetGroupNames();
+            var len = groupNames.Length;
             for( int j = len - 1; j > 0; j-- )
             {
-               var group = groups[ j ];
-               var groupName = "$" + j;
-               var value = group.Value;
-               var translation = getTranslation( value );
-               if( translation != null )
+               var groupName = groupNames[ j ];
+               var ignoreTranslate = groupName.EndsWith( IgnoredNameEnding );
+               int.TryParse( groupName, NumberStyles.None, CultureInfo.InvariantCulture, out var groupIndex );
+
+               Group group;
+               string replacement;
+               if( groupIndex != 0 )
                {
-                  result = result.Replace( groupName, translation );
+                  group = groups[ groupIndex ];
+                  replacement = "$" + groupIndex;
                }
                else
                {
-                  ok = false;
+                  group = groups[ groupName ];
+                  replacement = "${" + groupName + "}";
+               }
+
+               if( group.Success ) // was matched
+               {
+                  var value = group.Value;
+                  var translation = ignoreTranslate ? value : getTranslation( value );
+                  if( translation != null )
+                  {
+                     result = result.Replace( replacement, translation );
+                  }
+                  else
+                  {
+                     ok = false;
+                  }
+               }
+               else
+               {
+                  result = result.Replace( replacement, string.Empty );
                }
             }
          }

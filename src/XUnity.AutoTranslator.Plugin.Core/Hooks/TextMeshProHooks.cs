@@ -82,6 +82,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
+         // NOTE: Has function, but overridden
+
          if( !TextMeshProHooks.HooksOverriden )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
@@ -156,6 +158,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( object __instance )
       {
+         // NOTE: Has function, but overridden
+
          if( !TextMeshProHooks.HooksOverriden )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );

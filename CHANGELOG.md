@@ -1,4 +1,8 @@
-﻿### 4.11.0
+﻿### 4.11.1
+ * MISC - Added support for named and optional groups in splitter and standard regexes
+ * BUG FIX - Fixed bug in NGUI hooks that could cause a bunch of NullReferenceExceptions
+
+### 4.11.0
  * FEATURE - Enabled text parsing recursion. Disabled by default
  * FEATURE - Support for FairyGUI
  * MISC - New setting to toggle handling of rich text

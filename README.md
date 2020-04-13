@@ -535,6 +535,26 @@ These are identified by the untranslated text starting with 'sr:'.
 
 It is also worth noting that this methodology can be used recursively, if configured. This means that it allows the individual strings that were split for translations by a regex, to flow into another splitter regex, and so on.
 
+In addition to identifying each group by index, they can also be identified by a name, which allows groups to be completely additional. Let's take a look at an example that combines all of these things:
+
+```
+sr:"^\[(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?\](?<after>[\s\S]+)?$"="[${stat}${num_i}]${after}"
+```
+
+In this example there are 3 named groups, two of which are optional (standard regex syntax). The replacement pattern identifies these named group by surrounding the name with `${}`.
+
+If the identifier name ends in `_i` it means that the string will not be attempted to be translated, but rather transfered as is. Generally this is not really needed as the plugin is smart enough to determine if something should be translated or not.
+
+So what would this regex split? It would split strings like this:
+
+```
+[DEF+14][ATK+64][DEX+34][AGI]
+```
+
+The group(s) `(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?` matches the text inside the `[]`. As you can see there are two groups. The first is requried and represents the text. The second is optional and represents the plus-/minus sign and number that comes after.
+
+The group `(?<after>[\s\S]+)` matches whatever comes after. Because of this, it will attempt to translate that text like any other, and that may flow directly back into this splitter regex.
+
 ### UI Font Resizing
 It is also possible to manually control the font size of text components. This is useful when the translated text uses more space than the untranslated text.
 

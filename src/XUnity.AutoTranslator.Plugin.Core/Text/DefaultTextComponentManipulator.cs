@@ -7,6 +7,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Text
@@ -26,7 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       public string GetText( object ui )
       {
-         return (string)_property.Get( ui );
+         return (string)_property?.Get( ui );
       }
 
       public void SetText( object ui, string text )

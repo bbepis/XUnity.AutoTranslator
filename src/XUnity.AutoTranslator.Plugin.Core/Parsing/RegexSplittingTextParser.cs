@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       {
          if( _cache.TryGetTranslationSplitter( input, scope, out var match, out var splitter ) )
          {
-            return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, match );
+            return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, splitter.CompiledRegex, match );
          }
 
          return null;

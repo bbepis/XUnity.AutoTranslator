@@ -76,11 +76,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         if( !NGUIHooks.HooksOverriden )
+         if( ClrTypes.UILabel.IsAssignableFrom( __instance.GetType() ) )
          {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+            if( !NGUIHooks.HooksOverriden )
+            {
+               AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+            }
+            AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
          }
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object> _original;
