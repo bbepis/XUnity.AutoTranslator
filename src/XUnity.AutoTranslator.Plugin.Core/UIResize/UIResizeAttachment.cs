@@ -13,38 +13,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
       private static readonly char[] PathSplitters = new char[] { '/' };
       private static readonly char[] ArgSplitters = new char[] { ',' };
       private static Regex CommandRegex = new Regex( @"^\s*(.+)\s*\(([\s\S]*)\)\s*$" );
+      private static Dictionary<string, Type> CommandTypes;
 
-      private Dictionary<string, Type> _commandTypes;
-
-      public UIResizeAttachment()
+      static UIResizeAttachment()
       {
-         Descendants = new Dictionary<string, UIResizeAttachment>();
-
-         Result = new UIResizeResult();
-         ScopedResults = new Dictionary<int, UIResizeResult>();
-
-         _commandTypes = new Dictionary<string, Type>( StringComparer.OrdinalIgnoreCase );
+         CommandTypes = new Dictionary<string, Type>( StringComparer.OrdinalIgnoreCase );
 
          try
          {
-            var commands = typeof( UIResizeAttachment ).Assembly.GetTypes()
-               .Where( x => ( typeof( IFontResizeCommand ).IsAssignableFrom( x )
-               || typeof( IFontAutoResizeCommand ).IsAssignableFrom( x )
-               || typeof( IUGUI_LineSpacingCommand ).IsAssignableFrom( x )
-               || typeof( IUGUI_HorizontalOverflow ).IsAssignableFrom( x )
-               || typeof( IUGUI_VerticalOverflow ).IsAssignableFrom( x )
-               ) && !x.IsInterface && !x.IsAbstract )
-               .ToList();
+            var commands = new Type[]
+            {
+               typeof(ChangeFontSize),
+               typeof(ChangeFontSizeByPercentage),
+               typeof(IgnoreFontSize),
+               typeof(AutoResize),
+               typeof(UGUI_ChangeLineSpacing),
+               typeof(UGUI_ChangeLineSpacingByPercentage),
+               typeof(UGUI_HorizontalOverflow),
+               typeof(UGUI_VerticalOverflow)
+            };
+
+            //var commands = typeof( AutoTranslationPlugin ).Assembly.GetTypes()
+            //   .Where( x => ( typeof( IFontResizeCommand ).IsAssignableFrom( x )
+            //   || typeof( IFontAutoResizeCommand ).IsAssignableFrom( x )
+            //   || typeof( IUGUI_LineSpacingCommand ).IsAssignableFrom( x )
+            //   || typeof( IUGUI_HorizontalOverflow ).IsAssignableFrom( x )
+            //   || typeof( IUGUI_VerticalOverflow ).IsAssignableFrom( x )
+            //   ) && !x.IsInterface && !x.IsAbstract )
+            //   .ToList();
 
             foreach( var command in commands )
             {
-               _commandTypes[ command.Name ] = command;
+               CommandTypes[ command.Name ] = command;
             }
          }
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while loading ui resize commands." );
          }
+      }
+
+      public UIResizeAttachment()
+      {
+         Descendants = new Dictionary<string, UIResizeAttachment>();
+         Result = new UIResizeResult();
+         ScopedResults = new Dictionary<int, UIResizeResult>();
       }
 
       public Dictionary<string, UIResizeAttachment> Descendants { get; }
@@ -75,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                var args = match.Groups[ 2 ].Value.Split( ArgSplitters, StringSplitOptions.RemoveEmptyEntries );
                var result = scope == TranslationScopes.None ? attachment.Result : attachment.GetOrCreateResultFor( scope );
 
-               if( _commandTypes.TryGetValue( command, out var commandType ) )
+               if( CommandTypes.TryGetValue( command, out var commandType ) )
                {
                   var resizeCommand = Activator.CreateInstance( commandType, new object[] { args } );
                   if( resizeCommand is IFontResizeCommand fontResizeCommand )
@@ -166,13 +179,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
          }
       }
 
-      public bool TryGetUIResize( string[] segments, int scope, out UIResizeResult result )
+      public bool TryGetUIResize( string[] segments, int startIndex, int scope, out UIResizeResult result )
       {
          UIResizeAttachment attachment = this;
          result = null;
 
          var len = segments.Length;
-         for( int i = 0; i < len; i++ )
+         for( int i = startIndex; i < len; i++ )
          {
             var segment = segments[ i ];
             if( attachment.Descendants.TryGetValue( segment, out var newAttachment ) )
@@ -203,6 +216,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                      }
                   }
                }
+
+               //if( attachment.HasWildcardBelow )
+               //{
+               //   // we have to iterate all descendants of this attachment
+               //   foreach( var childAttachment in attachment.Descendants.Values )
+               //   {
+               //      if( childAttachment.TryGetUIResize( segments, i + 1, scope, out var otherResult ) )
+               //      {
+               //         if( result == null )
+               //         {
+               //            result = otherResult.Copy();
+               //         }
+               //         else
+               //         {
+               //            result.MergeInto( otherResult );
+               //         }
+               //      }
+               //   }
+               //}
 
                attachment = newAttachment;
             }

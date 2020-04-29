@@ -1,4 +1,8 @@
-﻿### 4.11.1
+﻿### 4.11.2
+ * BUG FIX - Fixed some startup errors that occurred while initializing the plugin if the Resource Redirector was not present
+ * BUG FIX - Fixed a bug in BaiduTranslate to allow it to use japanese (ja) as input/output language
+
+### 4.11.1
  * MISC - Added support for named and optional groups in splitter and standard regexes
  * BUG FIX - Fixed bug in NGUI hooks that could cause a bunch of NullReferenceExceptions
 

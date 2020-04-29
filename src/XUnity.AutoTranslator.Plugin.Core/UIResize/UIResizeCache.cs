@@ -145,7 +145,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
       public bool TryGetUIResize( string[] paths, int scope, out UIResizeResult result )
       {
-         return _root.TryGetUIResize( paths, scope, out result );
+         return _root.TryGetUIResize( paths, 0, scope, out result );
       }
    }
 }

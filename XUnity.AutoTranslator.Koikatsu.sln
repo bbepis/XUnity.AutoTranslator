@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core", "src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj", "{FDB73417-983D-4D42-97F8-F562149D2AA7}"
 EndProject
@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.ExtProtocol", "src\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj", "{134AE8FE-4942-415E-AF4C-8B21DCBF5C97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.KoikatsuResources", "src\XUnity.AutoTranslator.KoikatsuResources\XUnity.AutoTranslator.KoikatsuResources.csproj", "{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.KoikatsuResources", "src\XUnity.AutoTranslator.KoikatsuResources\XUnity.AutoTranslator.KoikatsuResources.csproj", "{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.KoikatsuFormatter", "src\XUnity.AutoTranslator.KoikatsuFormatter\XUnity.AutoTranslator.KoikatsuFormatter.csproj", "{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{4A9B6B0D-A1C4-49E8-95D4-36F32C48D627} = {57262841-794B-4996-A43C-00AA8E1A849E}
 		{134AE8FE-4942-415E-AF4C-8B21DCBF5C97} = {57262841-794B-4996-A43C-00AA8E1A849E}
 		{0754CB8F-BFAE-49C1-B923-5E37F5DC7C9B} = {57262841-794B-4996-A43C-00AA8E1A849E}
+		{9A3A2130-BDD5-4919-93E6-3ADF96A2B8F8} = {57262841-794B-4996-A43C-00AA8E1A849E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01634BC4-C45F-4967-A704-6705B0178273}

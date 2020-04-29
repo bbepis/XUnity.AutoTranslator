@@ -47,6 +47,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public int LevelsOfRecursion { get; private set; }
 
+      public bool CachedCombinedResult()
+      {
+         if( Result.CacheCombinedResult )
+         {
+            return ParentContext == null || !ParentContext.CachedCombinedResult();
+         }
+
+         return false;
+      }
+
       public bool HasAllJobsCompleted()
       {
          var completed = Jobs.All( x => x.State == TranslationJobState.Succeeded );

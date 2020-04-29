@@ -36,6 +36,8 @@ namespace BaiduTranslate
             case "zh-Hans":
             case "zh-CN":
                return "zh";
+            case "ja":
+               return "jp";
             default:
                return lang;
          }

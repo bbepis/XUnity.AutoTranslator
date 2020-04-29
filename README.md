@@ -538,7 +538,7 @@ It is also worth noting that this methodology can be used recursively, if config
 In addition to identifying each group by index, they can also be identified by a name, which allows groups to be completely additional. Let's take a look at an example that combines all of these things:
 
 ```
-sr:"^\[(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?\](?<after>[\s\S]+)?$"="[${stat}${num_i}]${after}"
+sr:"^\[(?<stat>[\w\s]+)(?<num_i>[\+\-]{1}[0-9]+)?\](?<after>[\s\S]+)?$"="[${stat}${num_i}]${after}"
 ```
 
 In this example there are 3 named groups, two of which are optional (standard regex syntax). The replacement pattern identifies these named group by surrounding the name with `${}`.

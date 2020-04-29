@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using ExIni;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Globalization;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -19,7 +20,6 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
-using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
@@ -159,7 +159,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( Settings.EnableTextAssetRedirector )
             {
-               new TextAssetLoadedHandler();
+               EnableTextAssetLoadedHandler();
             }
 
             //ResourceRedirection.Whatever();
@@ -188,6 +188,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while initializing resource redirectors." );
          }
+      }
+
+      private void EnableTextAssetLoadedHandler()
+      {
+         new TextAssetLoadedHandler();
       }
 
       private void InitializeGUI()
@@ -1436,6 +1441,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                return null;
             } );
 
+
+            //if( translation != null && context.CachedCombinedResult() )
+            //{
+            //   TextCache.AddTranslationToCache( context.Result.OriginalText, translation, result.PersistCombinedResult, TranslationType.Full, TranslationScopes.None );
+            //   context.Endpoint.AddTranslationToCache( context.Result.OriginalText, translation );
+            //}
+
             return translation;
          }
          else
@@ -1489,6 +1501,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                return null;
             } );
+
+
+            //if( translation != null && context.CachedCombinedResult() )
+            //{
+            //   context.Endpoint.AddTranslationToCache( context.Result.OriginalText, translation );
+            //}
 
             return translation;
          }
@@ -1643,7 +1661,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var isTranslatable = LanguageHelper.IsTranslatable( textKey.TemplatedOriginal_Text );
                if( !isTranslatable && !Settings.OutputUntranslatableText && ( !textKey.IsTemplated || isSpammer ) )
                {
-                  if( _isInTranslatedMode )
+                  if( _isInTranslatedMode && !isSpammer )
                      TranslationHelper.DisplayTranslationInfo( originalText, null );
 
                   // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
@@ -1765,7 +1783,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
                                  if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
                                  {
-                                    if( _isInTranslatedMode )
+                                    if( _isInTranslatedMode && !isSpammer )
                                        TranslationHelper.DisplayTranslationInfo( originalText, null );
 
                                     // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
@@ -1900,6 +1918,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             return null;
          } );
+
+
+         //try
+         //{
+         //   if( translation != null && context.CachedCombinedResult() )
+         //   {
+         //      XuaLogger.AutoTranslator.Debug( $"Cached: '{context.Result.OriginalText}' => '{translation}'" );
+
+         //      TextCache.AddTranslationToCache( context.Result.OriginalText, translation, result.PersistCombinedResult, TranslationType.Full, scope );
+         //      context.Endpoint.AddTranslationToCache( context.Result.OriginalText, translation );
+         //   }
+         //}
+         //catch( Exception e )
+         //{
+         //   XuaLogger.AutoTranslator.Error( e, "What is going on?" );
+         //}
 
          return translation;
       }
@@ -2730,7 +2764,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
          {
             // scan all textures and update
-            var textures = Resources.FindObjectsOfTypeAll<Texture2D>();
+            var textures = GameObject.FindObjectsOfType<Texture2D>();
             foreach( var texture in textures )
             {
                Texture2D t = texture;
