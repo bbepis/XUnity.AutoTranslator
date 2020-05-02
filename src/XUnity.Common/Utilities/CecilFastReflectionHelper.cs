@@ -134,7 +134,7 @@ namespace XUnity.Common.Utilities
             if( fieldInfo.DeclaringType == null || !fieldInfo.DeclaringType.IsAssignableFrom( typeof( T ) ) )
                throw new MissingFieldException( typeof( T ).Name, fieldInfo.Name );
 
-         var name = $"FastReflection{typeof( T ).FullName}.Get_{fieldInfo.Name}";
+         var name = $"FastReflection<{typeof( T ).FullName}.Get_{fieldInfo.Name}>";
 
          var dm = new DynamicMethodDefinition( name, typeof( F ), new[] { typeof( T ) } );
 
@@ -161,7 +161,7 @@ namespace XUnity.Common.Utilities
             if( fieldInfo.DeclaringType == null || !fieldInfo.DeclaringType.IsAssignableFrom( typeof( T ) ) )
                throw new MissingFieldException( typeof( T ).Name, fieldInfo.Name );
 
-         var name = $"FastReflection{typeof( T ).FullName}.Set_{fieldInfo.Name}";
+         var name = $"FastReflection<{typeof( T ).FullName}.Set_{fieldInfo.Name}>";
 
          var dm = new DynamicMethodDefinition( name, null, new[] { typeof( T ), typeof( F ) } );
 
