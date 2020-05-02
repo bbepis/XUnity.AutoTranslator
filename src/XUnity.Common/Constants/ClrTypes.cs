@@ -90,6 +90,7 @@ namespace XUnity.Common.Constants
       public static readonly Type Hook = FindTypeStrict( "MonoMod.RuntimeDetour.Hook, MonoMod.RuntimeDetour" );
       public static readonly Type Detour = FindTypeStrict( "MonoMod.RuntimeDetour.Detour, MonoMod.RuntimeDetour" );
       public static readonly Type NativeDetour = FindTypeStrict( "MonoMod.RuntimeDetour.NativeDetour, MonoMod.RuntimeDetour" );
+      public static readonly Type DynamicMethodDefinition = FindTypeStrict( "MonoMod.Utils.DynamicMethodDefinition, MonoMod.Utils" );
 
       // Mono / .NET
       public static readonly Type MethodBase = FindType( "System.Reflection.MethodBase" );
