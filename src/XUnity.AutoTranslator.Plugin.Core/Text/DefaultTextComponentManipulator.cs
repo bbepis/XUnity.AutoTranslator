@@ -268,7 +268,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       private class TypeAndMethod
       {
-         Action<object, object> _setterInvoker;
+         FastReflectionDelegate _setterInvoker;
 
          public TypeAndMethod( Type type, MethodBase method )
          {
@@ -278,11 +278,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
          public Type Type { get; }
          public MethodBase SetterMethod { get; }
-         public Action<object, object> SetterInvoker
+         public FastReflectionDelegate SetterInvoker
          {
             get
             {
-               return _setterInvoker ?? ( _setterInvoker = (Action<object, object>)VirtcallRuleBreaker.GenerateDelegate( SetterMethod, false ) );
+               return _setterInvoker ?? ( _setterInvoker = CustomFastReflectionHelper.CreateFastDelegate( SetterMethod, true, true ) );
             }
          }
       }

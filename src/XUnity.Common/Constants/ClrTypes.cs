@@ -54,8 +54,6 @@ namespace XUnity.Common.Constants
       public static readonly Type Scene = FindType( "UnityEngine.SceneManagement.Scene" );
       public static readonly Type UnityEventBase = FindType( "UnityEngine.Events.UnityEventBase" );
       public static readonly Type BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
-      //public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
-      //public static readonly Type GraphicRaycaster = FindType( "UnityEngine.UI.GraphicRaycaster" );
       public static readonly Type HorizontalWrapMode = FindType( "UnityEngine.HorizontalWrapMode" );
       public static readonly Type VerticalWrapMode = FindType( "UnityEngine.VerticalWrapMode" );
       public static readonly Type Font = FindType( "UnityEngine.Font" );
@@ -68,7 +66,6 @@ namespace XUnity.Common.Constants
       public static readonly Type Typewriter = FindType( "Typewriter" );
 
       // Utage
-      //public static readonly Type AdvCommand = FindType( "Utage.AdvCommand" );
       public static readonly Type UguiNovelText = FindType( "Utage.UguiNovelText" );
       public static readonly Type AdvEngine = FindType( "Utage.AdvEngine" );
       public static readonly Type AdvPage = FindType( "Utage.AdvPage" );

@@ -10,7 +10,7 @@ namespace XUnity.Common.Logging
    internal class BepInExLogger : XuaLogger
    {
       private readonly object _logObject;
-      private Func<object, object[], object> _logMethod;
+      private FastReflectionDelegate _logMethod;
 
       public BepInExLogger( string source )
          : base( source )
@@ -28,14 +28,14 @@ namespace XUnity.Common.Logging
             var createLogSourceMethod = loggerType.GetMethod( "CreateLogSource", staticFlags, null, new[] { typeof( string ) }, null );
             _logObject = createLogSourceMethod.Invoke( null, new object[] { Source } );
             var logMethod = _logObject.GetType().GetMethod( "Log", instanceFlags, null, new[] { logLevelType, typeof( object ) }, null );
-            _logMethod = ExpressionHelper.CreateFastInvoke( logMethod );
+            _logMethod = CustomFastReflectionHelper.CreateFastDelegate( logMethod );
          }
          else
          {
             var loggerType = Type.GetType( "BepInEx.Logger, BepInEx", false );
             _logObject = loggerType.GetProperty( "CurrentLogger", staticFlags ).GetValue( null, null );
             var logMethod = _logObject.GetType().GetMethod( "Log", instanceFlags, null, new[] { logLevelType, typeof( object ) }, null );
-            _logMethod = ExpressionHelper.CreateFastInvoke( logMethod );
+            _logMethod = CustomFastReflectionHelper.CreateFastDelegate( logMethod );
          }
 
          if( _logMethod == null )

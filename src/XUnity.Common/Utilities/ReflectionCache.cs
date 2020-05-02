@@ -195,11 +195,11 @@ namespace XUnity.Common.Utilities
       private static readonly object[] Args1 = new object[ 1 ];
       private static readonly object[] Args2 = new object[ 2 ];
 
-      private Func<object, object[], object> _invoke;
+      private FastReflectionDelegate _invoke;
 
       internal CachedMethod( MethodInfo method )
       {
-         _invoke = ExpressionHelper.CreateFastInvoke( method );
+         _invoke = CustomFastReflectionHelper.CreateFastDelegate( method );
       }
 
       /// <summary>
@@ -273,19 +273,19 @@ namespace XUnity.Common.Utilities
       private static readonly object[] Args0 = new object[ 0 ];
       private static readonly object[] Args1 = new object[ 1 ];
 
-      private Func<object, object[], object> _set;
-      private Func<object, object[], object> _get;
+      private FastReflectionDelegate _set;
+      private FastReflectionDelegate _get;
 
       internal CachedProperty( PropertyInfo propertyInfo )
       {
          if( propertyInfo.CanRead )
          {
-            _get = ExpressionHelper.CreateFastInvoke( propertyInfo.GetGetMethod() );
+            _get = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetGetMethod() );
          }
 
          if( propertyInfo.CanWrite )
          {
-            _set = ExpressionHelper.CreateFastInvoke( propertyInfo.GetSetMethod() );
+            _set = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetSetMethod() );
          }
 
          PropertyType = propertyInfo.PropertyType;
@@ -359,32 +359,33 @@ namespace XUnity.Common.Utilities
    /// </summary>
    public class CachedField
    {
-      //private Func<object, object[], object> _set;
       private Func<object, object> _get;
+      private Action<object, object> _set;
 
       internal CachedField( FieldInfo fieldInfo )
       {
-         _get = ExpressionHelper.CreateFastInvoke( fieldInfo );
+         _get = CustomFastReflectionHelper.CreateFastFieldGetter<object, object>( fieldInfo );
+         _set = CustomFastReflectionHelper.CreateFastFieldSetter<object, object>( fieldInfo );
 
-         PropertyType = fieldInfo.FieldType;
+         FieldType = fieldInfo.FieldType;
       }
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      public Type PropertyType { get; }
+      public Type FieldType { get; }
 
-      ///// <summary>
-      ///// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      ///// </summary>
-      ///// <param name="instance"></param>
-      ///// <param name="arguments"></param>
-      //public void Set( object instance, object[] arguments )
-      //{
-      //   if( _set == null ) return;
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="instance"></param>
+      /// <param name="value"></param>
+      public void Set( object instance, object value )
+      {
+         if( _set == null ) return;
 
-      //   _set( instance, arguments );
-      //}
+         _set( instance, value );
+      }
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
