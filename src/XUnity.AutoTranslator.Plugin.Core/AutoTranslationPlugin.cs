@@ -237,6 +237,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   "<b>SILENT</b>\nThe plugin will not print out success messages to the log in relation to translations.",
                   "<b>VERBOSE</b>\nThe plugin will print out success messages to the log in relation to translations.",
                   ToggleSilentMode, () => Settings.EnableSilentMode ),
+               new ToggleViewModel(
+                  " Translation Aggregator",
+                  "<b>SHOWN</b>\nThe translation aggregator window is shown.",
+                  "<b>HIDDEN</b>\nThe translation aggregator window is not shown.",
+                  ToggleTranslationAggregator, () => TranslationAggregatorWindow != null && TranslationAggregatorWindow.IsShown ),
             },
             new DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager>(
                TranslationManager.AllEndpoints.Select( x => new TranslatorDropdownOptionViewModel( () => x == TranslationManager.CurrentEndpoint, x ) ).ToList(),
@@ -2146,10 +2151,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                   else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
                   {
-                     if( TranslationAggregatorWindow != null )
-                     {
-                        TranslationAggregatorWindow.IsShown = !TranslationAggregatorWindow.IsShown;
-                     }
+                     ToggleTranslationAggregator();
                   }
                   else if( isCtrlPressed )
                   {
@@ -2176,6 +2178,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred in Update callback. " );
+         }
+      }
+
+      private void ToggleTranslationAggregator()
+      {
+         if( TranslationAggregatorWindow != null )
+         {
+            TranslationAggregatorWindow.IsShown = !TranslationAggregatorWindow.IsShown;
          }
       }
 
@@ -2704,23 +2714,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             try
             {
-               var builder = new StringBuilder();
-               foreach( var text in _textsToCopyToClipboardOrdered )
-               {
-                  if( text.Length + builder.Length > Settings.MaxClipboardCopyCharacters ) break;
-
-                  builder.AppendLine( text );
-               }
-
-               TextEditor editor = (TextEditor)GUIUtility.GetStateObject( typeof( TextEditor ), GUIUtility.keyboardControl );
-               editor.text = builder.ToString();
-               editor.SelectAll();
-               editor.Copy();
-
-            }
-            catch( Exception e )
-            {
-               XuaLogger.AutoTranslator.Error( e, "An error while copying text to clipboard." );
+               ClipboardHelper.CopyToClipboard( _textsToCopyToClipboardOrdered, Settings.MaxClipboardCopyCharacters );
             }
             finally
             {

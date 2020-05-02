@@ -1,4 +1,6 @@
 ﻿### 4.11.2
+ * MISC - Add toggle to enable/disable translation aggregator UI
+ * MISC - Enable copy translations / original text to clipboard from translation aggregator UI
  * BUG FIX - Fixed some startup errors that occurred while initializing the plugin if the Resource Redirector was not present
  * BUG FIX - Fixed a bug in BaiduTranslate to allow it to use japanese (ja) as input/output language
 

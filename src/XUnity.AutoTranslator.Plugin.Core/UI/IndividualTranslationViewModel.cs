@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -65,6 +66,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                }
             }
          }
+      }
+
+      public void CopyToClipboard()
+      {
+         if( _isTranslated )
+         {
+            ClipboardHelper.CopyToClipboard( _translations.Select( x => x.TranslatedText ), short.MaxValue );
+         }
+      }
+
+      public bool CanCopyToClipboard()
+      {
+         return _isTranslated;
       }
    }
 }

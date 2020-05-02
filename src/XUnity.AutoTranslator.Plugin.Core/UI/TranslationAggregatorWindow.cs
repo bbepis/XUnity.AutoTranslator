@@ -90,9 +90,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             var current = _viewModel.Current;
             if( current != null )
             {
+               if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" ) )
+               {
+                  current.CopyOriginalTextToClipboard();
+               }
                DrawTextArea( posy, _originalText, "Original Text", current.OriginalTexts );
                posy += _viewModel.Height;
 
+               if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" ) )
+               {
+                  current.CopyDefaultTranslationToClipboard();
+               }
                DrawTextArea( posy, _defaultTranslation, "Default Translation", current.DefaultTranslations );
                posy += _viewModel.Height;
 
@@ -103,6 +111,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                   {
                      var scroller = _translationViews[ i ];
 
+                     GUI.enabled = aggregatedTranslation.CanCopyToClipboard();
+                     if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" ) )
+                     {
+                        current.CopyDefaultTranslationToClipboard();
+                     }
+                     GUI.enabled = true;
                      DrawTextArea(
                         posy,
                         scroller,
@@ -114,9 +128,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             }
             else
             {
+               GUI.enabled = false;
+               GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" );
+               GUI.enabled = true;
                DrawTextArea( posy, _originalText, "Original Text", Empty );
                posy += _viewModel.Height;
 
+               GUI.enabled = false;
+               GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" );
+               GUI.enabled = true;
                DrawTextArea( posy, _defaultTranslation, "Default Translation", Empty );
                posy += _viewModel.Height;
 
@@ -127,6 +147,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                   {
                      var scroller = _translationViews[ i ];
 
+                     GUI.enabled = false;
+                     GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" );
+                     GUI.enabled = true;
                      DrawTextArea(
                         posy,
                         scroller,

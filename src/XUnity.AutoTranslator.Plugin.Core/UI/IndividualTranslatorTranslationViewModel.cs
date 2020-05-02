@@ -11,5 +11,15 @@
       public TranslatorViewModel Translator { get; private set; }
 
       public IndividualTranslationViewModel Translation { get; private set; }
+
+      public void CopyToClipboard()
+      {
+         Translation.CopyToClipboard();
+      }
+
+      public bool CanCopyToClipboard()
+      {
+         return Translation.CanCopyToClipboard();
+      }
    }
 }

@@ -10,7 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    internal class XuaWindow
    {
       private const int WindowId = 5464332;
-      private const float WindowHeight = 540;
+      private const float WindowHeight = 565;
       private const float WindowWidth = 320;
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
@@ -75,7 +75,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
             // GROUP
             var toggles = _viewModel.Toggles;
-            var groupHeight = ( GUIUtil.RowHeight * toggles.Count ) + ( GUIUtil.HalfComponentSpacing * toggles.Count ) - GUIUtil.HalfComponentSpacing;
+            var groupHeight = ( GUIUtil.RowHeight * toggles.Count ) + ( GUIUtil.HalfComponentSpacing * toggles.Count ) - GUIUtil.ComponentSpacing;
             GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
             foreach( var vm in toggles )

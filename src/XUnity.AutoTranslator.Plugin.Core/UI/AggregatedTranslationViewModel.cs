@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -29,6 +30,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public IEnumerable<string> DefaultTranslations => _translations.Select( x => x.TranslatedText );
 
       public IEnumerable<string> OriginalTexts => _translations.Select( x => x.OriginalText );
+
+      public void CopyDefaultTranslationToClipboard()
+      {
+         ClipboardHelper.CopyToClipboard( DefaultTranslations, short.MaxValue );
+      }
+
+      public void CopyOriginalTextToClipboard()
+      {
+         ClipboardHelper.CopyToClipboard( OriginalTexts, short.MaxValue );
+      }
 
       public void Update()
       {
