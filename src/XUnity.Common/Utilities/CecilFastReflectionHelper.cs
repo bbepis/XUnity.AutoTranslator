@@ -9,6 +9,11 @@ using System.Text;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// Mostly based on:
+   ///  * https://github.com/MonoMod/MonoMod/blob/master/MonoMod.Utils/FastReflectionHelper.cs
+   ///  * https://github.com/pardeike/Harmony/blob/master/Harmony/Extras/FastAccess.cs
+   /// </summary>
    internal static class CecilFastReflectionHelper
    {
       private static readonly Type[] _DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };

@@ -212,7 +212,7 @@ namespace GoogleTranslateCompat.ExtProtocol
             var request = CreateWebSiteRequest();
             response = await client.SendAsync( request );
          }
-         catch( Exception e )
+         catch( Exception )
          {
             return;
          }

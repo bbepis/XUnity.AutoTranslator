@@ -24,7 +24,7 @@ namespace BingTranslate
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {
-         "af","ar","bn","bs","bg","yue","ca","zh-Hans","zh-Hant","hr","cs","da","nl","en","et","fj","fil","fi","fr","de","el","ht","he","hi","mww","hu","is","id","it","ja","sw","tlh","tlh-Qaak","ko","lv","lt","mg","ms","mt","nb","fa","pl","pt","otq","ro","ru","sm","sr-Cyrl","sr-Latn","sk","sl","es","sv","ty","ta","te","th","to","tr","uk","ur","vi","cy","yua"
+         "auto","af","ar","bn","bs","bg","yue","ca","zh-Hans","zh-Hant","hr","cs","da","nl","en","et","fj","fil","fi","fr","de","el","ht","he","hi","mww","hu","is","id","it","ja","sw","tlh","tlh-Qaak","ko","lv","lt","mg","ms","mt","nb","fa","pl","pt","otq","ro","ru","sm","sr-Cyrl","sr-Latn","sk","sl","es","sv","ty","ta","te","th","to","tr","uk","ur","vi","cy","yua"
       };
 
       private static readonly string HttpsServicePointTemplateUrl = "https://www.bing.com/ttranslatev3?isVertical=1&&IG={0}&IID={1}.{2}"; // "https://www.bing.com/ttranslate?&category=&IG={0}&IID={1}.{2}";
@@ -72,6 +72,8 @@ namespace BingTranslate
                return "zh-Hans";
             case "zh-TW":
                return "zh-Hant";
+            case "auto":
+               return "auto-detect";
             default:
                return lang;
          }

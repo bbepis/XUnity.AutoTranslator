@@ -4,6 +4,11 @@ using System.Reflection.Emit;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// Mostly based on:
+   ///  * https://github.com/MonoMod/MonoMod/blob/master/MonoMod.Utils/FastReflectionHelper.cs
+   ///  * https://github.com/pardeike/Harmony/blob/master/Harmony/Extras/FastAccess.cs
+   /// </summary>
    internal static class ReflectionEmitFastReflectionHelper
    {
       private static readonly Type[] _DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };
@@ -21,13 +26,6 @@ namespace XUnity.Common.Utilities
             if( method.DeclaringType.IsValueType )
             {
                il.Emit( OpCodes.Unbox_Any, method.DeclaringType );
-               il.Emit( OpCodes.Stloc_0 );
-               var builder = il.DeclareLocal( method.DeclaringType );
-               il.Emit( OpCodes.Ldloca_S, builder );
-            }
-            else
-            {
-               il.Emit( OpCodes.Castclass, method.DeclaringType );
             }
          }
 
@@ -143,17 +141,7 @@ namespace XUnity.Common.Utilities
          if( !fieldInfo.IsStatic )
          {
             il.Emit( OpCodes.Ldarg_0 );
-            if( fieldInfo.DeclaringType.IsValueType )
-            {
-               il.Emit( OpCodes.Unbox_Any, fieldInfo.DeclaringType );
-               il.Emit( OpCodes.Stloc_0 );
-               var builder = il.DeclareLocal( fieldInfo.DeclaringType );
-               il.Emit( OpCodes.Ldloca_S, builder );
-            }
-            else
-            {
-               il.Emit( OpCodes.Castclass, fieldInfo.DeclaringType );
-            }
+            il.Emit( OpCodes.Castclass, fieldInfo.DeclaringType );
          }
 
          il.Emit( fieldInfo.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, fieldInfo );
@@ -180,17 +168,7 @@ namespace XUnity.Common.Utilities
          if( !fieldInfo.IsStatic )
          {
             il.Emit( OpCodes.Ldarg_0 );
-            if( fieldInfo.DeclaringType.IsValueType )
-            {
-               il.Emit( OpCodes.Unbox_Any, fieldInfo.DeclaringType );
-               il.Emit( OpCodes.Stloc_0 );
-               var builder = il.DeclareLocal( fieldInfo.DeclaringType );
-               il.Emit( OpCodes.Ldloca_S, builder );
-            }
-            else
-            {
-               il.Emit( OpCodes.Castclass, fieldInfo.DeclaringType );
-            }
+            il.Emit( OpCodes.Castclass, fieldInfo.DeclaringType );
          }
 
          il.Emit( OpCodes.Ldarg_1 );

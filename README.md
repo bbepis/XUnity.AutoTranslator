@@ -248,7 +248,7 @@ Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "G
 
 [General]
 Language=en                      ;The language to translate into
-FromLanguage=ja                  ;The original language of the game
+FromLanguage=ja                  ;The original language of the game. "auto" is also supported for some endpoints, but it is generally not recommended
 
 [Files]
 Directory=Translation\{Lang}\Text                                   ;Directory to search for cached translation files. Can use placeholder: {GameExeName}, {Lang}

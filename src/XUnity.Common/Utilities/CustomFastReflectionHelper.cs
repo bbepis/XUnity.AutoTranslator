@@ -10,10 +10,20 @@ using XUnity.Common.Constants;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class CustomFastReflectionHelper
    {
       private static readonly Dictionary<FastReflectionDelegateKey, FastReflectionDelegate> _MethodCache = new Dictionary<FastReflectionDelegateKey, FastReflectionDelegate>();
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="method"></param>
+      /// <param name="directBoxValueAccess"></param>
+      /// <param name="forceNonVirtCall"></param>
+      /// <returns></returns>
       public static FastReflectionDelegate CreateFastDelegate( this MethodBase method, bool directBoxValueAccess = true, bool forceNonVirtCall = false )
       {
          var key = new FastReflectionDelegateKey( method, directBoxValueAccess, forceNonVirtCall );
@@ -34,6 +44,13 @@ namespace XUnity.Common.Utilities
          return dmd;
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <typeparam name="F"></typeparam>
+      /// <param name="fieldInfo"></param>
+      /// <returns></returns>
       public static Func<T, F> CreateFastFieldGetter<T, F>( FieldInfo fieldInfo )
       {
          if( ClrTypes.DynamicMethodDefinition != null )
@@ -46,6 +63,13 @@ namespace XUnity.Common.Utilities
          }
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <typeparam name="F"></typeparam>
+      /// <param name="fieldInfo"></param>
+      /// <returns></returns>
       public static Action<T, F> CreateFastFieldSetter<T, F>( FieldInfo fieldInfo )
       {
          if( ClrTypes.DynamicMethodDefinition != null )

@@ -25,6 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          { "zh", ContainsChineseSymbols },
          { "ko", ContainsKoreanSymbols },
          { "en", ContainsStandardLatinSymbols },
+         { "auto", text => true },
       };
 
       private static readonly HashSet<string> LanguagesNotUsingWhitespaceBetweenWords = new HashSet<string>
