@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,6 +18,67 @@ namespace BaiduTranslate
 {
    internal class BaiduTranslateEndpoint : HttpEndpoint
    {
+      private static readonly Dictionary<string, string> SupportedLanguages = new Dictionary<string, string>
+      {
+         { "en", "en" },
+
+         { "ja", "jp" },
+         { "jp", "jp" },
+
+         { "zh", "zh" },
+         { "zh-Hans", "zh" },
+         { "zh-CN", "zh" },
+         { "zh-Hant", "cht" },
+         { "zh-TW", "cht" },
+
+         { "ko", "kor" },
+         { "kor", "kor" },
+
+         { "fra", "fra" },
+         { "fr", "fra" },
+
+         { "spa", "spa" },
+         { "es", "spa" },
+
+         { "ara", "ara" },
+         { "ar", "ara" },
+
+         { "bg", "bul" },
+         { "bul", "bul" },
+
+         { "et", "est" },
+         { "est", "est" },
+
+         { "da", "dan" },
+         { "dan", "dan" },
+
+         { "fi", "fin" },
+         { "fin", "fin" },
+
+         { "ro", "rom" },
+         { "rom", "rom" },
+
+         { "sl", "slo" },
+         { "slo", "slo" },
+
+         { "vi", "vie" },
+         { "vie", "vie" },
+
+         { "sv", "swe" },
+         { "swe", "swe" },
+
+         { "th", "th" },
+         { "ru", "ru" },
+         { "pt", "pt" },
+         { "de", "de" },
+         { "it", "it" },
+         { "el", "el" },
+         { "nl", "nl" },
+         { "pl", "pl" },
+         { "cs", "cs" },
+         { "hu", "hu" },
+      };
+
       private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
       private static readonly MD5 HashMD5 = MD5.Create();
 
@@ -31,16 +93,11 @@ namespace BaiduTranslate
 
       private string FixLanguage( string lang )
       {
-         switch( lang )
+         if( SupportedLanguages.TryGetValue( lang, out var transformed ) )
          {
-            case "zh-Hans":
-            case "zh-CN":
-               return "zh";
-            //case "ja":
-            //   return "jp";
-            default:
-               return lang;
+            return transformed;
          }
+         return lang;
       }
 
       public override void Initialize( IInitializationContext context )
@@ -53,7 +110,8 @@ namespace BaiduTranslate
 
          context.DisableCertificateChecksFor( "api.fanyi.baidu.com" );
 
-         // frankly, I have no idea what languages this does, or does not support...
+         if( !SupportedLanguages.ContainsKey( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.ContainsKey( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )

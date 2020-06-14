@@ -1,4 +1,8 @@
-﻿### 4.11.2
+﻿### 4.11.3
+ * MISC - Added API to control the scope when performing programmatic translations
+ * BUG FIX - Fixed a bug where BaiduTranslate could not be used properly with japanese (and various other languages). Now supported through 'ja'.
+
+### 4.11.2
  * MISC - Add toggle to enable/disable translation aggregator UI
  * MISC - Enable copy translations / original text to clipboard from translation aggregator UI
  * MISC - Enable "auto" source language for google, bing and papago translate

@@ -1142,9 +1142,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Translate( untranslatedText, TranslationScopes.None, TranslationManager.CurrentEndpoint, null, onCompleted, true, true );
       }
 
+      void ITranslator.TranslateAsync( string untranslatedText, int scope, Action<TranslationResult> onCompleted )
+      {
+         Translate( untranslatedText, scope, TranslationManager.CurrentEndpoint, null, onCompleted, true, true );
+      }
+
       bool ITranslator.TryTranslate( string text, out string translatedText )
       {
-         var scope = TranslationScopeProvider.GetScope( null );
+         return TryTranslate( text, TranslationScopes.None, out translatedText );
+      }
+
+      bool ITranslator.TryTranslate( string text, int scope, out string translatedText )
+      {
+         return TryTranslate( text, scope, out translatedText );
+      }
+
+      private bool TryTranslate( string text, int scope, out string translatedText )
+      {
+         if(scope == TranslationScopes.None)
+         {
+            scope = TranslationScopeProvider.GetScope( null );
+         }
+
          if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) && IsBelowMaxLength( text ) )
          {
             var textKey = GetCacheKey( null, text, false );
