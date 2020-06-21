@@ -161,28 +161,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                EnableTextAssetLoadedHandler();
             }
-
-            //ResourceRedirection.Whatever();
-
-            //XuaLogger.AutoTranslator.Info( "Creating bundle" );
-            //var bundle = AssetBundleHelper.CreateEmptyAssetBundle();
-            //XuaLogger.AutoTranslator.Info( "Is instance: " + ( bundle != null ) );
-            //XuaLogger.AutoTranslator.Info( "Created bundle" );
-
-            //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
-            //var bundle = AssetBundle.LoadFromFile( "idont/really/exist.unity3d" );
-            //var asset = bundle.LoadAsset( "oops" );
-
-            //ResourceRedirection.EnableSyncOverAsyncAssetLoads();
-            //ResourceRedirection.EnableEmulateAssetBundles2( 0, "emulation" );
-            //ResourceRedirection.EnableAsyncToSyncRedirector( 0 );
-            //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( int.MinValue );
-            //ResourceRedirection.EnableHighPoly1();
-            //ResourceRedirection.EmulateAssetBundles( int.MaxValue, "emulation" );
-
-            //ResourceRedirection.DisableRecursionPermanently();
-            //ResourceRedirection.EnableEmulateAssetBundles( 5, "emulation" );
-            //ResourceRedirection.EnableRedirectMissingAssetBundlesToEmptyAssetBundle( 0 );
          }
          catch( Exception e )
          {
@@ -2104,6 +2082,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            TranslationManager.Update();
+
             if( Features.SupportsClipboard )
             {
                CopyToClipboard();

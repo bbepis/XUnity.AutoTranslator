@@ -17,10 +17,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public event Action<TranslationJob> JobCompleted;
       public event Action<TranslationJob> JobFailed;
 
+      private readonly List<IMonoBehaviour_Update> _updateCallbacks;
       private readonly List<TranslationEndpointManager> _endpointsWithUnstartedJobs;
 
       public TranslationManager()
       {
+         _updateCallbacks = new List<IMonoBehaviour_Update>();
          _endpointsWithUnstartedJobs = new List<TranslationEndpointManager>();
          ConfiguredEndpoints = new List<TranslationEndpointManager>();
          AllEndpoints = new List<TranslationEndpointManager>();
@@ -158,6 +160,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      public void Update()
+      {
+         var len = _updateCallbacks.Count;
+         for( int i = 0; i < len; i++ )
+         {
+            try
+            {
+               _updateCallbacks[ i ].Update();
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while calling update on " + _updateCallbacks[ i ].GetType().Name + "." );
+            }
+         }
+      }
+
       public void KickoffTranslations()
       {
          // iterate in reverse order so we can remove from list while iterating
@@ -221,6 +239,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( translationEndpointManager.Error == null )
          {
             ConfiguredEndpoints.Add( translationEndpointManager );
+         }
+
+         if( translationEndpointManager.Endpoint is IMonoBehaviour_Update updatable )
+         {
+            _updateCallbacks.Add( updatable );
          }
       }
 

@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
    /// An implementation of ITranslateEndpoint that simplifies implementing
    /// the interface based on an external program.
    /// </summary>
-   public abstract class ExtProtocolEndpoint : MonoBehaviour, ITranslateEndpoint, IDisposable
+   public abstract class ExtProtocolEndpoint : IMonoBehaviour_Update, ITranslateEndpoint, IDisposable
    {
       private readonly Dictionary<Guid, ProtocolTransactionHandle> _transactionHandles = new Dictionary<Guid, ProtocolTransactionHandle>();
       private readonly object _sync = new object();
@@ -126,7 +126,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          }
       }
 
-      void Update()
+      /// <summary>
+      /// Update callback.
+      /// </summary>
+      public virtual void Update()
       {
          if( Time.frameCount % 30 == 0 )
          {

@@ -15,6 +15,7 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
+using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 
 namespace GoogleTranslate
@@ -27,20 +28,25 @@ namespace GoogleTranslate
       };
 
       //private static readonly string HttpsServicePointTranslateTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl={1}&dt=t&dt=at&tk={2}&q={3}";
-      private static readonly string HttpsServicePointTranslateTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl={1}&dt=t&tk={2}&q={3}";
-      private static readonly string HttpsServicePointRomanizeTemplateUrl = "https://translate.googleapis.com/translate_a/single?client=webapp&sl={0}&tl=en&dt=rm&tk={1}&q={2}";
-      private static readonly string HttpsTranslateUserSite = "https://translate.google.com";
+      private static readonly string DefaultApiBackend = "https://translate.googleapis.com";
+      private static readonly string DefaultUserBackend = "https://translate.google.com";
+
+      private static readonly string HttpsServicePointTranslateTemplateUrl = "/translate_a/single?client=webapp&sl={0}&tl={1}&dt=t&tk={2}&q={3}";
+      private static readonly string HttpsServicePointRomanizeTemplateUrl = "/translate_a/single?client=webapp&sl={0}&tl=en&dt=rm&tk={1}&q={2}";
       private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { null, "*/*", "application/json" };
       private static readonly string[] AcceptLanguages = new string[] { null, "en-US,en;q=0.9", "en-US", "en" };
-      private static readonly string[] Referers = new string[] { null, "https://translate.google.com/" };
       private static readonly string[] AcceptCharsets = new string[] { null, Encoding.UTF8.WebName };
 
       private static readonly string Accept = Accepts[ RandomNumbers.Next( Accepts.Length ) ];
       private static readonly string AcceptLanguage = AcceptLanguages[ RandomNumbers.Next( AcceptLanguages.Length ) ];
-      private static readonly string Referer = Referers[ RandomNumbers.Next( Referers.Length ) ];
       private static readonly string AcceptCharset = AcceptCharsets[ RandomNumbers.Next( AcceptCharsets.Length ) ];
+
+      private string _selectedApiBackend;
+      private string _selectedUserBackend;
+      private string _httpsServicePointTranslateTemplateUrl;
+      private string _httpsServicePointRomanizeTemplateUrl;
 
       private CookieContainer _cookieContainer;
       private bool _hasSetup = false;
@@ -77,12 +83,36 @@ namespace GoogleTranslate
 
       public override void Initialize( IInitializationContext context )
       {
-         context.DisableCertificateChecksFor( "translate.google.com", "translate.googleapis.com" );
 
          if( context.DestinationLanguage == "romaji" )
          {
             _translationsPerRequest = 1;
          }
+
+         _selectedApiBackend = DefaultApiBackend;
+         _selectedUserBackend = DefaultUserBackend;
+
+         var backendOverride = context.GetOrCreateSetting<string>( "Google", "ServiceUrl" );
+         if( !backendOverride.IsNullOrWhiteSpace() )
+         {
+            _selectedApiBackend = backendOverride;
+            _selectedUserBackend = backendOverride;
+
+            _httpsServicePointTranslateTemplateUrl = _selectedApiBackend + HttpsServicePointTranslateTemplateUrl;
+            _httpsServicePointRomanizeTemplateUrl = _selectedApiBackend + HttpsServicePointRomanizeTemplateUrl;
+
+            XuaLogger.AutoTranslator.Info( "The default backend for google translate was overwritten." );
+         }
+         else
+         {
+            _selectedApiBackend = DefaultApiBackend;
+            _selectedUserBackend = DefaultUserBackend;
+
+            _httpsServicePointTranslateTemplateUrl = _selectedApiBackend + HttpsServicePointTranslateTemplateUrl;
+            _httpsServicePointRomanizeTemplateUrl = _selectedApiBackend + HttpsServicePointRomanizeTemplateUrl;
+         }
+
+         context.DisableCertificateChecksFor( new Uri( _selectedApiBackend ).Host, new Uri( _selectedUserBackend ).Host );
 
          if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -117,7 +147,7 @@ namespace GoogleTranslate
          {
             request = new XUnityWebRequest(
                string.Format(
-                  HttpsServicePointRomanizeTemplateUrl,
+                  _httpsServicePointRomanizeTemplateUrl,
                   FixLanguage( context.SourceLanguage ),
                   Tk( allUntranslatedText ),
                   Uri.EscapeDataString( allUntranslatedText ) ) );
@@ -126,7 +156,7 @@ namespace GoogleTranslate
          {
             request = new XUnityWebRequest(
                string.Format(
-                  HttpsServicePointTranslateTemplateUrl,
+                  _httpsServicePointTranslateTemplateUrl,
                   FixLanguage( context.SourceLanguage ),
                   FixLanguage( context.DestinationLanguage ),
                   Tk( allUntranslatedText ),
@@ -187,7 +217,7 @@ namespace GoogleTranslate
                var untranslatedLinesCount = untranslatedLines.Length;
                var translatedText = string.Empty;
 
-               for( int i = 0 ; i < untranslatedLinesCount ; i++ )
+               for( int i = 0; i < untranslatedLinesCount; i++ )
                {
                   if( current >= translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
 
@@ -208,7 +238,7 @@ namespace GoogleTranslate
 
       private XUnityWebRequest CreateWebSiteRequest()
       {
-         var request = new XUnityWebRequest( HttpsTranslateUserSite );
+         var request = new XUnityWebRequest( _selectedUserBackend );
 
          request.Cookies = _cookieContainer;
          AddHeaders( request, false );
@@ -227,9 +257,9 @@ namespace GoogleTranslate
          {
             request.Headers[ HttpRequestHeader.Accept ] = Accept;
          }
-         if( Referer != null && isTranslationRequest )
+         if( isTranslationRequest )
          {
-            request.Headers[ HttpRequestHeader.Referer ] = Referer;
+            request.Headers[ HttpRequestHeader.Referer ] = _selectedUserBackend + "/";
          }
          if( AcceptCharset != null )
          {
@@ -335,7 +365,7 @@ namespace GoogleTranslate
 
       private long Vi( long r, string o )
       {
-         for( var t = 0 ; t < o.Length ; t += 3 )
+         for( var t = 0; t < o.Length; t += 3 )
          {
             long a = o[ t + 2 ];
             a = a >= 'a' ? a - 87 : a - '0';
@@ -350,7 +380,7 @@ namespace GoogleTranslate
       {
          List<long> S = new List<long>();
 
-         for( var v = 0 ; v < r.Length ; v++ )
+         for( var v = 0; v < r.Length; v++ )
          {
             long A = r[ v ];
             if( 128 > A )
@@ -379,7 +409,7 @@ namespace GoogleTranslate
          const string D = "+-3^+b+-f";
          long p = m;
 
-         for( var b = 0 ; b < S.Count ; b++ )
+         for( var b = 0; b < S.Count; b++ )
          {
             p += S[ b ];
             p = Vi( p, F );
