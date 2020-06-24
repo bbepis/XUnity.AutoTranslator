@@ -2,15 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
-using XUnity.AutoTranslator.Plugin.Core.Shim;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
+using XUnity.Common.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
@@ -266,10 +267,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private string GetTextToTranslate( TranslationJob job )
       {
-         var isNgui = job.Components.Any( x => x.Item.IsNGUI() )
-            || job.Contexts.Any( x => x.Component.IsNGUI() );
-
-         var removeInternalWhitespace = ( Settings.IgnoreWhitespaceInDialogue && job.Key.Original_Text.Length > Settings.MinDialogueChars ) || ( Settings.IgnoreWhitespaceInNGUI && isNgui );
+         var removeInternalWhitespace = Settings.IgnoreWhitespaceInDialogue && job.Key.Original_Text.Length > Settings.MinDialogueChars;
 
          string text;
          if( removeInternalWhitespace )
@@ -337,7 +335,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                AvailableBatchOperations--;
                var jobsArray = jobs.ToArray();
 
-               CoroutineHelper.Start(
+               CoroutineHelper.Instance.Start(
                   Translate(
                      untranslatedTexts.ToArray(),
                      Settings.FromLanguage,
@@ -377,7 +375,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   Manager.OngoingTranslations++;
 
                   if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
-                  CoroutineHelper.Start(
+                  CoroutineHelper.Instance.Start(
                      Translate(
                         new[] { untranslatedText },
                         Settings.FromLanguage,
@@ -436,7 +434,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( !HasBatchLogicFailed )
             {
-               CoroutineHelper.Start( EnableBatchingAfterDelay() );
+               CoroutineHelper.Instance.Start( EnableBatchingAfterDelay() );
             }
 
             HasBatchLogicFailed = true;
@@ -544,7 +542,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( !HasBatchLogicFailed )
             {
-               CoroutineHelper.Start( EnableBatchingAfterDelay() );
+               CoroutineHelper.Instance.Start( EnableBatchingAfterDelay() );
             }
 
             HasBatchLogicFailed = true;
@@ -577,7 +575,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private IEnumerator EnableBatchingAfterDelay()
       {
-         yield return new WaitForSeconds( 60 );
+         yield return CoroutineHelper.Instance.CreateWaitForSeconds( 60f );
 
          HasBatchLogicFailed = false;
 
@@ -719,7 +717,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public IEnumerator Translate( string[] untranslatedTexts, string from, string to, Action<string[]> success, Action<string, Exception> failure )
       {
-         var startTime = Time.realtimeSinceStartup;
+         var startTime = TimeHelper.Instance.realtimeSinceStartup;
          var context = new TranslationContext( untranslatedTexts, from, to, success, failure );
          _ongoingTranslations++;
 
@@ -727,7 +725,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( Settings.SimulateDelayedError )
             {
-               yield return new WaitForSeconds( 1 );
+               yield return CoroutineHelper.Instance.CreateWaitForSeconds( 1f );
 
                context.FailWithoutThrowing( "Simulating delayed error. Press CTRL+ALT+NP8 to disable!", null );
             }
@@ -746,7 +744,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                      ok = iterator.MoveNext();
 
                      // check for timeout
-                     var now = Time.realtimeSinceStartup;
+                     var now = TimeHelper.Instance.realtimeSinceStartup;
                      if( now - startTime > Settings.Timeout )
                      {
                         ok = false;

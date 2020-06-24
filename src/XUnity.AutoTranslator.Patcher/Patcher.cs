@@ -46,12 +46,12 @@ namespace XUnity.AutoTranslator.Patcher
             _assemblyName = "UnityEngine";
          }
 
-         _hookAssembly = LoadAssembly( "XUnity.AutoTranslator.Plugin.Core.dll" );
+         _hookAssembly = LoadAssembly( "XUnity.AutoTranslator.Plugin.Core.Managed.dll" );
       }
 
       public override bool CanPatch( PatcherArguments args )
       {
-         return ( args.Assembly.Name.Name == _assemblyName ) && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
+         return ( args.Assembly.Name.Name == _assemblyName ) && !HasAttribute( this, args.Assembly, "XUnity.AutoTranslator.Plugin.Core.Managed" );
       }
 
       public override void Patch( PatcherArguments args )
@@ -72,7 +72,7 @@ namespace XUnity.AutoTranslator.Patcher
             }
          }
 
-         SetPatchedAttribute( args.Assembly, "XUnity.AutoTranslator.Plugin.Core" );
+         SetPatchedAttribute( args.Assembly, "XUnity.AutoTranslator.Plugin.Core.Managed" );
       }
 
       public bool ManagedDllExists( string name )

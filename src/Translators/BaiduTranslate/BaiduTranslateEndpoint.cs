@@ -11,6 +11,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 
@@ -121,7 +122,7 @@ namespace BaiduTranslate
          {
             var delay = 1.0f - timeSinceLast;
 
-            var instruction = Features.GetWaitForSecondsRealtime( delay );
+            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( delay );
             if( instruction != null )
             {
                yield return instruction;
@@ -148,7 +149,7 @@ namespace BaiduTranslate
          var request = new XUnityWebRequest(
             string.Format(
                HttpServicePointTemplateUrl,
-               WwwHelper.EscapeUrl( context.UntranslatedText ),
+               Uri.EscapeDataString( context.UntranslatedText ),
                FixLanguage( context.SourceLanguage ),
                FixLanguage( context.DestinationLanguage ),
                _appId,

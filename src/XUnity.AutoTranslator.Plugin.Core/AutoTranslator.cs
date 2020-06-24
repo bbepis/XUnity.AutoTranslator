@@ -5,11 +5,18 @@
    /// </summary>
    public static class AutoTranslator
    {
-      internal static IInternalTranslator Internal => AutoTranslationPlugin.Current;
+      private static IInternalTranslator _internalTranslator;
+
+      internal static void SetTranslator( IInternalTranslator translator )
+      {
+         _internalTranslator = translator;
+      }
+
+      internal static IInternalTranslator Internal => _internalTranslator;
 
       /// <summary>
       /// Gets the translator instance.
       /// </summary>
-      public static ITranslator Default => AutoTranslationPlugin.Current;
+      public static ITranslator Default => _internalTranslator;
    }
 }

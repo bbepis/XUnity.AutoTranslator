@@ -56,7 +56,7 @@ namespace YandexTranslate
                HttpsServicePointTemplateUrl,
                FixLanguage( context.SourceLanguage ),
                FixLanguage( context.DestinationLanguage ),
-               WwwHelper.EscapeUrl( context.UntranslatedText ),
+               Uri.EscapeDataString( context.UntranslatedText ),
                _key ) );
          
          request.Headers[ HttpRequestHeader.Accept ] = "*/*";

@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Logging;
 
@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static object _writeToFileSync = new object(); // static on purpose so we do not start 100 IO operations at the same time
       private Dictionary<string, string> _newTranslations = new Dictionary<string, string>();
-      private Coroutine _currentScheduledTask;
+      private object _currentScheduledTask;
       private bool _shouldOverrideEntireFile;
 
       /// <summary>
@@ -255,15 +255,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( _currentScheduledTask != null )
             {
-               CoroutineHelper.Stop( _currentScheduledTask );
+               CoroutineHelper.Instance.Stop( _currentScheduledTask );
             }
-            _currentScheduledTask = CoroutineHelper.Start( ScheduleFileWriting() );
+            _currentScheduledTask = CoroutineHelper.Instance.Start( ScheduleFileWriting() );
          }
       }
 
       private IEnumerator ScheduleFileWriting()
       {
-         yield return new WaitForSeconds( 1 );
+         yield return CoroutineHelper.Instance.CreateWaitForSeconds( 1 );
 
          _currentScheduledTask = null;
          ThreadPool.QueueUserWorkItem( SaveNewTranslationsToDisk );

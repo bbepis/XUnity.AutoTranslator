@@ -7,13 +7,14 @@ using System.Reflection;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
+using XUnity.Common.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {
    internal class UnzippedDirectory : IDisposable
    {
       private static readonly char[] PathSeparators = new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
-      private static readonly string _loweredCurrentDirectory = Paths.GameRoot.ToLowerInvariant();
+      private static readonly string _loweredCurrentDirectory = PathsHelper.Instance.GameRoot.ToLowerInvariant();
       private readonly string _root;
       private readonly bool _cacheNormalFiles;
       private DirectoryEntry _rootDirectory;

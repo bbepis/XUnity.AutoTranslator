@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TextureReloadContext
    {
-      private readonly HashSet<Texture2D> _textures;
+      private readonly HashSet<object> _textures;
 
       public TextureReloadContext()
       {
-         _textures = new HashSet<Texture2D>();
+         _textures = new HashSet<object>();
       }
 
-      public bool RegisterTextureInContextAndDetermineWhetherToReload( Texture2D texture )
+      public bool RegisterTextureInContextAndDetermineWhetherToReload( object texture )
       {
          return _textures.Add( texture );
       }

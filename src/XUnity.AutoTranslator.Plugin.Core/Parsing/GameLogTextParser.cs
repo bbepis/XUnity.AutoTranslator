@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
@@ -17,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return ui.SupportsLineParser();
+         return TextComponentHelper.Instance.SupportsLineParser( ui );
       }
 
       public ParserResult Parse( string input, int scope )

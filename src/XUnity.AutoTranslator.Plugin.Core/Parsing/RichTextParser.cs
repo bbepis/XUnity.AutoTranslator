@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
@@ -21,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return Settings.HandleRichText && ui.SupportsRichText();
+         return Settings.HandleRichText && TextComponentHelper.Instance.SupportsRichText( ui );
       }
 
       private static bool IsAllLatin( string value, int endIdx )

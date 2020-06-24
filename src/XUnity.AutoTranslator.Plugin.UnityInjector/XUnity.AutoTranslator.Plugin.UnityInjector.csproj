@@ -6,7 +6,7 @@
    </PropertyGroup>
 
    <ItemGroup>
-      <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj" />
    </ItemGroup>
 
    <ItemGroup>

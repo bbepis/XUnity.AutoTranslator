@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -73,7 +74,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else
          {
-            if( ui != null && !ui.IsSpammingComponent() )
+            if( ui != null && !TextComponentHelper.Instance.IsSpammingComponent( ui ) )
             {
                Components.Add( new KeyAnd<object>( key, ui ) );
             }

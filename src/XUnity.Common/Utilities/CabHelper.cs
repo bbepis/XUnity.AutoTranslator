@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 
 namespace XUnity.Common.Utilities
 {
@@ -23,7 +22,7 @@ namespace XUnity.Common.Utilities
       /// <param name="assetBundleData"></param>
       public static void RandomizeCab( byte[] assetBundleData )
       {
-         var ascii = Encoding.ASCII.GetString( assetBundleData, 0, Mathf.Min( 1024, assetBundleData.Length - 4 ) );
+         var ascii = Encoding.ASCII.GetString( assetBundleData, 0, Math.Min( 1024, assetBundleData.Length - 4 ) );
 
          var origCabIndex = ascii.IndexOf( "CAB-", StringComparison.Ordinal );
          if( origCabIndex < 0 )

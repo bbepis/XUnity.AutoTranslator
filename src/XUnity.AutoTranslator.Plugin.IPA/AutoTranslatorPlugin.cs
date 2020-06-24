@@ -9,6 +9,7 @@ using IllusionPlugin;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.Common.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.IPA
 {
@@ -20,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.IPA
 
       public AutoTranslatorPlugin()
       {
-         _dataPath = Path.Combine( Common.Constants.Paths.GameRoot, "Plugins" );
+         _dataPath = Path.Combine( PathsHelper.Instance.GameRoot, "Plugins" );
          _configPath = Path.Combine( _dataPath, "AutoTranslatorConfig.ini" );
       }
 

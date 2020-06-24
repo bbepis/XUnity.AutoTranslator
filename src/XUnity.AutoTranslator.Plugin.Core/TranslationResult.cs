@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
-
+﻿
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    /// <summary>

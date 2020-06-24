@@ -5,12 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.AutoTranslator.Plugin.Shims;
+using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 
@@ -86,7 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableFairyGUI;
       public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
-      public static bool IgnoreWhitespaceInNGUI;
+      //public static bool IgnoreWhitespaceInNGUI;
       public static int MinDialogueChars;
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
@@ -189,7 +190,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
             IgnoreWhitespaceInDialogue = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInDialogue", true );
-            IgnoreWhitespaceInNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInNGUI", true );
+            //IgnoreWhitespaceInNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInNGUI", true );
             MinDialogueChars = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MinDialogueChars", 20 );
             ForceSplitTextAfterCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceSplitTextAfterCharacters", 0 );
             CopyToClipboard = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CopyToClipboard", false );
@@ -294,7 +295,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             FromLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
             ToLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( Language );
 
-            if( EnableTranslationScoping && !Features.SupportsSceneManager )
+            if( EnableTranslationScoping && !TranslationScopeHelper.Instance.SupportsSceneManager() )
             {
                EnableTranslationScoping = false;
 
@@ -379,14 +380,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       private static void Migrate()
       {
-      }
-
-      private static bool GetInitialDisableCertificateChecks()
-      {
-         var is2017 = Application.unityVersion.StartsWith( "2017" );
-         var isNet4x = Features.SupportsNet4x;
-
-         return is2017 && isNet4x;
       }
    }
 }

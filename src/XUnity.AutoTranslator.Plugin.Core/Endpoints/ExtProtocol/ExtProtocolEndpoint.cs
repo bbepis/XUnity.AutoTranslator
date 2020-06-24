@@ -6,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
+using XUnity.Common.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {
@@ -89,7 +90,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             if( _process == null )
             {
                _process = new Process();
-               _process.StartInfo.FileName = Path.Combine( Paths.GameRoot, ExecutablePath );
+               _process.StartInfo.FileName = Path.Combine( PathsHelper.Instance.GameRoot, ExecutablePath );
                _process.StartInfo.Arguments = Arguments;
                _process.StartInfo.WorkingDirectory = new FileInfo( ExecutablePath ).Directory.FullName;
                _process.EnableRaisingEvents = false;
@@ -131,11 +132,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// </summary>
       public virtual void Update()
       {
-         if( Time.frameCount % 30 == 0 )
+         var timeShim = TimeHelper.Instance;
+         if( timeShim.frameCount % 30 == 0 )
          {
             lock( _sync )
             {
-               var time = Time.realtimeSinceStartup;
+               var time = timeShim.realtimeSinceStartup;
 
                List<Guid> idsToRemove = null;
                foreach( var kvp in _transactionHandles )
@@ -172,7 +174,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       {
          EnsureInitialized();
 
-         while( _initializing && !_failed ) yield return new WaitForSeconds( 0.2f ); 
+         while( _initializing && !_failed ) yield return CoroutineHelper.Instance.CreateWaitForSeconds( 0.2f ); 
 
          if( _failed ) context.Fail( "External process failed." );
 

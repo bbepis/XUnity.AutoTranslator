@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    {
       private readonly float _delaySeconds;
       private readonly Action _callback;
-      private Coroutine _current;
+      private object _current;
 
       public DebounceFunction( float delaySeconds, Action callback )
       {
@@ -20,15 +20,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          if( _current != null )
          {
-            CoroutineHelper.Stop( _current );
+            CoroutineHelper.Instance.Stop( _current );
          }
 
-         _current = CoroutineHelper.Start( Run() );
+         _current = CoroutineHelper.Instance.Start( Run() );
       }
 
       private IEnumerator Run()
       {
-         yield return new WaitForSeconds( _delaySeconds );
+         yield return CoroutineHelper.Instance.CreateWaitForSeconds( _delaySeconds );
 
          _callback();
 
