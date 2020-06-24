@@ -1,4 +1,7 @@
-﻿### 4.11.3
+﻿### 4.11.4
+ * MISC - Allow using separate service endpoint for google
+
+### 4.11.3
  * MISC - Added API to control the scope when performing programmatic translations
  * BUG FIX - Fixed a bug where BaiduTranslate could not be used properly with japanese (and various other languages). Now supported through 'ja'.
 
