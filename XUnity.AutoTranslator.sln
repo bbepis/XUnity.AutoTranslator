@@ -137,7 +137,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.Common.Managed", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core.Managed", "src\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj", "{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.Core.IL2CPP", "src\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj", "{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core.IL2CPP", "src\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj", "{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.MelonMod", "src\XUnity.AutoTranslator.Plugin.MelonMod\XUnity.AutoTranslator.Plugin.MelonMod.csproj", "{332A2D79-680C-4641-B823-2F7DA87952E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -515,6 +517,14 @@ Global
 		{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}.Release|x86.Build.0 = Release|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{332A2D79-680C-4641-B823-2F7DA87952E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -567,6 +577,7 @@ Global
 		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
+		{332A2D79-680C-4641-B823-2F7DA87952E5} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE803FED-4447-4D19-B3D6-88C56E8DFCCA}

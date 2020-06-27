@@ -40,15 +40,13 @@ using MelonLoader;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.Common.IL2CPP.Logging;
 
-[assembly: MelonModInfo( typeof( AutoTranslationPlugin ), "XUnity.AutoTranslator", "5.0.0", "gravydevsupreme" )]
-[assembly: MelonModGame( null, null )]
-
 namespace XUnity.AutoTranslator.Plugin.Core
 {
+
    /// <summary>
    /// Main plugin class for the AutoTranslator.
    /// </summary>
-   public class AutoTranslationPlugin : MelonMod, IInternalTranslator
+   public class AutoTranslationPlugin : IInternalTranslator, IMonoBehaviour
    {
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
@@ -79,7 +77,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public void Initialize()
       {
-         PluginEnvironment.Current = new DefaultPluginEnvironment();
          XuaLogger.AutoTranslator = new MelonLogger( "XUnity.AutoTranslator" );
          XuaLogger.Common = new MelonLogger( "XUnity.Common" );
          XuaLogger.ResourceRedirector = new MelonLogger( "XUnity.ResourceRedirector" );
@@ -222,27 +219,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             _batchOperationSecondCounter = 0;
-         }
-      }
-
-      internal string Hook_TextChanged_WithResult( ITextComponent ui, string text, bool onEnable )
-      {
-         try
-         {
-            string result = null;
-            if( _textHooksEnabled && !_temporarilyDisabled )
-            {
-               var info = ui.GetOrCreateTextTranslationInfo();
-               CallOrigin.ExpectsTextToBeReturned = true;
-
-               result = TranslateOrQueueWebJob( ui, text, false, info );
-            }
-
-            return result;
-         }
-         finally
-         {
-            CallOrigin.ExpectsTextToBeReturned = false;
          }
       }
 
@@ -1376,7 +1352,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public override void OnApplicationStart()
+      public void OnApplicationStart()
       {
          if( !_initialized )
          {
@@ -1394,7 +1370,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public override void OnUpdate()
+      public void OnUpdate()
       {
          try
          {

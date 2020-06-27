@@ -17,8 +17,6 @@ namespace XUnity.Common.Utilities
             var dir = new FileInfo( parentAssembly.Location ).Directory.FullName;
             var path = Path.Combine( dir, assembly );
 
-            Console.WriteLine( "Trying to load assembly: " + path );
-
             var types = GetAllTypesOf<TService>( path );
             if( types == null )
                continue;

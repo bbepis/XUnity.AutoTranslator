@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <Version>4.11.4</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="ExIni">
+      <HintPath>..\..\libs\ExIni.dll</HintPath>
+    </Reference>
+    <Reference Include="MelonLoader.ModHandler">
+      <HintPath>..\..\libs\MelonMod\MelonLoader.ModHandler.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
