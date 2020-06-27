@@ -17,8 +17,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
             if( _instance == null )
             {
                _instance = ActivationHelper.Create<ITimeHelper>(
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.ManagedTimeHelper, XUnity.AutoTranslator.Plugin.Core.Managed.dll",
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.Il2CppTimeHelper, XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+                  typeof( TimeHelper ).Assembly,
+                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
+                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+
+               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }

@@ -17,8 +17,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
             if( _instance == null )
             {
                _instance = ActivationHelper.Create<ICoroutineHelper>(
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.ManagedPathsHelper, XUnity.AutoTranslator.Plugin.Core.Managed.dll",
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.Il2CppPathsHelper, XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+                  typeof( CoroutineHelper ).Assembly,
+                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
+                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+
+               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }
@@ -33,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
 
       object CreateWaitForSeconds( float seconds );
 
-      IEnumerator CreateWaitForSecondsRealtime( float seconds );
+      object CreateWaitForSecondsRealtime( float seconds );
 
       bool SupportsCustomYieldInstruction();
    }

@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Shims
          return TranslationScopes.None;
       }
 
-      public int GetScopeFromComponent( object component )
+      private int GetScopeFromComponent( object component )
       {
          // DANGER: May not exist in runtime!
          return ((Component)component).gameObject.scene.buildIndex;

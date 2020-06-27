@@ -17,8 +17,11 @@ namespace XUnity.Common.Shims
             if( _instance == null )
             {
                _instance = ActivationHelper.Create<IPathsHelper>(
-                  "XUnity.Common.Shims.ManagedPathsHelper, XUnity.Common.Managed.dll",
-                  "XUnity.Common.Shims.Il2CppPathsHelper, XUnity.Common.IL2CPP.dll" );
+                  typeof( PathsHelper ).Assembly,
+                  "XUnity.Common.Managed.dll",
+                  "XUnity.Common.IL2CPP.dll" );
+
+               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }

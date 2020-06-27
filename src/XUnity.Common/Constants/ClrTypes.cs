@@ -7,10 +7,10 @@ namespace XUnity.Common.Constants
    public static class ClrTypes
    {
       // Harmony
-      public static readonly Type AccessTools = FindTypeStrict( "Harmony.AccessTools, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.AccessTools, 0Harmony" );
-      public static readonly Type HarmonyInstance = FindTypeStrict( "Harmony.HarmonyInstance, 0Harmony" );
-      public static readonly Type HarmonyMethod = FindTypeStrict( "Harmony.HarmonyMethod, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.HarmonyMethod, 0Harmony" );
-      public static readonly Type Harmony = FindTypeStrict( "HarmonyLib.Harmony, 0Harmony" );
+      public static readonly Type AccessTools = FindTypeStrict( "Harmony.AccessTools, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.AccessTools, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.AccessTools, MelonLoader.ModHandler" );
+      public static readonly Type HarmonyInstance = FindTypeStrict( "Harmony.HarmonyInstance, 0Harmony" ) ?? FindTypeStrict( "Harmony.HarmonyInstance, MelonLoader.ModHandler" );
+      public static readonly Type HarmonyMethod = FindTypeStrict( "Harmony.HarmonyMethod, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.HarmonyMethod, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.HarmonyMethod, MelonLoader.ModHandler" );
+      public static readonly Type Harmony = FindTypeStrict( "HarmonyLib.Harmony, 0Harmony" ) ?? FindTypeStrict( "HarmonyLib.Harmony, MelonLoader.ModHandler" );
 
       // MonoMod
       public static readonly Type Hook = FindTypeStrict( "MonoMod.RuntimeDetour.Hook, MonoMod.RuntimeDetour" );

@@ -61,8 +61,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int MaxSecondsAboveTranslationThreshold = 30;
       public static readonly int TranslationQueueWatchWindow = 6;
 
-      public static bool RequiresToggleFix = false;
-
       // can be changed
       public static string ServiceEndpoint;
       public static string Language;

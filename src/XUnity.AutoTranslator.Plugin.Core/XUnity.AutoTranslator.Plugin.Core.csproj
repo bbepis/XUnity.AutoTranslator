@@ -29,9 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\libs\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="ExIni">
       <HintPath>..\..\libs\ExIni.dll</HintPath>
     </Reference>

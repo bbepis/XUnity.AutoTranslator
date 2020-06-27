@@ -471,38 +471,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Reset( string newText )
       {
-         if( Settings.RequiresToggleFix )
-         {
-            var frame = Time.frameCount;
-            if( frame != _translationFrame )
-            {
-               IsTranslated = false;
-               TranslatedText = null;
-               OriginalText = newText;
-            }
-         }
-         else
-         {
-            IsTranslated = false;
-            TranslatedText = null;
-            OriginalText = newText;
-         }
+         IsTranslated = false;
+         TranslatedText = null;
+         OriginalText = newText;
       }
 
       public void SetTranslatedText( string translatedText )
       {
-         if( Settings.RequiresToggleFix )
-         {
-            _translationFrame = Time.frameCount;
-
-            IsTranslated = true;
-            TranslatedText = translatedText;
-         }
-         else
-         {
-            IsTranslated = true;
-            TranslatedText = translatedText;
-         }
+         IsTranslated = true;
+         TranslatedText = translatedText;
       }
    }
 }

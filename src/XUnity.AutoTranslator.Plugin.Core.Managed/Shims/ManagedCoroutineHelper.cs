@@ -15,7 +15,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
          return new WaitForSeconds( seconds );
       }
 
-      public IEnumerator CreateWaitForSecondsRealtime( float delay )
+      public object CreateWaitForSecondsRealtime( float delay )
       {
          if( UnityFeatures.SupportsWaitForSecondsRealtime )
          {

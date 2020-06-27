@@ -15,8 +15,11 @@ namespace XUnity.AutoTranslator.Plugin.Shims
             if( _instance == null )
             {
                _instance = ActivationHelper.Create<ITranslationScopeHelper>(
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.ManagedTranslationScopeHelper, XUnity.AutoTranslator.Plugin.Core.Managed.dll",
-                  "XUnity.AutoTranslator.Plugin.Core.Shims.Il2CppTranslationScopeHelper, XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+                  typeof( TranslationScopeHelper ).Assembly,
+                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
+                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
+
+               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }
@@ -26,8 +29,6 @@ namespace XUnity.AutoTranslator.Plugin.Shims
    public interface ITranslationScopeHelper
    {
       int GetScope( object ui );
-
-      int GetScopeFromComponent( object component );
 
       bool SupportsSceneManager();
 
