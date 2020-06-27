@@ -20,8 +20,6 @@ namespace XUnity.Common.Shims
                   typeof( PathsHelper ).Assembly,
                   "XUnity.Common.Managed.dll",
                   "XUnity.Common.IL2CPP.dll" );
-
-               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }

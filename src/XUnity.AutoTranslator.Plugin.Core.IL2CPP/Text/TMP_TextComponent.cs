@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          }
          if( UnityTypes.TextMeshProUGUI != null )
          {
-            __TeshMeshPro_OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI.ClassPointer, "OnEnable", typeof( void ) );
+            __TeshMeshProUGUI_OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI.ClassPointer, "OnEnable", typeof( void ) );
          }
       }
 
@@ -87,7 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
 
       public override int GetHashCode()
       {
-         return -1407380504 + _ptr.GetHashCode();
+         return _ptr.ToInt32();
       }
 
       public bool IsCollected()

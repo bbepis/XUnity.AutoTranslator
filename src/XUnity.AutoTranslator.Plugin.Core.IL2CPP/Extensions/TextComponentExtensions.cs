@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnhollowerBaseLib;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -20,9 +21,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextComponentExtensions
    {
-      private static readonly string SupportRichTextPropertyName = "supportRichText";
-      private static readonly string RichTextPropertyName = "richText";
-
       public static bool ShouldTranslateTextComponent( this ITextComponent ui, bool ignoreComponentState )
       {
          return true;
@@ -86,15 +84,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetIl2CppType();
 
-         if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Type.IsAssignableFrom( type ) )
+         if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( type ) )
          {
             return new TextComponent( ui );
          }
-         else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.Type.IsAssignableFrom( type ) )
+         else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( type ) )
          {
             return new TextMeshComponent( ui );
          }
-         else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.Type.IsAssignableFrom( type ) )
+         else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( type ) )
          {
             return new TMP_TextComponent( ui );
          }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Harmony;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnhollowerBaseLib;
@@ -12,6 +15,55 @@ namespace XUnity.Common.Constants
 
    public static class UnityTypes
    {
+      private static bool _initialized;
+      private static readonly HashSet<string> Blacklist = new HashSet<string>( StringComparer.OrdinalIgnoreCase )
+      {
+         "netstandard.dll"
+      };
+
+      private static void Initialize()
+      {
+         // we need to force load ALL assemblies because we do not know which ones are relevant and which ones are not!!
+         // (types we are hooking may be stored in assemblies whose names are not known at runtime)
+         if( !_initialized )
+         {
+            _initialized = true;
+
+            try
+            {
+               XuaLogger.AutoTranslator.Info( "Force loading ALL proxy assemblies." );
+
+               var dir = new FileInfo( typeof( UnityTypes ).Assembly.Location ).Directory;
+               var files = dir.GetFiles();
+               foreach( var file in files )
+               {
+                  if( Blacklist.Contains( file.Name ) )
+                     continue;
+
+                  if( file.Extension.Equals( ".dll", StringComparison.OrdinalIgnoreCase ) )
+                  {
+                     try
+                     {
+                        XuaLogger.AutoTranslator.Debug( "Force loading assembly: " + file.FullName );
+
+                        var assemblyName = AssemblyName.GetAssemblyName( file.FullName );
+                        var assembly = Assembly.Load( assemblyName );
+                     }
+                     catch( Exception e )
+                     {
+                        XuaLogger.AutoTranslator.Error( e, "An error occurred while force loading assembly: " + file.FullName );
+                     }
+                  }
+               }
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while attempting to locate proxy assemblies." );
+            }
+         }
+      }
+
+
       // TextMeshPro
       public static readonly Il2CppTypeWrapper TMP_InputField = FindType( "TMPro.TMP_InputField" );
       public static readonly Il2CppTypeWrapper TMP_Text = FindType( "TMPro.TMP_Text" );
@@ -125,6 +177,8 @@ namespace XUnity.Common.Constants
 
       private static Il2CppTypeWrapper FindType( string name )
       {
+         Initialize();
+
          try
          {
             string @namespace = null;
@@ -144,7 +198,25 @@ namespace XUnity.Common.Constants
             var ptr = Il2CppUtilities.GetIl2CppClass( @namespace, typeName );
             if( ptr == System.IntPtr.Zero ) return null;
 
-            return new Il2CppTypeWrapper( Il2CppType.TypeFromPointer( ptr ), ptr );
+            Type wrapperType = null;
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach( var assembly in assemblies )
+            {
+               try
+               {
+                  var type = assembly.GetType( name, false );
+                  if( type != null )
+                  {
+                     wrapperType = type;
+                  }
+               }
+               catch
+               {
+                  // don't care!
+               }
+            }
+
+            return new Il2CppTypeWrapper( Il2CppType.TypeFromPointer( ptr ), wrapperType, ptr );
          }
          catch( Exception e )
          {
@@ -157,13 +229,15 @@ namespace XUnity.Common.Constants
 
    public class Il2CppTypeWrapper
    {
-      public Il2CppTypeWrapper( Il2CppSystem.Type type, IntPtr classPointer )
+      public Il2CppTypeWrapper( Il2CppSystem.Type il2cppType, Type wrapperType, IntPtr classPointer )
       {
-         Type = type;
+         Il2CppType = il2cppType;
+         ProxyType = wrapperType;
          ClassPointer = classPointer;
       }
 
-      public Il2CppSystem.Type Type { get; }
+      public Il2CppSystem.Type Il2CppType { get; }
+      public Type ProxyType { get; }
       public IntPtr ClassPointer { get; }
    }
 }

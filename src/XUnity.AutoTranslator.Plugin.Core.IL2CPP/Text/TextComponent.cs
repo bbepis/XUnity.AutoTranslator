@@ -84,7 +84,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
 
       public override int GetHashCode()
       {
-         return -1407380504 + _ptr.GetHashCode();
+         return _ptr.ToInt32();
       }
 
       public bool IsCollected()

@@ -18,8 +18,6 @@ namespace XUnity.AutoTranslator.Plugin.Shims
                   typeof( TranslationScopeHelper ).Assembly,
                   "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
                   "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
-
-               System.Console.WriteLine( "Instantiated: " + _instance?.GetType().Name );
             }
             return _instance;
          }

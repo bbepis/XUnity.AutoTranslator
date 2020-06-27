@@ -222,8 +222,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      internal string Hook_TextChanged_WithResult( ITextComponent ui, string text, bool onEnable )
+      {
+         string result = null;
+         if( _textHooksEnabled && !_temporarilyDisabled )
+         {
+            var info = ui.GetOrCreateTextTranslationInfo();
+
+            result = TranslateOrQueueWebJob( ui, text, false, info );
+         }
+
+         return result;
+      }
+
       internal void Hook_TextChanged( ITextComponent ui, bool onEnable )
       {
+         //XuaLogger.AutoTranslator.Error( ui.GetHashCode() + ": event!" );
+
          if( _textHooksEnabled && !_temporarilyDisabled )
          {
             var info = ui.GetOrCreateTextTranslationInfo();
@@ -304,6 +319,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                // NGUI only behaves if you set the text after the resize behaviour
                ui.SetText( text );
+
+               //XuaLogger.AutoTranslator.Error( ui.GetHashCode() + ": " + ui.text );
 
                if( originalText != null && ui != null && !ui.IsSpammingComponent() )
                {
@@ -1252,7 +1269,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private IEnumerator WaitForTextStablization( ITextComponent ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
       {
-         yield return 0; // wait a single frame to allow any external plugins to complete their hooking logic
+         yield return null;
 
          bool succeeded = false;
          while( currentTries < maxTries ) // shortcircuit
