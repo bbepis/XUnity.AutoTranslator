@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using UnityEngine;
@@ -62,7 +63,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
-            SupportsSceneManager = ClrTypes.Scene != null && ClrTypes.SceneManager != null;
+            SupportsSceneManager = ClrTypes.Scene != null
+               && ClrTypes.SceneManager != null
+               && ClrTypes.SceneManager.GetMethod( "add_sceneLoaded", BindingFlags.Static | BindingFlags.Public ) != null;
          }
          catch( Exception )
          {
