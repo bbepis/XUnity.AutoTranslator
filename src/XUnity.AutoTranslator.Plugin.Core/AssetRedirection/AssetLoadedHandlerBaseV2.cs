@@ -2,6 +2,7 @@
 using System.IO;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.Common.Logging;
+using XUnity.Common.Shims;
 using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
@@ -35,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 
       private void Handle( IAssetOrResourceLoadedContext context )
       {
-         if( context.Asset is TAsset castedAsset && ShouldHandleAsset( castedAsset, context ) )
+         if( TypeCastingHelper.Instance.TryCast<TAsset>( context.Asset, out var castedAsset ) && ShouldHandleAsset( castedAsset, context ) )
          {
             var unqiuePath = context.GetUniqueFileSystemAssetPath( castedAsset );
             var modificationFilePath = CalculateModificationFilePath( castedAsset, context );

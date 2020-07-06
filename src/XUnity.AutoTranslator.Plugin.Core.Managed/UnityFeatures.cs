@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -15,6 +16,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class UnityFeatures
    {
+      private static readonly BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+
       internal static bool SupportsMouseScrollDelta { get; } = false;
       internal static bool SupportsClipboard { get; } = false;
       internal static bool SupportsCustomYieldInstruction { get; } = false;
@@ -43,7 +46,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
-            SupportsSceneManager = UnityTypes.Scene != null && UnityTypes.SceneManager != null;
+            SupportsSceneManager = UnityTypes.Scene != null
+               && UnityTypes.SceneManager != null
+               && UnityTypes.SceneManager.GetMethod("add_sceneLoaded", All) != null;
          }
          catch( Exception )
          {

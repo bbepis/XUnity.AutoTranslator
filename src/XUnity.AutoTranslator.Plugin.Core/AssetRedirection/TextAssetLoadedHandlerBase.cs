@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Hooks;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
 
@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
       /// </summary>
       public TextAssetLoadedHandlerBase()
       {
-         HooksSetup.InstallTextAssetHooks();
+         HookSetupHelper.Instance.InstallTextAssetHooks();
       }
 
       /// <summary>

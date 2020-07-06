@@ -23,6 +23,8 @@ namespace XUnity.Common.Constants
 
       private static void Initialize()
       {
+         
+
          // we need to force load ALL assemblies because we do not know which ones are relevant and which ones are not!!
          // (types we are hooking may be stored in assemblies whose names are not known at runtime)
          if( !_initialized )
@@ -225,19 +227,5 @@ namespace XUnity.Common.Constants
             return null;
          }
       }
-   }
-
-   public class Il2CppTypeWrapper
-   {
-      public Il2CppTypeWrapper( Il2CppSystem.Type il2cppType, Type wrapperType, IntPtr classPointer )
-      {
-         Il2CppType = il2cppType;
-         ProxyType = wrapperType;
-         ClassPointer = classPointer;
-      }
-
-      public Il2CppSystem.Type Il2CppType { get; }
-      public Type ProxyType { get; }
-      public IntPtr ClassPointer { get; }
    }
 }

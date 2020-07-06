@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableUGUI )
             {
-               MLHookingHelper.PatchAll( UGUIHooks.All );
+               HookingHelper.PatchAll( UGUIHooks.All, false );
             }
          }
          catch( Exception e )
@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMeshPro )
             {
-               MLHookingHelper.PatchAll( TextMeshProHooks.All );
+               HookingHelper.PatchAll( TextMeshProHooks.All, false );
             }
          }
          catch( Exception e )
@@ -81,7 +81,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextMesh )
             {
-               MLHookingHelper.PatchAll( TextMeshHooks.All );
+               HookingHelper.PatchAll( TextMeshHooks.All, false );
             }
          }
          catch( Exception e )

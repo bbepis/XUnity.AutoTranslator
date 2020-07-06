@@ -20,8 +20,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
    internal static class UGUIHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( Text_text_Hook ),
          typeof( Text_get_text_Hook ),
@@ -41,12 +39,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          return TextComponent.__set_text;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static void _Postfix( ITextComponent __instance )
       {
-         if( !UGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
@@ -56,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
          Il2CppUtilities.InvokeMethod( TextComponent.__set_text, instance, value );
 
-         Postfix( __instance );
+         _Postfix( __instance );
       }
    }
 
@@ -72,13 +67,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          return TextComponent.__get_text;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static string _Postfix( ITextComponent __instance )
       {
-         if( !UGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, null, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+
+         return result;
       }
 
       static IntPtr ML_Detour( IntPtr instance )
@@ -87,20 +81,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
          var result = Il2CppUtilities.InvokeMethod( TextComponent.__get_text, instance );
 
-         //var text = UnhollowerBaseLib.IL2CPP.Il2CppStringToManaged( result );
+         var stringResult = _Postfix( __instance );
 
-         Postfix( __instance );
-
+         if(stringResult != null )
+         {
+            return UnhollowerBaseLib.IL2CPP.ManagedStringToIl2Cpp( stringResult );
+         }
+         
          return result;
-
-         //if( newText == null || ReferenceEquals( text, newText ) )
-         //{
-         //   return result;
-         //}
-         //else
-         //{
-         //   return UnhollowerBaseLib.IL2CPP.ManagedStringToIl2Cpp( newText );
-         //}
       }
    }
 
@@ -116,7 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          return TextComponent.__OnEnable;
       }
 
-      static MethodBase TargetMethod()
+      static MethodBase TargetMethod( object instance )
       {
          if( UnityTypes.Text?.ProxyType != null )
          {
@@ -134,20 +122,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void _Postfix( ITextComponent __instance )
       {
-         if( !UGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
-      static void ML_Detour( IntPtr instance )
+      static void ML_Detour( IntPtr __instance )
       {
-         var __instance = new TextComponent( instance );
+         var instance = new TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TextComponent.__OnEnable, instance );
+         Il2CppUtilities.InvokeMethod( TextComponent.__OnEnable, __instance );
 
-         _Postfix( __instance );
+         _Postfix( instance );
       }
    }
 }

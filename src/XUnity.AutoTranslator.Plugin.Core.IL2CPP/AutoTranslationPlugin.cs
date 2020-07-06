@@ -232,7 +232,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
             result = TranslateOrQueueWebJob( ui, text, false, info );
          }
 
-         return result;
+         if( _isInTranslatedMode )
+         {
+            return result;
+         }
+
+         return null;
       }
 
       internal void Hook_TextChanged( ITextComponent ui, bool onEnable )

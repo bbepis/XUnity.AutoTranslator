@@ -18,6 +18,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static bool _loaded;
       private static bool _bootstrapped;
 
+      //public void SetupOldUnityAssemblyResolver()
+      //{
+
+      //}
+
       /// <summary>
       /// Loads the plugin with the specified environment.
       /// </summary>

@@ -17,6 +17,7 @@ namespace XUnity.Common.Utilities
       private static readonly MethodInfo PatchMethod12 = ClrTypes.HarmonyInstance?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
       private static readonly MethodInfo PatchMethod20 = ClrTypes.Harmony?.GetMethod( "Patch", new Type[] { ClrTypes.MethodBase, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod, ClrTypes.HarmonyMethod } );
       private static readonly object Harmony;
+      private static bool _loggedHarmonyError = false;
 
       static HookingHelper()
       {
@@ -47,12 +48,12 @@ namespace XUnity.Common.Utilities
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
       /// <param name="types"></param>
-      /// <param name="forceMonoModHooks"></param>
-      public static void PatchAll( IEnumerable<Type> types, bool forceMonoModHooks )
+      /// <param name="forceExternHooks"></param>
+      public static void PatchAll( IEnumerable<Type> types, bool forceExternHooks )
       {
          foreach( var type in types )
          {
-            PatchType( type, forceMonoModHooks );
+            PatchType( type, forceExternHooks );
          }
       }
 
@@ -60,115 +61,76 @@ namespace XUnity.Common.Utilities
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
       /// <param name="type"></param>
-      /// <param name="forceMonoModHooks"></param>
-      public static void PatchType( Type type, bool forceMonoModHooks )
+      /// <param name="forceExternHooks"></param>
+      public static void PatchType( Type type, bool forceExternHooks )
       {
          MethodBase original = null;
          try
          {
+            // initialization warning
+            if( Harmony == null )
+            {
+               if( !_loggedHarmonyError )
+               {
+                  _loggedHarmonyError = true;
+
+                  XuaLogger.Common.Warn( "Harmony is not loaded or could not be initialized. Using fallback hooks instead." );
+               }
+            }
+
+
             var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             var prepare = type.GetMethod( "Prepare", flags );
             if( prepare == null || (bool)prepare.Invoke( null, new object[] { Harmony } ) )
             {
-               original = (MethodBase)type.GetMethod( "TargetMethod", flags ).Invoke( null, new object[] { Harmony } );
-               if( original != null )
+               original = (MethodBase)type.GetMethod( "TargetMethod", flags )?.Invoke( null, new object[] { Harmony } );
+               var originalPtr = (IntPtr?)type.GetMethod( "TargetMethodPointer", flags )?.Invoke( null, null ) ?? IntPtr.Zero;
+
+               if( original == null && originalPtr == IntPtr.Zero )
                {
-                  var prefix = type.GetMethod( "Prefix", flags );
-                  var postfix = type.GetMethod( "Postfix", flags );
-                  if( Harmony == null )
+                  if( original != null )
                   {
-                     XuaLogger.Common.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
-                  }
-
-                  if( forceMonoModHooks || Harmony == null || ( prefix == null && postfix == null ) )
-                  {
-                     if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
-                     {
-                        throw new NotSupportedException( "This runtime does not have MonoMod loaded, so MonoMod hooks cannot be used." );
-                     }
-
-                     var mmdetour = type.GetMethod( "Get_MM_Detour", flags )?.Invoke( null, null ) ?? type.GetMethod( "MM_Detour", flags );
-                     if( mmdetour != null )
-                     {
-                        string suffix = "(managed)";
-                        object hook;
-                        try
-                        {
-                           hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
-                        }
-                        catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
-                        {
-                           suffix = "(native)";
-                           hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
-                        }
-
-                        hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
-                        type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
-
-                        XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
-                     }
-                     else
-                     {
-                        XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}' because no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
-                     }
+                     XuaLogger.Common.Warn( $"Could not hook '{original.DeclaringType.FullName}.{original.Name}'. Likely due differences between different versions of the engine or text framework." );
                   }
                   else
                   {
-                     try
+                     XuaLogger.Common.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
+                  }
+                  return;
+               }
+
+               var prefix = type.GetMethod( "Prefix", flags );
+               var postfix = type.GetMethod( "Postfix", flags );
+               if( forceExternHooks || Harmony == null || ( prefix == null && postfix == null ) )
+               {
+                  PatchWithExternHooks( type, original, originalPtr, true );
+               }
+               else if( original != null )
+               {
+                  try
+                  {
+                     var priority = type.GetCustomAttributes( typeof( HookingHelperPriorityAttribute ), false )
+                        .OfType<HookingHelperPriorityAttribute>()
+                        .FirstOrDefault()
+                        ?.priority;
+
+                     var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
+                     var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
+
+                     if( PatchMethod12 != null )
                      {
-                        var priority = type.GetCustomAttributes( typeof( HookingHelperPriorityAttribute ), false )
-                           .OfType<HookingHelperPriorityAttribute>()
-                           .FirstOrDefault()
-                           ?.priority;
-
-                        var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
-                        var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
-
-                        if( PatchMethod12 != null )
-                        {
-                           PatchMethod12.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null } );
-                        }
-                        else
-                        {
-                           PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
-                        }
-
-                        XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+                        PatchMethod12.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null } );
                      }
-                     catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
+                     else
                      {
-                        if( ClrTypes.Hook != null && ClrTypes.NativeDetour != null )
-                        {
-                           var mmdetour = type.GetMethod( "Get_MM_Detour", flags )?.Invoke( null, null ) ?? type.GetMethod( "MM_Detour", flags );
-                           if( mmdetour != null )
-                           {
-                              string suffix = "(managed)";
-                              object hook;
-                              try
-                              {
-                                 hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
-                              }
-                              catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
-                              {
-                                 suffix = "(native)";
-                                 hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
-                              }
-
-                              hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
-                              type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
-
-                              XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
-                           }
-                           else
-                           {
-                              XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
-                           }
-                        }
-                        else
-                        {
-                           XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. MonoMod hooks is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
-                        }
+                        PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
                      }
+
+                     XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+                  }
+                  catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
+                  {
+                     PatchWithExternHooks( type, original, originalPtr, false );
                   }
                }
                else
@@ -186,6 +148,85 @@ namespace XUnity.Common.Utilities
             else
             {
                XuaLogger.Common.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
+            }
+         }
+      }
+
+      private static void PatchWithExternHooks( Type type, MethodBase original, IntPtr originalPtr, bool forced )
+      {
+         var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
+
+         if( ClrTypes.Imports != null )
+         {
+            if( originalPtr == IntPtr.Zero )
+            {
+               XuaLogger.Common.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
+               return;
+            }
+
+            var mldetour = type.GetMethod( "ML_Detour", flags )?.MethodHandle.GetFunctionPointer();
+            if( mldetour.HasValue && mldetour.Value != IntPtr.Zero )
+            {
+               ClrTypes.Imports.GetMethod( "Hook", flags ).Invoke( null, new object[] { originalPtr, mldetour.Value } );
+
+               XuaLogger.Common.Debug( $"Hooked {type.Name} through MelonMod Imports.Hook method." );
+            }
+            else
+            {
+               XuaLogger.Common.Warn( $"Could not hook '{type.Name}' because no detour method was found." );
+            }
+         }
+         else
+         {
+            if( original == null )
+            {
+               XuaLogger.Common.Warn( $"Cannot hook '{type.Name}'. Could not locate the original method. Failing hook: '{type.Name}'." );
+               return;
+            }
+
+            if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
+            {
+               XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. MonoMod hooks is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
+               return;
+            }
+
+            var mmdetour = type.GetMethod( "Get_MM_Detour", flags )?.Invoke( null, null ) ?? type.GetMethod( "MM_Detour", flags );
+            if( mmdetour != null )
+            {
+               string suffix = "(managed)";
+               object hook;
+               try
+               {
+                  hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
+               }
+               catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
+               {
+                  suffix = "(native)";
+                  hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+               }
+
+               hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
+               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
+
+               if( forced )
+               {
+                  XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
+               }
+               else
+               {
+                  XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
+               }
+            }
+            else
+            {
+               if( forced )
+               {
+                  XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
+               }
+               else
+               {
+                  XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. Harmony is not supported in this runtime and no alternate MonoMod hook has been implemented. Failing hook: '{type.Name}'." );
+               }
             }
          }
       }

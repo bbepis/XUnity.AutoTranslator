@@ -18,8 +18,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 {
    internal static class TextMeshProHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( TeshMeshProUGUI_OnEnable_Hook ),
          typeof( TeshMeshPro_OnEnable_Hook ),
@@ -39,22 +37,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return TMP_TextComponent.__TeshMeshProUGUI_OnEnable;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static void _Postfix( ITextComponent __instance )
       {
-         if( !TextMeshProHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
-      static void ML_Detour( IntPtr instance )
+      static void ML_Detour( IntPtr __instance )
       {
-         var __instance = new TMP_TextComponent( instance );
+         var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshProUGUI_OnEnable, instance );
+         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshProUGUI_OnEnable, __instance );
 
-         Postfix( __instance );
+         _Postfix( instance );
       }
    }
 
@@ -70,22 +65,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return TMP_TextComponent.__TeshMeshProUGUI_OnEnable;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static void _Postfix( ITextComponent __instance )
       {
-         if( !TextMeshProHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
-      static void ML_Detour( IntPtr instance )
+      static void ML_Detour( IntPtr __instance )
       {
-         var __instance = new TMP_TextComponent( instance );
+         var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshPro_OnEnable, instance );
+         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshPro_OnEnable, __instance );
 
-         Postfix( __instance );
+         _Postfix( instance );
       }
    }
 
@@ -101,22 +93,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return TMP_TextComponent.__set_text;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static void _Postfix( ITextComponent __instance )
       {
-         if( !TextMeshProHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
-      static void ML_Detour( IntPtr instance, IntPtr value )
+      static void ML_Detour( IntPtr __instance, IntPtr value )
       {
-         var __instance = new TMP_TextComponent( instance );
+         var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__set_text, instance, value );
+         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__set_text, __instance, value );
 
-         Postfix( __instance );
+         _Postfix( instance );
       }
    }
 }

@@ -44,6 +44,9 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

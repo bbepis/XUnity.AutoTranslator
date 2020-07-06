@@ -6,7 +6,7 @@ using System.Text;
 
 namespace XUnity.Common.Shims
 {
-   public class Il2CppPathsHelper : IPathsHelper
+   internal class Il2CppPathsHelper : IPathsHelper
    {
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.

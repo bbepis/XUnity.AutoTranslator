@@ -13,8 +13,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
    internal static class TextMeshHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( TextMesh_text_Hook ),
          //typeof( GameObject_SetActive_Hook )
@@ -33,21 +31,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          return TextMeshComponent.__set_text;
       }
 
-      static void Postfix( ITextComponent __instance )
+      static void _Postfix( ITextComponent __instance )
       {
-         if( !TextMeshHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static void ML_Detour( IntPtr instance, IntPtr value )
+      static void ML_Detour( IntPtr __instance, IntPtr value )
       {
-         var __instance = new TextMeshComponent( instance );
+         var instance = new TextMeshComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TextMeshComponent.__set_text, instance, value );
+         Il2CppUtilities.InvokeMethod( TextMeshComponent.__set_text, __instance, value );
 
-         Postfix( __instance );
+         _Postfix( instance );
       }
    }
 

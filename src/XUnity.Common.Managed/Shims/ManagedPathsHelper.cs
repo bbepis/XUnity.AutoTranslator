@@ -8,7 +8,7 @@ using XUnity.Common.Extensions;
 
 namespace XUnity.Common.Shims
 {
-   public class ManagedPathsHelper : IPathsHelper
+   internal class ManagedPathsHelper : IPathsHelper
    {
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
