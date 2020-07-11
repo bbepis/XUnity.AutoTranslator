@@ -1,5 +1,5 @@
 ﻿### 4.11.4
- * MISC - Allow using separate service endpoint for google
+ * MISC - Allow using separate service endpoint for google. Use to circumvent GFWoC
  * BUG FIX - Fix bug with scene scan that could sometimes fail in certain versions of Unity
 
 ### 4.11.3

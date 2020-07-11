@@ -330,6 +330,9 @@ Width=400                        ;The total width of the translation aggregator 
 Height=100                       ;The width (per translator) of the translation aggregator window.
 EnabledTranslators=              ;The id's of the translation endpoints that has been enabled in the translation aggregator window. List is separated by ';'.
 
+[Google]
+ServiceUrl=                      ;OPTIONAL, can be used to direct google API request to a different URL. Can be used to circumvent GFWoC
+
 [GoogleLegitimate]
 GoogleAPIKey=                    ;OPTIONAL, needed if GoogleTranslateLegitimate is configured
 
