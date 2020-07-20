@@ -1,4 +1,6 @@
-﻿using XUnity.AutoTranslator.Plugin.Core.Configuration;
+﻿using System.Linq;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.Common.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

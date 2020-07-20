@@ -101,7 +101,8 @@ namespace XUnity.Common.Utilities
 
                var prefix = type.GetMethod( "Prefix", flags );
                var postfix = type.GetMethod( "Postfix", flags );
-               if( forceExternHooks || Harmony == null || ( prefix == null && postfix == null ) )
+               var finalizer = type.GetMethod( "Finalizer", flags );
+               if( forceExternHooks || Harmony == null || ( prefix == null && postfix == null && finalizer == null ) )
                {
                   PatchWithExternHooks( type, original, originalPtr, true );
                }
@@ -116,6 +117,7 @@ namespace XUnity.Common.Utilities
 
                      var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
                      var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
+                     var harmonyFinalizer = finalizer != null ? CreateHarmonyMethod( finalizer, priority ) : null;
 
                      if( PatchMethod12 != null )
                      {
@@ -123,7 +125,7 @@ namespace XUnity.Common.Utilities
                      }
                      else
                      {
-                        PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
+                        PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, harmonyFinalizer } );
                      }
 
                      XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );

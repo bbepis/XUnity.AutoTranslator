@@ -63,16 +63,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
             string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translatioOrDirective in translations )
             {
-               if( Settings.EnableTranslationScoping )
+               var directive = TranslationFileDirective.Create( translatioOrDirective );
+               if( directive != null )
                {
-                  var directive = TranslationFileDirective.Create( translatioOrDirective );
-                  if( directive != null )
-                  {
-                     context.Apply( directive );
+                  context.Apply( directive );
 
-                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
-                     continue;
-                  }
+                  if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
+                  continue;
                }
 
                if( context.IsExecutable( Settings.ApplicationName ) )

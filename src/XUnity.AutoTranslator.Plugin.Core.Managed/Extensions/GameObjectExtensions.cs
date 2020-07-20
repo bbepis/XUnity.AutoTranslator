@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -29,6 +30,38 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
 
          return null;
+      }
+
+      public static IEnumerable<Component> GetAllTextComponentsInChildren( this GameObject go )
+      {
+         if( ClrTypes.TMP_Text != null )
+         {
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TMP_Text ) )
+            {
+               yield return comp;
+            }
+         }
+         if( ClrTypes.Text != null )
+         {
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.Text ) )
+            {
+               yield return comp;
+            }
+         }
+         if( ClrTypes.TextMesh != null )
+         {
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TextMesh ) )
+            {
+               yield return comp;
+            }
+         }
+         if( ClrTypes.UILabel != null )
+         {
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.UILabel ) )
+            {
+               yield return comp;
+            }
+         }
       }
 
       public static string[] GetPathSegments( this GameObject obj )

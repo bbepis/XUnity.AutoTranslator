@@ -12,11 +12,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       public static RegexSplittingTextParser RegexSplittingTextParser;
       public static GameLogTextParser GameLogTextParser;
 
-      public static void Initialize( TextTranslationCache cache, Func<string, int, bool> isTranslatable )
+      public static void Initialize()
       {
          RichTextParser = new RichTextParser();
-         RegexSplittingTextParser = new RegexSplittingTextParser( cache );
-         GameLogTextParser = new GameLogTextParser( isTranslatable );
+         RegexSplittingTextParser = new RegexSplittingTextParser();
+         GameLogTextParser = new GameLogTextParser();
       }
    }
 }

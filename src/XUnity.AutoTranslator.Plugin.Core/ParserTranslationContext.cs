@@ -7,6 +7,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class ParserTranslationContext
    {
+      private ParserResult _highestPriorityResult;
+
       public ParserTranslationContext( object component, TranslationEndpointManager endpoint, InternalTranslationResult translationResult, ParserResult result, ParserTranslationContext parentContext )
       {
          Jobs = new HashSet<TranslationJob>();
@@ -47,14 +49,38 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public int LevelsOfRecursion { get; private set; }
 
+      private ParserResult GetHighestPriorityResult()
+      {
+         if( _highestPriorityResult == null )
+         {
+            var highestPriorityResult = Result;
+            var highestPriority = highestPriorityResult.Priority;
+            var currentContext = this;
+
+            while( ( currentContext = currentContext.ParentContext ) != null )
+            {
+               var result = currentContext.Result;
+               var priority = result.Priority;
+               if( priority > highestPriority )
+               {
+                  highestPriority = priority;
+                  highestPriorityResult = result;
+               }
+            }
+
+            _highestPriorityResult = highestPriorityResult;
+         }
+         return _highestPriorityResult;
+      }
+
       public bool CachedCombinedResult()
       {
-         if( Result.CacheCombinedResult )
-         {
-            return ParentContext == null || !ParentContext.CachedCombinedResult();
-         }
+         return GetHighestPriorityResult().CacheCombinedResult;
+      }
 
-         return false;
+      public bool PersistCombinedResult()
+      {
+         return GetHighestPriorityResult().PersistCombinedResult;
       }
 
       public bool HasAllJobsCompleted()

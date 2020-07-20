@@ -110,7 +110,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          SpamChecker = new SpamChecker( TranslationManager );
 
          // WORKAROUND: Initialize text parsers with delegate indicating if text should be translated
-         UnityTextParsers.Initialize( TextCache, ( text, scope ) => TextCache.IsTranslatable( text, true, scope ) && IsBelowMaxLength( text ) );
+         UnityTextParsers.Initialize();
 
          // validate configuration
          ValidateConfiguration();
@@ -425,7 +425,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                {
-                  var result = UnityTextParsers.GameLogTextParser.Parse( text, scope );
+                  var result = UnityTextParsers.GameLogTextParser.Parse( text, scope, TextCache );
                   if( result != null )
                   {
                      translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, null );
@@ -498,7 +498,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope ) ?? UnityTextParsers.RichTextParser.Parse( text, scope );
+               var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope, TextCache ) ?? UnityTextParsers.RichTextParser.Parse( text, scope );
                if( parserResult != null )
                {
                   translatedText = TranslateByParserResult( null, parserResult, scope, null, false, true, null );
@@ -546,7 +546,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( context.GetLevelsOfRecursion() < Settings.MaxTextParserRecursion )
                   {
-                     var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope );
+                     var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope, TextCache );
                      if( parserResult != null )
                      {
                         translation = TranslateByParserResult( endpoint, parserResult, scope, result, allowStartTranslateImmediate, result.IsGlobal, context );
@@ -653,7 +653,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( context.GetLevelsOfRecursion() < Settings.MaxTextParserRecursion )
                   {
-                     var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, TranslationScopes.None );
+                     var parserResult = UnityTextParsers.RegexSplittingTextParser.Parse( text, TranslationScopes.None, TextCache );
                      if( parserResult != null )
                      {
                         translation = TranslateByParserResult( endpoint, parserResult, TranslationScopes.None, result, allowStartTranslateImmediate, result.IsGlobal, context );
@@ -919,7 +919,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( UnityTextParsers.GameLogTextParser.CanApply( ui ) && context == null ) // only at the first layer!
                      {
-                        var result = UnityTextParsers.GameLogTextParser.Parse( text, scope );
+                        var result = UnityTextParsers.GameLogTextParser.Parse( text, scope, TextCache );
                         if( result != null )
                         {
                            translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater && !allowStabilizationOnTextComponent, context );
@@ -940,7 +940,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                      if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                      {
-                        var result = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope );
+                        var result = UnityTextParsers.RegexSplittingTextParser.Parse( text, scope, TextCache );
                         if( result != null )
                         {
                            translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, allowStartTranslationImmediate, allowStartTranslationLater && !allowStabilizationOnTextComponent, context );
@@ -1072,7 +1072,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  var isBelowMaxLength = IsBelowMaxLength( stabilizedText );
                                  if( UnityTextParsers.GameLogTextParser.CanApply( ui ) && context == null )
                                  {
-                                    var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText, scope );
+                                    var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText, scope, TextCache );
                                     if( result != null )
                                     {
                                        var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, context );
@@ -1085,7 +1085,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  }
                                  if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                                  {
-                                    var result = UnityTextParsers.RegexSplittingTextParser.Parse( stabilizedText, scope );
+                                    var result = UnityTextParsers.RegexSplittingTextParser.Parse( stabilizedText, scope, TextCache );
                                     if( result != null )
                                     {
                                        var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, context );
@@ -1758,7 +1758,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
                         {
-                           var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope );
+                           var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope, TextCache );
                            if( result != null )
                            {
                               var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, null );
@@ -1772,7 +1772,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) && isBelowMaxLength )
                         {
-                           var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope );
+                           var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope, TextCache );
                            if( result != null )
                            {
                               var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, null );
