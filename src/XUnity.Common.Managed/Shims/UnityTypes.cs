@@ -33,6 +33,7 @@ namespace XUnity.Common.Constants
       public static readonly Type TextField = FindType( "FairyGUI.TextField" );
 
       // Unity
+      public static readonly Type GameObject = FindType( "UnityEngine.GameObject" );
       public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );
       public static readonly Type Image = FindType( "UnityEngine.UI.Image" );
@@ -43,6 +44,8 @@ namespace XUnity.Common.Constants
       public static readonly Type WWW = FindType( "UnityEngine.WWW" );
       public static readonly Type InputField = FindType( "UnityEngine.UI.InputField" );
       public static readonly Type GUI = FindType( "UnityEngine.GUI" );
+      public static readonly Type GUI_ToolbarButtonSize = FindType( "UnityEngine.GUI+ToolbarButtonSize" );
+      public static readonly Type GUIStyle = FindType( "UnityEngine.GUIStyle" );
       public static readonly Type ImageConversion = FindType( "UnityEngine.ImageConversion" );
       public static readonly Type Texture = FindType( "UnityEngine.Texture" );
       public static readonly Type SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );

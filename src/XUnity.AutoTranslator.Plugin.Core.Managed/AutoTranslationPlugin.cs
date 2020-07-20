@@ -99,6 +99,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Setup 'singleton'
          Current = this;
          AutoTranslator.SetTranslator( this );
+         TranslationRegistry.SetRegistry( this );
 
          // because we only use harmony/MonoMod through reflection due to
          // version compatibility issues, we call this method to

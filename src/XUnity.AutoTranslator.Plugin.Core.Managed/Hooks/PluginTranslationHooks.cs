@@ -33,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GameObject, "Internal_AddComponentWithType", new Type[] { typeof( Type ) } );
+         return AccessToolsShim.Method( UnityTypes.GameObject, "Internal_AddComponentWithType", new Type[] { typeof( Type ) } );
       }
 
       static Func<GameObject, Type, Component> _original;
@@ -70,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.Object, "Internal_InstantiateSingle", new Type[] { typeof( UnityEngine.Object ), typeof( Vector3 ), typeof( Quaternion ) } );
+         return AccessToolsShim.Method( UnityTypes.Object, "Internal_InstantiateSingle", new Type[] { typeof( UnityEngine.Object ), typeof( Vector3 ), typeof( Quaternion ) } );
       }
 
       static Func<UnityEngine.Object, Vector3, Quaternion, UnityEngine.Object> _original;
@@ -112,7 +112,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.Object, "Internal_InstantiateSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( Vector3 ), typeof( Quaternion ) } );
+         return AccessToolsShim.Method( UnityTypes.Object, "Internal_InstantiateSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( Vector3 ), typeof( Quaternion ) } );
       }
 
       static Func<UnityEngine.Object, Transform, Vector3, Quaternion, UnityEngine.Object> _original;
@@ -154,7 +154,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.Object, "Internal_CloneSingle", new Type[] { typeof( UnityEngine.Object ) } );
+         return AccessToolsShim.Method( UnityTypes.Object, "Internal_CloneSingle", new Type[] { typeof( UnityEngine.Object ) } );
       }
 
       static Func<UnityEngine.Object, UnityEngine.Object> _original;
@@ -196,7 +196,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.Object, "Internal_CloneSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( bool ) } );
+         return AccessToolsShim.Method( UnityTypes.Object, "Internal_CloneSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( bool ) } );
       }
 
       static Func<UnityEngine.Object, Transform, bool, UnityEngine.Object> _original;

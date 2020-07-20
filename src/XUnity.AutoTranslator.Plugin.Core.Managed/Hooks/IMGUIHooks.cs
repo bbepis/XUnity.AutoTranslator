@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
          typeof( GUI_DoToggle_Hook_New ),
       };
 
-      internal static bool Use2018StyleIMGUI = AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } ) != null;
+      internal static bool Use2018StyleIMGUI = AccessToolsShim.Method( UnityTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } ) != null;
    }
 
    //[HookingHelperPriority( HookPriority.Last )]
@@ -50,12 +50,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
    //   static bool Prepare( object instance )
    //   {
-   //      return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUIStyle != null;
+   //      return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUIStyle != null;
    //   }
 
    //   static MethodBase TargetMethod( object instance )
    //   {
-   //      return AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } );
+   //      return AccessToolsShim.Method( UnityTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } );
    //   }
 
    //   static void Prefix( GUIContent content )
@@ -85,12 +85,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
    //   static bool Prepare( object instance )
    //   {
-   //      return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUIStyle != null;
+   //      return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUIStyle != null;
    //   }
 
    //   static MethodBase TargetMethod( object instance )
    //   {
-   //      return AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_Draw2", new[] { typeof( Rect ), typeof( GUIContent ), typeof( int ), typeof( bool ) } );
+   //      return AccessToolsShim.Method( UnityTypes.GUIStyle, "Internal_Draw2", new[] { typeof( Rect ), typeof( GUIContent ), typeof( int ), typeof( bool ) } );
    //   }
 
    //   static void Prefix( GUIContent content )
@@ -120,12 +120,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 
    //   static bool Prepare( object instance )
    //   {
-   //      return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUIStyle != null;
+   //      return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUIStyle != null;
    //   }
 
    //   static MethodBase TargetMethod( object instance )
    //   {
-   //      return AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_DrawCursor", new[] { typeof( Rect ), typeof( GUIContent ), typeof( int ), typeof( Color ) } );
+   //      return AccessToolsShim.Method( UnityTypes.GUIStyle, "Internal_DrawCursor", new[] { typeof( Rect ), typeof( GUIContent ), typeof( int ), typeof( Color ) } );
    //   }
 
    //   static void Prefix( GUIContent content )
@@ -204,12 +204,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( Vector2 ) } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "BeginGroup", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ), typeof( Vector2 ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -336,12 +336,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "DoLabel", new[] { typeof( Rect ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -402,12 +402,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "DoButton", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )
@@ -549,12 +549,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null && UnityTypes.GUI_ToolbarButtonSize != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( string[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), ClrTypes.GUI_ToolbarButtonSize } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( string[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), UnityTypes.GUI_ToolbarButtonSize } );
       }
 
       static void Prefix( GUIContent[] contents )
@@ -587,12 +587,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null && UnityTypes.GUI_ToolbarButtonSize != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( string[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), ClrTypes.GUI_ToolbarButtonSize, typeof( bool[] ) } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "DoButtonGrid", new[] { typeof( Rect ), typeof( int ), typeof( GUIContent[] ), typeof( string[] ), typeof( int ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), typeof( GUIStyle ), UnityTypes.GUI_ToolbarButtonSize, typeof( bool[] ) } );
       }
 
       static void Prefix( GUIContent[] contents )
@@ -660,12 +660,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return IMGUIHooks.Use2018StyleIMGUI && UnityTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( ClrTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( GUIStyle ) } );
+         return AccessToolsShim.Method( UnityTypes.GUI, "DoToggle", new[] { typeof( Rect ), typeof( int ), typeof( bool ), typeof( GUIContent ), typeof( GUIStyle ) } );
       }
 
       static void Prefix( GUIContent content )

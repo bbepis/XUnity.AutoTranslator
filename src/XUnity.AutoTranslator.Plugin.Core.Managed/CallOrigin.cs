@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public static IReadOnlyTextTranslationCache GetTextCache( TextTranslationInfo info, TextTranslationCache generic )
+      internal static IReadOnlyTextTranslationCache GetTextCache( TextTranslationInfo info, TextTranslationCache generic )
       {
          if( info != null )
          {
@@ -48,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public static void SetTextCacheForAllObjectsInHierachy( GameObject go, IReadOnlyTextTranslationCache cache )
+      internal static void SetTextCacheForAllObjectsInHierachy( GameObject go, IReadOnlyTextTranslationCache cache )
       {
          try
          {
@@ -64,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public static IReadOnlyTextTranslationCache CalculateTextCacheFromStackTrace()
+      internal static IReadOnlyTextTranslationCache CalculateTextCacheFromStackTrace()
       {
          try
          {

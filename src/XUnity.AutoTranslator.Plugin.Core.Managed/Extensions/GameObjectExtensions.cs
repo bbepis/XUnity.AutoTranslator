@@ -34,30 +34,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static IEnumerable<Component> GetAllTextComponentsInChildren( this GameObject go )
       {
-         if( ClrTypes.TMP_Text != null )
+         if( UnityTypes.TMP_Text != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TMP_Text ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.TMP_Text ) )
             {
                yield return comp;
             }
          }
-         if( ClrTypes.Text != null )
+         if( UnityTypes.Text != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.Text ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.Text ) )
             {
                yield return comp;
             }
          }
-         if( ClrTypes.TextMesh != null )
+         if( UnityTypes.TextMesh != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TextMesh ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.TextMesh ) )
             {
                yield return comp;
             }
          }
-         if( ClrTypes.UILabel != null )
+         if( UnityTypes.UILabel != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.UILabel ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.UILabel ) )
             {
                yield return comp;
             }

@@ -101,57 +101,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          //   XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for FairyGUI." );
          //}
       }
-
-      public static bool SetupHook( string eventName, Func<object, string, string> callback )
-      {
-         if( !Settings.AllowPluginHookOverride ) return false;
-
-         try
-         {
-            var objects = GameObject.FindObjectsOfType<GameObject>();
-            foreach( var gameObject in objects )
-            {
-               if( gameObject != null )
-               {
-                  var components = gameObject.GetComponents<Component>();
-                  foreach( var component in components )
-                  {
-                     if( component != null )
-                     {
-                        var e = component.GetType().GetEvent( eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-                        if( e != null )
-                        {
-                           var addMethod = e.GetAddMethod();
-                           if( addMethod != null )
-                           {
-                              try
-                              {
-                                 if( addMethod.IsStatic )
-                                 {
-                                    addMethod.Invoke( null, new object[] { callback } );
-                                 }
-                                 else
-                                 {
-                                    addMethod.Invoke( component, new object[] { callback } );
-                                 }
-
-                                 XuaLogger.AutoTranslator.Info( eventName + " was hooked by external plugin." );
-                                 return true;
-                              }
-                              catch { }
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-         catch( Exception e )
-         {
-            XuaLogger.AutoTranslator.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
-         }
-
-         return false;
-      }
    }
 }
