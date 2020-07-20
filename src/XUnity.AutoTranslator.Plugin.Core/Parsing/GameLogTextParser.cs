@@ -6,13 +6,10 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-   internal class GameLogTextParser : ITextParser
+   internal class GameLogTextParser
    {
-      private Func<string, int, bool> _isTranslatable;
-
-      public GameLogTextParser( Func<string, int, bool> isTranslatable )
+      public GameLogTextParser()
       {
-         _isTranslatable = isTranslatable;
       }
 
       public bool CanApply( object ui )
@@ -20,7 +17,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return ui.SupportsLineParser();
       }
 
-      public ParserResult Parse( string input, int scope )
+      public ParserResult Parse( string input, int scope, IReadOnlyTextTranslationCache cache )
       {
          var reader = new StringReader( input );
          bool containsTranslatable = false;
@@ -35,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          {
             if( !string.IsNullOrEmpty( line ) )
             {
-               if( _isTranslatable( line, scope ) )
+               if( cache.IsTranslatable( line, true, scope ) )
                {
                   // template it!
                   containsTranslatable = true;

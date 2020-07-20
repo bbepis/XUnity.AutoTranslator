@@ -12,8 +12,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
    internal static class TextMeshHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( TextMesh_text_Hook ),
          typeof( GameObject_active_Hook ),
@@ -36,10 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         if( !TextMeshHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
       static Action<object, string> _original;
@@ -72,15 +67,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( GameObject __instance, bool active )
       {
-         if( !TextMeshHooks.HooksOverriden )
+         if( active )
          {
-            if( active )
+            var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
+            foreach( var tm in tms )
             {
-               var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
-               foreach( var tm in tms )
-               {
-                  AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
-               }
+               AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
             }
          }
       }
@@ -115,15 +107,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( GameObject __instance, bool active )
       {
-         if( !TextMeshHooks.HooksOverriden )
+         if( active )
          {
-            if( active )
+            var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
+            foreach( var tm in tms )
             {
-               var tms = __instance.GetComponentsInChildren( ClrTypes.TextMesh );
-               foreach( var tm in tms )
-               {
-                  AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
-               }
+               AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
             }
          }
       }

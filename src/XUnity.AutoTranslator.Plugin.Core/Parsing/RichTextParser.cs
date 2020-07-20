@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
 
-   internal class RichTextParser : ITextParser
+   internal class RichTextParser
    {
       private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
       private static readonly Regex TagRegex = new Regex( "<.*?>" );

@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DevelopmentDependency>True</DevelopmentDependency>
     <TargetFramework>net35</TargetFramework>
-    <Version>4.11.4</Version>
+    <Version>4.12.0</Version>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

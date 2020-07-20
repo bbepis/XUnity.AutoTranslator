@@ -52,6 +52,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool PersistTokenResult { get; }
 
+      public int Priority => (int)Origin;
+
       public string GetTranslationFromParts( Func<string, string> getTranslation )
       {
          bool ok = true;

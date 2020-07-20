@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -10,6 +11,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private HashSet<string> _executables = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
       private HashSet<int> _levels = new HashSet<int>();
+      private HashSet<string> _enabledTags = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
       public bool IsExecutable( string executable )
       {
@@ -21,6 +23,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public HashSet<int> GetLevels()
       {
          return _levels;
+      }
+
+      public bool IsEnabled( string tag )
+      {
+         return _enabledTags.Contains( tag );
       }
 
       public void Apply( TranslationFileDirective directive )
@@ -39,6 +46,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          public override void ModifyContext( TranslationFileLoadingContext context )
          {
+            if( !Settings.EnableTranslationScoping ) return;
+
             foreach( var level in Levels )
             {
                context._levels.Add( level );
@@ -62,6 +71,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          public override void ModifyContext( TranslationFileLoadingContext context )
          {
+            if( !Settings.EnableTranslationScoping ) return;
+
             foreach( var level in Levels )
             {
                context._levels.Remove( level );
@@ -85,6 +96,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          public override void ModifyContext( TranslationFileLoadingContext context )
          {
+            if( !Settings.EnableTranslationScoping ) return;
+
             foreach( var executable in Executables )
             {
                context._executables.Add( executable );
@@ -108,6 +121,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          public override void ModifyContext( TranslationFileLoadingContext context )
          {
+            if( !Settings.EnableTranslationScoping ) return;
+
             foreach( var executable in Executables )
             {
                context._executables.Remove( executable );
@@ -117,6 +132,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public override string ToString()
          {
             return "#unset exe " + string.Join( ",", Executables );
+         }
+      }
+
+      public class EnableTranslationFileDirective : TranslationFileDirective
+      {
+         public EnableTranslationFileDirective( string tag )
+         {
+            Tag = tag;
+         }
+
+         public string Tag { get; }
+
+         public override void ModifyContext( TranslationFileLoadingContext context )
+         {
+            if( Tag != null )
+            {
+               context._enabledTags.Add( Tag );
+            }
+         }
+
+         public override string ToString()
+         {
+            return "#enable " + Tag;
          }
       }
    }
@@ -137,7 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( directive.Length > 0 && directive[ 0 ] == '#' )
          {
             var parts = directive.Split( new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries );
-            if( parts.Length >= 3 )
+            if( parts.Length >= 2 )
             {
                var command = parts[ 0 ].ToLowerInvariant();
 
@@ -150,6 +188,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      return CreateSetCommand( setType, argument );
                   case "#unset":
                      return CreateUnsetCommand( setType, argument );
+                  case "#enable":
+                     return CreateEnableCommand( setType, argument );
                   default:
                      break;
                }
@@ -187,8 +227,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
+      private static TranslationFileDirective CreateEnableCommand( string setType, string argument )
+      {
+         return new TranslationFileLoadingContext.EnableTranslationFileDirective( setType );
+      }
+
       private static int[] ParseCommaSeperatedListAsIntArray( string argument )
       {
+         if( string.IsNullOrEmpty( argument ) ) return new int[ 0 ];
+
          List<int> result = new List<int>();
          var args = argument.Split( new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries );
          foreach( var arg in args )
@@ -203,6 +250,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static string[] ParseCommaSeperatedListAsStringArray( string argument )
       {
+         if( string.IsNullOrEmpty( argument ) ) return new string[ 0 ];
+
          return argument.Split( new[] { ',' }, StringSplitOptions.RemoveEmptyEntries ).Select( x => x.Trim() ).ToArray();
       }
 

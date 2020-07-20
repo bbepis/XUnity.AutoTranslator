@@ -10,6 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
+using static UnityEngine.GUI;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -17,10 +18,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static HashSet<MethodInfo> HandledMethods = new HashSet<MethodInfo>();
 
-      public static void BlockIfConfigured( MethodInfo method, int windowId )
+      public static void BlockIfConfigured( WindowFunction function, int windowId )
       {
-         //if( Settings.BlacklistedIMGUIWindowNames.Count == 0 ) return;
+         if( Settings.BlacklistedIMGUIPlugins.Count == 0 ) return;
 
+         var method = function.Method;
          if( !HandledMethods.Contains( method ) )
          {
             HandledMethods.Add( method );
@@ -85,8 +87,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _nextMethod;
       }
 
-      static void MM_Init( object detour )
+      static void Prefix()
       {
+         AutoTranslationPlugin.Current.DisableAutoTranslator();
+      }
+
+      static void Finalizer()
+      {
+         AutoTranslationPlugin.Current.EnableAutoTranslator();
       }
 
       static MethodInfo Get_MM_Detour()

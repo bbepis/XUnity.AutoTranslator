@@ -21,34 +21,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
    internal static class HooksSetup
    {
-      public static void InstallOverrideTextHooks()
-      {
-         if( Settings.EnableUGUI )
-         {
-            UGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateUGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-         if( Settings.EnableTextMeshPro )
-         {
-            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMeshPro, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-         if( Settings.EnableNGUI )
-         {
-            NGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateNGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-         if( Settings.EnableIMGUI )
-         {
-            IMGUIHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateIMGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-         if( Settings.EnableTextMesh )
-         {
-            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateTextMesh, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-         if( Settings.EnableFairyGUI )
-         {
-            TextMeshProHooks.HooksOverriden = SetupHook( KnownEvents.OnUnableToTranslateFairyGUI, AutoTranslationPlugin.Current.ExternalHook_TextChanged_WithResult );
-         }
-      }
-
       public static void InstallTextGetterCompatHooks()
       {
          try
@@ -103,7 +75,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static void InstallTextHooks()
       {
-
          try
          {
             if( Settings.EnableUGUI )
@@ -186,56 +157,61 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
-      public static bool SetupHook( string eventName, Func<object, string, string> callback )
+      private static bool _installedPluginTranslationHooks = false;
+      public static void InstallComponentBasedPluginTranslationHooks()
       {
-         if( !Settings.AllowPluginHookOverride ) return false;
-
-         try
+         if( AutoTranslationPlugin.Current.PluginTextCaches.Count > 0 )
          {
-            var objects = GameObject.FindObjectsOfType<GameObject>();
-            foreach( var gameObject in objects )
+            if( !_installedPluginTranslationHooks )
             {
-               if( gameObject != null )
+               _installedPluginTranslationHooks = true;
+               try
                {
-                  var components = gameObject.GetComponents<Component>();
-                  foreach( var component in components )
-                  {
-                     if( component != null )
-                     {
-                        var e = component.GetType().GetEvent( eventName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-                        if( e != null )
-                        {
-                           var addMethod = e.GetAddMethod();
-                           if( addMethod != null )
-                           {
-                              try
-                              {
-                                 if( addMethod.IsStatic )
-                                 {
-                                    addMethod.Invoke( null, new object[] { callback } );
-                                 }
-                                 else
-                                 {
-                                    addMethod.Invoke( component, new object[] { callback } );
-                                 }
-
-                                 XuaLogger.AutoTranslator.Info( eventName + " was hooked by external plugin." );
-                                 return true;
-                              }
-                              catch { }
-                           }
-                        }
-                     }
-                  }
+                  HookingHelper.PatchAll( PluginTranslationHooks.All, Settings.ForceMonoModHooks );
+               }
+               catch( Exception e )
+               {
+                  XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for Plugin translations." );
                }
             }
          }
-         catch( Exception e )
-         {
-            XuaLogger.AutoTranslator.Error( e, $"An error occurred while setting up override hooks for '{eventName}'." );
-         }
+      }
 
-         return false;
+      private static HashSet<Assembly> _installedAssemblies = new HashSet<Assembly>();
+      public static void InstallIMGUIBasedPluginTranslationHooks( Assembly assembly, bool final )
+      {
+         if( Settings.EnableIMGUI && !_installedAssemblies.Contains( assembly ) )
+         {
+            if( final )
+            {
+               IMGUIPluginTranslationHooks.ResetHandledForAllInAssembly( assembly );
+            }
+
+            var types = assembly.GetTypes();
+            foreach( var type in types )
+            {
+               try
+               {
+                  if( typeof( MonoBehaviour ).IsAssignableFrom( type ) && !type.IsAbstract )
+                  {
+                     var method = type.GetMethod( "OnGUI", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy );
+                     if( method != null )
+                     {
+                        IMGUIPluginTranslationHooks.HookIfConfigured( method );
+                     }
+                  }
+               }
+               catch( Exception e2 )
+               {
+                  XuaLogger.AutoTranslator.Warn( e2, "An error occurred while hooking type: " + type.FullName );
+               }
+            }
+
+            if( final )
+            {
+               _installedAssemblies.Add( assembly );
+            }
+         }
       }
    }
 }

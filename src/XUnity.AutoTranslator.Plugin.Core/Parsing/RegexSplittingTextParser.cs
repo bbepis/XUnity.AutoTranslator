@@ -5,13 +5,10 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-   internal class RegexSplittingTextParser : ITextParser
+   internal class RegexSplittingTextParser
    {
-      private readonly TextTranslationCache _cache;
-
-      public RegexSplittingTextParser( TextTranslationCache cache )
+      public RegexSplittingTextParser()
       {
-         _cache = cache;
       }
 
       public bool CanApply( object ui )
@@ -19,9 +16,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          return !ui.IsSpammingComponent();
       }
 
-      public ParserResult Parse( string input, int scope )
+      public ParserResult Parse( string input, int scope, IReadOnlyTextTranslationCache cache )
       {
-         if( _cache.TryGetTranslationSplitter( input, scope, out var match, out var splitter ) )
+         if( cache.TryGetTranslationSplitter( input, scope, out var match, out var splitter ) )
          {
             return new ParserResult( ParserResultOrigin.RegexTextParser, input, splitter.Translation, true, true, Settings.CacheRegexPatternResults, true, splitter.CompiledRegex, match );
          }

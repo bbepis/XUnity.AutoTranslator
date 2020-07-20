@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Gets a bool indicating if the WaitForSecondsRealtime class is supported.
       /// </summary>
       public static bool SupportsWaitForSecondsRealtime { get; } = false;
-
+       
       static Features()
       {
          try

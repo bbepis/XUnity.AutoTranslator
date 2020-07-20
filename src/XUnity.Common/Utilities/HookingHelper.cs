@@ -75,12 +75,13 @@ namespace XUnity.Common.Utilities
                {
                   var prefix = type.GetMethod( "Prefix", flags );
                   var postfix = type.GetMethod( "Postfix", flags );
+                  var finalizer = type.GetMethod( "Finalizer", flags );
                   if( Harmony == null )
                   {
                      XuaLogger.Common.Warn( "Harmony is not loaded or could not be initialized. Falling back to MonoMod hooks." );
                   }
 
-                  if( forceMonoModHooks || Harmony == null || ( prefix == null && postfix == null ) )
+                  if( forceMonoModHooks || Harmony == null || ( prefix == null && postfix == null && finalizer == null ) )
                   {
                      if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
                      {
@@ -95,14 +96,15 @@ namespace XUnity.Common.Utilities
                         try
                         {
                            hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
+                           hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         }
                         catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
                         {
                            suffix = "(native)";
                            hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                           hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         }
 
-                        hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                         type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
                         XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
@@ -123,6 +125,7 @@ namespace XUnity.Common.Utilities
 
                         var harmonyPrefix = prefix != null ? CreateHarmonyMethod( prefix, priority ) : null;
                         var harmonyPostfix = postfix != null ? CreateHarmonyMethod( postfix, priority ) : null;
+                        var harmonyFinalizer = finalizer != null ? CreateHarmonyMethod( finalizer, priority ) : null;
 
                         if( PatchMethod12 != null )
                         {
@@ -130,7 +133,7 @@ namespace XUnity.Common.Utilities
                         }
                         else
                         {
-                           PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, null } );
+                           PatchMethod20.Invoke( Harmony, new object[] { original, harmonyPrefix, harmonyPostfix, null, harmonyFinalizer } );
                         }
 
                         XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
@@ -147,14 +150,15 @@ namespace XUnity.Common.Utilities
                               try
                               {
                                  hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
+                                 hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               }
                               catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
                               {
                                  suffix = "(native)";
                                  hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                                 hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               }
 
-                              hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
                               XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );

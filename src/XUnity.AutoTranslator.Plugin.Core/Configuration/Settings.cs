@@ -84,7 +84,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextMeshPro;
       public static bool EnableTextMesh;
       public static bool EnableFairyGUI;
-      public static bool AllowPluginHookOverride;
       public static bool IgnoreWhitespaceInDialogue;
       public static bool IgnoreWhitespaceInNGUI;
       public static int MinDialogueChars;
@@ -185,7 +184,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMeshPro", true );
             EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
             EnableFairyGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableFairyGUI", true );
-            AllowPluginHookOverride = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "AllowPluginHookOverride", true );
 
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
             IgnoreWhitespaceInDialogue = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInDialogue", true );
@@ -289,7 +287,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             SubstitutionFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, SubstitutionFile.UseCorrectDirectorySeparators() ).Parameterize();
             PreprocessorsFilePath = Path.Combine( PluginEnvironment.Current.TranslationPath, PreprocessorsFile.UseCorrectDirectorySeparators() ).Parameterize();
 
-            TranslationsPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory ).Parameterize();
+            TranslationsPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TranslationDirectory.UseCorrectDirectorySeparators() ).Parameterize();
 
             FromLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
             ToLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( Language );

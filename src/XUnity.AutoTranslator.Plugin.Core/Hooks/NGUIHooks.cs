@@ -16,8 +16,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 {
    internal static class NGUIHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( UILabel_text_Hook ),
          typeof( UILabel_OnEnable_Hook )
@@ -39,10 +37,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       public static void Postfix( object __instance )
       {
-         if( !NGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
@@ -78,10 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       {
          if( ClrTypes.UILabel.IsAssignableFrom( __instance.GetType() ) )
          {
-            if( !NGUIHooks.HooksOverriden )
-            {
-               AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-            }
+            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
             AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
          }
       }

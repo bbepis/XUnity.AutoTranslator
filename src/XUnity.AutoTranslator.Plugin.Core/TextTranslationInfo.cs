@@ -53,6 +53,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsKnownTextComponent { get; set; }
       public bool SupportsStabilization { get; set; }
 
+      public IReadOnlyTextTranslationCache TextCache { get; set; }
+
       public void Initialize( object ui )
       {
          if( !_initialized )

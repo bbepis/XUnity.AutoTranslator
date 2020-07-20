@@ -1,4 +1,11 @@
-﻿### 4.11.4
+﻿### 4.12.0
+ * FEATURE - Specialized plugin translation support. Can now read text translation files that are only used for specific plugins
+ * FEATURE - Proper IMGUI support in Unity 2018 and 2019+
+ * MISC - Changed guidance on IMGUI redistribution
+ * MISC - Changed the way output text is determined when multiple text parsers are involved in the translation (now priority based rather than first come first serve)
+ * MISC - Removed feature listening to text changed event from external translation plugins
+
+### 4.11.4
  * MISC - Allow using separate service endpoint for google. Use to circumvent GFWoC
  * BUG FIX - Fix bug with scene scan that could sometimes fail in certain versions of Unity
 

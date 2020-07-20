@@ -12,8 +12,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
 {
    internal static class FairyGUIHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( TextField_text_Hook ),
          typeof( TextField_htmlText_Hook ),
@@ -35,10 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
 
       static void Postfix( object __instance )
       {
-         if( !FairyGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
@@ -72,10 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
 
       static void Postfix( object __instance )
       {
-         if( !FairyGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 

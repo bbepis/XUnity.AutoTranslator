@@ -15,8 +15,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 {
    internal static class UGUIHooks
    {
-      public static bool HooksOverriden = false;
-
       public static readonly Type[] All = new[] {
          typeof( Text_text_Hook ),
          typeof( Text_OnEnable_Hook ),
@@ -38,10 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         if( !UGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
@@ -75,12 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( object __instance )
       {
-         // NOTE: Has function, but overridden
-
-         if( !UGUIHooks.HooksOverriden )
-         {
-            AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         }
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
