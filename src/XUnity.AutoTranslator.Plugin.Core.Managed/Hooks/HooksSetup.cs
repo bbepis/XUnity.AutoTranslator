@@ -56,6 +56,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
+      public static void InstallSpriteRendererHooks()
+      {
+         try
+         {
+            if( Settings.EnableSpriteRendererHooking && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
+            {
+               HookingHelper.PatchAll( ImageHooks.SpriteRenderer, Settings.ForceMonoModHooks );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up image hooks." );
+         }
+      }
+
       private static bool _textAssetHooksInstalled = false;
       public static void InstallTextAssetHooks()
       {

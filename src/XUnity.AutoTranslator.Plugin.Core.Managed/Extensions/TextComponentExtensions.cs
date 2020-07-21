@@ -216,9 +216,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return;
 
-         if( ui is GUIContent )
+         if( ui is GUIContent gui )
          {
-            ( (GUIContent)ui ).text = text;
+            gui.text = text;
          }
          else
          {
