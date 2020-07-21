@@ -113,6 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Setup hooks
          HooksSetup.InstallTextHooks();
          HooksSetup.InstallImageHooks();
+         HooksSetup.InstallSpriteRendererHooks();
          HooksSetup.InstallTextGetterCompatHooks();
          HooksSetup.InstallComponentBasedPluginTranslationHooks();
 
@@ -720,7 +721,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( Settings.EnableUIResizing || Settings.ForceUIResizing )
+               if( info != null && Settings.EnableUIResizing || Settings.ForceUIResizing )
                {
                   if( isTranslated || Settings.ForceUIResizing )
                   {
@@ -737,7 +738,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                info?.ResetScrollIn( ui );
 
-               if( originalText != null && ui != null && !ui.IsSpammingComponent() && info.GetIsKnownTextComponent() )
+               if( info.GetIsKnownTextComponent() && originalText != null && ui != null && !ui.IsSpammingComponent() )
                {
                   if( _isInTranslatedMode && isTranslated )
                      TranslationHelper.DisplayTranslationInfo( originalText, text );

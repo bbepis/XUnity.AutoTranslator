@@ -22,7 +22,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( Image_material_Hook ),
          typeof( RawImage_texture_Hook ),
          typeof( Cursor_SetCursor_Hook ),
-         typeof( SpriteRenderer_sprite_Hook ),
 
          // fallback hooks on material (Prefix hooks)
          typeof( Material_mainTexture_Hook ),
@@ -49,6 +48,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       public static readonly Type[] Sprite = new[] {
          typeof( Sprite_texture_Hook )
+      };
+
+      public static readonly Type[] SpriteRenderer = new[] {
+         typeof( SpriteRenderer_sprite_Hook ),
       };
    }
 
