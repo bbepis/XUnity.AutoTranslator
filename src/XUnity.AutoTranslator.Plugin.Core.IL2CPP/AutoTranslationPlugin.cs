@@ -36,7 +36,6 @@ using XUnity.Common.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Shims;
 using UnityEngine.Events;
-using MelonLoader;
 using XUnity.AutoTranslator.Plugin.Core;
 
 namespace XUnity.AutoTranslator.Plugin.Core
