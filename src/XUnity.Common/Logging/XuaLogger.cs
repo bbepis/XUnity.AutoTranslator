@@ -76,7 +76,7 @@ namespace XUnity.Common.Logging
       {
          try
          {
-            return new BepInExLogger( source );
+            return new ModLoaderSpecificLogger( source );
          }
          catch( Exception )
          {

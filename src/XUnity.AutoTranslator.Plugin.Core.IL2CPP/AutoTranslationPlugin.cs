@@ -38,7 +38,6 @@ using XUnity.AutoTranslator.Plugin.Shims;
 using UnityEngine.Events;
 using MelonLoader;
 using XUnity.AutoTranslator.Plugin.Core;
-using XUnity.Common.IL2CPP.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -77,10 +76,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public void Initialize()
       {
-         XuaLogger.AutoTranslator = new MelonLogger( "XUnity.AutoTranslator" );
-         XuaLogger.Common = new MelonLogger( "XUnity.Common" );
-         XuaLogger.ResourceRedirector = new MelonLogger( "XUnity.ResourceRedirector" );
-
          // Setup 'singleton'
          Current = this;
          AutoTranslator.SetTranslator( this );

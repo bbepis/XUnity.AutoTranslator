@@ -16,9 +16,6 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\libs\MelonMod\Managed\Il2Cppmscorlib.dll</HintPath>
     </Reference>
-    <Reference Include="MelonLoader.ModHandler">
-      <HintPath>..\..\libs\MelonMod\MelonLoader.ModHandler.dll</HintPath>
-    </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\libs\MelonMod\Managed\UnhollowerBaseLib.dll</HintPath>
     </Reference>

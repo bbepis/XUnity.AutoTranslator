@@ -7,6 +7,12 @@ namespace XUnity.Common.Shims
    {
       public bool TryCast<TObject>( object obj, out TObject castedObject )
       {
+         if( obj is TObject c )
+         {
+            castedObject = c;
+            return true;
+         }
+
          if( obj is Il2CppObjectBase il2cppObject )
          {
             IntPtr nativeClassPtr = Il2CppClassPointerStore<TObject>.NativeClassPtr;
@@ -33,12 +39,6 @@ namespace XUnity.Common.Shims
          }
          else
          {
-            if( obj is TObject c )
-            {
-               castedObject = c;
-               return true;
-            }
-
             castedObject = default;
             return false;
          }

@@ -1,5 +1,4 @@
-﻿using Harmony;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,8 +22,6 @@ namespace XUnity.Common.Constants
 
       private static void Initialize()
       {
-         
-
          // we need to force load ALL assemblies because we do not know which ones are relevant and which ones are not!!
          // (types we are hooking may be stored in assemblies whose names are not known at runtime)
          if( !_initialized )
