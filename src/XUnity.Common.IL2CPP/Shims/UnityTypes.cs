@@ -23,7 +23,7 @@ namespace XUnity.Common.Constants
       private static void Initialize()
       {
          // we need to force load ALL assemblies because we do not know which ones are relevant and which ones are not!!
-         // (types we are hooking may be stored in assemblies whose names are not known at runtime)
+         // (types we are hooking may be stored in assemblies whose names are not known at compile time)
          if( !_initialized )
          {
             _initialized = true;
