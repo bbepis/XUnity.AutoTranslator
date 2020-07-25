@@ -23,59 +23,35 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       public static bool ShouldTranslateTextComponent( this ITextComponent ui, bool ignoreComponentState )
       {
+         var component = (Component)ui.Component;
+         if( component != null )
+         {
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return false;
+            }
+
+            if( !ignoreComponentState )
+            {
+               var behaviour = component.TryCast<Behaviour>();
+               if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
+               {
+                  return false;
+               }
+            }
+
+            return !ui.IsPlaceholder();
+         }
+
          return true;
-
-         //var component = ui.Component;
-         //if( component != null )
-         //{
-         //   // dummy check
-         //   var go = component.gameObject;
-         //   var ignore = go.HasIgnoredName();
-         //   if( ignore )
-         //   {
-         //      return false;
-         //   }
-
-         //   if( !ignoreComponentState )
-         //   {
-         //      var behaviour = component.TryCast<Behaviour>();
-         //      if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
-         //      {
-         //         return false;
-         //      }
-         //   }
-
-         //   var inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField );
-         //   if( inputField != null )
-         //   {
-         //      if( UnityTypes.InputField_Properties.Placeholder != null )
-         //      {
-         //         var placeholder = UnityTypes.InputField_Properties.Placeholder.Get( inputField );
-         //         return ReferenceEquals( placeholder, ui );
-         //      }
-         //   }
-
-         //   inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField );
-         //   if( inputField != null )
-         //   {
-         //      if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
-         //      {
-         //         var placeholder = UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-         //         return ReferenceEquals( placeholder, ui );
-         //      }
-         //   }
-
-         //   inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput );
-
-         //   return inputField == null;
-         //}
-
-         //return true;
       }
 
       public static bool IsComponentActive( this ITextComponent ui )
       {
-         return ui.GameObject?.activeSelf ?? false;
+         return ( (Component)ui.Component ).gameObject?.activeSelf ?? false;
       }
 
       public static ITextComponent AsTextComponent( this Component ui )
@@ -109,7 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool SupportsLineParser( this ITextComponent ui )
       {
-         return Settings.GameLogTextPaths.Count > 0 && Settings.GameLogTextPaths.Contains( ui.Component.gameObject.GetPath() );
+         return Settings.GameLogTextPaths.Count > 0 && Settings.GameLogTextPaths.Contains( ( (Component)ui.Component ).gameObject.GetPath() );
       }
 
       public static string GetText( this ITextComponent ui )

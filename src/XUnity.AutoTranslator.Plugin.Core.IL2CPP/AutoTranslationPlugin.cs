@@ -294,7 +294,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( Settings.EnableTextPathLogging )
                {
-                  var path = ui.GameObject.GetPath();
+                  var path = ( (Component)ui.Component ).gameObject.GetPath();
                   if( path != null )
                   {
                      var scope = TranslationScopeHelper.Instance.GetScope( ui );

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Il2CppSystem.Text;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -38,6 +39,11 @@ namespace XUnity.Common.Utilities
          return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz, false, methodName, returnType.FullName, types.Select( x => x.FullName ).ToArray() );
       }
 
+      public static IntPtr GetIl2CppMethod( IntPtr clazz, string methodName, string returnType, params string[] types )
+      {
+         return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz, false, methodName, returnType, types );
+      }
+
       unsafe public static IntPtr InvokeMethod( IntPtr method, IntPtr obj, params IntPtr[] paramtbl )
       {
          if( method == IntPtr.Zero )
@@ -62,7 +68,7 @@ namespace XUnity.Common.Utilities
          return returnval;
       }
 
-      unsafe public static bool PointerToManagedBool(IntPtr ptr)
+      unsafe public static bool PointerToManagedBool( IntPtr ptr )
       {
          return *(bool*)(long)UnhollowerBaseLib.IL2CPP.il2cpp_object_unbox( ptr );
       }

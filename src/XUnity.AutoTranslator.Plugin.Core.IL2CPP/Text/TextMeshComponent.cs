@@ -55,9 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          }
       }
 
-      public GameObject GameObject => _component.gameObject;
-
-      public Component Component => _component;
+      public object Component => _component;
 
       public int GetScope()
       {
@@ -96,6 +94,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
             ref exc );
          Il2CppException.RaiseExceptionIfNecessary( exc );
          return *(bool*)(long)UnhollowerBaseLib.IL2CPP.il2cpp_object_unbox( obj );
+      }
+
+      public bool IsPlaceholder()
+      {
+         return false;
       }
    }
 }

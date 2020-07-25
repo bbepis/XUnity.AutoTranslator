@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnhollowerBaseLib;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
@@ -15,6 +16,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
       internal static IntPtr __TeshMeshPro_OnEnable;
       internal static IntPtr __TeshMeshProUGUI_OnEnable;
 
+      internal static IntPtr __get_placeholder;
+
       static TMP_TextComponent()
       {
          if( UnityTypes.TMP_Text != null )
@@ -22,6 +25,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
             __set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "set_text", typeof( void ), typeof( string ) );
             __get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "get_text", typeof( string ) );
             __get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "get_richText", typeof( bool ) );
+
+            __get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_InputField.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
          }
          if( UnityTypes.TextMeshPro != null )
          {
@@ -65,9 +70,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          }
       }
 
-      public GameObject GameObject => _component.gameObject;
+      public bool IsPlaceholder()
+      {
+         if( __get_placeholder == IntPtr.Zero ) return false;
 
-      public Component Component => _component;
+         var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField.Il2CppType );
+         var ptr = inputField.Pointer;
+         var placeholderPtr = Il2CppUtilities.InvokeMethod( __get_placeholder, ptr );
+         return placeholderPtr == _ptr;
+      }
+
+      public object Component => _component;
 
       public int GetScope()
       {

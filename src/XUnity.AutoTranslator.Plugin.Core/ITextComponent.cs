@@ -14,8 +14,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       bool SupportsRichText();
 
-      GameObject GameObject { get; }
+      bool IsPlaceholder();
 
-      Component Component { get; }
+      object Component { get; }
    }
 }

@@ -19,6 +19,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
       internal static IntPtr __OnEnable;
       internal static IntPtr __get_supportRichText;
 
+      internal static IntPtr __get_placeholder;
+
       static TextComponent()
       {
          if( UnityTypes.Text != null )
@@ -27,6 +29,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
             __get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text.ClassPointer, "get_text", typeof( string ) );
             __OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text.ClassPointer, "OnEnable", typeof( void ) );
             __get_supportRichText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text.ClassPointer, "get_supportRichText", typeof( bool ) );
+
+            __get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.InputField.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
          }
       }
 
@@ -62,9 +66,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          }
       }
 
-      public GameObject GameObject => _component.gameObject;
+      public bool IsPlaceholder()
+      {
+         if( __get_placeholder == IntPtr.Zero ) return false;
 
-      public Component Component => _component;
+         var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField.Il2CppType );
+         if( inputField == null ) return false;
+
+         var ptr = inputField.Pointer;
+         var placeholderPtr = Il2CppUtilities.InvokeMethod( __get_placeholder, ptr );
+         return placeholderPtr == _ptr;
+      }
+
+      public object Component => _component;
 
       public int GetScope()
       {

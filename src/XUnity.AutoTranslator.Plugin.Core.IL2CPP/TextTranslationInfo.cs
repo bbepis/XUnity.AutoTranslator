@@ -35,8 +35,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Action<object> _unresizeFont;
       private Action<object> _unresize;
 
-      private int? _alteredFontSize;
-      private float? _alteredLineSpacing;
       private bool _initialized = false;
 
       public string OriginalText { get; set; }
@@ -79,8 +77,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          _unresizeFont?.Invoke( graphic );
          _unresizeFont = null;
-
-         _alteredFontSize = null;
       }
 
       public void Reset( string newText )

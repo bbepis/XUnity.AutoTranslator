@@ -39,7 +39,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
-      private int _translationFrame = -1;
 
       private int? _alteredFontSize;
       private float? _alteredLineSpacing;
