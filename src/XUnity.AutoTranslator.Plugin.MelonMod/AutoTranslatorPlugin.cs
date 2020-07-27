@@ -25,12 +25,12 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
       {
          _monoBehaviour = PluginLoader.Load();
 
-         _monoBehaviour.OnApplicationStart();
+         _monoBehaviour.Start();
       }
 
       public override void OnUpdate()
       {
-         _monoBehaviour.OnUpdate();
+         _monoBehaviour.Update();
       }
    }
 }

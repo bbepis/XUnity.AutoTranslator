@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -34,6 +35,12 @@ namespace XUnity.AutoTranslator.Plugin.Shims
       public int GetActiveSceneId()
       {
          return SceneManager.GetActiveScene().buildIndex;
+      }
+
+      public void RegisterSceneLoadCallback( Action<int> sceneLoaded )
+      {
+         SceneManager.add_sceneLoaded(
+            new Action<Scene, LoadSceneMode>( ( scene, mode ) => sceneLoaded( scene.buildIndex ) ) );
       }
    }
 }

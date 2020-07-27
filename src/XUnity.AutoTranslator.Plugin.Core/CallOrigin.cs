@@ -69,7 +69,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             var trace = new StackTrace( 2 );
-            var caches = AutoTranslationPlugin.Current.PluginTextCaches;
+            var caches = AutoTranslator.Internal.PluginTextCaches;
+            if( caches == null ) return null;
+
             var frames = trace.GetFrames();
             var len = frames.Length;
             for( int i = 0; i < len; i++ )
@@ -86,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var name = assembly.GetName().Name;
                   if( caches.TryGetValue( name, out var tc ) )
                   {
-                     var translationCache = AutoTranslationPlugin.Current.TextCache.GetOrCreateCompositeCache( tc );
+                     var translationCache = AutoTranslator.Internal.TextCache.GetOrCreateCompositeCache( tc );
                      return translationCache;
                   }
                }

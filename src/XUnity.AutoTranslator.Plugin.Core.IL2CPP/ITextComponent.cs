@@ -16,6 +16,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       bool IsPlaceholder();
 
-      object Component { get; }
+      Component Component { get; }
    }
 }

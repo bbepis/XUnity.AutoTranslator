@@ -4,11 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
-using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
-using XUnity.Common.Constants;
 
-namespace XUnity.AutoTranslator.Plugin.Core
+namespace XUnity.Common.Constants
 {
 
    /// <summary>
@@ -18,11 +15,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static readonly BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
-      internal static bool SupportsMouseScrollDelta { get; } = false;
-      internal static bool SupportsClipboard { get; } = false;
-      internal static bool SupportsCustomYieldInstruction { get; } = false;
-      internal static bool SupportsSceneManager { get; } = false;
-      internal static bool SupportsWaitForSecondsRealtime { get; } = false;
+      public static bool SupportsMouseScrollDelta { get; } = false;
+      public static bool SupportsClipboard { get; } = false;
+      public static bool SupportsCustomYieldInstruction { get; } = false;
+      public static bool SupportsSceneManager { get; } = false;
+      public static bool SupportsWaitForSecondsRealtime { get; } = false;
 
       static UnityFeatures()
       {

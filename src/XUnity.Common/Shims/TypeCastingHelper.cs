@@ -36,6 +36,6 @@ namespace XUnity.Common.Shims
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      bool TryCast<TObject>( object obj, out TObject castedObject );
+      bool TryCastTo<TObject>( object obj, out TObject castedObject );
    }
 }

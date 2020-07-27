@@ -18,20 +18,7 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   internal static class TextTranslationInfoExtensions
-   {
-      public static bool GetIsKnownTextComponent( this TextTranslationInfo info )
-      {
-         return info != null && info.IsKnownTextComponent;
-      }
-
-      public static bool GetSupportsStabilization( this TextTranslationInfo info )
-      {
-         return info != null && info.SupportsStabilization;
-      }
-   }
-
-   internal class TextTranslationInfo
+   internal class ManagedTextTranslationInfo : TextTranslationInfo
    {
       private Action<object> _unresizeFont;
       private Action<object> _unresize;
@@ -42,31 +29,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private int? _alteredFontSize;
       private float? _alteredLineSpacing;
-      private bool _initialized = false;
 
-      public string OriginalText { get; set; }
-      public string TranslatedText { get; set; }
-      public bool IsTranslated { get; set; }
-      public bool IsCurrentlySettingText { get; set; } // TODO: REMOVE; Why is this even here?
-
-      public bool IsStabilizingText { get; set; }
-      public bool IsKnownTextComponent { get; set; }
-      public bool SupportsStabilization { get; set; }
-
-      public IReadOnlyTextTranslationCache TextCache { get; set; }
-
-      public void Initialize( object ui )
-      {
-         if( !_initialized )
-         {
-            _initialized = true;
-
-            IsKnownTextComponent = ui.IsKnownTextType();
-            SupportsStabilization = ui.SupportsStabilization();
-         }
-      }
-
-      public void ResetScrollIn( object graphic )
+      public override void ResetScrollIn( object graphic )
       {
          if( !_hasCheckedTypeWriter )
          {
@@ -88,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void ChangeFont( object ui )
+      public override void ChangeFont( object ui )
       {
          if( ui == null ) return;
 
@@ -138,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void UnchangeFont( object ui )
+      public override void UnchangeFont( object ui )
       {
          if( ui == null ) return;
 
@@ -152,7 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return ( (RectTransform)component.transform ).rect.width;
       }
 
-      public void ResizeUI( object ui, UIResizeCache cache )
+      public override void ResizeUI( object ui, UIResizeCache cache )
       {
          // do not resize if there is no object of ir it is already resized
          if( ui == null ) return;
@@ -457,7 +421,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void UnresizeUI( object graphic )
+      public override void UnresizeUI( object graphic )
       {
          if( graphic == null ) return;
 
@@ -468,19 +432,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _unresizeFont = null;
 
          _alteredFontSize = null;
-      }
-
-      public void Reset( string newText )
-      {
-         IsTranslated = false;
-         TranslatedText = null;
-         OriginalText = newText;
-      }
-
-      public void SetTranslatedText( string translatedText )
-      {
-         IsTranslated = true;
-         TranslatedText = translatedText;
       }
    }
 }

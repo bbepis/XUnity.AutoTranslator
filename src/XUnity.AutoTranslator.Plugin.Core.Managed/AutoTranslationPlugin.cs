@@ -91,6 +91,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _lastSpriteUpdateFrame = -1;
       private bool _isCalledFromSceneManager = false;
 
+      TextTranslationCache IInternalTranslator.TextCache => TextCache;
+
+      Dictionary<string, TextTranslationCache> IInternalTranslator.PluginTextCaches => PluginTextCaches;
+
+      TextureTranslationCache IInternalTranslator.TextureCache => TextureCache;
+
       /// <summary>
       /// Initialized the plugin.
       /// </summary>
@@ -337,7 +343,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal static string[] GetSupportedFonts()
       {
-         return Font.GetOSInstalledFontNames();
+         return FontHelper.Instance.GetOSInstalledFontNames();
       }
 
       private void OnEndpointSelected( TranslationEndpointManager endpoint )
@@ -368,10 +374,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            var helper = TranslationScopeHelper.Instance;
+
             XuaLogger.AutoTranslator.Debug( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
-            if( UnityFeatures.SupportsSceneManager )
+            if( helper.SupportsSceneManager() )
             {
-               EnableSceneLoadScanInternal();
+               helper.RegisterSceneLoadCallback( OnLevelWasLoadedFromSceneManager );
                XuaLogger.AutoTranslator.Debug( "SceneManager is supported in this version of Unity." );
             }
             else
@@ -383,12 +391,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while settings up scene-load scans." );
          }
-      }
-
-      private void EnableSceneLoadScanInternal()
-      {
-         // do this in a different class to avoid having an anonymous method with references to the "Scene" class
-         SceneManagerLoader.EnableSceneLoadScanInternal( this );
       }
 
       internal void OnLevelWasLoadedFromSceneManager( int id )
@@ -406,7 +408,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnLevelWasLoaded( int id )
       {
-         if( !UnityFeatures.SupportsSceneManager || ( UnityFeatures.SupportsSceneManager && _isCalledFromSceneManager ) )
+         var supportsSceneManager = TranslationScopeHelper.Instance.SupportsSceneManager();
+         if( !supportsSceneManager || ( supportsSceneManager && _isCalledFromSceneManager ) )
          {
             if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
             {
@@ -551,7 +554,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void QueueNewUntranslatedForClipboard( UntranslatedText key )
       {
-         if( Settings.CopyToClipboard && UnityFeatures.SupportsClipboard )
+         if( Settings.CopyToClipboard && ClipboardHelper.Instance.SupportsClipboard() )
          {
             // Perhaps this should be the original, but that might have unexpected consequences for external tools??
             if( !_textsToCopyToClipboard.Contains( key.Original_Text_FullyTrimmed ) )
@@ -843,7 +846,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void TranslateTexture( object ui, TextureReloadContext context )
       {
-         if( ui is Texture2D texture2d )
+         if( ui.TryCastTo<Texture2D>( out var texture2d ) )
          {
             TranslateTexture( null, ref texture2d, false, context );
          }
@@ -861,7 +864,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             _imageHooksEnabled = false;
 
             var previousTextureValue = texture;
-            texture = texture ?? source.GetTexture();
+            texture = texture ?? (Texture2D)source.GetTexture();
             if( texture == null ) return;
 
             var tti = texture.GetOrCreateTextureTranslationInfo();
@@ -888,7 +891,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( newData );
+                           texture.LoadImageEx( newData, null );
                            changedImage = true;
                         }
                         else
@@ -912,7 +915,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( Settings.EnableLegacyTextureLoading )
                            {
-                              source.SetTexture( tti.Translated );
+                              source.SetTexture( tti.GetTranslatedTexture() );
                            }
 
                            if( !isPrefixHooked )
@@ -942,7 +945,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( originalData );
+                           texture.LoadImageEx( originalData, null );
                            changedImage = true;
                         }
                         else
@@ -965,7 +968,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           var original = tti.Original.Target;
+                           var original = tti.GetOriginalTexture();
                            if( Settings.EnableLegacyTextureLoading && original != null )
                            {
                               source.SetTexture( original );
@@ -997,7 +1000,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( originalData );
+                           texture.LoadImageEx( originalData, null );
                            changedImage = true;
                         }
                         else
@@ -1020,7 +1023,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           var original = tti.Original.Target;
+                           var original = tti.GetOriginalTexture();
                            if( Settings.EnableLegacyTextureLoading && original != null )
                            {
                               source.SetTexture( original );
@@ -1048,14 +1051,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( tti.IsTranslated )
                {
-                  if( tti.Translated != null )
+                  var translated = tti.GetTranslatedTexture();
+                  if( translated != null )
                   {
-                     texture = tti.Translated;
+                     texture = translated;
                   }
                }
                else
                {
-                  var original = tti.Original.Target;
+                  var original = tti.GetOriginalTexture();
                   if( original != null )
                   {
                      texture = original;
@@ -1084,7 +1088,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             _imageHooksEnabled = false;
 
-            texture = texture ?? source.GetTexture();
+            texture = texture ?? (Texture2D)source.GetTexture();
             if( texture == null ) return;
 
             var info = texture.GetOrCreateTextureTranslationInfo();
@@ -1099,7 +1103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( !TextureCache.IsImageRegistered( key ) )
                   {
-                     var name = texture.GetTextureName();
+                     var name = texture.GetTextureName( "Unnamed" );
 
                      var originalData = info.GetOrCreateOriginalData();
                      TextureCache.RegisterImageFromData( name, key, originalData );
@@ -1130,11 +1134,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             && format != 63;
       }
 
-      internal void RenameTextureWithKey( string name, string key, string newKey )
-      {
-         TextureCache.RenameFileWithKey( name, key, newKey );
-      }
-
       private string TranslateImmediate( object ui, string text, TextTranslationInfo info, bool ignoreComponentState, IReadOnlyTextTranslationCache tc )
       {
          text = text ?? ui.GetText();
@@ -1149,7 +1148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          info?.Reset( originalText );
-            
+
          var scope = TranslationScopeHelper.Instance.GetScope( ui );
          if( !text.IsNullOrWhiteSpace() && tc.IsTranslatable( text, false, scope ) && ui.ShouldTranslateTextComponent( ignoreComponentState ) && !IsCurrentlySetting( info ) )
          {
@@ -2251,7 +2250,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             TranslationManager.Update();
 
-            if( UnityFeatures.SupportsClipboard )
+            if( ClipboardHelper.Instance.SupportsClipboard() )
             {
                CopyToClipboard();
             }
@@ -2768,9 +2767,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var ui = kvp.Key;
                      try
                      {
-                        if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                        if( ui.IsComponentActive() )
                         {
-                           tti?.ChangeFont( ui );
+                           tti.ChangeFont( ui );
                         }
                      }
                      catch( Exception )
@@ -2787,18 +2786,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
                foreach( var kvp in objects )
                {
                   var tti = kvp.Value as TextTranslationInfo;
-                  var ui = kvp.Key;
-                  try
+                  if( tti != null )
                   {
-                     if( ( ui as Component )?.gameObject?.activeSelf ?? false )
+                     var ui = kvp.Key;
+                     try
                      {
-                        tti?.UnchangeFont( ui );
+                        if( ui.IsComponentActive() )
+                        {
+                           tti.UnchangeFont( ui );
+                        }
                      }
-                  }
-                  catch( Exception )
-                  {
-                     // not super pretty, no...
-                     ExtensionDataHelper.Remove( ui );
+                     catch( Exception )
+                     {
+                        // not super pretty, no...
+                        ExtensionDataHelper.Remove( ui );
+                     }
                   }
                }
             }
@@ -2998,9 +3000,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var components = obj.GetComponents<Component>();
             foreach( var component in components )
             {
-               if( component.IsKnownTextType() )
+               var textComponent = component.CreateWrapperTextComponentIfRequiredAndPossible();
+               if( textComponent != null )
                {
-                  Hook_TextChanged( component, false );
+                  Hook_TextChanged( textComponent, false );
                }
 
                if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
@@ -3068,15 +3071,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                XuaLogger.AutoTranslator.Error( e, "An error occurred while disposing endpoint." );
             }
          }
-      }
-   }
-
-   internal static class SceneManagerLoader
-   {
-      public static void EnableSceneLoadScanInternal( AutoTranslationPlugin plugin )
-      {
-         // specified in own method, because of chance that this has changed through Unity lifetime
-         SceneManager.sceneLoaded += ( arg1, arg2 ) => plugin.OnLevelWasLoadedFromSceneManager( arg1.buildIndex );
       }
    }
 }

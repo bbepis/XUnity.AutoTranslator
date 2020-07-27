@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          return placeholderPtr == _ptr;
       }
 
-      public object Component => _component;
+      public Component Component => _component;
 
       public int GetScope()
       {

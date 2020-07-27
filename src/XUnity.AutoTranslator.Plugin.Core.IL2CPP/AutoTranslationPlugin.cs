@@ -70,6 +70,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _initialized = false;
       private bool _temporarilyDisabled = false;
 
+      TextTranslationCache IInternalTranslator.TextCache => TextCache;
+
+      Dictionary<string, TextTranslationCache> IInternalTranslator.PluginTextCaches => null;
+
+      TextureTranslationCache IInternalTranslator.TextureCache => TextureCache;
+
       /// <summary>
       /// Initialized the plugin.
       /// </summary>
@@ -294,7 +300,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( Settings.EnableTextPathLogging )
                {
-                  var path = ( (Component)ui.Component ).gameObject.GetPath();
+                  var path = ui.Component.gameObject.GetPath();
                   if( path != null )
                   {
                      var scope = TranslationScopeHelper.Instance.GetScope( ui );
@@ -1368,7 +1374,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void OnApplicationStart()
+      public void Start()
       {
          if( !_initialized )
          {
@@ -1386,7 +1392,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void OnUpdate()
+      public void Update()
       {
          try
          {
@@ -1893,8 +1899,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var components = obj.GetComponents<Component>();
             foreach( var component in components )
             {
-               var textComponent = component.AsTextComponent();
-
+               var textComponent = component.CreateWrapperTextComponentIfRequiredAndPossible() as ITextComponent;
                if( textComponent != null )
                {
                   Hook_TextChanged( textComponent, false );

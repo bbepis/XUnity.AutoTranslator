@@ -7,7 +7,6 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
@@ -22,8 +21,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
    /// </summary>
    public abstract class WwwEndpoint : ITranslateEndpoint
    {
-      private static readonly ConstructorInfo WwwConstructor = UnityTypes.WWW.GetConstructor( new[] { typeof( string ), typeof( byte[] ), typeof( Dictionary<string, string> ) } );
-
       /// <summary>
       /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
       /// </summary>
@@ -81,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       /// <returns></returns>
       protected WWW CreateWww( string address, byte[] data, Dictionary<string, string> headers )
       {
-         return (WWW)WwwConstructor.Invoke( new object[] { address, data, headers } );
+         return new WWW( address, data, headers );
       }
 
       /// <summary>
@@ -115,11 +112,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
          yield return www;
 
          // extract error
-         string error = (string)AccessToolsShim.Property( UnityTypes.WWW, "error" ).GetValue( www, null );
+         string error = www.error;
          if( error != null ) wwwContext.Fail( "Error occurred while retrieving translation. " + error );
 
          // extract text
-         var text = (string)AccessToolsShim.Property( UnityTypes.WWW, "text" ).GetValue( www, null );
+         var text = www.text;
          if( text == null ) wwwContext.Fail( "Error occurred while extracting text from response." ); 
 
          wwwContext.ResponseData = text;

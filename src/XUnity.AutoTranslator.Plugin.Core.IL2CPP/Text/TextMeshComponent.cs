@@ -55,7 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          }
       }
 
-      public object Component => _component;
+      public Component Component => _component;
 
       public int GetScope()
       {

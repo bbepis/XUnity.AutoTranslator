@@ -6,7 +6,7 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Shims
 {
-   public static class TimeHelper
+   internal static class TimeHelper
    {
       private static ITimeHelper _instance;
 
@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
       }
    }
 
-   public interface ITimeHelper
+   internal interface ITimeHelper
    {
       int frameCount { get; }
 

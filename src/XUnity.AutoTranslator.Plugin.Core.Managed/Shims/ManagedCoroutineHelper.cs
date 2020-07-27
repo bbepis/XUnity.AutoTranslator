@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Shims
 {

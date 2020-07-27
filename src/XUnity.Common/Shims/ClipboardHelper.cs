@@ -1,17 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
-using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
-namespace XUnity.Common.Utilities
+namespace XUnity.Common.Shims
 {
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
    public static class ClipboardHelper
    {
+      private static IClipboardHelper _instance;
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      public static IClipboardHelper Instance
+      {
+         get
+         {
+            if( _instance == null )
+            {
+               _instance = ActivationHelper.Create<IClipboardHelper>(
+                  typeof( ClipboardHelper ).Assembly,
+                  "XUnity.Common.Managed.dll",
+                  "XUnity.Common.IL2CPP.dll" );
+            }
+            return _instance;
+         }
+      }
+
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
@@ -39,26 +57,23 @@ namespace XUnity.Common.Utilities
 
          var text = builder.ToString();
 
-         CopyToClipboard( text );
+         Instance.CopyToClipboard( text );
       }
+   }
+
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
+   public interface IClipboardHelper
+   {
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      void CopyToClipboard( string text );
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      /// <param name="text"></param>
-      public static void CopyToClipboard( string text )
-      {
-         try
-         {
-            TextEditor editor = (TextEditor)GUIUtility.GetStateObject( typeof( TextEditor ), GUIUtility.keyboardControl );
-            editor.text = text;
-            editor.SelectAll();
-            editor.Copy();
-         }
-         catch( Exception e )
-         {
-            XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
-         }
-      }
+      bool SupportsClipboard();
    }
 }

@@ -2,8 +2,8 @@
 {
    public interface IMonoBehaviour
    {
-      void OnApplicationStart();
+      void Start();
 
-      void OnUpdate();
+      void Update();
    }
 }

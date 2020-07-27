@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Shims
 {
@@ -58,6 +60,20 @@ namespace XUnity.AutoTranslator.Plugin.Shims
       private static int GetActiveSceneIdByApplication()
       {
          return Application.loadedLevel;
+      }
+
+      public void RegisterSceneLoadCallback( Action<int> sceneLoaded )
+      {
+         SceneManagerLoader.EnableSceneLoadScanInternal( sceneLoaded );
+      }
+   }
+
+   internal static class SceneManagerLoader
+   {
+      public static void EnableSceneLoadScanInternal( Action<int> sceneLoaded )
+      {
+         // specified in own method, because of chance that this has changed through Unity lifetime
+         SceneManager.sceneLoaded += ( arg1, arg2 ) => sceneLoaded( arg1.buildIndex );
       }
    }
 }

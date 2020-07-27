@@ -5,7 +5,7 @@ namespace XUnity.Common.Shims
 {
    internal class Il2CppTypeCastingHelper : ITypeCastingHelper
    {
-      public bool TryCast<TObject>( object obj, out TObject castedObject )
+      public bool TryCastTo<TObject>( object obj, out TObject castedObject )
       {
          if( obj is TObject c )
          {

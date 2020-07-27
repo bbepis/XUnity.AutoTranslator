@@ -2,18 +2,18 @@
 
 namespace XUnity.AutoTranslator.Plugin.Core.Shims
 {
-   internal static class HookSetupHelper
+   internal static class FontHelper
    {
-      private static IHookSetupHelper _instance;
+      private static IFontHelper _instance;
 
-      public static IHookSetupHelper Instance
+      public static IFontHelper Instance
       {
          get
          {
             if( _instance == null )
             {
-               _instance = ActivationHelper.Create<IHookSetupHelper>(
-                  typeof( HookSetupHelper ).Assembly,
+               _instance = ActivationHelper.Create<IFontHelper>(
+                  typeof( FontHelper ).Assembly,
                   "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
                   "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
             }
@@ -22,8 +22,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
       }
    }
 
-   internal interface IHookSetupHelper
+   internal interface IFontHelper
    {
-      void InstallTextAssetHooks();
+      object GetTextMeshProFont();
+
+      object GetTextFont( int size );
+
+      string[] GetOSInstalledFontNames();
    }
 }

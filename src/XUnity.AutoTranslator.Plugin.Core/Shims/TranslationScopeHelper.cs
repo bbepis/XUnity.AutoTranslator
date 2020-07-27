@@ -1,10 +1,11 @@
-﻿using XUnity.AutoTranslator.Plugin.Core.Configuration;
+﻿using System;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Shims
 {
-   public static class TranslationScopeHelper
+   internal static class TranslationScopeHelper
    {
       private static ITranslationScopeHelper _instance;
 
@@ -24,12 +25,14 @@ namespace XUnity.AutoTranslator.Plugin.Shims
       }
    }
 
-   public interface ITranslationScopeHelper
+   internal interface ITranslationScopeHelper
    {
       int GetScope( object ui );
 
       bool SupportsSceneManager();
 
       int GetActiveSceneId();
+
+      void RegisterSceneLoadCallback( Action<int> sceneLoaded );
    }
 }
