@@ -2060,7 +2060,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private IEnumerator WaitForTextStablization( object ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
       {
-         yield return 0; // wait a single frame to allow any external plugins to complete their hooking logic
+         yield return null; // wait a single frame to allow any external plugins to complete their hooking logic
 
          bool succeeded = false;
          while( currentTries < maxTries ) // shortcircuit

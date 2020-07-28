@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       public static readonly Type[] All = new[] {
          typeof( Text_text_Hook ),
-         typeof( Text_get_text_Hook ),
+         //typeof( Text_get_text_Hook ),
          typeof( Text_OnEnable_Hook ),
       };
    }
@@ -55,42 +55,42 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
-   internal static class Text_get_text_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return TextComponent.__get_text != IntPtr.Zero;
-      }
+   //internal static class Text_get_text_Hook
+   //{
+   //   static bool Prepare( object instance )
+   //   {
+   //      return TextComponent.__get_text != IntPtr.Zero;
+   //   }
 
-      static IntPtr TargetMethodPointer()
-      {
-         return TextComponent.__get_text;
-      }
+   //   static IntPtr TargetMethodPointer()
+   //   {
+   //      return TextComponent.__get_text;
+   //   }
 
-      static string _Postfix( ITextComponent __instance )
-      {
-         var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, null, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
+   //   static string _Postfix( ITextComponent __instance )
+   //   {
+   //      var result = AutoTranslationPlugin.Current.Hook_TextChanged_WithResult( __instance, null, false );
+   //      AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
 
-         return result;
-      }
+   //      return result;
+   //   }
 
-      static IntPtr ML_Detour( IntPtr instance )
-      {
-         var __instance = new TextComponent( instance );
+   //   static IntPtr ML_Detour( IntPtr instance )
+   //   {
+   //      var __instance = new TextComponent( instance );
 
-         var result = Il2CppUtilities.InvokeMethod( TextComponent.__get_text, instance );
+   //      var result = Il2CppUtilities.InvokeMethod( TextComponent.__get_text, instance );
 
-         var stringResult = _Postfix( __instance );
+   //      var stringResult = _Postfix( __instance );
 
-         if(stringResult != null )
-         {
-            return UnhollowerBaseLib.IL2CPP.ManagedStringToIl2Cpp( stringResult );
-         }
+   //      if(stringResult != null )
+   //      {
+   //         return UnhollowerBaseLib.IL2CPP.ManagedStringToIl2Cpp( stringResult );
+   //      }
          
-         return result;
-      }
-   }
+   //      return result;
+   //   }
+   //}
 
    internal static class Text_OnEnable_Hook
    {
