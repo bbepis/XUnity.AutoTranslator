@@ -157,11 +157,17 @@
   <data name="XUnity_AutoTranslator_Plugin_Core" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.AutoTranslator.Plugin.Core.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="XUnity_AutoTranslator_Plugin_Core_Managed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.AutoTranslator.Plugin.Core.Managed.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="XUnity_AutoTranslator_Plugin_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.AutoTranslator.Plugin.ExtProtocol.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="XUnity_Common" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.Common.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="XUnity_Common_Managed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.Common.Managed.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="XUnity_ResourceRedirector" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build\bin\net35\XUnity.ResourceRedirector.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <Version>4.11.4</Version>
+    <Version>4.12.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +20,15 @@
       <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+    </ItemGroup>
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   for %25%25f in (&quot;$(SolutionDir)dist\Translators\*&quot;) do XCOPY /Y /I &quot;%25%25f&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\Translators\&quot;&#xD;&#xA;   for %25%25f in (&quot;$(SolutionDir)dist\Translators\FullNET\*&quot;) do XCOPY /Y /I &quot;%25%25f&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\Translators\FullNET\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)ExIni.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.IL2CPP.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(SolutionDir)libs\MonoMod\Mono.Cecil.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(SolutionDir)libs\MonoMod\MonoMod.Utils.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(SolutionDir)libs\MonoMod\MonoMod.RuntimeDetour.dll&quot; &quot;$(SolutionDir)dist\MelonMod\MelonLoader\Managed\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\MelonMod\Mods\&quot;&#xD;&#xA;   COPY /Y &quot;$(SolutionDir)README.md&quot; &quot;$(SolutionDir)dist\MelonMod\Mods\README (AutoTranslator).md&quot;&#xD;&#xA;   &quot;$(SolutionDir)tools\xzip.exe&quot; &quot;$(SolutionDir)dist\MelonMod&quot; &quot;$(SolutionDir)dist\XUnity.AutoTranslator-MelonMod-@(VersionNumber).zip&quot;&#xD;&#xA;)" />
+  </Target>
 
 </Project>

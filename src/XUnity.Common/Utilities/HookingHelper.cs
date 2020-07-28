@@ -200,14 +200,15 @@ namespace XUnity.Common.Utilities
                try
                {
                   hook = ClrTypes.Hook.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodInfo ) } ).Invoke( new object[] { original, mmdetour } );
+                  hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                }
                catch( Exception e1 ) when( e1.FirstInnerExceptionOfType<NullReferenceException>() != null || e1.FirstInnerExceptionOfType<NotSupportedException>()?.Message?.Contains( "Body-less" ) == true )
                {
                   suffix = "(native)";
                   hook = ClrTypes.NativeDetour.GetConstructor( new Type[] { typeof( MethodBase ), typeof( MethodBase ) } ).Invoke( new object[] { original, mmdetour } );
+                  hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                }
 
-               hook.GetType().GetMethod( "Apply" ).Invoke( hook, null );
                type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
                if( forced )
