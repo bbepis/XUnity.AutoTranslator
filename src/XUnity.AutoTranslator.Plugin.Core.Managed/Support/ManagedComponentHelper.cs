@@ -12,7 +12,7 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
-   internal class ManagedTextComponentHelper : ITextComponentHelper
+   internal class ManagedComponentHelper : IComponentHelper
    {
       private static readonly MethodInfo LoadImage = UnityTypes.ImageConversion != null ? AccessToolsShim.Method( UnityTypes.ImageConversion, "LoadImage", new[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) } ) : null;
       private static readonly MethodInfo EncodeToPNG = UnityTypes.ImageConversion != null ? AccessToolsShim.Method( UnityTypes.ImageConversion, "EncodeToPNG", new[] { typeof( Texture2D ) } ) : null;

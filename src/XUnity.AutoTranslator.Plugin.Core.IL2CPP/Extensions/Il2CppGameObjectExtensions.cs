@@ -10,9 +10,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class Il2CppGameObjectExtensions
    {
-      public static readonly Func<GameObject, Il2CppSystem.Type, Component> GetComponentMethod =
+      public static readonly Func<GameObject, Il2CppSystem.Type, Component> GameObject_GetComponent =
          (Func<GameObject, Il2CppSystem.Type, Component>)ExpressionHelper.CreateTypedFastInvoke(
-            typeof( Component ).GetMethod(
+            typeof( GameObject ).GetMethod(
                "GetComponent",
                BindingFlags.Public | BindingFlags.Instance,
                null,
@@ -42,7 +42,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static Component GetComponentSafe( this GameObject go, Il2CppSystem.Type type )
       {
-         return GetComponentMethod( go, type );
+         return GameObject_GetComponent( go, type );
       }
    }
 }

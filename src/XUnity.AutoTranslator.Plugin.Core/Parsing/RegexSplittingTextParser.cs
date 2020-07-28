@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return !TextComponentHelper.Instance.IsSpammingComponent( ui );
+         return !ComponentHelper.Instance.IsSpammingComponent( ui );
       }
 
       public ParserResult Parse( string input, int scope, IReadOnlyTextTranslationCache cache )

@@ -4,18 +4,18 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
-   internal static class TextComponentHelper
+   internal static class ComponentHelper
    {
-      private static ITextComponentHelper _instance;
+      private static IComponentHelper _instance;
 
-      public static ITextComponentHelper Instance
+      public static IComponentHelper Instance
       {
          get
          {
             if( _instance == null )
             {
-               _instance = ActivationHelper.Create<ITextComponentHelper>(
-                  typeof( TextComponentHelper ).Assembly,
+               _instance = ActivationHelper.Create<IComponentHelper>(
+                  typeof( ComponentHelper ).Assembly,
                   "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
                   "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
             }
@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       }
    }
 
-   internal interface ITextComponentHelper
+   internal interface IComponentHelper
    {
       bool IsSpammingComponent( object ui );
 

@@ -29,19 +29,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
 
       public TextMeshComponent( IntPtr ptr )
       {
-         _ptr = ptr;
-         _component = new Component( ptr );
+         _component = Il2CppUtilities.CreateProxyComponent( ptr );
          _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( _component );
+         _ptr = ptr;
       }
 
       public TextMeshComponent( Component component )
       {
-         _ptr = component.Pointer;
+         _ptr = Il2CppUtilities.GetIl2CppInstancePointer( component );
+         _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( component );
          _component = component;
-         _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( _component );
       }
 
-      public string text
+      public string Text
       {
          get
          {

@@ -17,7 +17,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextComponentExtensions
    {
-      private static readonly ITextComponentHelper Helper = TextComponentHelper.Instance;
+      private static readonly IComponentHelper Helper = ComponentHelper.Instance;
 
       public static bool ShouldTranslateTextComponent( this object ui, bool ignoreComponentState )
       {

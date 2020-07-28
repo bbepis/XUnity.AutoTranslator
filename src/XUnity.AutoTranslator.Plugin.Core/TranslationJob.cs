@@ -74,7 +74,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else
          {
-            if( ui != null && !TextComponentHelper.Instance.IsSpammingComponent( ui ) )
+            if( ui != null && !ComponentHelper.Instance.IsSpammingComponent( ui ) )
             {
                Components.Add( new KeyAnd<object>( key, ui ) );
             }

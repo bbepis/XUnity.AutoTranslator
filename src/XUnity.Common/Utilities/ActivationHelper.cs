@@ -8,8 +8,17 @@ using System.Text;
 
 namespace XUnity.Common.Utilities
 {
+   /// <summary>
+   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+   /// </summary>
    public static class ActivationHelper
    {
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="assemblies"></param>
+      /// <param name="parentAssembly"></param>
+      /// <returns></returns>
       public static TService Create<TService>( Assembly parentAssembly, params string[] assemblies )
       {
          foreach( var assembly in assemblies )

@@ -16,6 +16,9 @@
     <Reference Include="MelonLoader.ModHandler">
       <HintPath>..\..\libs\MelonMod\MelonLoader.ModHandler.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

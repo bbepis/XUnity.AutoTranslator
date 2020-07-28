@@ -46,7 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var orig = Original.Target;
 
-            var texture = TextComponentHelper.Instance.CreateEmptyTexture2D();
+            var texture = ComponentHelper.Instance.CreateEmptyTexture2D();
             texture.LoadImageEx( newData, orig );
 
             SetTranslated( texture );
@@ -59,7 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( !Original.IsAlive && _originalData != null )
          {
-            var texture = TextComponentHelper.Instance.CreateEmptyTexture2D();
+            var texture = ComponentHelper.Instance.CreateEmptyTexture2D();
             texture.LoadImageEx( _originalData, null );
 
             SetOriginal( texture );

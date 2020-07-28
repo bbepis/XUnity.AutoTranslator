@@ -9,7 +9,9 @@ using MelonLoader;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.MelonMod;
+using XUnity.AutoTranslator.Plugin.MelonMod.Support;
 using XUnity.Common.Support;
 
 [assembly: MelonModInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
@@ -23,6 +25,8 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
 
       public override void OnApplicationStart()
       {
+         CoroutineHelper.Instance = new MelonModCoroutineHelper();
+
          _monoBehaviour = PluginLoader.Load();
 
          _monoBehaviour.Start();

@@ -5,7 +5,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public static class TypeCastingHelper
+   internal static class TypeCastingHelper
    {
       private static ITypeCastingHelper _instance;
 
@@ -31,7 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public interface ITypeCastingHelper
+   internal interface ITypeCastingHelper
    {
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.

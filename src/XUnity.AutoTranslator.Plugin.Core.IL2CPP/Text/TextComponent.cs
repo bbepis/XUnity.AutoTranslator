@@ -40,19 +40,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
 
       public TextComponent( IntPtr ptr )
       {
-         _ptr = ptr;
-         _component = new Component( ptr );
+         _component = Il2CppUtilities.CreateProxyComponent( ptr );
          _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( _component );
+         _ptr = ptr;
       }
 
       public TextComponent( Component component )
       {
-         _ptr = component.Pointer;
+         _ptr = Il2CppUtilities.GetIl2CppInstancePointer( component );
+         _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( component );
          _component = component;
-         _gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( _component );
       }
 
-      public string text
+      public string Text
       {
          get
          {
@@ -73,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField.Il2CppType );
          if( inputField == null ) return false;
 
-         var ptr = inputField.Pointer;
+         var ptr = Il2CppUtilities.GetIl2CppInstancePointer( inputField );
          var placeholderPtr = Il2CppUtilities.InvokeMethod( __get_placeholder, ptr );
          return placeholderPtr == _ptr;
       }

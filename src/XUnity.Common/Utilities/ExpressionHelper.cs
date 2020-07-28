@@ -17,32 +17,49 @@ namespace XUnity.Common.Utilities
       /// </summary>
       /// <param name="method"></param>
       /// <returns></returns>
-      public static Delegate CreateTypedFastInvoke( MethodInfo method )
+      public static Delegate CreateTypedFastInvoke( MethodBase method )
       {
          if( method == null ) throw new ArgumentNullException( "method" );
          if( method.IsGenericMethod ) throw new ArgumentException( "The provided method must not be generic.", "method" );
 
-         if( method.IsStatic )
+         if( method is MethodInfo methodInfo )
          {
-            var parameters = method.GetParameters()
+            if( method.IsStatic )
+            {
+               var parameters = methodInfo.GetParameters()
+                  .Select( p => Expression.Parameter( p.ParameterType, p.Name ) )
+                  .ToArray();
+
+               var call = Expression.Call( null, methodInfo, parameters );
+
+               return Expression.Lambda( call, parameters ).Compile();
+            }
+            else
+            {
+               var parameters = methodInfo.GetParameters()
+                  .Select( p => Expression.Parameter( p.ParameterType, p.Name ) )
+                  .ToList();
+
+               parameters.Insert( 0, Expression.Parameter( methodInfo.DeclaringType, "instance" ) );
+
+               var call = Expression.Call( parameters[ 0 ], methodInfo, parameters.Skip( 1 ).ToArray() );
+
+               return Expression.Lambda( call, parameters.ToArray() ).Compile();
+            }
+         }
+         else if( method is ConstructorInfo constructorInfo )
+         {
+            var parameters = constructorInfo.GetParameters()
                .Select( p => Expression.Parameter( p.ParameterType, p.Name ) )
                .ToArray();
 
-            var call = Expression.Call( null, method, parameters );
+            var call = Expression.New( constructorInfo, parameters );
 
             return Expression.Lambda( call, parameters ).Compile();
          }
          else
          {
-            var parameters = method.GetParameters()
-               .Select( p => Expression.Parameter( p.ParameterType, p.Name ) )
-               .ToList();
-
-            parameters.Insert( 0, Expression.Parameter( method.DeclaringType, "instance" ) );
-
-            var call = Expression.Call( parameters[ 0 ], method, parameters.Skip( 1 ).ToArray() );
-
-            return Expression.Lambda( call, parameters.ToArray() ).Compile();
+            throw new ArgumentException( "method", "This method only supports MethodInfo and ConstructorInfo." );
          }
       }
    }

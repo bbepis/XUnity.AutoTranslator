@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Support
+namespace XUnity.AutoTranslator.Plugin.MelonMod.Support
 {
-   internal class Il2CppCoroutineHelper : ICoroutineHelper
+   internal class MelonModCoroutineHelper : ICoroutineHelper
    {
       public object CreateWaitForSeconds( float seconds )
       {

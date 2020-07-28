@@ -8,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public static class ClipboardHelper
+   internal static class ClipboardHelper
    {
       private static IClipboardHelper _instance;
 

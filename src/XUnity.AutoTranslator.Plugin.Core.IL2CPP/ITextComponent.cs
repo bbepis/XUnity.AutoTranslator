@@ -6,7 +6,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal interface ITextComponent : IGarbageCollectable
    {
-      string text { get; set; }
+      string Text { get; set; }
 
       bool IsSpammingComponent();
 

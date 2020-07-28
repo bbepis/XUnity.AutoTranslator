@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnhollowerBaseLib;
+using UnityEngine;
 
 namespace XUnity.Common.Utilities
 {
@@ -12,9 +13,41 @@ namespace XUnity.Common.Utilities
    {
       private static Dictionary<string, IntPtr> ourImagesMap;
 
-      public static Func<Il2CppObjectBase, uint> GetGarbageCollectionHandle =
-         CustomFastReflectionHelper.CreateFastFieldGetter<Il2CppObjectBase, uint>( typeof( Il2CppObjectBase )
-            .GetField( "myGcHandle", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance ) );
+      public static Func<object, uint> GetGarbageCollectionHandle =
+         CustomFastReflectionHelper.CreateFastFieldGetter<object, uint>(
+            typeof( Il2CppObjectBase ).GetField(
+               "myGcHandle",
+               BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance ) );
+
+      public static readonly Func<IntPtr, Component> CreateProxyComponent =
+         (Func<IntPtr, Component>)ExpressionHelper.CreateTypedFastInvoke(
+            typeof( Component ).GetConstructor(
+               BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
+               null,
+               new Type[] { typeof( IntPtr ) },
+               null
+            ) );
+
+      public static IntPtr GetIl2CppInstancePointer( object obj )
+      {
+         var gcHandle = GetGarbageCollectionHandle( obj );
+         var intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_gchandle_get_target( gcHandle );
+         if( intPtr == IntPtr.Zero )
+         {
+            throw new ObjectCollectedException( "Object was garbage collected in IL2CPP domain" );
+         }
+         return intPtr;
+      }
+
+      public static IntPtr GetIl2CppInstancePointer( uint gcHandle )
+      {
+         var intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_gchandle_get_target( gcHandle );
+         if( intPtr == IntPtr.Zero )
+         {
+            throw new ObjectCollectedException( "Object was garbage collected in IL2CPP domain" );
+         }
+         return intPtr;
+      }
 
       public static IntPtr GetIl2CppClass( string namespaze, string className )
       {

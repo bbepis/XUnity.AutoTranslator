@@ -13,14 +13,14 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
-   internal class Il2CppTextComponentHelper : ITextComponentHelper
+   internal class Il2CppComponentHelper : IComponentHelper
    {
       private static GameObject[] _objects = new GameObject[ 128 ];
       private static readonly string XuaIgnore = "XUAIGNORE";
 
       public string GetText( object ui )
       {
-         return ( ui as ITextComponent )?.text;
+         return ( ui as ITextComponent )?.Text;
       }
 
       public bool IsComponentActive( object ui )
@@ -47,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       {
          if( ui is ITextComponent tc )
          {
-            tc.text = text;
+            tc.Text = text;
          }
       }
 
@@ -67,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
             if( !ignoreComponentState )
             {
-               var behaviour = component.TryCast<Behaviour>();
+               var behaviour = component.TryCastTo<Behaviour>();
                if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
                {
                   return false;
