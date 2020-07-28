@@ -62,7 +62,6 @@ namespace XUnity.Common.Constants
          }
       }
 
-
       // TextMeshPro
       public static readonly Il2CppTypeWrapper TMP_InputField = FindType( "TMPro.TMP_InputField" );
       public static readonly Il2CppTypeWrapper TMP_Text = FindType( "TMPro.TMP_Text" );

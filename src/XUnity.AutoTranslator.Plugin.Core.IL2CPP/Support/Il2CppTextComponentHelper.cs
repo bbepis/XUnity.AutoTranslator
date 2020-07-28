@@ -8,6 +8,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
 using XUnity.Common.Constants;
+using XUnity.Common.IL2CPP.Extensions;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
@@ -115,7 +116,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       {
          if( ui is Component tc )
          {
-            var type = tc.GetIl2CppType();
+            var type = tc.GetIl2CppTypeSafe();
 
             if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( type ) )
             {
