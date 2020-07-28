@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
 

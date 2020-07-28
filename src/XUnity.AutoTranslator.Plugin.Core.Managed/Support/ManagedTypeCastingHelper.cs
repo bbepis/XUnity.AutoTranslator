@@ -1,4 +1,4 @@
-﻿namespace XUnity.Common.Shims
+﻿namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class ManagedTypeCastingHelper : ITypeCastingHelper
    {

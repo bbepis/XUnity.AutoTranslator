@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
       }
 
-      public override void ResetScrollIn( object ui )
+      public override void UnchangeFont( object ui )
       {
       }
 
@@ -31,11 +31,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
       }
 
-      public override void UnchangeFont( object ui )
+      public override void UnresizeUI( object ui )
       {
       }
 
-      public override void UnresizeUI( object ui )
+      public override void ResetScrollIn( object ui )
       {
       }
    }

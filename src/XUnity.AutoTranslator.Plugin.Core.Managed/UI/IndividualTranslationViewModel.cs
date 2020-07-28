@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using XUnity.Common.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
+using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI

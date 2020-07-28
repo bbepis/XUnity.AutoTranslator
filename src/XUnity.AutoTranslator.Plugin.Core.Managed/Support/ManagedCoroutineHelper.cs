@@ -7,7 +7,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class ManagedCoroutineHelper : ICoroutineHelper
    {

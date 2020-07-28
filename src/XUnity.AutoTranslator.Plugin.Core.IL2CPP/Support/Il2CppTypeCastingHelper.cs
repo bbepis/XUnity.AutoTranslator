@@ -1,7 +1,7 @@
 ﻿using System;
 using UnhollowerBaseLib;
 
-namespace XUnity.Common.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class Il2CppTypeCastingHelper : ITypeCastingHelper
    {

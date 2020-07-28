@@ -9,9 +9,9 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class ManagedFontHelper : IFontHelper
    {

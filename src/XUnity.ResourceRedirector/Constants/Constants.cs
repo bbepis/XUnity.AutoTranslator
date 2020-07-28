@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XUnity.Common.Constants;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
 namespace XUnity.ResourceRedirector.Constants
 {

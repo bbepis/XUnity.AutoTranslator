@@ -19,12 +19,10 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
-using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
 using System.Diagnostics;
-using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Web.Internal;
 using XUnity.AutoTranslator.Plugin.Utilities;
@@ -35,25 +33,39 @@ using XUnity.Common.Constants;
 using XUnity.ResourceRedirector;
 using XUnity.Common.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.UIResize;
-using XUnity.Common.Shims;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.Common.Support;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Shims;
+
+#if MANAGED
+using XUnity.AutoTranslator.Plugin.Core.UI;
+#endif
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    /// <summary>
    /// Main plugin class for the AutoTranslator.
    /// </summary>
-   public class AutoTranslationPlugin : MonoBehaviour, IInternalTranslator, ITranslationRegistry
+   public class AutoTranslationPlugin :
+#if MANAGED
+      MonoBehaviour,
+#endif
+#if IL2CPP
+      IMonoBehaviour,
+#endif
+      IInternalTranslator,
+      ITranslationRegistry
    {
       /// <summary>
       /// Allow the instance to be accessed statically, as only one will exist.
       /// </summary>
       internal static AutoTranslationPlugin Current;
 
+#if MANAGED
       internal XuaWindow MainWindow;
       internal TranslationAggregatorWindow TranslationAggregatorWindow;
       internal TranslationAggregatorOptionsWindow TranslationAggregatorOptionsWindow;
+#endif
       internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal Dictionary<string, TextTranslationCache> PluginTextCaches = new Dictionary<string, TextTranslationCache>( StringComparer.OrdinalIgnoreCase );
@@ -151,8 +163,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // load all translations from files
          LoadTranslations( false );
 
+#if MANAGED
          // initialize ui
          InitializeGUI();
+#endif
 
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
@@ -185,6 +199,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          ResourceRedirection.LogAllLoadedResources = true;
       }
 
+      private void EnableTextAssetLoadedHandler()
+      {
+         new TextAssetLoadedHandler();
+      }
+
       private void InitializeResourceRedirector()
       {
          try
@@ -205,11 +224,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void EnableTextAssetLoadedHandler()
-      {
-         new TextAssetLoadedHandler();
-      }
-
+#if MANAGED
       private void InitializeGUI()
       {
          try
@@ -221,7 +236,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var vm = CreateTranslationAggregatorViewModel();
             TranslationAggregatorWindow = new TranslationAggregatorWindow( vm );
             TranslationAggregatorOptionsWindow = new TranslationAggregatorOptionsWindow( vm );
-         }
+      }
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up UI." );
@@ -280,6 +295,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
             } );
       }
 
+      private void ToggleTranslationAggregator()
+      {
+         if( TranslationAggregatorWindow != null )
+         {
+            TranslationAggregatorWindow.IsShown = !TranslationAggregatorWindow.IsShown;
+         }
+      }
+
       private void ToggleSilentMode()
       {
          Settings.SetSlientMode( !Settings.EnableSilentMode );
@@ -298,6 +321,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          return "Running";
       }
+#endif
 
       private void ValidateConfiguration()
       {
@@ -654,6 +678,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
+#if MANAGED
             if( Settings.ForceUIResizing )
             {
                var info = ui.GetOrCreateTextTranslationInfo();
@@ -667,6 +692,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
             }
+#endif
          }
          catch( Exception e )
          {
@@ -751,10 +777,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( _isInTranslatedMode && isTranslated )
                      TranslationHelper.DisplayTranslationInfo( originalText, text );
 
+#if MANAGED
                   if( TranslationAggregatorWindow != null )
                   {
                      TranslationAggregatorWindow.OnNewTranslationAdded( originalText, text );
                   }
+#endif
                }
             }
             catch( TargetInvocationException )
@@ -794,9 +822,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             return TranslateImmediate( ui, text, info, ignoreComponentState, tc );
          }
-
-         //XuaLogger.AutoTranslator.Warn( tc.GetType().Name );
-         //XuaLogger.AutoTranslator.Warn( tc.AllowGeneratingNewTranslations.ToString() );
 
          return TranslateOrQueueWebJobImmediate(
             ui,
@@ -1196,7 +1221,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      #region IInternalTranslator
+#region IInternalTranslator
 
       void IInternalTranslator.TranslateAsync( TranslationEndpointManager endpoint, string untranslatedText, Action<TranslationResult> onCompleted )
       {
@@ -1264,7 +1289,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return false;
       }
 
-      #endregion
+#endregion
 
       private InternalTranslationResult Translate( string text, int scope, TranslationEndpointManager endpoint, ParserTranslationContext context, Action<TranslationResult> onCompleted, bool isGlobal, bool allowStartTranslateImmediate )
       {
@@ -1903,7 +1928,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         else
                         {
-                           StartCoroutine(
+                           CoroutineHelper.Instance.Start(
                               WaitForTextStablization(
                                  ui: ui,
                                  delay: 0.9f, // 0.9 second to prevent '1 second tickers' from getting translated
@@ -1923,7 +1948,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                   else if( allowStartTranslationLater ) // this should only be called for immediate UI translation, theoreticalaly
                   {
-                     StartCoroutine(
+                     CoroutineHelper.Instance.Start(
                         WaitForTextStablization(
                            textKey: textKey,
                            delay: 0.9f,
@@ -2232,11 +2257,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      void Start()
+      public void Start()
       {
+         // Ensure awake is called. This will not be called when the plugin is loaded by MelonLoader
+         Awake();
+
          try
          {
-            StartCoroutine( HookLoadedPlugins() );
+            CoroutineHelper.Instance.Start( HookLoadedPlugins() );
          }
          catch( Exception e )
          {
@@ -2244,7 +2272,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      void Update()
+      public void Update()
       {
          try
          {
@@ -2264,7 +2292,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                IncrementBatchOperations();
                KickoffTranslations();
 
+#if MANAGED
                TranslationAggregatorWindow?.Update();
+#endif
             }
 
             // perform this check every 100 frames!
@@ -2275,67 +2305,66 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ConnectionTrackingWebClient.CheckServicePoints();
             }
 
-            if( Input.anyKey )
+            var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
+
+            if( isAltPressed )
             {
-               var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
+               var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
 
-               if( isAltPressed )
+               if( Input.GetKeyDown( KeyCode.T ) )
                {
-                  var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
-
-                  if( Input.GetKeyDown( KeyCode.T ) )
+                  ToggleTranslation();
+               }
+               else if( Input.GetKeyDown( KeyCode.F ) )
+               {
+                  ToggleFont();
+               }
+               else if( Input.GetKeyDown( KeyCode.R ) )
+               {
+                  ReloadTranslations();
+               }
+               else if( Input.GetKeyDown( KeyCode.U ) )
+               {
+                  ManualHook();
+               }
+               else if( Input.GetKeyDown( KeyCode.Q ) )
+               {
+                  RebootPlugin();
+               }
+               //else if( Input.GetKeyDown( KeyCode.B ) )
+               //{
+               //   ConnectionTrackingWebClient.CloseServicePoints();
+               //}
+#if MANAGED
+               else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
+               {
+                  if( MainWindow != null )
                   {
-                     ToggleTranslation();
+                     MainWindow.IsShown = !MainWindow.IsShown;
                   }
-                  else if( Input.GetKeyDown( KeyCode.F ) )
+               }
+               else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
+               {
+                  ToggleTranslationAggregator();
+               }
+#endif
+               else if( isCtrlPressed )
+               {
+                  if( Input.GetKeyDown( KeyCode.Keypad9 ) )
                   {
-                     ToggleFont();
+                     Settings.SimulateError = !Settings.SimulateError;
                   }
-                  else if( Input.GetKeyDown( KeyCode.R ) )
+                  else if( Input.GetKeyDown( KeyCode.Keypad8 ) )
                   {
-                     ReloadTranslations();
+                     Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
                   }
-                  else if( Input.GetKeyDown( KeyCode.U ) )
+                  else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
                   {
-                     ManualHook();
+                     PrintSceneInformation();
                   }
-                  else if( Input.GetKeyDown( KeyCode.Q ) )
+                  else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
                   {
-                     RebootPlugin();
-                  }
-                  //else if( Input.GetKeyDown( KeyCode.B ) )
-                  //{
-                  //   ConnectionTrackingWebClient.CloseServicePoints();
-                  //}
-                  else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
-                  {
-                     if( MainWindow != null )
-                     {
-                        MainWindow.IsShown = !MainWindow.IsShown;
-                     }
-                  }
-                  else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
-                  {
-                     ToggleTranslationAggregator();
-                  }
-                  else if( isCtrlPressed )
-                  {
-                     if( Input.GetKeyDown( KeyCode.Keypad9 ) )
-                     {
-                        Settings.SimulateError = !Settings.SimulateError;
-                     }
-                     else if( Input.GetKeyDown( KeyCode.Keypad8 ) )
-                     {
-                        Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
-                     }
-                     else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
-                     {
-                        PrintSceneInformation();
-                     }
-                     else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
-                     {
-                        PrintObjects();
-                     }
+                     PrintObjects();
                   }
                }
             }
@@ -2343,14 +2372,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred in Update callback. " );
-         }
-      }
-
-      private void ToggleTranslationAggregator()
-      {
-         if( TranslationAggregatorWindow != null )
-         {
-            TranslationAggregatorWindow.IsShown = !TranslationAggregatorWindow.IsShown;
          }
       }
 
@@ -2368,6 +2389,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+#if MANAGED
       void OnGUI()
       {
          try
@@ -2421,6 +2443,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             EnableAutoTranslator();
          }
       }
+#endif
 
       private void RebootPlugin()
       {
@@ -2958,7 +2981,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( obj != null )
          {
-            var layer = LayerMask.LayerToName( obj.layer );
+            var layer =
+#if MANAGED
+               LayerMask.LayerToName( obj.layer );
+#elif IL2CPP
+               obj.layer.ToString();
+#endif
             var components = string.Join( ", ", obj.GetComponents<Component>().Select( x =>
             {
                string output = null;

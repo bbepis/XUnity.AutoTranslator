@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using XUnity.Common.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
+using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI

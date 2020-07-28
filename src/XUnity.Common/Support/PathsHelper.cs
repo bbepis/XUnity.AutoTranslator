@@ -1,25 +1,29 @@
-﻿using XUnity.Common.Utilities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using XUnity.Common.Utilities;
 
-namespace XUnity.Common.Shims
+namespace XUnity.Common.Support
 {
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public static class TypeCastingHelper
+   public static class PathsHelper
    {
-      private static ITypeCastingHelper _instance;
+      private static IPathsHelper _instance;
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      public static ITypeCastingHelper Instance
+      public static IPathsHelper Instance
       {
          get
          {
             if( _instance == null )
             {
-               _instance = ActivationHelper.Create<ITypeCastingHelper>(
-                  typeof( TypeCastingHelper ).Assembly,
+               _instance = ActivationHelper.Create<IPathsHelper>(
+                  typeof( PathsHelper ).Assembly,
                   "XUnity.Common.Managed.dll",
                   "XUnity.Common.IL2CPP.dll" );
             }
@@ -31,11 +35,11 @@ namespace XUnity.Common.Shims
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public interface ITypeCastingHelper
+   public interface IPathsHelper
    {
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      bool TryCastTo<TObject>( object obj, out TObject castedObject );
+      string GameRoot { get; }
    }
 }

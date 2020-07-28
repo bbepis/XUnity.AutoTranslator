@@ -10,7 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class Il2CppTextComponentHelper : ITextComponentHelper
    {
@@ -24,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
 
       public bool IsComponentActive( object ui )
       {
-         return ( ( ui as ITextComponent )?.Component ).gameObject?.activeSelf ?? false;
+         return ( ( ui as ITextComponent )?.Component ).gameObject?.activeInHierarchy ?? false;
       }
 
       public bool IsKnownTextType( object ui )

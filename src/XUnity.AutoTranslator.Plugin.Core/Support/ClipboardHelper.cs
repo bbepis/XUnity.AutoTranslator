@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using XUnity.Common.Utilities;
 
-namespace XUnity.Common.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
@@ -23,8 +23,8 @@ namespace XUnity.Common.Shims
             {
                _instance = ActivationHelper.Create<IClipboardHelper>(
                   typeof( ClipboardHelper ).Assembly,
-                  "XUnity.Common.Managed.dll",
-                  "XUnity.Common.IL2CPP.dll" );
+                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
+                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
             }
             return _instance;
          }

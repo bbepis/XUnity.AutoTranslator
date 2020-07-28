@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {

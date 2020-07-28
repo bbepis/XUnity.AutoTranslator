@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {

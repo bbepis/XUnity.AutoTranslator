@@ -7,7 +7,7 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class Il2CppCoroutineHelper : ICoroutineHelper
    {

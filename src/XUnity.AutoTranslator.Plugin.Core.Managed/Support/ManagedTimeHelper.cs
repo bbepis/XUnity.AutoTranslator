@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Managed.Shims
 {
-   internal class Il2CppTimeHelper : ITimeHelper
+   internal class ManagedTimeHelper : ITimeHelper
    {
       public int frameCount => Time.frameCount;
 

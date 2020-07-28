@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection

@@ -5,9 +5,9 @@ using System.Text;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
-namespace XUnity.Common.Managed.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    public class Il2CppClipboardHelper : IClipboardHelper
    {

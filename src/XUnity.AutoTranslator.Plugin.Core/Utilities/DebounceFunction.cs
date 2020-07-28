@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {

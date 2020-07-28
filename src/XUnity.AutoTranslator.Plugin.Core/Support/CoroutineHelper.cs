@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    public static class CoroutineHelper
    {

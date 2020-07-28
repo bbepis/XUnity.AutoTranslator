@@ -10,7 +10,7 @@ using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.MelonMod;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
 [assembly: MelonModInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
 [assembly: MelonModGame( null, null )]

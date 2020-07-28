@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal static class TextComponentHelper
    {

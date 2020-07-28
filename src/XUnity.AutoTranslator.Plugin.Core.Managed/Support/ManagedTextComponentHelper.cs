@@ -10,7 +10,7 @@ using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class ManagedTextComponentHelper : ITextComponentHelper
    {
@@ -212,7 +212,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
       {
          if( ui is Component component )
          {
-            return component.gameObject?.activeSelf ?? false;
+            return component.gameObject?.activeInHierarchy ?? false;
          }
          return true;
       }

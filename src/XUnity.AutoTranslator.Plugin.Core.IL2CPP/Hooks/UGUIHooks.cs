@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
-using XUnity.AutoTranslator.Plugin.Core.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.Logging;

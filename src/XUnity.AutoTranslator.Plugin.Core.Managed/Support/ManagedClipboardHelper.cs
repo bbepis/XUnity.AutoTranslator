@@ -5,9 +5,9 @@ using System.Text;
 using UnityEngine;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Shims;
+using XUnity.Common.Support;
 
-namespace XUnity.Common.Managed.Shims
+namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    public class ManagedClipboardHelper : IClipboardHelper
    {

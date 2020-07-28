@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using XUnity.Common.Shims;
+using XUnity.AutoTranslator.Plugin.Core.Support;
+using XUnity.Common.Support;
 
-namespace XUnity.Common.Extensions
+namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    public static class CastingExtensions
    {

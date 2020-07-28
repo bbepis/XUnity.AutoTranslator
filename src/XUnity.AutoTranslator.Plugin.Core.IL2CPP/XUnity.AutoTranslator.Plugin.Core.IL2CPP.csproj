@@ -3,12 +3,18 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>TRACE;IL2CPP</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\AutoTranslationPlugin.cs" Link="AutoTranslationPlugin.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
     <ProjectReference Include="..\XUnity.Common.IL2CPP\XUnity.Common.IL2CPP.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
+    <ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +38,9 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.TextRenderingModule.dll</HintPath>

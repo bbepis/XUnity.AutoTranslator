@@ -84,7 +84,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextMesh;
       public static bool EnableFairyGUI;
       public static bool IgnoreWhitespaceInDialogue;
-      //public static bool IgnoreWhitespaceInNGUI;
       public static int MinDialogueChars;
       public static int ForceSplitTextAfterCharacters;
       public static bool EnableMigrations;
@@ -186,7 +185,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
             IgnoreWhitespaceInDialogue = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInDialogue", true );
-            //IgnoreWhitespaceInNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInNGUI", true );
             MinDialogueChars = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MinDialogueChars", 20 );
             ForceSplitTextAfterCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceSplitTextAfterCharacters", 0 );
             CopyToClipboard = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CopyToClipboard", false );
