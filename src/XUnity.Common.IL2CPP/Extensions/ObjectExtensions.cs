@@ -36,7 +36,7 @@ namespace XUnity.Common.IL2CPP.Extensions
             (void**)param,
             ref exc );
          Il2CppException.RaiseExceptionIfNecessary( exc );
-         return ( intPtr != (System.IntPtr)0 ) ? new Il2CppSystem.Type( intPtr ) : null;
+         return intPtr != IntPtr.Zero ? new Il2CppSystem.Type( intPtr ) : null;
       }
    }
 }

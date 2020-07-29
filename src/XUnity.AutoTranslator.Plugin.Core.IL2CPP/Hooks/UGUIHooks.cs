@@ -26,6 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       };
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class Text_text_Hook
    {
       static bool Prepare( object instance )
@@ -66,6 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class Text_OnEnable_Hook
    {
       static bool Prepare( object instance )

@@ -21,6 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       };
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TextMesh_text_Hook
    {
       static bool Prepare( object instance )
@@ -48,6 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       }
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class GameObject_SetActive_Hook
    {
       static bool Prepare( object instance )

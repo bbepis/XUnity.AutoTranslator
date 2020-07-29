@@ -8,6 +8,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
 using XUnity.Common.Logging;
@@ -115,17 +116,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for TextMeshPro." );
          }
 
-         //try
-         //{
-         //   if( Settings.EnableNGUI )
-         //   {
-         //      MLHookingHelper.PatchAll( NGUIHooks.All, Settings.ForceMonoModHooks );
-         //   }
-         //}
-         //catch( Exception e )
-         //{
-         //   XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for NGUI." );
-         //}
+         try
+         {
+            if( Settings.EnableNGUI )
+            {
+               HookingHelper.PatchAll( NGUIHooks.All, Settings.ForceMonoModHooks );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for NGUI." );
+         }
 
          //try
          //{

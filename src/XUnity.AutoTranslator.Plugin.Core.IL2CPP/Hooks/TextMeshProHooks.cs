@@ -25,6 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       };
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshProUGUI_OnEnable_Hook
    {
       static bool Prepare( object instance )
@@ -65,6 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshPro_OnEnable_Hook
    {
       static bool Prepare( object instance )
@@ -105,6 +107,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       }
    }
 
+   [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_text_Hook
    {
       static bool Prepare( object instance )
