@@ -67,14 +67,25 @@ namespace XUnity.Common.Utilities
          return IntPtr.Zero;
       }
 
-      public static IntPtr GetIl2CppMethod( IntPtr clazz, string methodName, Type returnType, params Type[] types )
+      public static IntPtr GetIl2CppMethod( IntPtr? clazz, string methodName, Type returnType, params Type[] types )
       {
-         return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz, false, methodName, returnType.FullName, types.Select( x => x.FullName ).ToArray() );
+         try
+         {
+            if( !clazz.HasValue || clazz == IntPtr.Zero ) return IntPtr.Zero;
+
+            return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz.Value, false, methodName, returnType.FullName, types.Select( x => x.FullName ).ToArray() );
+         }
+         catch
+         {
+            return IntPtr.Zero;
+         }
       }
 
-      public static IntPtr GetIl2CppMethod( IntPtr clazz, string methodName, string returnType, params string[] types )
+      public static IntPtr GetIl2CppMethod( IntPtr? clazz, string methodName, string returnType, params string[] types )
       {
-         return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz, false, methodName, returnType, types );
+         if( !clazz.HasValue || clazz == IntPtr.Zero ) return IntPtr.Zero;
+
+         return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz.Value, false, methodName, returnType, types );
       }
 
       unsafe public static IntPtr InvokeMethod( IntPtr method, IntPtr obj, params IntPtr[] paramtbl )

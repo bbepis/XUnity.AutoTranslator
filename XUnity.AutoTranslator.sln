@@ -115,8 +115,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Setup
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.BepIn-5x", "src\XUnity.ResourceRedirector.BepIn-5x\XUnity.ResourceRedirector.BepIn-5x.csproj", "{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.ResourceRedirector.BepIn", "src\XUnity.ResourceRedirector.BepIn\XUnity.ResourceRedirector.BepIn.csproj", "{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.TextureHashGenerator", "src\XUnity.TextureHashGenerator\XUnity.TextureHashGenerator.csproj", "{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoogleTranslateCompat", "src\Translators\GoogleTranslateCompat\GoogleTranslateCompat.csproj", "{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06}"
@@ -139,7 +137,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core.IL2CPP", "src\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj", "{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.MelonMod", "src\XUnity.AutoTranslator.Plugin.MelonMod\XUnity.AutoTranslator.Plugin.MelonMod.csproj", "{332A2D79-680C-4641-B823-2F7DA87952E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.MelonMod", "src\XUnity.AutoTranslator.Plugin.MelonMod\XUnity.AutoTranslator.Plugin.MelonMod.csproj", "{332A2D79-680C-4641-B823-2F7DA87952E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -429,14 +427,6 @@ Global
 		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|x86.ActiveCfg = Release|Any CPU
 		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B}.Release|x86.Build.0 = Release|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Debug|x86.Build.0 = Debug|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.ActiveCfg = Release|Any CPU
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985}.Release|x86.Build.0 = Release|Any CPU
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -566,7 +556,6 @@ Global
 		{B704D970-E95D-4297-AF83-A4F7DAFC1690} = {2A4A3DDF-338C-40C0-8E26-2A810BAAADD6}
 		{B3A3D3E7-A8F1-4110-8151-E674947CB8FD} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{526D9044-1C4D-4A06-BAEB-0EB135F04F6B} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
-		{E5CAAB5A-4919-4AD6-9F72-3A09AFD36985} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{B0CFE100-5BB0-4FF0-B36A-98F6FE4E3DF0} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{A560E8E8-C0B1-4FC3-8CD4-C15D64BF9B06} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{6DC48447-D7DC-45F6-B830-35A0F916C7BF} = {7A01BA34-3B96-4910-AC70-462BA59417CB}

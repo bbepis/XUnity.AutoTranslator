@@ -86,6 +86,7 @@ namespace XUnity.Common.Constants
       public static readonly Il2CppTypeWrapper SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
       public static readonly Il2CppTypeWrapper Sprite = FindType( "UnityEngine.Sprite" );
       public static readonly Il2CppTypeWrapper Object = FindType( "UnityEngine.Object" );
+      public static readonly Il2CppTypeWrapper GameObject = FindType( "UnityEngine.GameObject" );
       public static readonly Il2CppTypeWrapper TextEditor = FindType( "UnityEngine.TextEditor" );
       public static readonly Il2CppTypeWrapper CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
       public static readonly Il2CppTypeWrapper SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
@@ -97,6 +98,53 @@ namespace XUnity.Common.Constants
       public static readonly Il2CppTypeWrapper Font = FindType( "UnityEngine.Font" );
       public static readonly Il2CppTypeWrapper WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
       public static readonly Il2CppTypeWrapper Input = FindType( "UnityEngine.Input" );
+
+      public static class GameObject_Methods
+      {
+         public static readonly IntPtr SetActive = Il2CppUtilities.GetIl2CppMethod( UnityTypes.GameObject?.ClassPointer, "SetActive", typeof( void ), typeof( bool ) );
+      }
+
+      public static class TextMesh_Methods
+      {
+         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "get_text", typeof( string ) );
+         public static readonly IntPtr get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "get_richText", typeof( bool ) );
+      }
+
+      public static class Text_Methods
+      {
+         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_text", typeof( string ) );
+         public static readonly IntPtr get_supportRichText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_supportRichText", typeof( bool ) );
+         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "OnEnable", typeof( void ) );
+      }
+
+      public static class InputField_Methods
+      {
+         public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+      }
+
+      public static class TMP_Text_Methods
+      {
+         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_text", typeof( string ) );
+         public static readonly IntPtr get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_richText", typeof( bool ) );
+      }
+
+      public static class TMP_InputField_Methods
+      {
+         public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+      }
+
+      public static class TextMeshPro_Methods
+      {
+         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshPro?.ClassPointer, "OnEnable", typeof( void ) );
+      }
+
+      public static class TextMeshProUGUI_Methods
+      {
+         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI?.ClassPointer, "OnEnable", typeof( void ) );
+      }
 
       //public static class AdvUguiMessageWindow_Properties
       //{

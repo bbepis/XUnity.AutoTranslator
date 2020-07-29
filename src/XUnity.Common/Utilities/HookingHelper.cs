@@ -65,6 +65,7 @@ namespace XUnity.Common.Utilities
       public static void PatchType( Type type, bool forceExternHooks )
       {
          MethodBase original = null;
+         IntPtr originalPtr = IntPtr.Zero;
          try
          {
             // initialization warning
@@ -78,13 +79,20 @@ namespace XUnity.Common.Utilities
                }
             }
 
-
             var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             var prepare = type.GetMethod( "Prepare", flags );
             if( prepare == null || (bool)prepare.Invoke( null, new object[] { Harmony } ) )
             {
-               original = (MethodBase)type.GetMethod( "TargetMethod", flags )?.Invoke( null, new object[] { Harmony } );
-               var originalPtr = (IntPtr?)type.GetMethod( "TargetMethodPointer", flags )?.Invoke( null, null ) ?? IntPtr.Zero;
+               try
+               {
+                  original = (MethodBase)type.GetMethod( "TargetMethod", flags )?.Invoke( null, new object[] { Harmony } );
+               }
+               catch { }
+               try
+               {
+                  originalPtr = (IntPtr?)type.GetMethod( "TargetMethodPointer", flags )?.Invoke( null, null ) ?? IntPtr.Zero;
+               }
+               catch { }
 
                if( original == null && originalPtr == IntPtr.Zero )
                {
@@ -102,7 +110,7 @@ namespace XUnity.Common.Utilities
                var prefix = type.GetMethod( "Prefix", flags );
                var postfix = type.GetMethod( "Postfix", flags );
                var finalizer = type.GetMethod( "Finalizer", flags );
-               if( forceExternHooks || Harmony == null || ( prefix == null && postfix == null && finalizer == null ) )
+               if( original == null || forceExternHooks || Harmony == null || ( prefix == null && postfix == null && finalizer == null ) )
                {
                   PatchWithExternHooks( type, original, originalPtr, true );
                }

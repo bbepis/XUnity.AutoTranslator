@@ -10,34 +10,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
 {
    internal class TMP_TextComponent : ITextComponent
    {
-      internal static IntPtr __set_text;
-      internal static IntPtr __get_text;
-      internal static IntPtr __get_richText;
-      internal static IntPtr __TeshMeshPro_OnEnable;
-      internal static IntPtr __TeshMeshProUGUI_OnEnable;
-
-      internal static IntPtr __get_placeholder;
-
-      static TMP_TextComponent()
-      {
-         if( UnityTypes.TMP_Text != null )
-         {
-            __set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "set_text", typeof( void ), typeof( string ) );
-            __get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "get_text", typeof( string ) );
-            __get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text.ClassPointer, "get_richText", typeof( bool ) );
-
-            __get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_InputField.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
-         }
-         if( UnityTypes.TextMeshPro != null )
-         {
-            __TeshMeshPro_OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshPro.ClassPointer, "OnEnable", typeof( void ) );
-         }
-         if( UnityTypes.TextMeshProUGUI != null )
-         {
-            __TeshMeshProUGUI_OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI.ClassPointer, "OnEnable", typeof( void ) );
-         }
-      }
-
       private IntPtr _ptr;
       private Component _component;
       private uint _gcHandle;
@@ -60,25 +32,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
       {
          get
          {
-            var ptr = Il2CppUtilities.InvokeMethod( __get_text, _ptr );
+            var ptr = Il2CppUtilities.InvokeMethod( UnityTypes.TMP_Text_Methods.get_text, _ptr );
             return UnhollowerBaseLib.IL2CPP.Il2CppStringToManaged( ptr );
          }
          set
          {
             var ptr = UnhollowerBaseLib.IL2CPP.ManagedStringToIl2Cpp( value );
-            Il2CppUtilities.InvokeMethod( __set_text, _ptr, ptr );
+            Il2CppUtilities.InvokeMethod( UnityTypes.TMP_Text_Methods.set_text, _ptr, ptr );
          }
       }
 
       public bool IsPlaceholder()
       {
-         if( __get_placeholder == IntPtr.Zero ) return false;
+         if( UnityTypes.TMP_InputField_Methods.get_placeholder == IntPtr.Zero ) return false;
 
          var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField.Il2CppType );
          if( inputField == null ) return false;
 
          var ptr = Il2CppUtilities.GetIl2CppInstancePointer( inputField );
-         var placeholderPtr = Il2CppUtilities.InvokeMethod( __get_placeholder, ptr );
+         var placeholderPtr = Il2CppUtilities.InvokeMethod( UnityTypes.TMP_InputField_Methods.get_placeholder, ptr );
          return placeholderPtr == _ptr;
       }
 
@@ -115,7 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text
          System.IntPtr* param = null;
          System.IntPtr exc = default;
          System.IntPtr obj = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke(
-            __get_richText,
+            UnityTypes.TMP_Text_Methods.get_richText,
             _ptr,
             (void**)param,
             ref exc );

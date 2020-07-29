@@ -29,12 +29,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( object instance )
       {
-         return TMP_TextComponent.__TeshMeshProUGUI_OnEnable != IntPtr.Zero;
+         return UnityTypes.TextMeshProUGUI_Methods.OnEnable != IntPtr.Zero;
       }
 
       static IntPtr TargetMethodPointer()
       {
-         return TMP_TextComponent.__TeshMeshProUGUI_OnEnable;
+         return UnityTypes.TextMeshProUGUI_Methods.OnEnable;
       }
 
       static void _Postfix( ITextComponent __instance )
@@ -47,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshProUGUI_OnEnable, __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshProUGUI_Methods.OnEnable, __instance );
 
          _Postfix( instance );
       }
@@ -57,12 +57,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( object instance )
       {
-         return TMP_TextComponent.__TeshMeshPro_OnEnable != IntPtr.Zero;
+         return UnityTypes.TextMeshPro_Methods.OnEnable != IntPtr.Zero;
       }
 
       static IntPtr TargetMethodPointer()
       {
-         return TMP_TextComponent.__TeshMeshProUGUI_OnEnable;
+         return UnityTypes.TextMeshPro_Methods.OnEnable;
       }
 
       static void _Postfix( ITextComponent __instance )
@@ -75,7 +75,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__TeshMeshPro_OnEnable, __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshPro_Methods.OnEnable, __instance );
 
          _Postfix( instance );
       }
@@ -85,12 +85,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( object instance )
       {
-         return TMP_TextComponent.__set_text != IntPtr.Zero;
+         return UnityTypes.TMP_Text_Methods.set_text != IntPtr.Zero;
       }
 
       static IntPtr TargetMethodPointer()
       {
-         return TMP_TextComponent.__set_text;
+         return UnityTypes.TMP_Text_Methods.set_text;
       }
 
       static void _Postfix( ITextComponent __instance )
@@ -103,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          var instance = new TMP_TextComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TMP_TextComponent.__set_text, __instance, value );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TMP_Text_Methods.set_text, __instance, value );
 
          _Postfix( instance );
       }

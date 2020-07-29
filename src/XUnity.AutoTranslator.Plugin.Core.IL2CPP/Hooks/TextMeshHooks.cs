@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
+using UnhollowerBaseLib;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;
 
@@ -15,7 +17,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       public static readonly Type[] All = new[] {
          typeof( TextMesh_text_Hook ),
-         //typeof( GameObject_SetActive_Hook )
+         typeof( GameObject_SetActive_Hook )
       };
    }
 
@@ -23,12 +25,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( object instance )
       {
-         return TextMeshComponent.__set_text != IntPtr.Zero;
+         return UnityTypes.TextMesh_Methods.set_text != IntPtr.Zero;
       }
 
       static IntPtr TargetMethodPointer()
       {
-         return TextMeshComponent.__set_text;
+         return UnityTypes.TextMesh_Methods.set_text;
       }
 
       static void _Postfix( ITextComponent __instance )
@@ -40,48 +42,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          var instance = new TextMeshComponent( __instance );
 
-         Il2CppUtilities.InvokeMethod( TextMeshComponent.__set_text, __instance, value );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMesh_Methods.set_text, __instance, value );
 
          _Postfix( instance );
       }
    }
 
-   //internal static class GameObject_SetActive_Hook
-   //{
-   //   static bool Prepare( object instance )
-   //   {
-   //      return true;
-   //   }
+   internal static class GameObject_SetActive_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return UnityTypes.GameObject_Methods.SetActive != IntPtr.Zero;
+      }
 
-   //   static MethodBase TargetMethod( object instance )
-   //   {
-   //      return AccessToolsShim.Method( typeof( GameObject ), "SetActive", typeof( bool ) );
-   //   }
+      static IntPtr TargetMethodPointer()
+      {
+         return UnityTypes.GameObject_Methods.SetActive;
+      }
 
-   //   static void Postfix( GameObject __instance, bool active )
-   //   {
-   //      if( !TextMeshHooks.HooksOverriden )
-   //      {
-   //         if( active )
-   //         {
-   //            var tms = __instance.GetComponentsInternal(( UnityTypes.TextMesh.Type );
-   //            foreach( var tm in tms )
-   //            {
-   //               AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
-   //            }
-   //         }
-   //      }
-   //   }
+      static void _Postfix( GameObject __instance, bool active )
+      {
+         if( active )
+         {
+            var tms = __instance.GetComponentsInternal( UnityTypes.TextMesh.Il2CppType, false, true, false, false, null );
+            foreach( var tm in tms )
+            {
+               var comp = new TextMeshComponent( tm.Pointer );
+               AutoTranslationPlugin.Current.Hook_TextChanged( comp, true );
+            }
+         }
+      }
 
-   //   static void MM_Detour( IntPtr instance, IntPtr value )
-   //   {
-   //      var __instance = new GameObject( instance );
-   //      var v = Il2CppUtilities.PointerToManagedBool( value );
+      unsafe static void ML_Detour( IntPtr __instance, bool active )
+      {
+         // proxy way to call
+         var instance = new GameObject( __instance );
+         instance.SetActive( active );
 
+         //// non-proxy way to call
+         //System.IntPtr* ptr = stackalloc System.IntPtr[ 1 ];
+         //ptr[0] = (IntPtr)( &active );
+         //System.IntPtr returnedException = IntPtr.Zero;
+         //System.IntPtr intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( UnityTypes.GameObject_Methods.SetActive, __instance, (void**)ptr, ref returnedException );
+         //Il2CppException.RaiseExceptionIfNecessary( returnedException );
 
-   //      _original( __instance, value );
-
-   //      Postfix( __instance, v );
-   //   }
-   //}
+         _Postfix( instance, active );
+      }
+   }
 }
