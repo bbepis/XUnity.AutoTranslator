@@ -104,7 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
          var component = Il2CppUtilities.CreateProxyComponent( instance );
          if( UnityTypes.UILabel.Il2CppType.IsAssignableFrom( component.GetIl2CppTypeSafe() ) )
          {
-            var __instance = new UILabelComponent( instance );
+            var __instance = new UILabelComponent( component );
 
             Il2CppUtilities.InvokeMethod( UnityTypes.UIRect_Methods.OnEnable, instance );
 
