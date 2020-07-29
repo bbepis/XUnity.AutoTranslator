@@ -37,6 +37,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return UnityTypes.TextMeshProUGUI_Methods.OnEnable;
       }
 
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( UnityTypes.TextMeshProUGUI?.ProxyType, "OnEnable" );
+      }
+
+      static void Postfix( Component __instance )
+      {
+         var instance = new TMP_TextComponent( __instance );
+
+         _Postfix( instance );
+      }
+
       static void _Postfix( ITextComponent __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
@@ -65,6 +77,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return UnityTypes.TextMeshPro_Methods.OnEnable;
       }
 
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( UnityTypes.TextMeshPro?.ProxyType, "OnEnable" );
+      }
+
+      static void Postfix( Component __instance )
+      {
+         var instance = new TMP_TextComponent( __instance );
+
+         _Postfix( instance );
+      }
+
       static void _Postfix( ITextComponent __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
@@ -91,6 +115,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static IntPtr TargetMethodPointer()
       {
          return UnityTypes.TMP_Text_Methods.set_text;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( UnityTypes.TMP_Text?.ProxyType, "text" ).GetSetMethod();
+      }
+
+      static void Postfix( Component __instance )
+      {
+         var instance = new TMP_TextComponent( __instance );
+
+         _Postfix( instance );
       }
 
       static void _Postfix( ITextComponent __instance )
