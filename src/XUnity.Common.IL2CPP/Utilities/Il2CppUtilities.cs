@@ -92,24 +92,66 @@ namespace XUnity.Common.Utilities
       {
          if( method == IntPtr.Zero )
             return IntPtr.Zero;
-         IntPtr[] intPtrArray;
-         IntPtr returnval = IntPtr.Zero;
-         intPtrArray = ( ( paramtbl != null ) ? paramtbl : new IntPtr[ 0 ] );
-         IntPtr intPtr = Marshal.AllocHGlobal( intPtrArray.Length * sizeof( void* ) );
-         try
+
+
+
+
+         if( paramtbl == null || paramtbl.Length == 0 )
          {
-            void** pointerArray = (void**)intPtr.ToPointer();
-            for( int i = 0; i < intPtrArray.Length; i++ )
-               pointerArray[ i ] = intPtrArray[ i ].ToPointer();
+            IntPtr* parameters = null;
             IntPtr exp = IntPtr.Zero;
-            returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, pointerArray, ref exp );
+            var returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)parameters, ref exp );
             Il2CppException.RaiseExceptionIfNecessary( exp );
+            return returnval;
          }
-         finally
+         else
          {
-            Marshal.FreeHGlobal( intPtr );
+            fixed( IntPtr* ptr = &paramtbl[ 0 ] )
+            {
+               IntPtr exp = IntPtr.Zero;
+               var returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)ptr, ref exp );
+               Il2CppException.RaiseExceptionIfNecessary( exp );
+               return returnval;
+            }
          }
-         return returnval;
+
+
+
+
+         //var cnt = paramtbl?.Length ?? 0;
+         //var parameters = stackalloc IntPtr[ cnt ];
+         //for( int i = 0; i < cnt; i++ )
+         //{
+         //   parameters[ i ] = paramtbl[ i ];
+         //}
+
+         //IntPtr exp = IntPtr.Zero;
+         //var returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)parameters, ref exp );
+         //Il2CppException.RaiseExceptionIfNecessary( exp );
+         //return returnval;
+
+
+
+
+
+         //IntPtr[] intPtrArray;
+         //IntPtr returnval = IntPtr.Zero;
+         //intPtrArray = ( ( paramtbl != null ) ? paramtbl : new IntPtr[ 0 ] );
+         //IntPtr intPtr = Marshal.AllocHGlobal( intPtrArray.Length * sizeof( void* ) );
+         //try
+         //{
+         //   void** pointerArray = (void**)intPtr.ToPointer();
+         //   for( int i = 0; i < intPtrArray.Length; i++ )
+         //      pointerArray[ i ] = intPtrArray[ i ].ToPointer();
+         //   IntPtr exp = IntPtr.Zero;
+         //   returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, pointerArray, ref exp );
+         //   Il2CppException.RaiseExceptionIfNecessary( exp );
+         //}
+         //finally
+         //{
+         //   Marshal.FreeHGlobal( intPtr );
+         //}
+         //return returnval;
       }
 
       unsafe public static bool PointerToManagedBool( IntPtr ptr )
