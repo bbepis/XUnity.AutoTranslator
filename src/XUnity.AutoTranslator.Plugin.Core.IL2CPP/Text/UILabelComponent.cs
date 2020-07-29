@@ -48,9 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       public bool IsPlaceholder()
       {
-         if( UnityTypes.InputField_Methods.get_placeholder == IntPtr.Zero ) return false;
-
-         var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField.Il2CppType );
+         var inputField = _component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput.Il2CppType );
          return inputField != null;
       }
 
