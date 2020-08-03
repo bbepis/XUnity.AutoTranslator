@@ -48,6 +48,7 @@ namespace XUnity.Common.Constants
       public static readonly Type GUIStyle = FindType( "UnityEngine.GUIStyle" );
       public static readonly Type ImageConversion = FindType( "UnityEngine.ImageConversion" );
       public static readonly Type Texture = FindType( "UnityEngine.Texture" );
+      public static readonly Type Texture2D = FindType( "UnityEngine.Texture2D" );
       public static readonly Type SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
       public static readonly Type Sprite = FindType( "UnityEngine.Sprite" );
       public static readonly Type Object = FindType( "UnityEngine.Object" );

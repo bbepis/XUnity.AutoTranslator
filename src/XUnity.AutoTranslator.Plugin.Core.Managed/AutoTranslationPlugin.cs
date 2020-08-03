@@ -905,7 +905,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                forceReload = context.RegisterTextureInContextAndDetermineWhetherToReload( texture );
             }
 
-            if( TextureCache.TryGetTranslatedImage( key, out var newData ) )
+            if( TextureCache.TryGetTranslatedImage( key, out var newData, out var translatedImage ) )
             {
                if( _isInTranslatedMode )
                {
@@ -916,12 +916,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( newData, null );
+                           texture.LoadImageEx( newData, translatedImage.ImageFormat, null );
                            changedImage = true;
                         }
                         else
                         {
-                           tti.CreateTranslatedTexture( newData );
+                           tti.CreateTranslatedTexture( newData, translatedImage.ImageFormat );
                            changedImage = true;
                         }
                      }
@@ -970,7 +970,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( originalData, null );
+                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
                            changedImage = true;
                         }
                         else
@@ -1025,7 +1025,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         if( !Settings.EnableLegacyTextureLoading )
                         {
-                           texture.LoadImageEx( originalData, null );
+                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
                            changedImage = true;
                         }
                         else

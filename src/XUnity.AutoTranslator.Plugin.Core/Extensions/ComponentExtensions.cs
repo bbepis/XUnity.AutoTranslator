@@ -15,7 +15,7 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
-   internal static class TextComponentExtensions
+   internal static class ComponentExtensions
    {
       private static readonly IComponentHelper Helper = ComponentHelper.Instance;
 
@@ -151,9 +151,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return Helper.GetTextureName( texture, fallbackName );
       }
 
-      public static void LoadImageEx( this object texture, byte[] data, object originalTexture )
+      public static void LoadImageEx( this object texture, byte[] data, ImageFormat dataType, object originalTexture )
       {
-         Helper.LoadImageEx( texture, data, originalTexture );
+         Helper.LoadImageEx( texture, data, dataType, originalTexture );
       }
 
       public static TextureDataResult GetTextureData( this object texture )

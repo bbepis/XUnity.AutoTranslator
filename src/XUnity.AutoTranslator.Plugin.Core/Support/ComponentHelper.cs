@@ -65,11 +65,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       string GetTextureName( object texture, string fallbackName );
 
-      void LoadImageEx( object texture, byte[] data, object originalTexture );
+      void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture );
 
       TextureDataResult GetTextureData( object texture );
 
-      object CreateEmptyTexture2D();
+      object CreateEmptyTexture2D( int originalTextureFormat );
 
 
       // UI will have to be a custom implementation like ITextComponent (ITextureComponent for IL2CPP)

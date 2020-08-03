@@ -6,6 +6,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Text;
+using XUnity.AutoTranslator.Plugin.Core.Textures;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.Utilities;
@@ -14,7 +15,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal class ManagedComponentHelper : IComponentHelper
    {
-      private static readonly MethodInfo LoadImage = UnityTypes.ImageConversion != null ? AccessToolsShim.Method( UnityTypes.ImageConversion, "LoadImage", new[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) } ) : null;
       private static readonly MethodInfo EncodeToPNG = UnityTypes.ImageConversion != null ? AccessToolsShim.Method( UnityTypes.ImageConversion, "EncodeToPNG", new[] { typeof( Texture2D ) } ) : null;
 
       private static readonly Color Transparent = new Color( 0, 0, 0, 0 );
@@ -361,16 +361,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return fallbackName;
       }
 
-      public void LoadImageEx( object texture, byte[] data, object originalTexture )
+      public void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture )
       {
-         if( LoadImage != null )
-         {
-            LoadImage.Invoke( null, new object[] { texture, data, false } );
-         }
-         else
-         {
-            LoadImageSafe( (Texture2D)texture, data );
-         }
+         TextureLoader.Load( texture, data, dataType );
 
          if( texture is Texture2D texture2D && originalTexture is Texture2D originalTexture2D )
          {
@@ -473,11 +466,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
       }
 
-      private static void LoadImageSafe( Texture2D texture, byte[] data )
-      {
-         texture.LoadImage( data );
-      }
-
       private static byte[] EncodeToPNGSafe( Texture2D texture )
       {
          return texture.EncodeToPNG();
@@ -526,9 +514,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return new TextureDataResult( data, false, end - start );
       }
 
-      public object CreateEmptyTexture2D()
+      public object CreateEmptyTexture2D( int originalTextureFormat )
       {
-         return new Texture2D( 2, 2, TextureFormat.ARGB32, false );
+         var format = (TextureFormat)originalTextureFormat;
+
+         TextureFormat newFormat;
+         switch( format )
+         {
+            case TextureFormat.RGB24:
+               newFormat = TextureFormat.RGB24;
+               break;
+            case TextureFormat.DXT1:
+               newFormat = TextureFormat.RGB24;
+               break;
+            case TextureFormat.DXT5:
+               newFormat = TextureFormat.ARGB32;
+               break;
+            default:
+               newFormat = TextureFormat.ARGB32;
+               break;
+         }
+
+         return new Texture2D( 2, 2, newFormat, false );
       }
    }
 }

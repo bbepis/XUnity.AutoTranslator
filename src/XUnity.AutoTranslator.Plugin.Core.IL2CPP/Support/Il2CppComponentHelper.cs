@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -242,8 +242,53 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return fallbackName;
       }
 
-      public void LoadImageEx( object texture, byte[] data, object originalTexture )
+      public void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture )
       {
+         //Texture2D texture2D = (Texture2D)texture;
+         //var format = texture2D.format;
+
+
+         //using( var stream = new MemoryStream( data ) )
+         //using( var binaryReader = new BinaryReader( stream ) )
+         //{
+         //   binaryReader.BaseStream.Seek( 12L, SeekOrigin.Begin );
+         //   short num1 = binaryReader.ReadInt16();
+         //   short num2 = binaryReader.ReadInt16();
+         //   int num3 = (int)binaryReader.ReadByte();
+         //   binaryReader.BaseStream.Seek( 1L, SeekOrigin.Current );
+         //   Color[] colors = new Color[ (int)num1 * (int)num2 ];
+         //   if( num3 == 32 )
+         //   {
+         //      for( int index = 0; index < (int)num1 * (int)num2; ++index )
+         //      {
+         //         float b = binaryReader.ReadByte() / 255f;
+         //         float g = binaryReader.ReadByte() / 255f;
+         //         float r = binaryReader.ReadByte() / 255f;
+         //         float a = binaryReader.ReadByte() / 255f;
+         //         colors[ index ] = new Color( r, g, b, a );
+         //      }
+         //   }
+         //   else
+         //   {
+         //      for( int index = 0; index < (int)num1 * (int)num2; ++index )
+         //      {
+         //         float b = binaryReader.ReadByte() / 255f;
+         //         float g = binaryReader.ReadByte() / 255f;
+         //         float r = binaryReader.ReadByte() / 255f;
+         //         colors[ index ] = new Color( r, g, b, 1f );
+         //      }
+         //   }
+         //   texture2D.SetPixels( colors );
+         //   texture2D.Apply();
+         //}
+
+         //if( originalTexture is Texture2D originalTexture2D )
+         //{
+         //   texture2D.name = originalTexture2D.name;
+         //   texture2D.filterMode = originalTexture2D.filterMode;
+         //   texture2D.wrapMode = originalTexture2D.wrapMode;
+         //}
+
          // why no Image Conversion?
          throw new NotImplementedException();
       }
@@ -273,9 +318,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       {
       }
 
-      public object CreateEmptyTexture2D()
+      public object CreateEmptyTexture2D( int originalTextureFormat )
       {
-         return new Texture2D( 2, 2, TextureFormat.ARGB32, false );
+         var format = (TextureFormat)originalTextureFormat;
+
+         TextureFormat newFormat;
+         switch( format )
+         {
+            case TextureFormat.RGB24:
+               newFormat = TextureFormat.RGB24;
+               break;
+            case TextureFormat.DXT1:
+               newFormat = TextureFormat.RGB24;
+               break;
+            case TextureFormat.DXT5:
+               newFormat = TextureFormat.ARGB32;
+               break;
+            default:
+               newFormat = TextureFormat.ARGB32;
+               break;
+         }
+
+         return new Texture2D( 2, 2, newFormat, false );
       }
    }
 }

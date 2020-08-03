@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
@@ -21,6 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private string _key;
       private byte[] _originalData;
+      private bool _initialized;
+      private int _textureFormat;
 
       public WeakReference Original { get; private set; }
 
@@ -29,6 +32,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsTranslated { get; set; }
 
       public bool IsDumped { get; set; }
+
+      // INTIALIZE to set texture format???
+      // We also have specialized hooks for legacy textures???
+      public void Initialize( object texture )
+      {
+         if( !_initialized )
+         {
+            _initialized = true;
+
+            // NOT ALLOWED!!!!
+            _textureFormat = (int)( (Texture2D)texture ).format;
+
+            SetOriginal( texture );
+         }
+      }
 
       public void SetOriginal( object texture )
       {
@@ -40,14 +58,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Translated = texture;
       }
 
-      public void CreateTranslatedTexture( byte[] newData )
+      public void CreateTranslatedTexture( byte[] newData, ImageFormat format )
       {
          if( Translated == null )
          {
             var orig = Original.Target;
 
-            var texture = ComponentHelper.Instance.CreateEmptyTexture2D();
-            texture.LoadImageEx( newData, orig );
+            var texture = ComponentHelper.Instance.CreateEmptyTexture2D( _textureFormat );
+            texture.LoadImageEx( newData, format, orig );
 
             SetTranslated( texture );
 
@@ -59,8 +77,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( !Original.IsAlive && _originalData != null )
          {
-            var texture = ComponentHelper.Instance.CreateEmptyTexture2D();
-            texture.LoadImageEx( _originalData, null );
+            var texture = ComponentHelper.Instance.CreateEmptyTexture2D( _textureFormat );
+            texture.LoadImageEx( _originalData, ImageFormat.PNG, null );
 
             SetOriginal( texture );
          }

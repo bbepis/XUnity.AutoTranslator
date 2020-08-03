@@ -1,9 +1,11 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Support;
@@ -58,8 +60,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
       }
    }
 
+   enum ImageFormat
+   {
+      PNG = 0,
+      TGA = 1
+   }
+
    class TranslatedImage
    {
+      private static readonly Dictionary<string, ImageFormat> Formats = new Dictionary<string, ImageFormat>( StringComparer.OrdinalIgnoreCase )
+      {
+         { ".png", ImageFormat.PNG },
+         { ".tga", ImageFormat.TGA },
+      };
+
       private readonly ITranslatedImageSource _source;
       private WeakReference<byte[]> _weakData;
       private byte[] _data;
@@ -70,9 +84,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          FileName = fileName;
          Data = data;
+         ImageFormat = Formats[ Path.GetExtension( fileName ) ];
+
+         // .png => Don't really care about which format it is in. If it is DXT1 or DXT5 could be used to force creation of new texture
+         //  => Because we use LoadImage, which works for any texture but causes bad quality if used on DXT1 or DXT5
+
+         // .tga => Require that the format is RGBA32 or RGB24. If not, we must create a new one no matter what
+         //  => Because we use SetPixels. This function works only on RGBA32, ARGB32, RGB24 and Alpha8 texture formats. 
+      }
+
+      public bool CanBeLoadedInto( Texture2D texture )
+      {
+#error referring to Texture2D in this assembly is not allowed at the moment!
+
+         var format = texture.format;
+
+         return ImageFormat == ImageFormat.PNG
+            || ( ImageFormat == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
+
       }
 
       public string FileName { get; }
+
+      internal ImageFormat ImageFormat { get; }
 
       private byte[] Data
       {
@@ -104,7 +138,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
       }
-
       public byte[] GetData()
       {
          var data = Data;
@@ -345,14 +378,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return _translatedImages.ContainsKey( key ) || _untranslatedImages.Contains( key );
       }
 
-      internal bool TryGetTranslatedImage( string key, out byte[] data )
+      internal bool TryGetTranslatedImage( string key, out byte[] data, out TranslatedImage image )
       {
          if( _translatedImages.TryGetValue( key, out var translatedImage ) )
          {
             try
             {
                data = translatedImage.GetData();
-
+               image = translatedImage;
                return data != null;
             }
             catch( Exception e )
@@ -365,6 +398,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          data = null;
+         image = null;
          return false;
       }
    }
