@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using SimpleJSON;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
@@ -11,21 +13,29 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
+using XUnity.Common.Logging;
 
 namespace PapagoTranslate
 {
    public class PapagoTranslate : HttpEndpoint
    {
-      private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "en", "ko", "zh-CN", "zh-TW", "es", "fr", "ru", "vi", "th", "id", "de", "ja" };
+      private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "en", "ko", "zh-CN", "zh-TW", "es", "fr", "ru", "vi", "th", "id", "de", "ja", "hi", "pt" };
+      private static readonly HashSet<string> SMTLanguages = new HashSet<string> { "hi", "pt" };
 
-      private static readonly string Url = "https://papago.naver.com/apis/n2mt/translate";
-      private static readonly string Website = "https://papago.naver.com";
-      private static readonly string JsonTemplate = "{{\"deviceId\":\"{0}\",\"dict\":false,\"dictDisplay\":0,\"honorific\":false,\"instant\":false,\"source\":\"{1}\",\"target\":\"{2}\",\"text\":\"{3}\"}}";
-      private static readonly string FormUrlEncodedTemplate = "data={0}";
+      private static readonly string UrlBase = "https://papago.naver.com";
+      private static readonly string UrlN2MT = "/apis/n2mt/translate"; // Neural Machine Translation
+      private static readonly string UrlNSMT = "/apis/nsmt/translate"; // Statistical Machine Translation
+      private static readonly string FormUrlEncodedTemplate = "honorific=false&source={0}&target={1}&text={2}";
+      private static readonly Random RandomNumbers = new Random();
+      private static readonly Guid UUID = Guid.NewGuid();
 
-      private CookieContainer _cookies;
-      private string _deviceId;
+      private static readonly Regex patternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
+      private static readonly Regex patternVersion = new Regex( @"v\d\.\d\.\d_[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
+
+      private string _version; // for hmac key
+      private bool _isSMT;
       private int _translationCount = 0;
+      private int _resetAfter = 0;
 
       public override string Id => "PapagoTranslate";
 
@@ -51,44 +61,54 @@ namespace PapagoTranslate
       {
          context.DisableCertificateChecksFor( "papago.naver.com" );
 
-         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         var fixedSourceLanguage = FixLanguage( context.SourceLanguage );
+         var fixedDestinationLanguage = FixLanguage( context.DestinationLanguage );
+
+         _isSMT = SMTLanguages.Contains( fixedSourceLanguage ) || SMTLanguages.Contains( fixedDestinationLanguage );
+
+         if( !SupportedLanguages.Contains( fixedDestinationLanguage ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         if( _isSMT )
+         {
+            // SMT can only be translated into English
+            if( fixedSourceLanguage != "en" && fixedDestinationLanguage != "en" )
+               throw new EndpointInitializationException( $"Translation from '{context.SourceLanguage}' to '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         }
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
       {
-         if( _translationCount % 133 == 0 )
+         if( _resetAfter == 0 || _translationCount % _resetAfter == 0 )
          {
-            _cookies = new CookieContainer();
-            _deviceId = Guid.NewGuid().ToString();
+            _translationCount = 0;
+            _resetAfter = RandomNumbers.Next( 150, 200 );
 
-            // terminate session?????
-
-            var client = new XUnityWebClient();
-            var request = new XUnityWebRequest( Website );
-            request.Cookies = _cookies;
-
-            SetupDefaultHeaders( request );
-
-            var response = client.Send( request );
-            while( response.MoveNext() ) yield return response.Current;
-
-            // dont actually cared about the response, just the cookies
+            var enumerator = SetupVersion();
+            while( enumerator.MoveNext() ) yield return enumerator.Current;
          }
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
       {
-         var fullTranslationText = string.Join( "\n", context.UntranslatedTexts );
-         var jsonString = string.Format( JsonTemplate, _deviceId, FixLanguage( context.SourceLanguage ), FixLanguage( context.DestinationLanguage ), JsonHelper.Escape( fullTranslationText ) );
-         var base64 = Convert.ToBase64String( Encoding.UTF8.GetBytes( jsonString ) );
-         var obfuscatedBase64 = Obfuscate( 16, base64 );
-         var data = string.Format( FormUrlEncodedTemplate, Uri.EscapeDataString( obfuscatedBase64 ) );
+         var text = Uri.EscapeDataString( string.Join( "\n", context.UntranslatedTexts ) );
+         var request = new XUnityWebRequest(
+            "POST",
+            UrlBase + ( _isSMT ? UrlNSMT : UrlN2MT ),
+            string.Format(
+               FormUrlEncodedTemplate,
+               FixLanguage( context.SourceLanguage ),
+               FixLanguage( context.DestinationLanguage ),
+               text ) );
 
-         var request = new XUnityWebRequest( "POST", Url, data );
-         request.Cookies = _cookies;
+         // create token
+         var timestamp = Math.Truncate( DateTime.Now.Subtract( DateTime.MinValue.AddYears( 1969 ) ).TotalMilliseconds );
+         var key = Encoding.UTF8.GetBytes( _version );
+         var data = Encoding.UTF8.GetBytes( $"{UUID}\n{request.Address}\n{timestamp}" );
+         var token = Convert.ToBase64String( new HMACMD5( key ).ComputeHash( data ) );
 
-         SetupDefaultHeaders( request );
-         SetupApiRequestHeaders( request );
+         // set required headers
+         request.Headers[ "Authorization" ] = $"PPG {UUID}:{token}";
+         request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
+         request.Headers[ "Timestamp" ] = timestamp.ToString();
 
          context.Complete( request );
 
@@ -137,47 +157,47 @@ namespace PapagoTranslate
          }
       }
 
-      private static void SetupDefaultHeaders( XUnityWebRequest request )
+      private IEnumerator SetupVersion()
       {
-         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
-         request.Headers[ "Accept-Language" ] = "en-US";
-      }
+         var client = new XUnityWebClient();
 
-      private static void SetupApiRequestHeaders( XUnityWebRequest request )
-      {
-         request.Headers[ "device-type" ] = "pc";
-         request.Headers[ "Accept" ] = "application/json";
-         request.Headers[ "x-apigw-partnerid" ] = "papago";
-         request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
-         request.Headers[ "Origin" ] = "https://papago.naver.com";
-         request.Headers[ "Referer" ] = "https://papago.naver.com/";
-      }
+         string urlSource;
 
-      private static string Obfuscate( int count, string str )
-      {
-         var builder = new StringBuilder();
-         for( int i = 0; i < count; i++ )
+         // parse javascript url from main page
          {
-            var c = str[ i ];
-            if( ( 'a' <= c && c <= 'm' ) || ( 'A' <= c && c <= 'M' ) )
-            {
-               c += (char)13;
+            var response = client.Send( new XUnityWebRequest( UrlBase ) );
 
-            }
-            else if( ( 'n' <= c && c <= 'z' ) || 'N' <= c && c <= 'Z' )
+            var iterator = response.GetSupportedEnumerator();
+            while( iterator.MoveNext() ) yield return iterator.Current;
+
+            var match = patternSource.Match( response.Data );
+            if( !match.Success )
             {
-               c -= (char)13;
+               XuaLogger.AutoTranslator.Warn( "Could not parse papago page" );
+               yield break;
             }
 
-            builder.Append( c );
+            urlSource = match.Value;
          }
 
-         for( int i = count; i < str.Length; i++ )
+         // parse version from javascript file
          {
-            builder.Append( str[ i ] );
-         }
+            var response = client.Send( new XUnityWebRequest( UrlBase + urlSource ) );
 
-         return builder.ToString();
+            var iterator = response.GetSupportedEnumerator();
+            while( iterator.MoveNext() ) yield return iterator.Current;
+
+            var match = patternVersion.Match( response.Data );
+            if( !match.Success )
+            {
+               XuaLogger.AutoTranslator.Warn( "Could not parse papago version" );
+               yield break;
+            }
+
+            XuaLogger.AutoTranslator.Debug( $"Current papago version is {match.Value}" );
+
+            _version = match.Value;
+         }
       }
    }
 }
