@@ -28,9 +28,8 @@ namespace PapagoTranslate
       private static readonly string FormUrlEncodedTemplate = "honorific=false&source={0}&target={1}&text={2}";
       private static readonly Random RandomNumbers = new Random();
       private static readonly Guid UUID = Guid.NewGuid();
-
-      private static readonly Regex patternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
-      private static readonly Regex patternVersion = new Regex( @"v\d\.\d\.\d_[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
+      private static readonly Regex PatternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Singleline );
+      private static readonly Regex PatternVersion = new Regex( @"v\d\.\d\.\d_[^""]+", RegexOptions.Singleline );
 
       private string _version; // for hmac key
       private bool _isSMT;
@@ -66,7 +65,9 @@ namespace PapagoTranslate
 
          _isSMT = SMTLanguages.Contains( fixedSourceLanguage ) || SMTLanguages.Contains( fixedDestinationLanguage );
 
-         if( !SupportedLanguages.Contains( fixedDestinationLanguage ) ) throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+         if( !SupportedLanguages.Contains( fixedDestinationLanguage ) )
+            throw new EndpointInitializationException( $"The language '{context.DestinationLanguage}' is not supported by Papago Translate." );
+
          if( _isSMT )
          {
             // SMT can only be translated into English
@@ -170,7 +171,7 @@ namespace PapagoTranslate
             var iterator = response.GetSupportedEnumerator();
             while( iterator.MoveNext() ) yield return iterator.Current;
 
-            var match = patternSource.Match( response.Data );
+            var match = PatternSource.Match( response.Data );
             if( !match.Success )
             {
                XuaLogger.AutoTranslator.Warn( "Could not parse papago page" );
@@ -187,7 +188,7 @@ namespace PapagoTranslate
             var iterator = response.GetSupportedEnumerator();
             while( iterator.MoveNext() ) yield return iterator.Current;
 
-            var match = patternVersion.Match( response.Data );
+            var match = PatternVersion.Match( response.Data );
             if( !match.Success )
             {
                XuaLogger.AutoTranslator.Warn( "Could not parse papago version" );

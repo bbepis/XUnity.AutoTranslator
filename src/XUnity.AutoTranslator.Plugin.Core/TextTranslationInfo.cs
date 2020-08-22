@@ -48,6 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public string TranslatedText { get; set; }
       public bool IsTranslated { get; set; }
       public bool IsCurrentlySettingText { get; set; } // TODO: REMOVE; Why is this even here?
+      public bool ShouldIgnore { get; set; }
 
       public bool IsStabilizingText { get; set; }
       public bool IsKnownTextComponent { get; set; }
@@ -63,7 +64,48 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             IsKnownTextComponent = ui.IsKnownTextType();
             SupportsStabilization = ui.SupportsStabilization();
+            ShouldIgnore = ShouldIgnoreTextComponent( ui );
          }
+      }
+
+      public bool ShouldIgnoreTextComponent( object ui )
+      {
+         if( ui is Component component )
+         {
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return true;
+            }
+
+            var inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField );
+            if( inputField != null )
+            {
+               if( ClrTypes.InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = ClrTypes.InputField_Properties.Placeholder.Get( inputField );
+                  return !ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField );
+            if( inputField != null )
+            {
+               if( ClrTypes.TMP_InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = ClrTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
+                  return !ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.UIInput );
+
+            return inputField != null;
+         }
+
+         return false;
       }
 
       public void ResetScrollIn( object graphic )

@@ -47,61 +47,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return manipulator;
       }
 
-      public static bool ShouldTranslateTextComponent( this object ui, bool ignoreComponentState )
-      {
-         var component = ui as Component;
-         if( component != null )
-         {
-            // dummy check
-            var go = component.gameObject;
-            var ignore = go.HasIgnoredName();
-            if( ignore )
-            {
-               return false;
-            }
-
-            if( !ignoreComponentState )
-            {
-               var behaviour = component as Behaviour;
-               if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
-               {
-                  return false;
-               }
-            }
-
-            var inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.InputField );
-            if( inputField != null )
-            {
-               if( ClrTypes.InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = ClrTypes.InputField_Properties.Placeholder.Get( inputField );
-                  return ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.TMP_InputField );
-            if( inputField != null )
-            {
-               if( ClrTypes.TMP_InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = ClrTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-                  return ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( ClrTypes.UIInput );
-
-            return inputField == null;
-         }
-
-         return true;
-      }
-
       public static bool IsComponentActive( this object ui )
       {
          if( ui is Component component )
          {
-            return component.gameObject?.activeSelf ?? false;
+            var go = component.gameObject;
+            if( go )
+            {
+               if( component is Behaviour be )
+               {
+                  return go.activeInHierarchy && be.enabled;
+               }
+               else
+               {
+                  return go.activeInHierarchy;
+               }
+            }
+
          }
          return true;
       }

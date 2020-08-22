@@ -38,6 +38,8 @@ namespace XUnity.AutoTranslator.Plugin.BepIn_5x
 
       public string TranslationPath { get; }
 
+      public bool AllowDefaultInitializeHarmonyDetourBridge => false;
+
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )

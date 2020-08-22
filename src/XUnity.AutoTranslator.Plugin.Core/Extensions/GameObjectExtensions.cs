@@ -77,7 +77,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
 
          var result = new string[ i ];
-         StringBuilder path = new StringBuilder();
          while( --i >= 0 )
          {
             result[ j++ ] = _objects[ i ].name;

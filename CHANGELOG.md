@@ -1,4 +1,11 @@
-﻿### 4.12.0
+﻿### 4.12.1
+ * MISC - Option to enable Harmony detour bridge (enabled by default for ReiPatcher setup if SRE is not supported)
+ * MISC - Improved ForceUIResizing implementation
+ * MISC - Some performance improvements during text component compatibility checks
+ * BUG FIX - Disabled hooking of SpriteRenderer unless the hooking config is enabled
+ * BUG FIX - Fixed PapagoTranslate API - Thanks to hype5 on Github
+
+### 4.12.0
  * FEATURE - Specialized plugin translation support. Can now read text translation files that are only used for specific plugins
  * FEATURE - Proper IMGUI support in Unity 2018 and 2019+
  * MISC - Changed guidance on IMGUI redistribution

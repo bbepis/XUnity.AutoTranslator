@@ -36,6 +36,8 @@ namespace XUnity.AutoTranslator.Plugin.IPA
 
       public string ConfigPath => _dataPath;
 
+      public bool AllowDefaultInitializeHarmonyDetourBridge => false;
+
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )
