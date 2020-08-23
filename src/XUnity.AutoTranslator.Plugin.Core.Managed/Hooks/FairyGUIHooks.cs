@@ -34,7 +34,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;
@@ -68,7 +67,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;

@@ -30,6 +30,46 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int? _alteredFontSize;
       private float? _alteredLineSpacing;
 
+      public override bool ShouldIgnoreTextComponent( object ui )
+      {
+         if( ui is Component component )
+         {
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return true;
+            }
+
+            var inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField );
+            if( inputField != null )
+            {
+               if( UnityTypes.InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = UnityTypes.InputField_Properties.Placeholder.Get( inputField );
+                  return !ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField );
+            if( inputField != null )
+            {
+               if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
+               {
+                  var placeholder = UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
+                  return !ReferenceEquals( placeholder, ui );
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput );
+
+            return inputField != null;
+         }
+
+         return false;
+      }
+
       public override void ResetScrollIn( object graphic )
       {
          if( !_hasCheckedTypeWriter )

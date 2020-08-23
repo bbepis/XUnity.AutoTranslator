@@ -83,6 +83,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableTextMeshPro;
       public static bool EnableTextMesh;
       public static bool EnableFairyGUI;
+      public static bool InitializeHarmonyDetourBridge;
       public static bool IgnoreWhitespaceInDialogue;
       public static int MinDialogueChars;
       public static int ForceSplitTextAfterCharacters;
@@ -204,7 +205,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
             RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes );
             TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex );
-            ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
             CacheRegexPatternResults = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexPatternResults", false );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", false );
@@ -224,6 +224,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             HtmlEntityPreprocessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HtmlEntityPreprocessing", true );
             HandleRichText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "HandleRichText", true );
             EnableTranslationHelper = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationHelper", false );
+            ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
+            InitializeHarmonyDetourBridge = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "InitializeHarmonyDetourBridge", !Features.SupportsReflectionEmit && PluginEnvironment.Current.AllowDefaultInitializeHarmonyDetourBridge );
 
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );

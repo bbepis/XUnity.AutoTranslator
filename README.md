@@ -283,7 +283,6 @@ TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Gett
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters"]
-ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
 CacheRegexPatternResults=False   ;Indicates whether or not the complete result of regex-splitted translations should be output to the specified OutputFile
@@ -298,6 +297,8 @@ MaxTextParserRecursion=1         ;Indicates how many levels of recursion are all
 HtmlEntityPreprocessing=True     ;Will preprocess and decode html entities before they are send for translation. Some translators will fail when html entities are sent.
 HandleRichText=True              ;Will enable automated handling of rich text (text with markup)
 EnableTranslationHelper=False    ;Indicates if translator-related helpful log messages should be enabled. May be useful when tranlating based on redirected resources
+ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
+InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}

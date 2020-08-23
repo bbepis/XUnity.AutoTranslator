@@ -19,11 +19,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
       private static readonly IComponentHelper Helper = ComponentHelper.Instance;
 
-      public static bool ShouldTranslateTextComponent( this object ui, bool ignoreComponentState )
-      {
-         return Helper.ShouldTranslateTextComponent( ui, ignoreComponentState );
-      }
-
       public static bool IsComponentActive( this object ui )
       {
          return Helper.IsComponentActive( ui );

@@ -158,56 +158,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
       }
 
-      public bool ShouldTranslateTextComponent( object ui, bool ignoreComponentState )
-      {
-         var component = ui as Component;
-         if( component != null )
-         {
-            // dummy check
-            var go = component.gameObject;
-            var ignore = go.HasIgnoredName();
-            if( ignore )
-            {
-               return false;
-            }
-
-            if( !ignoreComponentState )
-            {
-               var behaviour = component as Behaviour;
-               if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
-               {
-                  return false;
-               }
-            }
-
-            var inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField );
-            if( inputField != null )
-            {
-               if( UnityTypes.InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = UnityTypes.InputField_Properties.Placeholder.Get( inputField );
-                  return ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField );
-            if( inputField != null )
-            {
-               if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-                  return ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput );
-
-            return inputField == null;
-         }
-
-         return true;
-      }
-
       public bool IsComponentActive( object ui )
       {
          if( ui is Component component )

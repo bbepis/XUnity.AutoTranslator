@@ -19,6 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsStabilizingText { get; set; }
       public bool IsKnownTextComponent { get; set; }
       public bool SupportsStabilization { get; set; }
+      public bool ShouldIgnore { get; set; }
 
       public IReadOnlyTextTranslationCache TextCache { get; set; }
 
@@ -30,6 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             IsKnownTextComponent = ui.IsKnownTextType();
             SupportsStabilization = ui.SupportsStabilization();
+            ShouldIgnore = ShouldIgnoreTextComponent( ui );
          }
       }
 
@@ -45,6 +47,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          IsTranslated = true;
          TranslatedText = translatedText;
       }
+
+      public abstract bool ShouldIgnoreTextComponent( object ui );
 
       public abstract void ResetScrollIn( object ui );
 

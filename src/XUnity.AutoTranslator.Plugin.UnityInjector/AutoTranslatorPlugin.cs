@@ -18,6 +18,8 @@ namespace XUnity.AutoTranslator.Plugin.UnityInjector
 
       public string ConfigPath => DataPath;
 
+      public bool AllowDefaultInitializeHarmonyDetourBridge => false;
+
       void IPluginEnvironment.SaveConfig()
       {
          SaveConfig();

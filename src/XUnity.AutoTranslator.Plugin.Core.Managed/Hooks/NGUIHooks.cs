@@ -38,7 +38,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       public static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;
@@ -74,7 +73,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
          if( UnityTypes.UILabel.IsAssignableFrom( __instance.GetType() ) )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-            AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
          }
       }
 

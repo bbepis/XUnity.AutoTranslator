@@ -38,6 +38,7 @@ using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Shims;
 
 #if MANAGED
+using MonoMod.RuntimeDetour;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 #endif
 
@@ -61,12 +62,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       internal static AutoTranslationPlugin Current;
 
+      private static bool _hasResizedCurrentComponentDuringDiscovery;
+
 #if MANAGED
       internal XuaWindow MainWindow;
       internal TranslationAggregatorWindow TranslationAggregatorWindow;
       internal TranslationAggregatorOptionsWindow TranslationAggregatorOptionsWindow;
 #endif
-      internal TranslationManager TranslationManager;
+        internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal Dictionary<string, TextTranslationCache> PluginTextCaches = new Dictionary<string, TextTranslationCache>( StringComparer.OrdinalIgnoreCase );
       internal TextureTranslationCache TextureCache;
@@ -131,6 +134,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Setup console, if enabled
          DebugConsole.Enable();
 
+         InitializeHarmonyDetourBridge();
+
          InitializeTextTranslationCaches();
 
          // Setup hooks
@@ -169,6 +174,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
 #endif
 
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
+      }
+
+      private static void InitializeHarmonyDetourBridge()
+      {
+         try
+         {
+            if( Settings.InitializeHarmonyDetourBridge )
+            {
+               InitializeHarmonyDetourBridgeSafe();
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while initializing harmony detour bridge." );
+         }
+      }
+
+      private static void InitializeHarmonyDetourBridgeSafe()
+      {
+#if MANAGED
+         HarmonyDetourBridge.Init();
+#endif
       }
 
       private void InitializeTextTranslationCaches()
@@ -598,15 +625,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string result = null;
             if( _textHooksEnabled && !_temporarilyDisabled )
             {
-               var info = ui.GetOrCreateTextTranslationInfo();
-               if( onEnable && info != null && CallOrigin.TextCache != null )
+               try
                {
-                  info.TextCache = CallOrigin.TextCache;
+                  var info = ui.GetOrCreateTextTranslationInfo();
+                  var isComponentActive = DiscoverComponent( ui, info );
+
+                  if( onEnable && info != null && CallOrigin.TextCache != null )
+                  {
+                     info.TextCache = CallOrigin.TextCache;
+                  }
+
+                  CallOrigin.ExpectsTextToBeReturned = true;
+
+                  result = TranslateOrQueueWebJob( ui, text, isComponentActive, info );
                }
-
-               CallOrigin.ExpectsTextToBeReturned = true;
-
-               result = TranslateOrQueueWebJob( ui, text, false, info );
+               catch( Exception e )
+               {
+                  XuaLogger.AutoTranslator.Warn( e, "An unexpected error occurred." );
+               }
+               finally
+               {
+                  _hasResizedCurrentComponentDuringDiscovery = false;
+               }
             }
 
             if( onEnable )
@@ -625,13 +665,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( _textHooksEnabled && !_temporarilyDisabled )
          {
-            var info = ui.GetOrCreateTextTranslationInfo();
-            if( onEnable && info != null && CallOrigin.TextCache != null )
+            try
             {
-               info.TextCache = CallOrigin.TextCache;
-            }
+               var info = ui.GetOrCreateTextTranslationInfo();
+               var isComponentActive = DiscoverComponent( ui, info );
 
-            TranslateOrQueueWebJob( ui, null, false, info );
+               if( onEnable && info != null && CallOrigin.TextCache != null )
+               {
+                  info.TextCache = CallOrigin.TextCache;
+               }
+
+               TranslateOrQueueWebJob( ui, null, isComponentActive, info );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Warn( e, "An unexpected error occurred." );
+            }
+            finally
+            {
+               _hasResizedCurrentComponentDuringDiscovery = false;
+            }
          }
 
          if( onEnable )
@@ -661,43 +714,41 @@ namespace XUnity.AutoTranslator.Plugin.Core
          HandleImage( null, ref texture, isPrefixHooked );
       }
 
-      internal void Hook_HandleComponent( object ui )
+      private bool DiscoverComponent( object ui, TextTranslationInfo info )
       {
+         if( info == null ) return true;
+
          try
          {
-            if( _hasValidOverrideFont )
+            if( ( _hasValidOverrideFont || Settings.ForceUIResizing ) && ui.IsComponentActive() )
             {
-               var info = ui.GetOrCreateTextTranslationInfo();
-               if( _hasOverridenFont )
+               if( _hasValidOverrideFont )
                {
-                  info?.ChangeFont( ui );
-               }
-               else
-               {
-                  info?.UnchangeFont( ui );
-               }
-            }
-
-#if MANAGED
-            if( Settings.ForceUIResizing )
-            {
-               var info = ui.GetOrCreateTextTranslationInfo();
-               if( info?.IsCurrentlySettingText == false )
-               {
-                  // force UI resizing is highly problematic for NGUI because text should somehow
-                  // be set after changing "resize" properties... brilliant stuff
-                  if( ui.GetType() != UnityTypes.UILabel )
+                  if( _hasOverridenFont )
                   {
-                     info?.ResizeUI( ui, ResizeCache );
+                     info.ChangeFont( ui );
+                  }
+                  else
+                  {
+                     info.UnchangeFont( ui );
                   }
                }
+
+               if( Settings.ForceUIResizing )
+               {
+                  info.ResizeUI( ui, ResizeCache );
+                  _hasResizedCurrentComponentDuringDiscovery = true;
+               }
+
+               return true;
             }
-#endif
          }
          catch( Exception e )
          {
-            XuaLogger.AutoTranslator.Error( e, "An error occurred while handling the UI resize/font hooks." );
+            XuaLogger.AutoTranslator.Warn( e, "An error occurred while handling the UI discovery." );
          }
+
+         return false;
       }
 
       private void CheckSpriteRenderer( object ui )
@@ -755,15 +806,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( info != null && Settings.EnableUIResizing || Settings.ForceUIResizing )
+               if( !_hasResizedCurrentComponentDuringDiscovery && info != null && ( Settings.EnableUIResizing || Settings.ForceUIResizing ) )
                {
                   if( isTranslated || Settings.ForceUIResizing )
                   {
-                     info?.ResizeUI( ui, ResizeCache );
+                     info.ResizeUI( ui, ResizeCache );
                   }
                   else
                   {
-                     info?.UnresizeUI( ui );
+                     info.UnresizeUI( ui );
                   }
                }
 
@@ -1172,10 +1223,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return null;
          }
 
-         info?.Reset( originalText );
+         bool shouldIgnore = false;
+         if( info != null )
+         {
+            info.Reset( originalText );
+            shouldIgnore = info.ShouldIgnore;
+         }
 
          var scope = TranslationScopeHelper.Instance.GetScope( ui );
-         if( !text.IsNullOrWhiteSpace() && tc.IsTranslatable( text, false, scope ) && ui.ShouldTranslateTextComponent( ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         if( !shouldIgnore && !text.IsNullOrWhiteSpace() && tc.IsTranslatable( text, false, scope ) && ( ignoreComponentState || ui.IsComponentActive() ) && !IsCurrentlySetting( info ) )
          {
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var isSpammer = ui.IsSpammingComponent();
@@ -1649,7 +1705,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return null;
          }
 
-         info?.Reset( originalText );
+         bool shouldIgnore = false;
+         if( info != null )
+         {
+            info.Reset( originalText );
+            shouldIgnore = info.ShouldIgnore;
+         }
 
          if( scope == TranslationScopes.None && context == null )
          {
@@ -1657,7 +1718,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
          // Ensure that we actually want to translate this text and its owning UI element. 
-         if( !text.IsNullOrWhiteSpace() && tc.IsTranslatable( text, false, scope ) && ui.ShouldTranslateTextComponent( ignoreComponentState ) && !IsCurrentlySetting( info ) )
+         if( !shouldIgnore && !text.IsNullOrWhiteSpace() && tc.IsTranslatable( text, false, scope ) && ( ignoreComponentState || ui.IsComponentActive() ) && !IsCurrentlySetting( info ) )
          {
             var isSpammer = ui.IsSpammingComponent();
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!

@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public static void Load()
       {
-         LoadWithConfig( new DefaultPluginEnvironment() );
+         LoadWithConfig( new DefaultPluginEnvironment( true ) );
       }
 
       /// <summary>

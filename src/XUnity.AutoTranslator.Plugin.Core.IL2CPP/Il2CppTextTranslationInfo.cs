@@ -19,6 +19,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class Il2CppTextTranslationInfo : TextTranslationInfo
    {
+      public override bool ShouldIgnoreTextComponent( object ui )
+      {
+         if( ui is ITextComponent tc && tc.Component != null )
+         {
+            var component = tc.Component;
+
+            // dummy check
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return true;
+            }
+
+            return tc.IsPlaceholder();
+         }
+
+         return false;
+      }
+
       public override void ChangeFont( object ui )
       {
       }

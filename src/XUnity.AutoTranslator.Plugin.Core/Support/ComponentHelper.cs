@@ -42,8 +42,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       string GetText( object ui );
 
-      bool ShouldTranslateTextComponent( object ui, bool ignoreComponentState );
-
       bool IsComponentActive( object ui );
 
       TextTranslationInfo GetTextTranslationInfo( object ui );

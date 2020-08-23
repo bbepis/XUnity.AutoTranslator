@@ -40,7 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public static IMonoBehaviour Load()
       {
-         return LoadWithConfig( new DefaultPluginEnvironment() );
+         return LoadWithConfig( new DefaultPluginEnvironment( false ) );
       }
    }
 }

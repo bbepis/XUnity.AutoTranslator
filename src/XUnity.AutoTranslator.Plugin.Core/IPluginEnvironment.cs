@@ -33,5 +33,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// Saves the preferences file.
       /// </summary>
       void SaveConfig();
+
+      /// <summary>
+      /// Gets a bool indicating whether or not to allow the default value of InitializeHarmonyDetourBridge to be true.
+      /// </summary>
+      bool AllowDefaultInitializeHarmonyDetourBridge { get; }
    }
 }

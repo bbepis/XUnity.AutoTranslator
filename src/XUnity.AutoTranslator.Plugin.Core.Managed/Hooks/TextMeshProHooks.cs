@@ -81,7 +81,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object> _original;
@@ -115,7 +114,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;
@@ -149,7 +147,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object> _original;
@@ -183,7 +180,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;
@@ -217,7 +213,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string> _original;
@@ -251,7 +246,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, StringBuilder> _original;
@@ -285,7 +279,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, string, bool> _original;
@@ -321,7 +314,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static OriginalMethod _original;
@@ -355,7 +347,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, char[]> _original;
@@ -389,7 +380,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, char[], int, int> _original;
@@ -423,7 +413,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       static void Postfix( object __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static Action<object, int[], int, int> _original;
