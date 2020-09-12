@@ -136,17 +136,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var type = ui.GetType();
 
-         if( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) )
+         if( ClrTypes.Text != null && ClrTypes.Text.IsAssignableFrom( type ) && ( ClrTypes.Font_Properties.FontSize != null || Settings.OverrideFontSize.HasValue ) )
          {
             if( string.IsNullOrEmpty( Settings.OverrideFont ) ) return;
 
             var Text_fontProperty = ClrTypes.Text_Properties.Font;
-            var Text_fontSizeProperty = ClrTypes.Text_Properties.FontSize;
 
             var previousFont = (Font)Text_fontProperty.Get( ui );
-            var Font_fontSizeProperty = ClrTypes.Font_Properties.FontSize;
 
-            var newFont = FontCache.GetOrCreate( (int?)Font_fontSizeProperty?.Get( previousFont ) ?? (int)Text_fontSizeProperty.Get( ui ) );
+            var newFont = FontCache.GetOrCreate( Settings.OverrideFontSize ?? (int)ClrTypes.Font_Properties.FontSize.Get( previousFont ) );
             if( newFont == null || previousFont == null ) return;
 
             if( !ReferenceEquals( newFont, previousFont ) )
@@ -397,7 +395,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          else if( type == ClrTypes.UILabel )
          {
             // special handling for NGUI to better handle textbox sizing
-            
+
             var useFloatSpacingPropertyValue = ClrTypes.UILabel_Properties.UseFloatSpacing?.Get( ui );
             var spacingXPropertyValue = ClrTypes.UILabel_Properties.SpacingX?.Get( ui );
             var multiLinePropertyValue = ClrTypes.UILabel_Properties.MultiLine?.Get( ui );

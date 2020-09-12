@@ -95,6 +95,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUIResizing;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
+      public static int? OverrideFontSize;
       public static string OverrideFontTextMeshPro;
       public static string UserAgent;
       public static bool DisableCertificateValidation;
@@ -197,6 +198,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
             UseStaticTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "UseStaticTranslations", true );
             OverrideFont = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFont", string.Empty );
+            OverrideFontSize = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontSize", (int?)null );
             OverrideFontTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontTextMeshPro", string.Empty );
             ResizeUILineSpacingScale = PluginEnvironment.Current.Preferences.GetOrDefault<float?>( "Behaviour", "ResizeUILineSpacingScale", null );
             ForceUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceUIResizing", false );
