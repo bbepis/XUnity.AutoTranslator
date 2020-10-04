@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
+using XUnity.AutoTranslator.Plugin.Core.Textures;
 using XUnity.Common.Constants;
 using XUnity.Common.IL2CPP.Extensions;
 using XUnity.Common.Utilities;
@@ -244,53 +245,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       public void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture )
       {
-         //Texture2D texture2D = (Texture2D)texture;
-         //var format = texture2D.format;
+         TextureLoader.Load( texture, data, dataType );
 
+         if( texture is Texture2D texture2D && originalTexture is Texture2D originalTexture2D )
+         {
+#error how do we set all properties if possible?
 
-         //using( var stream = new MemoryStream( data ) )
-         //using( var binaryReader = new BinaryReader( stream ) )
-         //{
-         //   binaryReader.BaseStream.Seek( 12L, SeekOrigin.Begin );
-         //   short num1 = binaryReader.ReadInt16();
-         //   short num2 = binaryReader.ReadInt16();
-         //   int num3 = (int)binaryReader.ReadByte();
-         //   binaryReader.BaseStream.Seek( 1L, SeekOrigin.Current );
-         //   Color[] colors = new Color[ (int)num1 * (int)num2 ];
-         //   if( num3 == 32 )
-         //   {
-         //      for( int index = 0; index < (int)num1 * (int)num2; ++index )
-         //      {
-         //         float b = binaryReader.ReadByte() / 255f;
-         //         float g = binaryReader.ReadByte() / 255f;
-         //         float r = binaryReader.ReadByte() / 255f;
-         //         float a = binaryReader.ReadByte() / 255f;
-         //         colors[ index ] = new Color( r, g, b, a );
-         //      }
-         //   }
-         //   else
-         //   {
-         //      for( int index = 0; index < (int)num1 * (int)num2; ++index )
-         //      {
-         //         float b = binaryReader.ReadByte() / 255f;
-         //         float g = binaryReader.ReadByte() / 255f;
-         //         float r = binaryReader.ReadByte() / 255f;
-         //         colors[ index ] = new Color( r, g, b, 1f );
-         //      }
-         //   }
-         //   texture2D.SetPixels( colors );
-         //   texture2D.Apply();
-         //}
+            // Use ExpressionHelper + null checks to set values
 
-         //if( originalTexture is Texture2D originalTexture2D )
-         //{
-         //   texture2D.name = originalTexture2D.name;
-         //   texture2D.filterMode = originalTexture2D.filterMode;
-         //   texture2D.wrapMode = originalTexture2D.wrapMode;
-         //}
-
-         // why no Image Conversion?
-         throw new NotImplementedException();
+            texture2D.name = originalTexture2D.name;
+            texture2D.anisoLevel = originalTexture2D.anisoLevel;
+            texture2D.filterMode = originalTexture2D.filterMode;
+            texture2D.mipMapBias = originalTexture2D.mipMapBias;
+            texture2D.wrapMode = originalTexture2D.wrapMode;
+         }
       }
 
       public TextureDataResult GetTextureData( object texture )
@@ -340,6 +308,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
 
          return new Texture2D( 2, 2, newFormat, false );
+      }
+
+      public bool IsCompatible( object texture, ImageFormat dataType )
+      {
+         // .png => Don't really care about which format it is in. If it is DXT1 or DXT5 could be used to force creation of new texture
+         //  => Because we use LoadImage, which works for any texture but causes bad quality if used on DXT1 or DXT5
+
+         // .tga => Require that the format is RGBA32 or RGB24. If not, we must create a new one no matter what
+         //  => Because we use SetPixels. This function works only on RGBA32, ARGB32, RGB24 and Alpha8 texture formats.
+
+         var texture2d = (Texture2D)texture;
+
+         var format = texture2d.format;
+         return dataType == ImageFormat.PNG
+            || ( dataType == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
       }
    }
 }

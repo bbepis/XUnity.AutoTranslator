@@ -69,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TranslationAggregatorWindow TranslationAggregatorWindow;
       internal TranslationAggregatorOptionsWindow TranslationAggregatorOptionsWindow;
 #endif
-        internal TranslationManager TranslationManager;
+      internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal Dictionary<string, TextTranslationCache> PluginTextCaches = new Dictionary<string, TextTranslationCache>( StringComparer.OrdinalIgnoreCase );
       internal TextureTranslationCache TextureCache;
@@ -960,19 +960,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( _isInTranslatedMode )
                {
+                  var isCompatible = texture.IsCompatible( translatedImage.ImageFormat );
+
                   // handle texture
                   if( !tti.IsTranslated || forceReload )
                   {
                      try
                      {
-                        if( !Settings.EnableLegacyTextureLoading )
+                        if( Settings.EnableLegacyTextureLoading || !isCompatible )
                         {
-                           texture.LoadImageEx( newData, translatedImage.ImageFormat, null );
+                           tti.CreateTranslatedTexture( newData, translatedImage.ImageFormat );
                            changedImage = true;
                         }
                         else
                         {
-                           tti.CreateTranslatedTexture( newData, translatedImage.ImageFormat );
+                           texture.LoadImageEx( newData, translatedImage.ImageFormat, null );
                            changedImage = true;
                         }
                      }
@@ -989,7 +991,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           if( Settings.EnableLegacyTextureLoading )
+                           if( Settings.EnableLegacyTextureLoading || !isCompatible )
                            {
                               source.SetTexture( tti.GetTranslatedTexture() );
                            }
@@ -1019,15 +1021,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      try
                      {
-                        if( !Settings.EnableLegacyTextureLoading )
+                        if( Settings.EnableLegacyTextureLoading ) // original data is always compatible (PNG)
                         {
-                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
+                           // we just need to ensure we set/change the reference
+                           tti.CreateOriginalTexture();
                            changedImage = true;
                         }
                         else
                         {
-                           // we just need to ensure we set/change the reference
-                           tti.CreateOriginalTexture();
+                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
                            changedImage = true;
                         }
                      }
@@ -1074,15 +1076,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      try
                      {
-                        if( !Settings.EnableLegacyTextureLoading )
+                        if( Settings.EnableLegacyTextureLoading ) // original data is always compatible (PNG)
                         {
-                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
+                           // we just need to ensure we set/change the reference
+                           tti.CreateOriginalTexture();
                            changedImage = true;
                         }
                         else
                         {
-                           // we just need to ensure we set/change the reference
-                           tti.CreateOriginalTexture();
+                           texture.LoadImageEx( originalData, ImageFormat.PNG, null );
                            changedImage = true;
                         }
                      }
@@ -1123,7 +1125,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                texture = null;
             }
-            else if( Settings.EnableLegacyTextureLoading )
+            else if( tti.UsingReplacedTexture )
             {
                if( tti.IsTranslated )
                {

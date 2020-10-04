@@ -87,6 +87,7 @@ namespace XUnity.Common.Constants
       public static readonly Il2CppTypeWrapper InputField = FindType( "UnityEngine.UI.InputField" );
       public static readonly Il2CppTypeWrapper GUI = FindType( "UnityEngine.GUI" );
       public static readonly Il2CppTypeWrapper ImageConversion = FindType( "UnityEngine.ImageConversion" );
+      public static readonly Il2CppTypeWrapper Texture2D = FindType( "UnityEngine.Texture2D" );
       public static readonly Il2CppTypeWrapper Texture = FindType( "UnityEngine.Texture" );
       public static readonly Il2CppTypeWrapper SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
       public static readonly Il2CppTypeWrapper Sprite = FindType( "UnityEngine.Sprite" );

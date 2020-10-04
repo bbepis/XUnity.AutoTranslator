@@ -9,6 +9,11 @@
 
   <ItemGroup>
     <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\AutoTranslationPlugin.cs" Link="AutoTranslationPlugin.cs" />
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\FallbackTgaImageLoader.cs" Link="Textures\FallbackTgaImageLoader.cs" />
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\ITextureLoader.cs" Link="Textures\ITextureLoader.cs" />
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\LoadImageImageLoader.cs" Link="Textures\LoadImageImageLoader.cs" />
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\TextureLoader.cs" Link="Textures\TextureLoader.cs" />
+    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\TgaImageLoader.cs" Link="Textures\TgaImageLoader.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,6 +48,10 @@
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Textures\" />
   </ItemGroup>
 
 </Project>

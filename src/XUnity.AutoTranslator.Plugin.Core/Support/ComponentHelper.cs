@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
@@ -68,6 +69,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       TextureDataResult GetTextureData( object texture );
 
       object CreateEmptyTexture2D( int originalTextureFormat );
+
+      bool IsCompatible( object texture, ImageFormat dataType );
 
 
       // UI will have to be a custom implementation like ITextComponent (ITextureComponent for IL2CPP)

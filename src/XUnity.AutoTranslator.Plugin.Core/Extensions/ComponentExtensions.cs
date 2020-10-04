@@ -155,5 +155,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          return Helper.GetTextureData( texture );
       }
+
+      public static bool IsCompatible( this object texture, ImageFormat dataType )
+      {
+         return Helper.IsCompatible( texture, dataType );
+      }
    }
 }

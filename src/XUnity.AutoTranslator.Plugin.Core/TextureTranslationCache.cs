@@ -85,23 +85,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          FileName = fileName;
          Data = data;
          ImageFormat = Formats[ Path.GetExtension( fileName ) ];
-
-         // .png => Don't really care about which format it is in. If it is DXT1 or DXT5 could be used to force creation of new texture
-         //  => Because we use LoadImage, which works for any texture but causes bad quality if used on DXT1 or DXT5
-
-         // .tga => Require that the format is RGBA32 or RGB24. If not, we must create a new one no matter what
-         //  => Because we use SetPixels. This function works only on RGBA32, ARGB32, RGB24 and Alpha8 texture formats. 
-      }
-
-      public bool CanBeLoadedInto( Texture2D texture )
-      {
-#error referring to Texture2D in this assembly is not allowed at the moment!
-
-         var format = texture.format;
-
-         return ImageFormat == ImageFormat.PNG
-            || ( ImageFormat == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
-
       }
 
       public string FileName { get; }

@@ -52,7 +52,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       public static void _Postfix( ITextComponent __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static void ML_Detour( IntPtr instance, IntPtr value )
@@ -96,7 +95,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       public static void _Postfix( ITextComponent __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
-         AutoTranslationPlugin.Current.Hook_HandleComponent( __instance );
       }
 
       static void ML_Detour( IntPtr instance )

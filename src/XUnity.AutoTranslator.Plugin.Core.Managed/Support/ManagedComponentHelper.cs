@@ -487,5 +487,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
          return new Texture2D( 2, 2, newFormat, false );
       }
+
+      public bool IsCompatible( object texture, ImageFormat dataType )
+      {
+         // .png => Don't really care about which format it is in. If it is DXT1 or DXT5 could be used to force creation of new texture
+         //  => Because we use LoadImage, which works for any texture but causes bad quality if used on DXT1 or DXT5
+
+         // .tga => Require that the format is RGBA32 or RGB24. If not, we must create a new one no matter what
+         //  => Because we use SetPixels. This function works only on RGBA32, ARGB32, RGB24 and Alpha8 texture formats.
+
+         var texture2d = (Texture2D)texture;
+
+         var format = texture2d.format;
+         return dataType == ImageFormat.PNG
+            || ( dataType == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
+      }
    }
 }

@@ -33,6 +33,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool IsDumped { get; set; }
 
+      public bool UsingReplacedTexture { get; set; }
+
       // INTIALIZE to set texture format???
       // We also have specialized hooks for legacy textures???
       public void Initialize( object texture )
@@ -70,6 +72,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             SetTranslated( texture );
 
             texture.SetExtensionData( this );
+
+            UsingReplacedTexture = true;
          }
       }
 
