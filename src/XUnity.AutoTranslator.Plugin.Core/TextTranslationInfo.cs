@@ -35,6 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Action<object> _unresizeFont;
       private Action<object> _unresize;
       private Action<object> _unfont;
+      private HashSet<string> _redirectedTranslations;
 
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
@@ -53,6 +54,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsStabilizingText { get; set; }
       public bool IsKnownTextComponent { get; set; }
       public bool SupportsStabilization { get; set; }
+
+      public HashSet<string> RedirectedTranslations => _redirectedTranslations ?? ( _redirectedTranslations = new HashSet<string>() );
 
       public IReadOnlyTextTranslationCache TextCache { get; set; }
 

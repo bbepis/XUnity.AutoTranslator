@@ -39,7 +39,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static string GetTextureName( this Texture texture )
       {
-         if( !string.IsNullOrEmpty( texture.name ) ) return texture.name;
+         var name = texture.name;
+
+         if( !string.IsNullOrEmpty( name ) ) return name;
          return "Unnamed";
       }
 

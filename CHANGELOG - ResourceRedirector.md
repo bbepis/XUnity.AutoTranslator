@@ -1,4 +1,7 @@
-﻿### 1.1.2
+﻿### 1.1.3
+ * BUG FIX - Fixed bug that caused the GetBuiltinResource to not be found on later versions of the Unity Engine. Thanks to aqie13 on GitHub
+
+### 1.1.2
  * MISC - Internal API changes - some code moved to XUnity.Common
 
 ### 1.1.1

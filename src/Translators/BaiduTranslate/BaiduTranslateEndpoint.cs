@@ -110,16 +110,16 @@ namespace BaiduTranslate
 
          context.DisableCertificateChecksFor( "api.fanyi.baidu.com" );
 
-         if( !SupportedLanguages.ContainsKey( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.ContainsKey( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
+         if( !SupportedLanguages.ContainsKey( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
+         if( !SupportedLanguages.ContainsKey( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
       }
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
       {
          var timeSinceLast = Time.realtimeSinceStartup - _lastRequestTimestamp;
-         if( timeSinceLast < 1.0f )
+         if( timeSinceLast < _delay )
          {
-            var delay = 1.0f - timeSinceLast;
+            var delay = _delay - timeSinceLast;
 
             var instruction = Features.GetWaitForSecondsRealtime( delay );
             if( instruction != null )

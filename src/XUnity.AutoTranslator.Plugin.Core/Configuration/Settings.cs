@@ -21,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
       public static readonly string TranslatorsFolder = "Translators";
-      public static readonly int MaxMaxCharactersPerTranslation = 1000;
+      public static readonly int MaxMaxCharactersPerTranslation = 2500;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
       public static readonly string EnglishLanguage = "en";
@@ -122,6 +122,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool HtmlEntityPreprocessing;
       public static bool HandleRichText;
       public static bool EnableTranslationHelper;
+      public static RedirectedResourceDetection RedirectedResourceDetectionStrategy;
+      public static bool OutputTooLongText;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -231,7 +233,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTranslationHelper = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationHelper", false );
             ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
             InitializeHarmonyDetourBridge = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "InitializeHarmonyDetourBridge", !Features.SupportsReflectionEmit && PluginEnvironment.Current.AllowDefaultInitializeHarmonyDetourBridge );
-
+            RedirectedResourceDetectionStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RedirectedResourceDetectionStrategy", RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll );
+            OutputTooLongText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputTooLongText", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();

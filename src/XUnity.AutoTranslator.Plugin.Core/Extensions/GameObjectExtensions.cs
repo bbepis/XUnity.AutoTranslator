@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
@@ -36,33 +37,62 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ClrTypes.TMP_Text != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TMP_Text ) )
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TMP_Text, true ) )
             {
                yield return comp;
             }
          }
          if( ClrTypes.Text != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.Text ) )
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.Text, true ) )
             {
                yield return comp;
             }
          }
          if( ClrTypes.TextMesh != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TextMesh ) )
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.TextMesh, true ) )
             {
                yield return comp;
             }
          }
          if( ClrTypes.UILabel != null )
          {
-            foreach( var comp in go.GetComponentsInChildren( ClrTypes.UILabel ) )
+            foreach( var comp in go.GetComponentsInChildren( ClrTypes.UILabel, true ) )
             {
                yield return comp;
             }
          }
       }
+
+      //public static Transform[] GetAllDescendents( GameObject go )
+      //{
+      //   return go.GetComponentsInChildren<Transform>();
+
+      //   //var l = new List<GameObject>();
+
+      //   //try
+      //   //{
+      //   //   FillListWithDescendents( go.transform, l );
+      //   //}
+      //   //catch( Exception e )
+      //   //{
+      //   //   XuaLogger.AutoTranslator.Warn( e, "An error occurred while scanning object hierarchy." ); ;
+      //   //}
+
+      //   //return l;
+      //}
+
+      //public static void FillListWithDescendents( Transform t, List<GameObject> list )
+      //{
+      //   list.Add( t.gameObject );
+      //   var len = t.childCount;
+      //   for( int i = 0; i < len; i++ )
+      //   {
+      //      var c = t.GetChild( i );
+      //      FillListWithDescendents( c, list );
+      //   }
+      //}
 
       public static string[] GetPathSegments( this GameObject obj )
       {

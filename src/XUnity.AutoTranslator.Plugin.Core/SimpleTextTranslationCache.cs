@@ -184,7 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         else
                         {
-                           AddTranslation( key, value, allowOverride );
+                           AddTranslation( key, value.MakeRedirected(), allowOverride );
                         }
                      }
                   }
@@ -236,7 +236,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !hadTranslated )
          {
-            AddTranslation( key, value, false );
+            AddTranslation( key, value.MakeRedirected(), false );
 
             QueueNewTranslationForDisk( key, value, hadTranslated );
          }
@@ -482,7 +482,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var match = regex.CompiledRegex.Match( key.TemplatedOriginal_Text );
                      if( !match.Success ) continue;
 
-                     value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation );
+                     value = regex.CompiledRegex.Replace( key.TemplatedOriginal_Text, regex.Translation ).MakeRedirected();
 
                      return true;
                   }

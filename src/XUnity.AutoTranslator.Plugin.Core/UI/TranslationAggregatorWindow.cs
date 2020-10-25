@@ -114,7 +114,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                      GUI.enabled = aggregatedTranslation.CanCopyToClipboard();
                      if( GUI.Button( GUIUtil.R( _viewModel.Width - GUIUtil.HalfComponentSpacing - 50, posy + 5 + 1, 50, GUIUtil.LabelHeight ), "Copy" ) )
                      {
-                        current.CopyDefaultTranslationToClipboard();
+                        aggregatedTranslation.CopyToClipboard();
                      }
                      GUI.enabled = true;
                      DrawTextArea(

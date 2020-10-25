@@ -10,18 +10,63 @@ using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 {
    internal static class PluginTranslationHooks
    {
       public static readonly Type[] All = new[] {
+         typeof( Transform_SetParent_Hook ),
          typeof( GameObject_AddComponent_Hook ),
          typeof( Object_InstantiateSingle_Hook ),
          typeof( Object_InstantiateSingleWithParent_Hook ),
          typeof( Object_CloneSingle_Hook ),
          typeof( Object_CloneSingleWithParent_Hook ),
       };
+   }
+
+   internal static class Transform_SetParent_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( ClrTypes.Transform, "SetParent", new Type[] { ClrTypes.Transform, typeof( bool ) } );
+      }
+
+      static Action<Transform, Transform, bool> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Transform, Transform, bool>>();
+      }
+
+      static void MM_Detour( Transform __instance, Transform parent, bool worldPositionStays )
+      {
+         if( parent != null )
+         {
+            var info = parent.GetExtensionData<TransformInfo>();
+            if( info?.TextCache != null )
+            {
+               var prev = CallOrigin.TextCache;
+               CallOrigin.TextCache = info.TextCache;
+               try
+               {
+                  CallOrigin.AssociateSubHierarchyWithTransformInfo( __instance, info );
+               }
+               finally
+               {
+                  CallOrigin.TextCache = prev;
+               }
+            }
+         }
+
+         _original( __instance, parent, worldPositionStays );
+      }
    }
 
    internal static class GameObject_AddComponent_Hook
@@ -49,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
          if( result.IsKnownTextType() )
          {
-            var cache = CallOrigin.CalculateTextCacheFromStackTrace();
+            var cache = CallOrigin.CalculateTextCacheFromStackTrace( null );
             if( cache != null )
             {
                var info = result.GetOrCreateTextTranslationInfo();
@@ -85,7 +130,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
          var prev = CallOrigin.TextCache;
          try
          {
-            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace();
+            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace( null );
 
             var result = _original( data, pos, rot );
 
@@ -127,7 +172,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
          var prev = CallOrigin.TextCache;
          try
          {
-            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace();
+            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace( parent?.gameObject );
 
             var result = _original( data, parent, pos, rot );
 
@@ -169,7 +214,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
          var prev = CallOrigin.TextCache;
          try
          {
-            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace();
+            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace( null );
 
             var result = _original( data );
 
@@ -211,7 +256,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
          var prev = CallOrigin.TextCache;
          try
          {
-            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace();
+            CallOrigin.TextCache = CallOrigin.CalculateTextCacheFromStackTrace( parent?.gameObject );
 
             var result = _original( data, parent, worldPositionStays );
 
