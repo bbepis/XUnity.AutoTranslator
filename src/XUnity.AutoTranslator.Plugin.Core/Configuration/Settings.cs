@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
@@ -163,7 +162,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             try
             {
-               ApplicationName = Path.GetFileNameWithoutExtension( Process.GetCurrentProcess().MainModule.FileName );
+               try
+               {
+                  ApplicationName = Path.GetFileNameWithoutExtension( ApplicationInformation.StartupPath );
+               }
+               catch( Exception )
+               {
+                  ApplicationName = Path.GetFileNameWithoutExtension( Process.GetCurrentProcess().MainModule.FileName );
+               }
             }
             catch( Exception e )
             {
