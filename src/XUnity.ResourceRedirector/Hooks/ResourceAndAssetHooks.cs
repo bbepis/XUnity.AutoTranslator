@@ -39,7 +39,8 @@ namespace XUnity.ResourceRedirector.Hooks
          typeof( Resources_Load_Hook ),
          typeof( Resources_LoadAll_Hook ),
          //typeof( Resources_LoadAsync_Hook ), // not needed
-         typeof( Resources_GetBuiltinResource_Hook ),
+         typeof( Resources_GetBuiltinResource_Old_Hook ),
+         typeof( Resources_GetBuiltinResource_New_Hook ),
          //typeof( Resources_FindObjectsOfTypeAll_Hook ), // impossible
          
 
@@ -1005,11 +1006,11 @@ namespace XUnity.ResourceRedirector.Hooks
       }
    }
 
-   internal static class Resources_GetBuiltinResource_Hook
+   internal static class Resources_GetBuiltinResource_Old_Hook
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return AccessToolsShim.Method( typeof( Resources ), "GetBuiltinResource", typeof( Type ), typeof( string ) ) == null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -1029,6 +1030,38 @@ namespace XUnity.ResourceRedirector.Hooks
       static UnityEngine.Object MM_Detour( string path, Type systemTypeInstance )
       {
          var result = _original( path, systemTypeInstance );
+
+         var parameters = new ResourceLoadedParameters( path, systemTypeInstance, ResourceLoadType.LoadNamedBuiltIn );
+         ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref result );
+
+         return result;
+      }
+   }
+
+   internal static class Resources_GetBuiltinResource_New_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return AccessToolsShim.Method( typeof( Resources ), "GetBuiltinResource", typeof( string ), typeof( Type ) ) == null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( Resources ), "GetBuiltinResource", typeof( Type ), typeof( string ) );
+      }
+
+      delegate UnityEngine.Object OriginalMethod( Type systemTypeInstance, string path );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static UnityEngine.Object MM_Detour( Type systemTypeInstance, string path )
+      {
+         var result = _original( systemTypeInstance, path );
 
          var parameters = new ResourceLoadedParameters( path, systemTypeInstance, ResourceLoadType.LoadNamedBuiltIn );
          ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref result );

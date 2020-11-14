@@ -4,10 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -47,7 +49,18 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal static void SetTextCacheForAllObjectsInHierachy( this object go, IReadOnlyTextTranslationCache cache )
+      public static void AssociateSubHierarchyWithTransformInfo( Transform root, TransformInfo info )
+      {
+         var transforms = root.GetComponentsInChildren<Transform>( true );
+         foreach( var transform in transforms )
+         {
+            transform.SetExtensionData( info );
+         }
+
+         SetTextCacheForAllObjectsInHierachy( root.gameObject, info.TextCache );
+      }
+
+      public static void SetTextCacheForAllObjectsInHierachy( this GameObject go, IReadOnlyTextTranslationCache cache )
       {
          try
          {
@@ -56,6 +69,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var info = comp.GetOrCreateTextTranslationInfo();
                info.TextCache = cache;
             }
+
+            var ti = new TransformInfo { TextCache = cache };
+            foreach( var transform in go.GetComponentsInChildren<Transform>( true ) )
+            {
+               transform.SetExtensionData( ti );
+            }
          }
          catch( Exception e )
          {
@@ -63,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      internal static IReadOnlyTextTranslationCache CalculateTextCacheFromStackTrace()
+      public static IReadOnlyTextTranslationCache CalculateTextCacheFromStackTrace( GameObject parent )
       {
          try
          {
@@ -91,6 +110,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      return translationCache;
                   }
                }
+            }
+
+            if( parent != null )
+            {
+               var info = parent.transform.GetExtensionData<TransformInfo>();
+               return info?.TextCache;
             }
          }
          catch( Exception e )

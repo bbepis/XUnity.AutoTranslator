@@ -13,6 +13,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    /// </summary>
    public static class LanguageHelper
    {
+      internal static bool HasRedirectedTexts = false;
+
+      private const string MogolianVowelSeparatorString = "\u180e";
+      private const char MogolianVowelSeparatorCharacter = '\u180e';
+
       private static Func<string, bool> DefaultSymbolCheck;
       private static readonly Dictionary<string, Func<string, bool>> LanguageSymbolChecks = new Dictionary<string, Func<string, bool>>( StringComparer.OrdinalIgnoreCase )
       {
@@ -62,6 +67,66 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return DefaultSymbolCheck( text );
       }
 
+      internal static bool IsRedirected( this string text )
+      {
+         if( text.Length > 0 )
+         {
+            switch( Settings.RedirectedResourceDetectionStrategy )
+            {
+               case RedirectedResourceDetection.AppendMongolianVowelSeparator:
+               case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAppended:
+               case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll:
+                  return text.Contains( MogolianVowelSeparatorString ); // Using a char here causes Linq usage which is MASSIVELY slower, since String.Contains(char) does not exist in net35
+               case RedirectedResourceDetection.None:
+               default:
+                  return false;
+            }
+         }
+         return false;
+      }
+
+      internal static string FixRedirected( this string text )
+      {
+         switch( Settings.RedirectedResourceDetectionStrategy )
+         {
+            case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAppended:
+               if( text.Length > 0 && text[ text.Length - 1 ] == MogolianVowelSeparatorCharacter )
+               {
+                  return text.Substring( 0, text.Length - 1 );
+               }
+               break;
+            case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll:
+               return text.Replace( MogolianVowelSeparatorString, string.Empty );
+            case RedirectedResourceDetection.AppendMongolianVowelSeparator:
+            case RedirectedResourceDetection.None:
+            default:
+               return text;
+         }
+
+         return text;
+      }
+
+      internal static string MakeRedirected( this string text )
+      {
+         switch( Settings.RedirectedResourceDetectionStrategy )
+         {
+            case RedirectedResourceDetection.AppendMongolianVowelSeparator:
+            case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAppended:
+            case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll:
+               if( ContainsLanguageSymbolsForSourceLanguage( text ) )
+               {
+                  HasRedirectedTexts = Settings.RedirectedResourceDetectionStrategy != RedirectedResourceDetection.None;
+
+                  return text + MogolianVowelSeparatorCharacter;
+               }
+               break;
+            case RedirectedResourceDetection.None:
+            default:
+               break;
+         }
+         return text;
+      }
+
       /// <summary>
       /// Gets a bool indicating if the given string is translatable based on whether or not it
       /// contains symbols of the source language.
@@ -71,7 +136,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       public static bool IsTranslatable( string text )
       {
          return ContainsLanguageSymbolsForSourceLanguage( text )
-            //&& str.Length <= Settings.MaxCharactersPerTranslation
             && !Settings.IgnoreTextStartingWith.Any( x => text.StartsWithStrict( x ) );
       }
 

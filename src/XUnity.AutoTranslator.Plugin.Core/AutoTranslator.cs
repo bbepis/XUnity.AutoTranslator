@@ -1,4 +1,6 @@
-﻿namespace XUnity.AutoTranslator.Plugin.Core
+﻿using UnityEngine;
+
+namespace XUnity.AutoTranslator.Plugin.Core
 {
    /// <summary>
    /// Accessor for the public API surface to interact with translations provided by the Auto Translator Plugin.

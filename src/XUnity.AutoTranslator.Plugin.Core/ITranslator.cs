@@ -51,5 +51,30 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <param name="translatedText">The translated text.</param>
       /// <returns></returns>
       bool TryTranslate( string untranslatedText, int scope, out string translatedText );
+
+      /// <summary>
+      /// Indicates that the specific text component should be ignored until otherwise indicated.
+      /// </summary>
+      /// <param name="textComponent"></param>
+      void IgnoreTextComponent( object textComponent );
+
+      /// <summary>
+      /// Indicates that the specific text component should no longer be ignored until otherwise indicated.
+      /// </summary>
+      /// <param name="textComponent"></param>
+      void UnignoreTextComponent( object textComponent );
+
+      /// <summary>
+      /// Registers a callback that is called every time the plugin wants to set a translated text on
+      /// a text component allowing an external plugin to control what should be done.
+      /// </summary>
+      /// <param name="context"></param>
+      void RegisterOnTranslatingCallback( Action<ComponentTranslationContext> context );
+
+      /// <summary>
+      /// Unregisters a previous registered callback.
+      /// </summary>
+      /// <param name="context"></param>
+      void UnregisterOnTranslatingCallback( Action<ComponentTranslationContext> context );
    }
 }

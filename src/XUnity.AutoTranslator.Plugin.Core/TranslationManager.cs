@@ -38,6 +38,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationEndpointManager CurrentEndpoint { get; set; }
 
+      public TranslationEndpointManager PassthroughEndpoint { get; private set; }
+
       public void InitializeEndpoints()
       {
          try
@@ -51,6 +53,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                .OrderBy( x => x.Error != null )
                .ThenBy( x => x.Endpoint.FriendlyName )
                .ToList();
+
+            PassthroughEndpoint = AllEndpoints.FirstOrDefault( x => x.Endpoint is PassthroughTranslateEndpoint );
 
             var primaryEndpoint = AllEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.ServiceEndpoint );
             if( primaryEndpoint != null )

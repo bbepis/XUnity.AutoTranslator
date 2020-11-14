@@ -34,6 +34,7 @@ namespace XUnity.Common.Constants
 
       // Unity
       public static readonly Type GameObject = FindType( "UnityEngine.GameObject" );
+      public static readonly Type Transform = FindType( "UnityEngine.Transform" );
       public static readonly Type TextMesh = FindType( "UnityEngine.TextMesh" );
       public static readonly Type Text = FindType( "UnityEngine.UI.Text" );
       public static readonly Type Image = FindType( "UnityEngine.UI.Image" );

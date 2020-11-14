@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       // cannot be changed
       public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
       public static readonly string TranslatorsFolder = "Translators";
-      public static readonly int MaxMaxCharactersPerTranslation = 1000;
+      public static readonly int MaxMaxCharactersPerTranslation = 2500;
       public static readonly string DefaultLanguage = "en";
       public static readonly string DefaultFromLanguage = "ja";
       public static readonly string EnglishLanguage = "en";
@@ -93,6 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool EnableUIResizing;
       public static bool UseStaticTranslations;
       public static string OverrideFont;
+      public static int? OverrideFontSize;
       public static string OverrideFontTextMeshPro;
       public static string UserAgent;
       public static bool DisableCertificateValidation;
@@ -119,6 +120,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool HtmlEntityPreprocessing;
       public static bool HandleRichText;
       public static bool EnableTranslationHelper;
+      public static RedirectedResourceDetection RedirectedResourceDetectionStrategy;
+      public static bool OutputTooLongText;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -158,7 +161,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             try
             {
-               ApplicationName = Path.GetFileNameWithoutExtension( Process.GetCurrentProcess().MainModule.FileName );
+               try
+               {
+                  ApplicationName = Path.GetFileNameWithoutExtension( ApplicationInformation.StartupPath );
+               }
+               catch( Exception )
+               {
+                  ApplicationName = Path.GetFileNameWithoutExtension( Process.GetCurrentProcess().MainModule.FileName );
+               }
             }
             catch( Exception e )
             {
@@ -194,6 +204,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
             UseStaticTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "UseStaticTranslations", true );
             OverrideFont = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFont", string.Empty );
+            OverrideFontSize = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontSize", (int?)null );
             OverrideFontTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontTextMeshPro", string.Empty );
             ResizeUILineSpacingScale = PluginEnvironment.Current.Preferences.GetOrDefault<float?>( "Behaviour", "ResizeUILineSpacingScale", null );
             ForceUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceUIResizing", false );
@@ -226,7 +237,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTranslationHelper = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableTranslationHelper", false );
             ForceMonoModHooks = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceMonoModHooks", false );
             InitializeHarmonyDetourBridge = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "InitializeHarmonyDetourBridge", !ClrFeatures.SupportsReflectionEmit && PluginEnvironment.Current.AllowDefaultInitializeHarmonyDetourBridge );
-
+            RedirectedResourceDetectionStrategy = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RedirectedResourceDetectionStrategy", RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll );
+            OutputTooLongText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputTooLongText", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();

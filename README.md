@@ -264,7 +264,7 @@ EnableTextMesh=False             ;Enable or disable TextMesh translation
 EnableIMGUI=False                ;Enable or disable IMGUI translation
 
 [Behaviour]
-MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 1000.
+MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 2500.
 IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
 IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
 MinDialogueChars=20              ;The length of the text for it to be considered a dialogue
@@ -299,6 +299,8 @@ HandleRichText=True              ;Will enable automated handling of rich text (t
 EnableTranslationHelper=False    ;Indicates if translator-related helpful log messages should be enabled. May be useful when tranlating based on redirected resources
 ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
 InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)
+RedirectedResourceDetectionStrategy=AppendMongolianVowelSeparatorAndRemoveAll ;Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
+OutputTooLongText=False          ;Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -449,6 +451,8 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
  * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. Enabling this may also output a lot of garbage to the `OutputFile` that should be deleted before potential redistribution. **Never redistribute the mod with this enabled.**
  * `IgnoreVirtualTextSetterCallingRules`: Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components.
+ * `RedirectedResourceDetectionStrategy`: Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
+ * `OutputTooLongText`: Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
@@ -2529,5 +2533,10 @@ public class ScenarioDataResourceRedirector : AssetLoadedHandlerBaseV2<ScenarioD
    }
 }
 ```
+
+Note that this implementation uses a `SimpleTextTranslationCache` to lookup translations. Using this class for translation lookups have the following benefits:
+ * Whitespace doesn't have to match exactly.
+ * It respects the `RedirectedResourceDetectionStrategy` configuration. If this is not respected the plugin may double translate certain texts.
+ * When loading text translation files, it supports the same text format that is otherwise used by the plugin.
 
 Once you have implemented one of these classes, you just need to instantiate it and it will do it's magic. 

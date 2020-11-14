@@ -10,6 +10,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    internal abstract class TextTranslationInfo
    {
       private bool _initialized = false;
+      private HashSet<string> _redirectedTranslations;
 
       public string OriginalText { get; set; }
       public string TranslatedText { get; set; }
@@ -20,6 +21,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public bool IsKnownTextComponent { get; set; }
       public bool SupportsStabilization { get; set; }
       public bool ShouldIgnore { get; set; }
+
+      public HashSet<string> RedirectedTranslations => _redirectedTranslations ?? ( _redirectedTranslations = new HashSet<string>() );
 
       public IReadOnlyTextTranslationCache TextCache { get; set; }
 

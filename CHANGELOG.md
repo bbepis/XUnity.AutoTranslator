@@ -1,4 +1,16 @@
-﻿### 4.12.1
+﻿### 4.13.0
+ * FEATURE - API that allows external plugins to take some degree of control of how a game is translated
+ * FEATURE - Can now output text that exceeds the maximum length if configured through 'OutputTooLongText'
+ * MISC - Increased max value of 'MaxCharactersPerTranslation' from 1000 to 2500
+ * MISC - Allow fallback to reflection when dynamic code generation fails
+ * BUG FIX - A new option that controls and attempts to prevent potential double translations of redirected resources
+ * BUG FIX - Bug in manual plugin translations in relation to unity combo boxes
+ * BUG FIX - Bug in the translation aggregator where the default translation would always be copied
+ * BUG FIX - Fixed bug that caused traditional chinese not to be usable with Baidu
+ * BUG FIX - Fixed bug that ignored the delay configuration in the BaiduTranslate implementation
+ * BUG FIX - Fixed bug that caused language detection not to be usable with Bing
+
+### 4.12.1
  * MISC - Option to enable Harmony detour bridge (enabled by default for ReiPatcher setup if SRE is not supported)
  * MISC - Improved ForceUIResizing implementation
  * MISC - Some performance improvements during text component compatibility checks

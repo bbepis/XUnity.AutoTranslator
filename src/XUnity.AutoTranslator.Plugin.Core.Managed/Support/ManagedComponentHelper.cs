@@ -192,28 +192,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
          if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TMP_Text ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TMP_Text, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableUGUI && UnityTypes.Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.Text ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.Text, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableTextMesh && UnityTypes.TextMesh != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TextMesh ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TextMesh, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableNGUI && UnityTypes.UILabel != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.UILabel ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.UILabel, true ) )
             {
                yield return comp;
             }

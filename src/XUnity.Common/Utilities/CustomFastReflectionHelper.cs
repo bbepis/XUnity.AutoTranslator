@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 
 namespace XUnity.Common.Utilities
 {
@@ -37,7 +38,7 @@ namespace XUnity.Common.Utilities
          }
          else
          {
-            dmd = ReflectionEmitFastReflectionHelper.CreateFastDelegate( method, directBoxValueAccess, forceNonVirtCall );
+            dmd = GetFastDelegateForSRE( method, directBoxValueAccess, forceNonVirtCall );
          }
 
          _MethodCache.Add( key, dmd );
@@ -59,7 +60,7 @@ namespace XUnity.Common.Utilities
          }
          else
          {
-            return ReflectionEmitFastReflectionHelper.CreateFastFieldGetter<T, F>( fieldInfo );
+            return CreateFastFieldGetterForSRE<T, F>( fieldInfo );
          }
       }
 
@@ -78,22 +79,117 @@ namespace XUnity.Common.Utilities
          }
          else
          {
-            return ReflectionEmitFastReflectionHelper.CreateFastFieldSetter<T, F>( fieldInfo );
+            return CreateFastFieldSetterForSRE<T, F>( fieldInfo );
          }
       }
 
       // wrapped method calls to ensure the class is not initialized if unavailable
       private static FastReflectionDelegate GetFastDelegateForCecil( MethodBase method, bool directBoxValueAccess, bool forceNonVirtCall )
       {
-         return CecilFastReflectionHelper.CreateFastDelegate( method, directBoxValueAccess, forceNonVirtCall ); ;
+         try
+         {
+            return CecilFastReflectionHelper.CreateFastDelegate( method, directBoxValueAccess, forceNonVirtCall );
+         }
+         catch( Exception e1 )
+         {
+            try
+            {
+               XuaLogger.Common.Warn( e1, "Failed creating fast reflection delegate through with cecil. Retrying with reflection emit..." );
+
+               return ReflectionEmitFastReflectionHelper.CreateFastDelegate( method, directBoxValueAccess, forceNonVirtCall ); ;
+            }
+            catch( Exception e2 )
+            {
+               XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+               return ( target, args ) => method.Invoke( target, args );
+            }
+         }
       }
       private static Func<T, F> CreateFastFieldGetterForCecil<T, F>( FieldInfo fieldInfo )
       {
-         return CecilFastReflectionHelper.CreateFastFieldGetter<T, F>( fieldInfo );
+         try
+         {
+            return CecilFastReflectionHelper.CreateFastFieldGetter<T, F>( fieldInfo );
+         }
+         catch( Exception e1 )
+         {
+            try
+            {
+               XuaLogger.Common.Warn( e1, "Failed creating fast reflection delegate through with cecil. Retrying with reflection emit..." );
+
+               return ReflectionEmitFastReflectionHelper.CreateFastFieldGetter<T, F>( fieldInfo );
+            }
+            catch( Exception e2 )
+            {
+               XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+               return ( target ) => (F)fieldInfo.GetValue( target );
+            }
+         }
       }
       private static Action<T, F> CreateFastFieldSetterForCecil<T, F>( FieldInfo fieldInfo )
       {
-         return CecilFastReflectionHelper.CreateFastFieldSetter<T, F>( fieldInfo );
+         try
+         {
+            return CecilFastReflectionHelper.CreateFastFieldSetter<T, F>( fieldInfo );
+         }
+         catch( Exception e1 )
+         {
+            try
+            {
+               XuaLogger.Common.Warn( e1, "Failed creating fast reflection delegate through with cecil. Retrying with reflection emit..." );
+
+               return ReflectionEmitFastReflectionHelper.CreateFastFieldSetter<T, F>( fieldInfo );
+            }
+            catch( Exception e2 )
+            {
+               XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+               return ( target, value ) => fieldInfo.SetValue( target, value );
+            }
+         }
+      }
+
+
+      private static FastReflectionDelegate GetFastDelegateForSRE( MethodBase method, bool directBoxValueAccess, bool forceNonVirtCall )
+      {
+         try
+         {
+            return ReflectionEmitFastReflectionHelper.CreateFastDelegate( method, directBoxValueAccess, forceNonVirtCall ); ;
+         }
+         catch( Exception e2 )
+         {
+            XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+            return ( target, args ) => method.Invoke( target, args );
+         }
+      }
+      private static Func<T, F> CreateFastFieldGetterForSRE<T, F>( FieldInfo fieldInfo )
+      {
+         try
+         {
+            return ReflectionEmitFastReflectionHelper.CreateFastFieldGetter<T, F>( fieldInfo );
+         }
+         catch( Exception e2 )
+         {
+            XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+            return ( target ) => (F)fieldInfo.GetValue( target );
+         }
+      }
+      private static Action<T, F> CreateFastFieldSetterForSRE<T, F>( FieldInfo fieldInfo )
+      {
+         try
+         {
+            return ReflectionEmitFastReflectionHelper.CreateFastFieldSetter<T, F>( fieldInfo );
+         }
+         catch( Exception e2 )
+         {
+            XuaLogger.Common.Warn( e2, "Failed creating fast reflection delegate through with reflection emit. Falling back to standard reflection..." );
+
+            return ( target, value ) => fieldInfo.SetValue( target, value );
+         }
       }
 
       private struct FastReflectionDelegateKey
