@@ -50,8 +50,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Textures\" />
-  </ItemGroup>
-
 </Project>

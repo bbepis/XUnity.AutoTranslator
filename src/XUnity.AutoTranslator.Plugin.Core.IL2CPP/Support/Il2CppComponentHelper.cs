@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -243,21 +245,63 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return fallbackName;
       }
 
+      private List<IPropertyMover> _texturePropertyMovers;
+
+      private interface IPropertyMover
+      {
+         void MoveProperty( object source, object destination );
+      }
+
+      private class PropertyMover<T, TPropertyType> : IPropertyMover
+      {
+         private readonly Func<T, TPropertyType> _get;
+         private readonly Action<T, TPropertyType> _set;
+
+         public PropertyMover( PropertyInfo propertyInfo )
+         {
+            var getter = propertyInfo.GetGetMethod();
+            var setter = propertyInfo.GetSetMethod();
+
+            _get = (Func<T, TPropertyType>)ExpressionHelper.CreateTypedFastInvoke( getter );
+            _set = (Action<T, TPropertyType>)ExpressionHelper.CreateTypedFastInvoke( setter );
+         }
+
+         public void MoveProperty( object source, object destination )
+         {
+            var value = _get( (T)source );
+            _set( (T)destination, value );
+         }
+      }
+
+      private void LoadProperty<TPropertyType>( string propertyName )
+      {
+         var property = typeof( Texture2D ).GetProperty( propertyName );
+         if( property.CanWrite && property.CanRead )
+         {
+            _texturePropertyMovers.Add( new PropertyMover<Texture, TPropertyType>( property ) );
+         }
+      }
+
       public void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture )
       {
          TextureLoader.Load( texture, data, dataType );
 
          if( texture is Texture2D texture2D && originalTexture is Texture2D originalTexture2D )
          {
-#error how do we set all properties if possible?
+            if( _texturePropertyMovers == null )
+            {
+               _texturePropertyMovers = new List<IPropertyMover>();
+               LoadProperty<string>( "name" );
+               LoadProperty<int>( "anisoLevel" );
+               LoadProperty<FilterMode>( "filterMode" );
+               LoadProperty<float>( "mipMapBias" );
+               LoadProperty<bool>( "wrapMode" );
+            }
 
-            // Use ExpressionHelper + null checks to set values
-
-            texture2D.name = originalTexture2D.name;
-            texture2D.anisoLevel = originalTexture2D.anisoLevel;
-            texture2D.filterMode = originalTexture2D.filterMode;
-            texture2D.mipMapBias = originalTexture2D.mipMapBias;
-            texture2D.wrapMode = originalTexture2D.wrapMode;
+            foreach( var prop in _texturePropertyMovers )
+            {
+               prop.MoveProperty( originalTexture2D, texture2D );
+            }
          }
       }
 
@@ -279,7 +323,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       public void SetTexture( object ui, object texture )
       {
-         
+
       }
 
       public void SetAllDirtyEx( object ui )

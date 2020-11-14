@@ -32,7 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
 
       public void Load( object texture, byte[] data )
       {
-#error use custom reflection helper here
+#warning use custom reflection helper here
 
          if( ImageConversion_LoadImage != null )
          {

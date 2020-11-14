@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Utilities;
 

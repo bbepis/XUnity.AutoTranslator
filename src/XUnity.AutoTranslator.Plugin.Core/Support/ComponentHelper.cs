@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support

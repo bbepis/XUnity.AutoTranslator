@@ -42,6 +42,10 @@ using MonoMod.RuntimeDetour;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 #endif
 
+#if IL2CPP
+using XUnity.AutoTranslator.Plugin.Core.IL2CPP;
+#endif
+
 namespace XUnity.AutoTranslator.Plugin.Core
 {
    /// <summary>
@@ -2436,6 +2440,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred in Update callback. " );
          }
+
+#if IL2CPP
+         Il2CppCoroutines.Process();
+#endif
       }
 
       private void PrintSceneInformation()

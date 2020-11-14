@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Textures;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
 {
@@ -8,6 +10,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
    {
       public void Load( object texture, byte[] data )
       {
+#if IL2CPP
+         throw new NotImplementedException();
+#endif
+
+#if MANAGED
          if( texture == null && data == null ) return;
 
          Texture2D texture2D = (Texture2D)texture;
@@ -73,6 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
             texture2D.SetPixels32( colors );
             texture2D.Apply();
          }
+#endif
       }
 
       public bool Verify()

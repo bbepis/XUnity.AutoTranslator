@@ -54,7 +54,7 @@ namespace XUnity.Common.Logging
          }
          else
          {
-            var melonModLogger = Type.GetType( "MelonLoader.MelonModLogger, MelonLoader.ModHandler", false );
+            var melonModLogger = Type.GetType( "MelonLoader.MelonLogger, MelonLoader.ModHandler", false );
             if( melonModLogger != null )
             {
                var logDebugMethod = melonModLogger.GetMethod( "Log", staticFlags, null, new Type[] { typeof( ConsoleColor ), typeof( string ) }, null );

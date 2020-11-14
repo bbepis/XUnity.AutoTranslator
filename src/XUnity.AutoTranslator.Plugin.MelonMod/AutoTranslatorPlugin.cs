@@ -11,11 +11,10 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.MelonMod;
-using XUnity.AutoTranslator.Plugin.MelonMod.Support;
 using XUnity.Common.Support;
 
-[assembly: MelonModInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
-[assembly: MelonModGame( null, null )]
+[assembly: MelonInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
+[assembly: MelonGame( null, null )]
 
 namespace XUnity.AutoTranslator.Plugin.MelonMod
 {
@@ -25,7 +24,7 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
 
       public override void OnApplicationStart()
       {
-         CoroutineHelper.Instance = new MelonModCoroutineHelper();
+         //CoroutineHelper.Instance = new MelonModCoroutineHelper();
 
          _monoBehaviour = PluginLoader.Load();
 
