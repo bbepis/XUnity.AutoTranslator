@@ -1,4 +1,5 @@
-﻿using XUnity.AutoTranslator.Plugin.Core.Shims;
+﻿using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Support;
 
@@ -8,7 +9,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
    {
       public ProtocolTransactionHandle()
       {
-         StartTime = TimeHelper.Instance.realtimeSinceStartup;
+         StartTime = Time.realtimeSinceStartup;
       }
 
       public void SetCompleted( string[] translatedTexts, string error )

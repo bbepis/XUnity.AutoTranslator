@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Support;
@@ -163,8 +164,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
-               var timeShim = TimeHelper.Instance;
-               var startTime = timeShim.realtimeSinceStartup;
+               var startTime = Time.realtimeSinceStartup;
 
                _translatedImages.Clear();
                _untranslatedImages.Clear();
@@ -176,7 +176,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   RegisterImageFromFile( fullFileName );
                }
 
-               var endTime = timeShim.realtimeSinceStartup;
+               var endTime = Time.realtimeSinceStartup;
                XuaLogger.AutoTranslator.Debug( $"Loaded texture files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
             }
          }

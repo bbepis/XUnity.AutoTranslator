@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Support;
@@ -51,7 +52,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckConsecutiveSeconds()
       {
-         var currentSecond = (int)TimeHelper.Instance.time;
+         var currentSecond = (int)Time.time;
          var lastSecond = currentSecond - 1;
 
          if( lastSecond == _secondForQueuedTranslation )
@@ -84,7 +85,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckConsecutiveFrames()
       {
-         var currentFrame = TimeHelper.Instance.frameCount;
+         var currentFrame = Time.frameCount;
          var lastFrame = currentFrame - 1;
 
          if( lastFrame == _frameForLastQueuedTranslation )
@@ -117,7 +118,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void PeriodicResetFrameCheck()
       {
-         var currentSecond = (int)TimeHelper.Instance.time;
+         var currentSecond = (int)Time.time;
          if( currentSecond % 100 == 0 )
          {
             _consecutiveFramesTranslated = 0;
@@ -126,7 +127,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckStaggerText( string untranslatedText )
       {
-         var currentFrame = TimeHelper.Instance.frameCount;
+         var currentFrame = Time.frameCount;
          if( currentFrame != _lastStaggerCheckFrame )
          {
             _lastStaggerCheckFrame = currentFrame;
@@ -171,8 +172,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void CheckThresholds()
       {
-         var timeShim = TimeHelper.Instance;
-
          if( _translationManager.UnstartedTranslations > Settings.MaxUnstartedJobs )
          {
             _translationManager.ClearAllJobs();
@@ -181,8 +180,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             XuaLogger.AutoTranslator.Error( $"SPAM DETECTED: More than {Settings.MaxUnstartedJobs} queued for translations due to unknown reasons. Shutting down plugin." );
          }
 
-         var previousIdx = ( (int)( timeShim.time - timeShim.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
-         var newIdx = ( (int)timeShim.time ) % Settings.TranslationQueueWatchWindow;
+         var time = Time.time;
+         var previousIdx = ( (int)( time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
+         var newIdx = ( (int)time ) % Settings.TranslationQueueWatchWindow;
          if( previousIdx != newIdx )
          {
             _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ] = 0;
@@ -195,10 +195,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( !_timeExceededThreshold.HasValue )
             {
-               _timeExceededThreshold = timeShim.time;
+               _timeExceededThreshold = time;
             }
 
-            if( timeShim.time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
+            if( time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
             {
                _translationManager.ClearAllJobs();
 
@@ -214,10 +214,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void ResetThresholdTimerIfRequired()
       {
-         var timeShim = TimeHelper.Instance;
-
-         var previousIdx = ( (int)( timeShim.time - timeShim.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
-         var newIdx = ( (int)timeShim.time ) % Settings.TranslationQueueWatchWindow;
+         var time = Time.time;
+         var previousIdx = ( (int)( time - Time.deltaTime ) ) % Settings.TranslationQueueWatchWindow;
+         var newIdx = ( (int)time ) % Settings.TranslationQueueWatchWindow;
          if( previousIdx != newIdx )
          {
             _currentTranslationsQueuedPerSecondRollingWindow[ newIdx ] = 0;

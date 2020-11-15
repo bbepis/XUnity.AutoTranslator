@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Web;
@@ -132,12 +133,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// </summary>
       public virtual void Update()
       {
-         var timeShim = TimeHelper.Instance;
-         if( timeShim.frameCount % 30 == 0 )
+         if( Time.frameCount % 30 == 0 )
          {
             lock( _sync )
             {
-               var time = timeShim.realtimeSinceStartup;
+               var time = Time.realtimeSinceStartup;
 
                List<Guid> idsToRemove = null;
                foreach( var kvp in _transactionHandles )

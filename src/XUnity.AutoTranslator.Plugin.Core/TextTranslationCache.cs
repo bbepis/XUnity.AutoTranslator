@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
@@ -125,8 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                XuaLogger.AutoTranslator.Debug( $"--- Loading Global Translations ---" );
             }
 
-            var timeShim = TimeHelper.Instance;
-            var startTime = timeShim.realtimeSinceStartup;
+            var startTime = Time.realtimeSinceStartup;
             lock( _writeToFileSync )
             {
                string pluginsDir = Path.Combine( Settings.TranslationsPath, "plugins" );
@@ -210,13 +210,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   XuaLogger.AutoTranslator.Error( e, "An error occurred while loading translations in KVP translation package: " + kvpPackage.Name );
                }
             }
-            var endTime = timeShim.realtimeSinceStartup;
+            var endTime = Time.realtimeSinceStartup;
 
             XuaLogger.AutoTranslator.Debug( $"Loaded translation text files (took {Math.Round( endTime - startTime, 2 )} seconds)" );
 
             // generate variations of created translations
             {
-               startTime = timeShim.realtimeSinceStartup;
+               startTime = Time.realtimeSinceStartup;
 
                foreach( var kvp in _translations.ToList() )
                {
@@ -255,13 +255,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                XuaLogger.AutoTranslator.Debug( $"Created variation translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
-               endTime = timeShim.realtimeSinceStartup;
+               endTime = Time.realtimeSinceStartup;
             }
 
             // generate token translations, which are online allowed when getting 'token' translations
             if( Settings.GeneratePartialTranslations )
             {
-               startTime = timeShim.realtimeSinceStartup;
+               startTime = Time.realtimeSinceStartup;
 
                foreach( var kvp in _translations.ToList() )
                {
@@ -270,11 +270,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
 
                XuaLogger.AutoTranslator.Debug( $"Created partial translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
-               endTime = timeShim.realtimeSinceStartup;
+               endTime = Time.realtimeSinceStartup;
             }
 
             var parser = new RichTextParser();
-            startTime = timeShim.realtimeSinceStartup;
+            startTime = Time.realtimeSinceStartup;
 
             foreach( var kvp in _translations.ToList() )
             {
@@ -322,7 +322,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             XuaLogger.AutoTranslator.Debug( $"Created token translations (took {Math.Round( endTime - startTime, 2 )} seconds)" );
-            endTime = timeShim.realtimeSinceStartup;
+            endTime = Time.realtimeSinceStartup;
 
             if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Translations generated: {_translations.Count}" );
             if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Regex translations generated: {_defaultRegexes.Count}" );

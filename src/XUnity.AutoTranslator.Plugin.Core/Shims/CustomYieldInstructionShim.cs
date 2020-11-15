@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Support;
 
@@ -28,15 +29,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
          
          if( InGameTimeout.HasValue )
          {
-            var timeShim = TimeHelper.Instance;
-
             if( !_startTime.HasValue )
             {
-               _startTime = timeShim.realtimeSinceStartup;
+               _startTime = Time.realtimeSinceStartup;
             }
 
             var startTime = _startTime.Value;
-            var time = timeShim.realtimeSinceStartup - startTime;
+            var time = Time.realtimeSinceStartup - startTime;
 
             if( time > InGameTimeout )
             {

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
@@ -717,7 +718,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       public IEnumerator Translate( string[] untranslatedTexts, string from, string to, Action<string[]> success, Action<string, Exception> failure )
       {
-         var startTime = TimeHelper.Instance.realtimeSinceStartup;
+         var startTime = Time.realtimeSinceStartup;
          var context = new TranslationContext( untranslatedTexts, from, to, success, failure );
          _ongoingTranslations++;
 
@@ -744,7 +745,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                      ok = iterator.MoveNext();
 
                      // check for timeout
-                     var now = TimeHelper.Instance.realtimeSinceStartup;
+                     var now = Time.realtimeSinceStartup;
                      if( now - startTime > Settings.Timeout )
                      {
                         ok = false;
