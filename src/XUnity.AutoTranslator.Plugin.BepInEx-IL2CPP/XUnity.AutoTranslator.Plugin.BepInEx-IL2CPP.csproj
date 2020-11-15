@@ -21,13 +21,13 @@
       <HintPath>..\..\libs\ExIni.dll</HintPath>
     </Reference>
     <Reference Include="Il2Cppmscorlib">
-      <HintPath>..\..\libs\MelonMod\Managed\Il2Cppmscorlib.dll</HintPath>
+      <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerBaseLib">
-      <HintPath>..\..\libs\MelonMod\Managed\UnhollowerBaseLib.dll</HintPath>
+      <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\libs\MelonMod\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
