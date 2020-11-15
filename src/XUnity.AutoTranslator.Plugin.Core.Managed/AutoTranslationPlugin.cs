@@ -103,6 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _hasValidOverrideFont = false;
       private bool _hasOverridenFont = false;
       private bool _initialized = false;
+      private bool _started = false;
       private bool _temporarilyDisabled = false;
       private string _requireSpriteRendererCheckCausedBy = null;
       private int _lastSpriteUpdateFrame = -1;
@@ -2484,16 +2485,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void Start()
       {
-         // Ensure awake is called. This will not be called when the plugin is loaded by MelonLoader
-         Awake();
+         if( !_started )
+         {
+            _started = true;
 
-         try
-         {
-            CoroutineHelper.Instance.Start( HookLoadedPlugins() );
-         }
-         catch( Exception e )
-         {
-            XuaLogger.AutoTranslator.Error( e, "An unexpected error occurred during plugin start." );
+            // Ensure awake is called. This will not be called when the plugin is loaded by MelonLoader
+            Awake();
+
+            try
+            {
+               CoroutineHelper.Instance.Start( HookLoadedPlugins() );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An unexpected error occurred during plugin start." );
+            }
          }
       }
 
