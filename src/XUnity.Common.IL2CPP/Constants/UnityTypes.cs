@@ -10,8 +10,6 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Constants
 {
-#pragma warning disable CS1591 // Really could not care less..
-
    public static class UnityTypes
    {
       private static bool _initialized;
@@ -32,7 +30,7 @@ namespace XUnity.Common.Constants
             {
                XuaLogger.AutoTranslator.Info( "Force loading ALL proxy assemblies." );
 
-               var dir = new FileInfo( typeof( UnityTypes ).Assembly.Location ).Directory;
+               var dir = string.IsNullOrEmpty( Il2CppProxyAssemblies.Location ) ? new FileInfo( typeof( UnityTypes ).Assembly.Location ).Directory : new DirectoryInfo( Il2CppProxyAssemblies.Location );
                var files = dir.GetFiles();
                foreach( var file in files )
                {

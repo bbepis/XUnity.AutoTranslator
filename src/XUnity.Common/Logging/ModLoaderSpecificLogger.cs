@@ -20,13 +20,13 @@ namespace XUnity.Common.Logging
          var staticFlags = BindingFlags.Static | BindingFlags.Public;
          var instanceFlags = BindingFlags.Instance | BindingFlags.Public;
 
-         var logLevelType = Type.GetType( "BepInEx.Logging.LogLevel, BepInEx", false );
+         var logLevelType = Type.GetType( "BepInEx.Logging.LogLevel, BepInEx", false ) ?? Type.GetType( "BepInEx.Logging.LogLevel, BepInEx.Core", false );
          if( logLevelType != null )
          {
-            var manualLogSourceType = Type.GetType( "BepInEx.Logging.ManualLogSource, BepInEx", false );
+            var manualLogSourceType = Type.GetType( "BepInEx.Logging.ManualLogSource, BepInEx", false ) ?? Type.GetType( "BepInEx.Logging.ManualLogSource, BepInEx.Core", false );
             if( manualLogSourceType != null )
             {
-               var loggerType = Type.GetType( "BepInEx.Logging.Logger, BepInEx", false );
+               var loggerType = Type.GetType( "BepInEx.Logging.Logger, BepInEx", false ) ?? Type.GetType( "BepInEx.Logging.Logger, BepInEx.Core", false );
                var createLogSourceMethod = loggerType.GetMethod( "CreateLogSource", staticFlags, null, new[] { typeof( string ) }, null );
                var logInstance = createLogSourceMethod.Invoke( null, new object[] { Source } );
                var logMethod = logInstance.GetType().GetMethod( "Log", instanceFlags, null, new[] { logLevelType, typeof( object ) }, null );

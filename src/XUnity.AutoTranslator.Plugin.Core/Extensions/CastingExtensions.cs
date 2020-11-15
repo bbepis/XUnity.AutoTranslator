@@ -16,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return Helper.TryCastTo( obj, out castedObject );
       }
 
-      public static TObject TryCastTo<TObject>( this object obj )
+      public static TObject CastTo<TObject>( this object obj )
       {
          if( Helper.TryCastTo( obj, out TObject castedObject ) )
          {

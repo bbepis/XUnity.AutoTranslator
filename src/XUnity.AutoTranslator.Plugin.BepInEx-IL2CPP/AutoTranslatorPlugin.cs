@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using BepInEx;
+using BepInEx.IL2CPP;
+using BepInEx.Logging;
 using ExIni;
-using MelonLoader;
 using UnhollowerRuntimeLib;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
@@ -13,31 +15,69 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.MelonMod;
+using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;
 
-[assembly: MelonInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
-[assembly: MelonGame( null, null )]
-
 namespace XUnity.AutoTranslator.Plugin.MelonMod
 {
-   public class AutoTranslatorPlugin : MelonLoader.MelonMod
+   [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
+   public class AutoTranslatorPlugin : BasePlugin, IPluginEnvironment
    {
       public static IMonoBehaviour _monoBehaviour;
 
+      private IniFile _file;
+      private string _configPath;
 
-      public override void OnApplicationStart()
+      public AutoTranslatorPlugin()
       {
-         _monoBehaviour = PluginLoader.Load();
+         ConfigPath = Paths.ConfigPath;
+         TranslationPath = Paths.BepInExRootPath;
 
-         AutoTranslatorBehaviour.Create();
+         _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
 
-         //_monoBehaviour.Start();
+         Il2CppProxyAssemblies.Location = Path.Combine( Paths.BepInExRootPath, "unhollowed" );
       }
 
-      public override void OnUpdate()
+      public override void Load()
       {
-         //_monoBehaviour.Update();
+         _monoBehaviour = PluginLoader.LoadWithConfig( this );
+
+         AutoTranslatorBehaviour.Create();
+      }
+
+      public IniFile Preferences
+      {
+         get
+         {
+            return ( _file ?? ( _file = ReloadConfig() ) );
+         }
+      }
+
+      public string ConfigPath { get; }
+
+      public string TranslationPath { get; }
+
+      public bool AllowDefaultInitializeHarmonyDetourBridge => false;
+
+      public IniFile ReloadConfig()
+      {
+         if( !File.Exists( _configPath ) )
+         {
+            return ( _file ?? new IniFile() );
+         }
+         IniFile ini = IniFile.FromFile( _configPath );
+         if( _file == null )
+         {
+            return ( _file = ini );
+         }
+         _file.Merge( ini );
+         return _file;
+      }
+
+      public void SaveConfig()
+      {
+         _file.Save( _configPath );
       }
    }
 

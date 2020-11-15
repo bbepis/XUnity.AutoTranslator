@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return Settings.HandleRichText && ComponentHelper.Instance.SupportsRichText( ui );
+         return Settings.HandleRichText && ui.SupportsRichText();
       }
 
       private static bool IsAllLatin( string value, int endIdx )

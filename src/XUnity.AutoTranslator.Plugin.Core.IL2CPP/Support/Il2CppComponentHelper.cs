@@ -70,7 +70,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
             if( !ignoreComponentState )
             {
-               var behaviour = component.TryCastTo<Behaviour>();
+               var behaviour = component.CastTo<Behaviour>();
                if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
                {
                   return false;

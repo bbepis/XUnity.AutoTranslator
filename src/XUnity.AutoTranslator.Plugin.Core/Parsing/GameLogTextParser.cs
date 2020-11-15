@@ -15,7 +15,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public bool CanApply( object ui )
       {
-         return ComponentHelper.Instance.SupportsLineParser( ui );
+         return ui.SupportsLineParser();
       }
 
       public ParserResult Parse( string input, int scope, IReadOnlyTextTranslationCache cache )
