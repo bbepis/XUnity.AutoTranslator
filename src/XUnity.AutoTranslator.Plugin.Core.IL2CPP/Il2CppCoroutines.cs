@@ -64,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP
          }
       }
 
-      internal static void Process()
+      internal static void ProcessPostUpdate()
       {
          for( var i = _coroutines.Count - 1; i >= 0; i-- )
          {
@@ -79,17 +79,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.IL2CPP
             }
          }
 
-         ProcessCoroList( _coroutinesForNextFrame );
+         ProcessCoroutinesForNextFrame();
       }
 
-      private static void ProcessCoroList( List<IEnumerator> target )
+      private static void ProcessCoroutinesForNextFrame()
       {
-         if( target.Count == 0 ) return;
+         if( _coroutinesForNextFrame.Count == 0 ) return;
 
          // use a temp list to make sure waits made during processing are not handled by same processing invocation
          // additionally, a temp list reduces allocations compared to an array
-         _temp.AddRange( target );
-         target.Clear();
+         _temp.AddRange( _coroutinesForNextFrame );
+         _coroutinesForNextFrame.Clear();
          foreach( var enumerator in _temp )
          {
             ProcessNextOfCoroutine( enumerator );

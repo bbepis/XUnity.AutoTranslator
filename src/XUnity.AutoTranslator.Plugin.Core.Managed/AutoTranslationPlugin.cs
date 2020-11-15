@@ -2600,7 +2600,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
 
 #if IL2CPP
-         Il2CppCoroutines.Process();
+         Il2CppCoroutines.ProcessPostUpdate();
 #endif
       }
 
