@@ -77,11 +77,13 @@ namespace XUnity.Common.Constants
       public static readonly Type AdvPage = FindType( "Utage.AdvPage" );
       public static readonly Type TextData = FindType( "Utage.TextData" );
       public static readonly Type AdvUguiMessageWindow = FindType( "Utage.AdvUguiMessageWindow" ) ?? FindType( "AdvUguiMessageWindow" );
+      public static readonly Type AdvUiMessageWindow = FindType( "AdvUiMessageWindow" );
       public static readonly Type AdvDataManager = FindType( "Utage.AdvDataManager" );
       public static readonly Type AdvScenarioData = FindType( "Utage.AdvScenarioData" );
       public static readonly Type AdvScenarioLabelData = FindType( "Utage.AdvScenarioLabelData" );
       public static readonly Type DicingTextures = FindType( "Utage.DicingTextures" );
       public static readonly Type DicingImage = FindType( "Utage.DicingImage" );
+      public static readonly Type TextArea2D = FindType( "Utage.TextArea2D" );
 
       // Live2D
       public static readonly Type CubismRenderer = FindType( "Live2D.Cubism.Rendering.CubismRenderer" );
@@ -109,6 +111,12 @@ namespace XUnity.Common.Constants
       {
          public static CachedProperty Text = ClrTypes.AdvUguiMessageWindow?.CachedProperty( "Text" );
          public static CachedProperty Engine = ClrTypes.AdvUguiMessageWindow?.CachedProperty( "Engine" );
+      }
+
+      public static class AdvUiMessageWindow_Fields
+      {
+         public static CachedField text = ClrTypes.AdvUiMessageWindow?.CachedField( "text" );
+         public static CachedField nameText = ClrTypes.AdvUiMessageWindow?.CachedField( "nameText" );
       }
 
       public static class AdvUguiMessageWindow_Fields
@@ -188,7 +196,7 @@ namespace XUnity.Common.Constants
             try
             {
                var type = assembly.GetType( name, false );
-               if(type != null)
+               if( type != null )
                {
                   return type;
                }

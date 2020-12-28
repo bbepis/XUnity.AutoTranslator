@@ -493,7 +493,7 @@ In some ADV engines text 'scrolls' into place slowly. Different techniques are u
 ### Plugin-specific Manual Translations
 Often you may want to provide translations for other plugins that are not naturally translated. This is obviously also possible with this plugin as described in the previous section. But what if you want to provide translations that should be specific to that plugin because such translation would conflict with a different plugin/generic translation?
 
-In order to add plugin-specific translations, simply create a `Plugins` direcetory in the text translation `Directory`. In this directory you can create a new directory for each plugin you want to provide plugin-specific translations for. The name of the directory should be the same as the dll name without the extension (.dll).
+In order to add plugin-specific translations, simply create a `Plugins` directory in the text translation `Directory`. In this directory you can create a new directory for each plugin you want to provide plugin-specific translations for. The name of the directory should be the same as the dll name without the extension (.dll).
 
 Within this directory you can create translations files as you normally would. In addition you can add the following directive in these files:
 

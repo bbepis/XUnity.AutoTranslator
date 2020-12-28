@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
 using XUnity.Common.Constants;
@@ -53,26 +54,41 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          if( currentTexture != texture )
          {
-            // This logic is only used in legacy mode and is not verified with NGUI
-
-            var type = ui.GetType();
-            type.CachedProperty( MainTexturePropertyName )?.Set( ui, texture );
-            type.CachedProperty( TexturePropertyName )?.Set( ui, texture );
-            type.CachedProperty( CapitalMainTexturePropertyName )?.Set( ui, texture );
-
-            // special handling for UnityEngine.UI.Image
-            var material = type.CachedProperty( "material" )?.Get( ui );
-            if( material != null )
+            if( Settings.EnableSpriteRendererHooking && ui is SpriteRenderer sr )
             {
-               var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
-               var materialTexture = mainTextureProperty?.Get( material );
-               if( ReferenceEquals( materialTexture, currentTexture ) )
+               var sprite = sr.sprite;
+               if( sprite != null )
                {
-                  mainTextureProperty?.Set( material, texture );
+                  SafeSetSprite( sr, texture );
+               }
+            }
+            else
+            {
+               // This logic is only used in legacy mode and is not verified with NGUI
+               var type = ui.GetType();
+               type.CachedProperty( MainTexturePropertyName )?.Set( ui, texture );
+               type.CachedProperty( TexturePropertyName )?.Set( ui, texture );
+               type.CachedProperty( CapitalMainTexturePropertyName )?.Set( ui, texture );
+
+               // special handling for UnityEngine.UI.Image
+               var material = type.CachedProperty( "material" )?.Get( ui );
+               if( material != null )
+               {
+                  var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
+                  var materialTexture = mainTextureProperty?.Get( material );
+                  if( ReferenceEquals( materialTexture, currentTexture ) )
+                  {
+                     mainTextureProperty?.Set( material, texture );
+                  }
                }
             }
          }
+      }
 
+      private static void SafeSetSprite( SpriteRenderer sr, Texture2D texture )
+      {
+         var newSprite = Sprite.Create( texture, sr.sprite.rect, Vector2.zero );
+         sr.sprite = newSprite;
       }
 
       public static void SetAllDirtyEx( this object ui )

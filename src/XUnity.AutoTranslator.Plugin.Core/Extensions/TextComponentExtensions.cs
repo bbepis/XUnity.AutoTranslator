@@ -37,6 +37,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
+            else if( type == ClrTypes.TextArea2D )
+            {
+               manipulator = new TextArea2DComponentManipulator();
+            }
             else
             {
                manipulator = new DefaultTextComponentManipulator( type );

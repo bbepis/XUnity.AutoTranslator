@@ -865,7 +865,7 @@ namespace XUnity.ResourceRedirector.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return AccessToolsShim.Property( typeof( AssetBundleRequest ), "allAssets" ) != null;
       }
 
       static MethodBase TargetMethod( object instance )

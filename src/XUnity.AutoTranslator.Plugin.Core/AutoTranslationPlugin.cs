@@ -568,15 +568,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void QueueNewUntranslatedForClipboard( UntranslatedText key )
+      private void QueueNewUntranslatedForClipboard( string untranslatedText )
       {
          if( Settings.CopyToClipboard && Features.SupportsClipboard )
          {
             // Perhaps this should be the original, but that might have unexpected consequences for external tools??
-            if( !_textsToCopyToClipboard.Contains( key.Original_Text_FullyTrimmed ) )
+            if( !_textsToCopyToClipboard.Contains( untranslatedText ) )
             {
-               _textsToCopyToClipboard.Add( key.Original_Text_FullyTrimmed );
-               _textsToCopyToClipboardOrdered.Add( key.Original_Text_FullyTrimmed );
+               _textsToCopyToClipboard.Add( untranslatedText );
+               _textsToCopyToClipboardOrdered.Add( untranslatedText );
 
                _clipboardUpdated = Time.realtimeSinceStartup;
             }
@@ -790,6 +790,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( _isInTranslatedMode && isTranslated )
                      TranslationHelper.DisplayTranslationInfo( originalText, text );
+
+                  QueueNewUntranslatedForClipboard( originalText );
 
                   if( TranslationAggregatorWindow != null )
                   {
@@ -1802,8 +1804,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( text.IsNullOrWhiteSpace() )
             return null;
 
-         if( CheckAndFixRedirected( ui, text, info ) )
-            return null;
+         if( context == null )
+         {
+            if( CheckAndFixRedirected( ui, text, info ) )
+               return null;
+         }
 
          // Ensure that we actually want to translate this text and its owning UI element. 
          if( !shouldIgnore && ( ignoreComponentState || ui.IsComponentActive() ) )
@@ -1855,11 +1860,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string translation;
             if( tc.TryGetTranslation( textKey, !isSpammer, false, scope, out translation ) )
             {
-               if( context == null && !isSpammer )
-               {
-                  QueueNewUntranslatedForClipboard( textKey );
-               }
-
                var untemplatedTranslation = textKey.Untemplate( translation );
                if( context == null ) // never set text if operation is contextualized (only a part translation)
                {
@@ -2010,8 +2010,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            if( stabilizedText.IsNullOrWhiteSpace() )
                               return;
 
-                           if( CheckAndFixRedirected( ui, text, info ) )
-                              return;
+                           if( context == null )
+                           {
+                              if( CheckAndFixRedirected( ui, text, info ) )
+                                 return;
+                           }
 
                            if( tc.IsTranslatable( stabilizedText, false, scope ) )
                            {
@@ -2025,8 +2028,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  SetTranslatedText( ui, untemplatedTranslation, text, info );
                                  return;
                               }
-
-                              QueueNewUntranslatedForClipboard( stabilizedTextKey );
 
                               // once the text has stabilized, attempt to look it up
                               if( tc.TryGetTranslation( stabilizedTextKey, true, false, scope, out translation ) )
@@ -2497,7 +2498,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( isAltPressed )
                {
-                  var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
+                  var isCtrlPressed = Input.GetKey( KeyCode.LeftControl ) || Input.GetKey( KeyCode.RightControl );
 
                   if( Input.GetKeyDown( KeyCode.T ) )
                   {
@@ -3090,7 +3091,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          if( Settings.CopyToClipboard
             && _textsToCopyToClipboardOrdered.Count > 0
-            && Time.realtimeSinceStartup - _clipboardUpdated > Settings.ClipboardDebounceTime )
+            && ( _textsToCopyToClipboardOrdered.Count > 5 || Time.realtimeSinceStartup - _clipboardUpdated > Settings.ClipboardDebounceTime ) )
          {
             try
             {

@@ -146,7 +146,7 @@ namespace XUnity.Common.Utilities
             .Where( x => x.FieldType == fieldType )
             .ToArray();
 
-         if(index < fields.Length)
+         if( index < fields.Length )
          {
             var field = fields[ index ];
 

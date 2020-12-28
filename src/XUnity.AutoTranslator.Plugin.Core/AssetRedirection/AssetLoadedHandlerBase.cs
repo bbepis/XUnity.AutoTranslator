@@ -52,11 +52,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   bool handled = ReplaceOrUpdateAsset( modificationFilePath, ref castedAsset, context );
                   if( handled )
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Replaced or updated resource file: '{unqiuePath}'." );
+                     if( !Settings.EnableSilentMode )
+                        XuaLogger.AutoTranslator.Debug( $"Replaced or updated resource file: '{unqiuePath}'." );
                   }
                   else
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Did not replace or update resource file: '{unqiuePath}'." );
+                     if( !Settings.EnableSilentMode )
+                        XuaLogger.AutoTranslator.Debug( $"Did not replace or update resource file: '{unqiuePath}'." );
                   }
 
                   context.Complete(
@@ -74,11 +76,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                   bool handled = DumpAsset( modificationFilePath, castedAsset, context );
                   if( handled )
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{unqiuePath}'." );
+                     if( !Settings.EnableSilentMode )
+                        XuaLogger.AutoTranslator.Debug( $"Dumped resource file: '{unqiuePath}'." );
                   }
                   else
                   {
-                     XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{unqiuePath}'." );
+                     if( !Settings.EnableSilentMode )
+                        XuaLogger.AutoTranslator.Debug( $"Did not dump resource file: '{unqiuePath}'." );
                   }
 
                   context.Complete(

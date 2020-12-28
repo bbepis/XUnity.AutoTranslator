@@ -121,7 +121,6 @@ namespace XUnity.Common.Utilities
       /// <param name="obj"></param>
       /// <returns></returns>
       public static T GetExtensionData<T>( this object obj )
-         where T : new()
       {
          if( obj == null ) return default( T );
 
