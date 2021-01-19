@@ -1,4 +1,14 @@
-﻿### 4.13.0
+﻿### 4.14.0
+ * FEATURE - New version of GoogleTranslate endpoint that supports new API. May replace replace old GoogleTranslate endpoint in the future
+ * MISC - Made more log statements affected by silent mode
+ * MISC - Changed behaviour of the copy to clipboard feature. Now it will always copy to clipboard when text is being translated on a text component
+ * MISC - Support for older versions of UTAGE
+ * MISC - Fixed some log statements to no longer indicate error in case an error did not occur during hooking
+ * MISC - Updated user agents for API requests
+ * BUG FIX - Fixed a bug that could cause crash in older versions of the Unity Engine
+ * BUG FIX - Fixed a bug that could occur during dynamic code generation in certain situations
+
+### 4.13.0
  * FEATURE - API that allows external plugins to take some degree of control of how a game is translated
  * FEATURE - Can now output text that exceeds the maximum length if configured through 'OutputTooLongText'
  * MISC - Increased max value of 'MaxCharactersPerTranslation' from 1000 to 2500

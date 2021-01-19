@@ -133,7 +133,7 @@ namespace GoogleTranslate
       {
          _translationCount++;
 
-         var allUntranslatedText = string.Join( "\n", context.UntranslatedTexts );
+         var allUntranslatedText = string.Join( "\\\\n", context.UntranslatedTexts ).Replace( "\n", "\\\\n" ).Replace("\r", "");
 
          var query = string.Join( "&", new[]
          {
@@ -165,25 +165,30 @@ namespace GoogleTranslate
       public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
          var data = context.Response.Data;
-         var idx = data.IndexOf( '[' );
-         if( idx == -1 )
-         {
-            context.Fail( "Could not find any JSON in returned response." );
-         }
 
-         data = data.Substring( idx );
+         //var idx = data.IndexOf( '[' );
+         //if( idx == -1 )
+         //{
+         //   context.Fail( "Could not find any JSON in returned response." );
+         //}
+         //data = data.Substring( idx );
+         //var recognizedEnd = data.IndexOf( "af.httprm" );
+         //if( recognizedEnd == -1 )
+         //{
+         //   context.Fail( "Could not find the end of the JSON content in the returned response." );
+         //}
+         //var endIdx = data.IndexOf( ']', recognizedEnd );
+         //if( endIdx == -1 )
+         //{
+         //   context.Fail( "Could not find the end of the JSON content in the returned response." );
+         //}
+         //data = data.Substring( 0, endIdx + 1 );
 
-         var recognizedEnd = data.IndexOf( "af.httprm" );
-         if( recognizedEnd == -1 )
-         {
-            context.Fail( "Could not find the end of the JSON content in the returned response." );
-         }
-         var endIdx = data.IndexOf( ']', recognizedEnd );
-         if( endIdx == -1 )
-         {
-            context.Fail( "Could not find the end of the JSON content in the returned response." );
-         }
-         data = data.Substring( 0, endIdx + 1 );
+         // output is some odd form of chunked-encoding. We just look at the first chunk
+         data = data.Substring( 6 );
+         var chars = data.Substring( 0, data.IndexOf( "\n" ) );
+         var num = int.Parse( chars, CultureInfo.InvariantCulture );
+         data = data.Substring( chars.Length, num );
 
          var outerArr = JSON.Parse( data );
          var innerJsonString = outerArr.AsArray[ 0 ].AsArray[ 2 ].ToString();
