@@ -5,6 +5,7 @@
  * MISC - Support for older versions of UTAGE
  * MISC - Fixed some log statements to no longer indicate error in case an error did not occur during hooking
  * MISC - Updated user agents for API requests
+ * MISC - Improved SpriteRenderer support
  * BUG FIX - Fixed a bug that could cause crash in older versions of the Unity Engine
  * BUG FIX - Fixed a bug that could occur during dynamic code generation in certain situations
 

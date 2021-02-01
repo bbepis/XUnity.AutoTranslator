@@ -15,6 +15,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal static class CallOrigin
    {
+      public static bool ImageHooksEnabled = true;
       public static bool ExpectsTextToBeReturned = false;
       public static IReadOnlyTextTranslationCache TextCache = null;
 

@@ -35,9 +35,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return null;
       }
 
-      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj )
+      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj, Texture2D originalTexture )
       {
-         return obj.GetOrCreateExtensionData<ImageTranslationInfo>();
+         if( obj == null ) return null;
+
+         var iti = obj.GetOrCreateExtensionData<ImageTranslationInfo>();
+         if( iti.Original == null ) iti.Initialize( originalTexture );
+
+         return iti;
       }
 
       public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )

@@ -46,9 +46,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static void SetTexture( this object ui, Texture2D texture )
+      public static Sprite SetTexture( this object ui, Texture2D texture, Sprite sprite, bool isPrefixHooked )
       {
-         if( ui == null ) return;
+         if( ui == null ) return null;
 
          var currentTexture = ui.GetTexture();
 
@@ -56,10 +56,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             if( Settings.EnableSpriteRendererHooking && ui is SpriteRenderer sr )
             {
-               var sprite = sr.sprite;
-               if( sprite != null )
+               if( isPrefixHooked )
                {
-                  SafeSetSprite( sr, texture );
+                  return SafeCreateSprite( sr, sprite, texture );
+               }
+               else
+               {
+                  return SafeSetSprite( sr, sprite, texture );
                }
             }
             else
@@ -83,12 +86,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                }
             }
          }
+
+         return null;
       }
 
-      private static void SafeSetSprite( SpriteRenderer sr, Texture2D texture )
+      private static Sprite SafeSetSprite( SpriteRenderer sr, Sprite sprite, Texture2D texture )
       {
-         var newSprite = Sprite.Create( texture, sr.sprite.rect, Vector2.zero );
+         var newSprite = Sprite.Create( texture, sprite != null ? sprite.rect : sr.sprite.rect, Vector2.zero );
          sr.sprite = newSprite;
+         return newSprite;
+      }
+
+      private static Sprite SafeCreateSprite( SpriteRenderer sr, Sprite sprite, Texture2D texture )
+      {
+         var newSprite = Sprite.Create( texture, sprite != null ? sprite.rect : sr.sprite.rect, Vector2.zero );
+         return newSprite;
       }
 
       public static void SetAllDirtyEx( this object ui )
@@ -101,7 +113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             ClrTypes.Graphic.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
-         else
+         else if( ui is not SpriteRenderer )
          {
             AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
          }

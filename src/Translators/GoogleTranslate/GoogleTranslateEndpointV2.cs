@@ -86,7 +86,7 @@ namespace GoogleTranslate
 
       public override void Initialize( IInitializationContext context )
       {
-         var backendOverride = context.GetOrCreateSetting( "GoogleV2", "ServiceUrl", DefaultUserBackend );
+         var backendOverride = context.GetOrCreateSetting<string>( "GoogleV2", "ServiceUrl" );
          if( !backendOverride.IsNullOrWhiteSpace() )
          {
             _selectedUserBackend = backendOverride;
@@ -97,7 +97,9 @@ namespace GoogleTranslate
          }
          else
          {
-            throw new Exception( "ServiceUrl is empty." );
+            _selectedUserBackend = DefaultUserBackend;
+
+            _httpsServicePointTranslateTemplateUrl = _selectedUserBackend + HttpsServicePointTranslateTemplateUrl;
          }
 
          _translateRpcId = context.GetOrCreateSetting( "GoogleV2", "RPCID", "MkEWBc" );
