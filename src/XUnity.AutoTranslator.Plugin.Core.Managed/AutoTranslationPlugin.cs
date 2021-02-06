@@ -2503,6 +2503,89 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private static bool _inputSupported = true;
+      private void HandleInputSafe()
+      {
+         if( _inputSupported )
+         {
+            try
+            {
+               HandleInput();
+            }
+            catch( TypeLoadException e )
+            {
+               _inputSupported = false;
+               XuaLogger.AutoTranslator.Warn( e, "Input API is not available!" );
+            }
+         }
+      }
+
+      private void HandleInput()
+      {
+         var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
+         if( isAltPressed )
+         {
+            var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
+
+            if( Input.GetKeyDown( KeyCode.T ) )
+            {
+               ToggleTranslation();
+            }
+            else if( Input.GetKeyDown( KeyCode.F ) )
+            {
+               ToggleFont();
+            }
+            else if( Input.GetKeyDown( KeyCode.R ) )
+            {
+               ReloadTranslations();
+            }
+            else if( Input.GetKeyDown( KeyCode.U ) )
+            {
+               ManualHook();
+            }
+            else if( Input.GetKeyDown( KeyCode.Q ) )
+            {
+               RebootPlugin();
+            }
+            //else if( Input.GetKeyDown( KeyCode.B ) )
+            //{
+            //   ConnectionTrackingWebClient.CloseServicePoints();
+            //}
+#if MANAGED
+            else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
+            {
+               if( MainWindow != null )
+               {
+                  MainWindow.IsShown = !MainWindow.IsShown;
+               }
+            }
+            else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
+            {
+               ToggleTranslationAggregator();
+            }
+#endif
+            else if( isCtrlPressed )
+            {
+               if( Input.GetKeyDown( KeyCode.Keypad9 ) )
+               {
+                  Settings.SimulateError = !Settings.SimulateError;
+               }
+               else if( Input.GetKeyDown( KeyCode.Keypad8 ) )
+               {
+                  Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
+               }
+               else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
+               {
+                  PrintSceneInformation();
+               }
+               else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
+               {
+                  PrintObjects();
+               }
+            }
+         }
+      }
+
       public void Update()
       {
          try
@@ -2536,69 +2619,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                ConnectionTrackingWebClient.CheckServicePoints();
             }
 
-            var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
-
-            if( isAltPressed )
-            {
-               var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
-
-               if( Input.GetKeyDown( KeyCode.T ) )
-               {
-                  ToggleTranslation();
-               }
-               else if( Input.GetKeyDown( KeyCode.F ) )
-               {
-                  ToggleFont();
-               }
-               else if( Input.GetKeyDown( KeyCode.R ) )
-               {
-                  ReloadTranslations();
-               }
-               else if( Input.GetKeyDown( KeyCode.U ) )
-               {
-                  ManualHook();
-               }
-               else if( Input.GetKeyDown( KeyCode.Q ) )
-               {
-                  RebootPlugin();
-               }
-               //else if( Input.GetKeyDown( KeyCode.B ) )
-               //{
-               //   ConnectionTrackingWebClient.CloseServicePoints();
-               //}
-#if MANAGED
-               else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
-               {
-                  if( MainWindow != null )
-                  {
-                     MainWindow.IsShown = !MainWindow.IsShown;
-                  }
-               }
-               else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
-               {
-                  ToggleTranslationAggregator();
-               }
-#endif
-               else if( isCtrlPressed )
-               {
-                  if( Input.GetKeyDown( KeyCode.Keypad9 ) )
-                  {
-                     Settings.SimulateError = !Settings.SimulateError;
-                  }
-                  else if( Input.GetKeyDown( KeyCode.Keypad8 ) )
-                  {
-                     Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
-                  }
-                  else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
-                  {
-                     PrintSceneInformation();
-                  }
-                  else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
-                  {
-                     PrintObjects();
-                  }
-               }
-            }
+            HandleInputSafe();
          }
          catch( Exception e )
          {
