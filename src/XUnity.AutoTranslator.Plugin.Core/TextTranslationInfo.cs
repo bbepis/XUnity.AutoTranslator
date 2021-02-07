@@ -343,10 +343,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            bool isBestFit = (bool)ClrTypes.Text_Properties.ResizeTextForBestFit.Get( text );
-            if( isComponentWide && !isBestFit )
+            if( isComponentWide && ( ClrTypes.Text_Properties.ResizeTextForBestFit == null || !(bool)ClrTypes.Text_Properties.ResizeTextForBestFit.Get( text ) ) )
             {
-               if( !isLineSpacingSet && Settings.ResizeUILineSpacingScale.HasValue )
+               if( !isLineSpacingSet && Settings.ResizeUILineSpacingScale.HasValue && ClrTypes.Text_Properties.LineSpacing != null )
                {
                   var originalLineSpacing = ClrTypes.Text_Properties.LineSpacing.Get( text );
 
@@ -366,7 +365,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( !isVerticalOverflowSet )
+               if( !isVerticalOverflowSet && ClrTypes.Text_Properties.VerticalOverflow != null )
                {
                   var originalVerticalOverflow = ClrTypes.Text_Properties.VerticalOverflow.Get( text );
                   ClrTypes.Text_Properties.VerticalOverflow.Set( text, 1 /* VerticalWrapMode.Overflow */ );
@@ -380,7 +379,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( !isHorizontalOverflowSet )
+               if( !isHorizontalOverflowSet && ClrTypes.Text_Properties.HorizontalOverflow != null )
                {
                   var originalHorizontalOverflow = ClrTypes.Text_Properties.HorizontalOverflow.Get( text );
                   ClrTypes.Text_Properties.HorizontalOverflow.Set( text, 0 /* HorizontalWrapMode.Wrap */ );

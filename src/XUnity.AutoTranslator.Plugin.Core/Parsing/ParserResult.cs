@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
@@ -11,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
    {
       private static readonly string IgnoredNameEnding = "_i";
 
-      public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, Dictionary<string, string> args )
+      public ParserResult( ParserResultOrigin origin, string originalText, string template, bool allowPartialTranslation, bool cacheCombinedResult, bool persistCombinedResult, bool persistTokenResult, List<ArgumentedUntranslatedTextInfo> args )
       {
          Origin = origin;
          OriginalText = originalText;
@@ -40,7 +41,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       public string OriginalText { get; }
 
       public string TranslationTemplate { get; }
-      public Dictionary<string, string> Arguments { get; }
+      public List<ArgumentedUntranslatedTextInfo> Arguments { get; }
       public Match Match { get; }
       public Regex Regex { get; }
 
@@ -54,7 +55,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 
       public int Priority => (int)Origin;
 
-      public string GetTranslationFromParts( Func<string, string> getTranslation )
+      public string GetTranslationFromParts( Func<UntranslatedTextInfo, string> getTranslation )
       {
          bool ok = true;
          var result = new StringBuilder( TranslationTemplate );
@@ -85,7 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                if( group.Success ) // was matched
                {
                   var value = group.Value;
-                  var translation = ignoreTranslate ? value : getTranslation( value );
+                  var translation = ignoreTranslate ? value : getTranslation( new UntranslatedTextInfo( value ) );
                   if( translation != null )
                   {
                      result = result.Replace( replacement, translation );
@@ -103,35 +104,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          }
          else
          {
-            // This is really not a nice fix...
-            if( Arguments.Count > 9 )
+            foreach( var kvp in Arguments )
             {
-               foreach( var kvp in Arguments.OrderByDescending( x => x.Key.Length ) )
+               var translation = getTranslation( kvp.Info );
+               if( translation != null )
                {
-                  var translation = getTranslation( kvp.Value );
-                  if( translation != null )
-                  {
-                     result = result.Replace( kvp.Key, translation );
-                  }
-                  else
-                  {
-                     ok = false;
-                  }
+                  result = result.Replace( kvp.Key, translation );
                }
-            }
-            else
-            {
-               foreach( var kvp in Arguments )
+               else
                {
-                  var translation = getTranslation( kvp.Value );
-                  if( translation != null )
-                  {
-                     result = result.Replace( kvp.Key, translation );
-                  }
-                  else
-                  {
-                     ok = false;
-                  }
+                  ok = false;
                }
             }
          }

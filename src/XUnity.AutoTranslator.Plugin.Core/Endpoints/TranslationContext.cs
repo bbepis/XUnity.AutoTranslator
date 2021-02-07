@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
@@ -6,15 +7,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
    {
       private Action<string[]> _complete;
       private Action<string, Exception> _fail;
+      private string[] _untranslatedTexts;
 
       public TranslationContext(
-         string[] untranslatedTexts,
+         UntranslatedTextInfo[] untranslatedTextInfos,
          string sourceLanguage,
          string destinationLanguage,
          Action<string[]> complete,
          Action<string, Exception> fail )
       {
-         UntranslatedTexts = untranslatedTexts;
+         UntranslatedTextInfos = untranslatedTextInfos;
          SourceLanguage = sourceLanguage;
          DestinationLanguage = destinationLanguage;
 
@@ -23,12 +25,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       }
 
       public string UntranslatedText => UntranslatedTexts[ 0 ];
-      public string[] UntranslatedTexts { get; }
+      public string[] UntranslatedTexts => _untranslatedTexts ?? ( _untranslatedTexts = UntranslatedTextInfos.Select( x => x.UntranslatedText ).ToArray() );
+      public UntranslatedTextInfo UntranslatedTextInfo => UntranslatedTextInfos[ 0 ];
+      public UntranslatedTextInfo[] UntranslatedTextInfos { get; }
+
       public string SourceLanguage { get; }
       public string DestinationLanguage { get; }
 
       internal bool IsDone { get; private set; }
-
+      public object UserState { get; set; }
 
       public void Complete( string translatedText )
       {

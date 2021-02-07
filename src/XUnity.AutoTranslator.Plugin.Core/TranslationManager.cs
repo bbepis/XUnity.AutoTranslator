@@ -38,7 +38,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public TranslationEndpointManager CurrentEndpoint { get; set; }
 
+      public TranslationEndpointManager FallbackEndpoint { get; set; }
+
       public TranslationEndpointManager PassthroughEndpoint { get; private set; }
+
+      public bool IsFallbackAvailableFor(TranslationEndpointManager endpoint)
+      {
+         return endpoint != null && FallbackEndpoint != null
+            && endpoint == CurrentEndpoint
+            && FallbackEndpoint != endpoint;
+      }
 
       public void InitializeEndpoints( GameObject go )
       {
@@ -56,6 +65,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             PassthroughEndpoint = AllEndpoints.FirstOrDefault( x => x.Endpoint is PassthroughTranslateEndpoint );
 
+            var fallbackEndpoint = AllEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.FallbackServiceEndpoint );
+            if( fallbackEndpoint != null )
+            {
+               if( fallbackEndpoint.Error != null )
+               {
+                  XuaLogger.AutoTranslator.Error( fallbackEndpoint.Error, "Error occurred during the initialization of the fallback translate endpoint." );
+               }
+               else
+               {
+                  FallbackEndpoint = fallbackEndpoint;
+               }
+            }
+
             var primaryEndpoint = AllEndpoints.FirstOrDefault( x => x.Endpoint.Id == Settings.ServiceEndpoint );
             if( primaryEndpoint != null )
             {
@@ -65,13 +87,21 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  CurrentEndpoint = primaryEndpoint;
+                  if( fallbackEndpoint == primaryEndpoint )
+                  {
+                     XuaLogger.AutoTranslator.Error( "Error occurred during the initialization of the selected translate endpoint. Cannot use same fallback endpoint as primary." );
+                  }
+                  else
+                  {
+                     CurrentEndpoint = primaryEndpoint;
+                  }
                }
             }
             else if( !string.IsNullOrEmpty( Settings.ServiceEndpoint ) )
             {
                XuaLogger.AutoTranslator.Error( $"Could not find the configured endpoint '{Settings.ServiceEndpoint}'." );
             }
+
 
             if( Settings.DisableCertificateValidation )
             {

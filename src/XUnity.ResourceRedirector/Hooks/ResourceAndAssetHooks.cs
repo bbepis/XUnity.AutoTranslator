@@ -23,6 +23,8 @@ namespace XUnity.ResourceRedirector.Hooks
          typeof( AssetBundle_LoadFromFile_Hook ),
          typeof( AssetBundle_LoadFromMemoryAsync_Hook ),
          typeof( AssetBundle_LoadFromMemory_Hook ),
+         typeof( AssetBundle_LoadFromStreamAsync_Hook ),
+         typeof( AssetBundle_LoadFromStream_Hook ),
 
          typeof( AssetBundle_mainAsset_Hook ),
          typeof( AssetBundle_returnMainAsset_Hook ),
@@ -211,7 +213,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, AssetBundleLoadType.LoadFromFile );
+         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, null, 0, AssetBundleLoadType.LoadFromFile );
          var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          if( !context.SkipOriginalCall )
@@ -252,7 +254,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, AssetBundleLoadType.LoadFromFile );
+         var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, null, 0, AssetBundleLoadType.LoadFromFile );
          var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          var p = context.Parameters;
@@ -314,7 +316,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundleCreateRequest result;
 
-         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, AssetBundleLoadType.LoadFromMemory );
+         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
          var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          if( !context.SkipOriginalCall )
@@ -355,13 +357,116 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          AssetBundle result;
 
-         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, AssetBundleLoadType.LoadFromMemory );
+         var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
          var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
 
          var p = context.Parameters;
          if( !context.SkipOriginalCall )
          {
             result = _original( p.Binary, p.Crc );
+         }
+
+         if( !context.SkipAllPostfixes )
+         {
+            ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
+         }
+
+         if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
+         {
+            var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
+            ext.Path = p.Path;
+         }
+
+         return result;
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+   internal static class AssetBundle_LoadFromStreamAsync_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromStreamAsyncInternal", typeof( Stream ), typeof( uint ), typeof( uint ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromStreamAsync", typeof( Stream ), typeof( uint ), typeof( uint ) );
+      }
+
+      delegate AssetBundleCreateRequest OriginalMethod( Stream stream, uint crc, uint managedReadBufferSize );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static AssetBundleCreateRequest MM_Detour( Stream stream, uint crc, uint managedReadBufferSize )
+      {
+         AssetBundleCreateRequest result;
+
+         var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
+
+         if( !context.SkipOriginalCall )
+         {
+            var p = context.Parameters;
+            result = _original( p.Stream, p.Crc, p.ManagedReadBufferSize );
+         }
+
+         ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
+
+         return result;
+      }
+   }
+
+   internal static class AssetBundle_LoadFromStream_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return true;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromStreamInternal", typeof( Stream ), typeof( uint ), typeof( uint ) )
+            ?? AccessToolsShim.Method( typeof( AssetBundle ), "LoadFromStream", typeof( Stream ), typeof( uint ), typeof( uint ) );
+      }
+
+      delegate AssetBundle OriginalMethod( Stream stream, uint crc, uint managedReadBufferSize );
+
+      static OriginalMethod _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<OriginalMethod>();
+      }
+
+      static AssetBundle MM_Detour( Stream stream, uint crc, uint managedReadBufferSize )
+      {
+         AssetBundle result;
+
+         var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
+         var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
+
+         var p = context.Parameters;
+         if( !context.SkipOriginalCall )
+         {
+            result = _original( p.Stream, p.Crc, p.ManagedReadBufferSize );
          }
 
          if( !context.SkipAllPostfixes )

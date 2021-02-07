@@ -9,6 +9,15 @@ namespace Http.ExtProtocol
    public abstract class ExtHttpEndpoint : IExtTranslateEndpoint
    {
       /// <summary>
+      /// Callback for when the endpoint is initialized.
+      /// </summary>
+      /// <param name="config"></param>
+      public virtual void Initialize( string config)
+      {
+
+      }
+
+      /// <summary>
       /// Callback that can be overwritten that is called before any requests are sent out.
       /// </summary>
       /// <param name="context"></param>

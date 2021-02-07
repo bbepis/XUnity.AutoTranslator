@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -20,15 +21,16 @@ using XUnity.Common.Logging;
 
 namespace GoogleTranslate
 {
-   internal class GoogleTranslateEndpointV2 : HttpEndpoint
+   public class GoogleTranslateEndpointV2 : HttpEndpoint
    {
+      private static readonly char[] WordSplitters = new char[] { ' ', '\r', '\n' };
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {
          "auto","af","sq","am","ar","hy","az","eu","be","bn","bs","bg","ca","ceb","zh-CN","zh-TW","co","hr","cs","da","nl","en","eo","et","fi","fr","fy","gl","ka","de","el","gu","ht","ha","haw","he","hi","hmn","hu","is","ig","id","ga","it","ja","jw","kn","kk","km","ko","ku","ky","lo","la","lv","lt","lb","mk","mg","ms","ml","mt","mi","mr","mn","my","ne","no","ny","ps","fa","pl","pt","pa","ro","ru","sm","gd","sr","st","sn","sd","si","sk","sl","so","es","su","sw","sv","tl","tg","ta","te","th","tr","uk","ur","uz","vi","cy","xh","yi","yo","zu"
       };
 
       private static readonly string DefaultUserBackend = "https://translate.google.com";
-      private static readonly string TranslationPostTemplate = "[[[\"{0}\",\"[[\\\"{1}\\\",\\\"{2}\\\",\\\"{3}\\\",true],[null]]\",null,\"generic\"]]]&";
+      private static readonly string TranslationPostTemplate = "[[[\"{0}\",\"[[\\\"{1}\\\",\\\"{2}\\\",\\\"{3}\\\",true],[null]]\",null,\"generic\"]]]";
 
       private static readonly string HttpsServicePointTranslateTemplateUrl = "/_/TranslateWebserverUi/data/batchexecute";
       private static readonly Random RandomNumbers = new Random();
@@ -48,6 +50,7 @@ namespace GoogleTranslate
 
       private string _translateRpcId;
       private string _version;
+      private bool _useSimplestSuggestion;
       private long _reqId;
 
       public GoogleTranslateEndpointV2()
@@ -101,9 +104,10 @@ namespace GoogleTranslate
 
             _httpsServicePointTranslateTemplateUrl = _selectedUserBackend + HttpsServicePointTranslateTemplateUrl;
          }
-
+         
          _translateRpcId = context.GetOrCreateSetting( "GoogleV2", "RPCID", "MkEWBc" );
-         _version = context.GetOrCreateSetting( "GoogleV2", "VERSION", "boq_translate-webserver_20201220.16_p1" );
+         _version = context.GetOrCreateSetting( "GoogleV2", "VERSION", "boq_translate-webserver_20210323.10_p0" );
+         _useSimplestSuggestion = context.GetOrCreateSetting( "GoogleV2", "UseSimplest", false );
 
 
          context.DisableCertificateChecksFor( new Uri( _selectedUserBackend ).Host, new Uri( _selectedUserBackend ).Host );
@@ -135,7 +139,11 @@ namespace GoogleTranslate
       {
          _translationCount++;
 
-         var allUntranslatedText = string.Join( "\\\\n", context.UntranslatedTexts ).Replace( "\n", "\\\\n" ).Replace("\r", "");
+         var allUntranslatedText =
+            string.Join( "\\\\n", context.UntranslatedTexts )
+            .Replace( "\"", "\\\\\\\"" )
+            .Replace( "\n", "\\\\n" )
+            .Replace("\r", "");
 
          var query = string.Join( "&", new[]
          {
@@ -150,7 +158,7 @@ namespace GoogleTranslate
             "rt=c"
          } );
 
-         var data = "f.req=" + Uri.EscapeDataString( string.Format( TranslationPostTemplate, _translateRpcId, allUntranslatedText, FixLanguage( context.SourceLanguage ), FixLanguage( context.DestinationLanguage ) ) );
+         var data = "f.req=" + Uri.EscapeDataString( string.Format( TranslationPostTemplate, _translateRpcId, allUntranslatedText, FixLanguage( context.SourceLanguage ), FixLanguage( context.DestinationLanguage ) ) ) + "&";
 
          var url = _httpsServicePointTranslateTemplateUrl + "?" + query;
 
@@ -167,24 +175,6 @@ namespace GoogleTranslate
       public override void OnExtractTranslation( IHttpTranslationExtractionContext context )
       {
          var data = context.Response.Data;
-
-         //var idx = data.IndexOf( '[' );
-         //if( idx == -1 )
-         //{
-         //   context.Fail( "Could not find any JSON in returned response." );
-         //}
-         //data = data.Substring( idx );
-         //var recognizedEnd = data.IndexOf( "af.httprm" );
-         //if( recognizedEnd == -1 )
-         //{
-         //   context.Fail( "Could not find the end of the JSON content in the returned response." );
-         //}
-         //var endIdx = data.IndexOf( ']', recognizedEnd );
-         //if( endIdx == -1 )
-         //{
-         //   context.Fail( "Could not find the end of the JSON content in the returned response." );
-         //}
-         //data = data.Substring( 0, endIdx + 1 );
 
          // output is some odd form of chunked-encoding. We just look at the first chunk
          data = data.Substring( 6 );
@@ -203,10 +193,46 @@ namespace GoogleTranslate
 
          foreach( JSONNode entry in arr.AsArray )
          {
-            var token = entry.AsArray[ 0 ].ToString();
+            var translationArray = entry.AsArray;
+            var token = translationArray[ 0 ].ToString();
             token = JsonHelper.Unescape( token.Substring( 1, token.Length - 2 ) );
             if( token.IsNullOrWhiteSpace() )
                continue;
+
+            if( _useSimplestSuggestion && translationArray.Count > 1 )
+            {
+               var alternativeTranslationsArray = translationArray[ 1 ]?.AsArray;
+               if( alternativeTranslationsArray != null )
+               {
+                  var translations = new HashSet<string>();
+                  translations.Add( token );
+
+                  for( int i = 0; i < alternativeTranslationsArray.Count; i++ )
+                  {
+                     var alternativeToken = alternativeTranslationsArray[ i ].ToString();
+                     alternativeToken = JsonHelper.Unescape( alternativeToken.Substring( 1, alternativeToken.Length - 2 ) );
+                     translations.Add( alternativeToken );
+                  }
+
+                  if( translations.Count > 1 )
+                  {
+                     XuaLogger.AutoTranslator.Debug( "[GoogleTranslateV2]: Primary translation is '" + token + "', but found multiple suggestion:" );
+                     foreach( var translation in translations )
+                     {
+                        XuaLogger.AutoTranslator.Debug( "[GoogleTranslateV2]: " + translation );
+                     }
+
+                     var wordsInPrimary = token.Split( WordSplitters ).Length;
+                     token = translations
+                        .Where( x => x.Split( WordSplitters ).Length < wordsInPrimary )
+                        .OrderBy( x => x.Split( WordSplitters ).Length )
+                        .FirstOrDefault() ?? token;
+
+                     XuaLogger.AutoTranslator.Debug( "[GoogleTranslateV2]: Selecting translation: " + token );
+                  }
+               }
+            }
+
 
             if( !lineBuilder.EndsWithWhitespaceOrNewline() ) lineBuilder.Append( '\n' );
 

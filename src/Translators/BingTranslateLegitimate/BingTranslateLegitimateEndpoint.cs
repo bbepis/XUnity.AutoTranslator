@@ -18,7 +18,7 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 
 namespace BingTranslateLegitimate
 {
-   internal class BingTranslateLegitimateEndpoint : HttpEndpoint
+   public class BingTranslateLegitimateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {

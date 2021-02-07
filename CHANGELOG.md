@@ -1,4 +1,17 @@
-﻿### 4.14.0
+﻿### 4.15.0
+ * FEATURE - Added DeepL support
+ * FEATURE - New setting for automated fallback translation endpoint
+ * FEATURE - Extensions to ITranslateEndpoint interface allowing handling of contextual translation information
+ * MISC - Added HTML Entity decoding during postprocessing (enabled by default if configuration is reset)
+ * BUG FIX - Fixed issue related to newline handling
+ * BUG FIX - Fixed issue that could cause text not to be displayed in older versions of Unity
+ * BUG FIX - Fixed issue that could cause out-of-process hosted translation endpoints to fail in certain situations
+ * BUG FIX - Fixed issue where out-of-process translation endpoints would sometimes get shutdown before the game
+ * BUG FIX - Fixed issue where redirected resources were not always identified as such during standard translations
+ * BUG FIX - Fixed issue that could cause web requests timeout after a long period rather than fail immediately in certain situations
+ * BUG FIX - Fixed issue with GoogleTranslateV2 that could cause it to fail if untranslated texts included certain characters
+
+### 4.14.0
  * FEATURE - New version of GoogleTranslate endpoint that supports new API. May replace replace old GoogleTranslate endpoint in the future
  * MISC - Made more log statements affected by silent mode
  * MISC - Changed behaviour of the copy to clipboard feature. Now it will always copy to clipboard when text is being translated on a text component

@@ -67,6 +67,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return DefaultSymbolCheck( text );
       }
 
+      internal static bool ContainsVariableSymbols(string text)
+      {
+         var fidx = text.IndexOf( '{' );
+         return fidx > -1
+            && text.IndexOf( '}', fidx ) > fidx;
+      }
+
       internal static bool IsRedirected( this string text )
       {
          if( text.Length > 0 )
@@ -113,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             case RedirectedResourceDetection.AppendMongolianVowelSeparator:
             case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAppended:
             case RedirectedResourceDetection.AppendMongolianVowelSeparatorAndRemoveAll:
-               if( ContainsLanguageSymbolsForSourceLanguage( text ) )
+               if( ContainsLanguageSymbolsForSourceLanguage( text ) || ContainsVariableSymbols( text ) )
                {
                   HasRedirectedTexts = Settings.RedirectedResourceDetectionStrategy != RedirectedResourceDetection.None;
 

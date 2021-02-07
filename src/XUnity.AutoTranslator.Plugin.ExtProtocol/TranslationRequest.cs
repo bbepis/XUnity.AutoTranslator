@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Text;
+using System.Linq;
 
 namespace XUnity.AutoTranslator.Plugin.ExtProtocol
 {
@@ -16,6 +16,8 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
       /// </summary>
       public static readonly string Type = "1";
 
+      private string[] _untranslatedTexts;
+
       /// <summary>
       /// Gets or sets the source language.
       /// </summary>
@@ -29,7 +31,12 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
       /// <summary>
       /// Gets or sets the untranslated text.
       /// </summary>
-      public string[] UntranslatedTexts { get; set; }
+      public string[] UntranslatedTexts => _untranslatedTexts ?? ( _untranslatedTexts = UntranslatedTextInfos.Select( x => x.UntranslatedText ).ToArray() );
+
+      /// <summary>
+      /// Gets or sets the untranslated text.
+      /// </summary>
+      public TransmittableUntranslatedTextInfo[] UntranslatedTextInfos { get; set; }
 
       internal override void Decode( TextReader reader )
       {
@@ -37,14 +44,14 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
          SourceLanguage = reader.ReadLine();
          DestinationLanguage = reader.ReadLine();
          var count = int.Parse( reader.ReadLine(), CultureInfo.InvariantCulture );
-         var untranslatedTexts = new string[ count ];
-         for( int i = 0 ; i < count ; i++ )
+         var untranslatedTextInfos = new TransmittableUntranslatedTextInfo[ count ];
+         for( int i = 0; i < count; i++ )
          {
-            var encodedUntranslatedText = reader.ReadLine();
-            var untranslatedText = Encoding.UTF8.GetString( Convert.FromBase64String( encodedUntranslatedText ) );
-            untranslatedTexts[ i ] = untranslatedText;
+            var untranslatedTextInfo = new TransmittableUntranslatedTextInfo();
+            untranslatedTextInfo.Decode( reader );
+            untranslatedTextInfos[ i ] = untranslatedTextInfo;
          }
-         UntranslatedTexts = untranslatedTexts;
+         UntranslatedTextInfos = untranslatedTextInfos;
       }
 
       internal override void Encode( TextWriter writer )
@@ -52,11 +59,10 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
          writer.WriteLine( Id.ToString() );
          writer.WriteLine( SourceLanguage );
          writer.WriteLine( DestinationLanguage );
-         writer.WriteLine( UntranslatedTexts.Length.ToString( CultureInfo.InvariantCulture ) );
-         foreach( var untranslatedText in UntranslatedTexts )
+         writer.WriteLine( UntranslatedTextInfos.Length.ToString( CultureInfo.InvariantCulture ) );
+         foreach( var untranslatedText in UntranslatedTextInfos )
          {
-            var encodedUntranslatedText = Convert.ToBase64String( Encoding.UTF8.GetBytes( untranslatedText ), Base64FormattingOptions.None );
-            writer.WriteLine( encodedUntranslatedText );
+            untranslatedText.Encode( writer );
          }
       }
    }

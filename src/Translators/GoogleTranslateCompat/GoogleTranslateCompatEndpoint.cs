@@ -51,15 +51,11 @@ namespace GoogleTranslateCompat
 
       public override void Initialize( IInitializationContext context )
       {
+         base.Initialize( context );
+
          if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
 
-         var exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\Common.ExtProtocol.Executor.exe" );
-
-         var fileExists = File.Exists( exePath );
-         if( !fileExists ) throw new EndpointInitializationException( $"Could not find any executable at '{exePath}'" );
-
-         ExecutablePath = exePath;
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( "GoogleTranslateCompat.ExtProtocol.GoogleTranslateCompatTranslate, GoogleTranslateCompat.ExtProtocol" ) );
       }
    }

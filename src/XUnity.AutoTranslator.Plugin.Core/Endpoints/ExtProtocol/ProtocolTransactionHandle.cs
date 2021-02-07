@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Shim;
+using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {
@@ -7,10 +8,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
    {
       public ProtocolTransactionHandle()
       {
-         StartTime = Time.realtimeSinceStartup;
+         StartTime = TimeSupport.Time.realtimeSinceStartup;
       }
 
-      public void SetCompleted( string[] translatedTexts, string error )
+      public void SetCompleted( string[] translatedTexts, string error, StatusCode statusCode )
       {
          IsCompleted = true;
          Results = translatedTexts;
@@ -24,6 +25,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       public string[] Results { get; set; }
 
       public string Error { get; set; }
+
+      public StatusCode StatusCode { get; set; }
 
       public bool IsCompleted { get; private set; } = false;
 

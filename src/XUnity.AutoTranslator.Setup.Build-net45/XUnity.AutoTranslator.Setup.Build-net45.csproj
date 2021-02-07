@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Translators\Common.ExtProtocol.Executor\Common.ExtProtocol.Executor.csproj" />
     <ProjectReference Include="..\Translators\Common.ExtProtocol\Common.ExtProtocol.csproj" />
+    <ProjectReference Include="..\Translators\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
     <ProjectReference Include="..\Translators\GoogleTranslateCompat.ExtProtocol\GoogleTranslateCompat.ExtProtocol.csproj" />
     <ProjectReference Include="..\Translators\Http.ExtProtocol\Http.ExtProtocol.csproj" />
   </ItemGroup>

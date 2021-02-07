@@ -18,11 +18,9 @@
  * [Implementing a Resource Redirector](#implementing-a-resource-redirector)
  
 ## Introduction
-This is a plugin that is capable of using various online translators to provide on-the-fly translations for various Unity-based games.
+This is an advanced translator plugin that can be used to translate Unity-based games automatically and also provides the tools required to translate games manually.
 
-It does (obviously) go to the internet, in order to provide the translation, so if you are not comfortable with that, don't use it.
-
-Oh, and it is also capable of doing some basic image loading/dumping. Go to the [Texture Translation](#texture-translation) section to find out more.
+It does (obviously) go to the internet, in order to provide the automated translation, so if you are not comfortable with that, don't use it.
 
 If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution) and the section regarding [manual translations](#manual-translations) so you understand how the plugin operates.
 
@@ -80,7 +78,7 @@ The file structure should like like this
 
 **NOTE:** The `Mono.Cecil.dll` file placed in the ReiPatcher directory is not the same file as is placed in the Managed directory.
 
-### BepInEx (5.x) Plugin
+### BepInEx Plugin
 REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow its installation instructions first!). 
 
  1. Download XUnity.AutoTranslator-BepIn-5x-{VERSION}.zip from [releases](../../releases).
@@ -170,6 +168,8 @@ The following key inputs are mapped:
 The supported translators are:
  * [GoogleTranslate](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
    * No limitations, but unstable.
+ * [GoogleTranslateV2](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
+   * No limitations, but unstable. Currently being tested. May replace original version in future since that API is no longer used on their official translator web.
  * [GoogleTranslateCompat](https://anonym.to/?https://translate.google.com/), same as the above, except requests are served out-of-process which is needed in some versions of Unity/Mono.
    * No limitations, but unstable.
  * [GoogleTranslateLegitimate](https://anonym.to/?https://cloud.google.com/translate/), based on the Google cloud translation API. Requires an API key.
@@ -178,7 +178,11 @@ The supported translators are:
    * No limitations, but unstable.
  * [BingTranslateLegitimate](https://anonym.to/?https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview), based on the Azure text translation. Requires an API key.
    * Free up to 2 million characters per month.
- * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Google translation service. Does not require authentication.
+ * [DeepLTranslate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Does not require authentication.
+   * No limitations, but unstable. Remarkable quality.
+ * [DeepLTranslateLegitimate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Requires an  API Key.
+   * $4.99 per month and $20 per million characters translated that month. Expensive but remarkable quality.
+ * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
    * No limitations, but unstable.
  * [BaiduTranslate](https://anonym.to/?https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
    * Not sure on quotas on this one.
@@ -208,7 +212,9 @@ Since 3.0.0, you can also implement your own translators. To do so, follow the i
 ### About Authenticated Translators
 If you decide to use an authenticated service *do not ever share your key or secret*. If you do so by accident, you should revoke it immediately. Most, if not all services provides an option for this.
 
-Also, make sure you monitor the service's request usage/quotas, especially when it is being used with unknown games. This plugin makes no guarantees about how many translation requests will be sent out, although it will attempt to keep the number to a minimum. It does so by using the [spam prevention mechanisms](#spam-prevention) discussed below.
+If you want to use a paid option, remember to check if that plugin supports the language you want to translate from and to before paying. Also, while the plugin does attempt to keep the amount of requests sent to the translation endpoint to a minimum, there are no guarantees about how much it will ask the endpoint to translate, and the author/owner of this repository takes no responsibility for any charges you may receive from your selected translation provider as a result of using this plugin.
+
+How the plugin attempts to minmize the number of requests it sends out is outlined [here](#spam-prevention).
 
 ### Spam Prevention
 The plugin employs the following spam prevention mechanisms:
@@ -244,7 +250,8 @@ The default configuration file, looks as such:
 
 ```ini
 [Service]
-Endpoint=GoogleTranslate         ;Endpoint to use. Can be ["GoogleTranslate", "GoogleTranslateLegitimate", "BingTranslate", "BingTranslateLegitimate", "BaiduTranslate", "YandexTranslate", "WatsonTranslate", "LecPowerTranslator15", "CustomTranslate", ""]. If empty, it simply means: Only use cached translations. Additional translators can also be used if downloaded externally.
+Endpoint=GoogleTranslate         ;Endpoint to use. See the [translators section](#translators) for valid values.
+FallbackEndpoint=                ;Endpoint to automatically fallback to if the primary endpoint fails for a specific translation.
 
 [General]
 Language=en                      ;The language to translate into
@@ -281,8 +288,8 @@ ForceUIResizing=True             ;Indicates whether the UI resize behavior shoul
 IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
-RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes"]
-TranslationPostProcessing=ReplaceMacronWithCircumflex ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters"]
+RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
+TranslationPostProcessing=ReplaceMacronWithCircumflex;ReplaceHtmlEntities ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
 CacheRegexPatternResults=False   ;Indicates whether or not the complete result of regex-splitted translations should be output to the specified OutputFile
@@ -352,6 +359,13 @@ YandexAPIKey=                    ;OPTIONAL, needed if YandexTranslate is configu
 Url=                             ;OPTIONAL, needed if WatsonTranslate is configured
 Key=                             ;OPTIONAL, needed if WatsonTranslate is configured
 
+[DeepL]
+MinDelay=2                       ;OPTIONAL, used for throttling DeepL
+MaxDelay=7                       ;OPTIONAL, used for throttling DeepL
+
+[DeepLLegitimate]
+ApiKey=                          ;OPTIONAL, required if DeepLLegitimate is configured
+
 [Custom]
 Url=                             ;Optional, needed if CustomTranslated is configured
 
@@ -364,7 +378,7 @@ EnableLog=False                  ;Enables extra logging for debugging purposes
 
 [Migrations]
 Enable=True                      ;Used to enable automatic migrations of this configuration file
-Tag=4.5.0                        ;Tag representing the last version this plugin was executed under. Do not edit
+Tag=4.15.0                        ;Tag representing the last version this plugin was executed under. Do not edit
 ```
 
 ### Behaviour Configuration Explanation
@@ -421,6 +435,7 @@ To rememdy this, post processing can be applied to translations when 'romaji' is
  * `ReplaceMacronWithCircumflex`: Replaces the macron diacritic with a circumflex.
  * `RemoveApostrophes`: Some translators might decide to include apostrophes after the 'n'-character. Applying this option removes those.
  * `ReplaceWideCharacters`: Replaces wide-width japanese characters with standard ASCII characters
+ * `ReplaceHtmlEntities`: Replaces all html entities with their unescaped character
 
 This type of post processing is also applied to normal translations, but instead uses the option `TranslationPostProcessing`, which can use the same values.
 
@@ -768,6 +783,9 @@ ZIP files that are placed in the `PreferredStoragePath` will be indexed during s
 Redistributing this plugin for various games is absolutely encouraged. However, if you do so, please keep the following in mind:
  * **Distribute the _AutoGeneratedTranslations.txt file along with the redistribution with as many translations as possible to ensure the online translator is hit as little as possible.**
  * **Test your redistribution with logging/console enabled to ensure the game does not exhibit undesirable behaviour such as spamming the endpoints.**
+ * Do not redistribute the plugin with a non-default translation endpoint configured which comes from this repository. This means:
+   * Don't set `Endpoint=DeepLTranslate` and then redistribute.
+   * However, if you implemented your own endpoint or the endpoint is not a part of this repository, you can go ahead and redistribute it with that as the default endpoint.
  * Ensure you keep the plugin up-to-date, as much as reasonably possible.
  * If you use image loading feature, make sure you read [this section](#texture-translation).
 

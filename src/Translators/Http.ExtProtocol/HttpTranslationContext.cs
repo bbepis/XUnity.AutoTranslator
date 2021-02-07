@@ -1,5 +1,6 @@
 ﻿using Common.ExtProtocol;
 using System;
+using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace Http.ExtProtocol
 {
@@ -14,10 +15,18 @@ namespace Http.ExtProtocol
 
       public string UntranslatedText => _context.UntranslatedText;
       public string[] UntranslatedTexts => _context.UntranslatedTexts;
+      public UntranslatedTextInfo UntranslatedTextInfo => _context.UntranslatedTextInfo;
+      public UntranslatedTextInfo[] UntranslatedTextInfos => _context.UntranslatedTextInfos;
+
       public string SourceLanguage => _context.SourceLanguage;
       public string DestinationLanguage => _context.DestinationLanguage;
       public XUnityWebResponse Response { get; internal set; }
       public XUnityWebRequest Request { get; internal set; }
+      public object UserState
+      {
+         get => _context.UserState;
+         set => _context.UserState = value;
+      }
 
       public void Fail( string reason, Exception exception )
       {

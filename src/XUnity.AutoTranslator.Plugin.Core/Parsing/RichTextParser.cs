@@ -2,17 +2,17 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
-
    internal class RichTextParser
    {
       private static readonly char[] TagNameEnders = new char[] { '=', ' ' };
-      private static readonly Regex TagRegex = new Regex( "<.*?>" );
+      private static readonly Regex TagRegex = new Regex( "(<.*?>)" );
       private static readonly HashSet<string> IgnoreTags = new HashSet<string> { "ruby", "group" };
-      private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "ruby", "em", "sup", "sub", "dash", "space", "group", "u", "strike", "param", "format", "emoji", "speed", "sound", "line-height" };
+      private static readonly HashSet<string> KnownTags = new HashSet<string> { "b", "i", "size", "color", "em", "sup", "sub", "dash", "space", "u", "strike", "param", "format", "emoji", "speed", "sound", "line-height" };
 
       public RichTextParser()
       {
@@ -47,110 +47,95 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       {
          if( !Settings.HandleRichText ) return null;
 
-         var matches = TagRegex.Matches( input );
-
-         var accumulation = new StringBuilder();
-         var args = new Dictionary<string, string>();
+         var allMatches = new List<ArgumentedUntranslatedTextInfo>();
          var template = new StringBuilder( input.Length );
-         var offset = 0;
          var arg = 'A';
-         var foundIgnoredTag = false;
 
-         foreach( Match m in matches )
+         bool addedArgumentLastTime = false;
+         foreach( var tagOrText in TagRegex.Split( input ) )
          {
-            var tag = m.Value;
-            var value = tag.Substring( 1, tag.Length - 2 );
-            bool isEndTag = value.StartsWith( "/" );
-            if( isEndTag )
+            if( tagOrText.Length > 0 )
             {
-               value = value.Substring( 1, value.Length - 1 );
-            }
+               bool isTag = tagOrText[ 0 ] == '<' && tagOrText[ tagOrText.Length - 1 ] == '>';
+               bool isEndTag = isTag && tagOrText.Length > 1 && tagOrText[ 1 ] == '/';
 
-            var parts = value.Split( TagNameEnders );
-            if( parts.Length >= 2 )
-            {
-               value = parts[ 0 ];
-            }
-            var isKnown = KnownTags.Contains( value );
-            var isIgnored = IgnoreTags.Contains( value );
-            if( !isKnown )
-            {
-               var endIdx = value.Length;
-               isKnown = IsAllLatin( value, endIdx ) || StartsWithPound( value, endIdx );
-            }
-
-            // add normal text
-            var end = m.Index;
-            var start = offset;
-            var text = input.Substring( start, end - start );
-            offset = end + m.Length;
-
-            // if the tag is not known, we want to include as normal text in the NEXT iteration
-            if( !isKnown )
-            {
-               accumulation.Append( text );
-               accumulation.Append( m.Value );
-            }
-            else
-            {
-               text += accumulation;
-               accumulation.Length = 0;
-
-               if( !string.IsNullOrEmpty( text ) )
+               string tagText = null;
+               if( isEndTag )
                {
-                  var argument = "[[" + ( arg++ ) + "]]";
-                  args.Add( argument, text );
-                  template.Append( argument );
+                  tagText = tagOrText.Substring( 2, tagOrText.Length - 3 );
+               }
+               else if( isTag )
+               {
+                  tagText = tagOrText.Substring( 1, tagOrText.Length - 2 );
                }
 
-               if( !isIgnored )
+               if( isTag )
                {
-                  template.Append( m.Value );
+                  string tagName;
+                  var parts = tagText.Split( TagNameEnders );
+                  if( parts.Length >= 2 )
+                  {
+                     tagName = parts[ 0 ];
+                  }
+                  else
+                  {
+                     tagName = tagText;
+                  }
+
+                  var endIdx = tagName.Length;
+                  var isKnown = KnownTags.Contains( tagName )
+                      || ( IsAllLatin( tagName, endIdx ) && !IgnoreTags.Contains( tagName ) )
+                      || StartsWithPound( tagName, endIdx );
+
+                  if( isKnown )
+                  {
+                     template.Append( tagOrText );
+                     addedArgumentLastTime = false;
+                  }
                }
                else
                {
-                  foundIgnoredTag = true;
+                  if( addedArgumentLastTime )
+                  {
+                     var info = allMatches[ allMatches.Count - 1 ];
+                     info.Info.UntranslatedText += tagOrText;
+                  }
+                  else
+                  {
+                     var argument = "[[" + ( arg++ ) + "]]";
+                     var info = new ArgumentedUntranslatedTextInfo
+                     {
+                        Key = argument,
+                        Info = new UntranslatedTextInfo( tagOrText )
+                     };
+                     allMatches.Add( info );
+                     template.Append( argument );
+                  }
+                  addedArgumentLastTime = true;
                }
             }
          }
 
-         // catch any remaining text
-         if( offset < input.Length )
+         // construct context info for each match!
+         for( int i = 0; i < allMatches.Count; i++ )
          {
-            var argument = "[[" + ( arg++ ) + "]]";
-            var text = input.Substring( offset, input.Length - offset );
-            args.Add( argument, text );
-            template.Append( argument );
-         }
+            var item = allMatches[ i ];
+            for( int j = 0; j < i; j++ )
+            {
+               item.Info.ContextBefore.Add( allMatches[ j ].Info.UntranslatedText );
+            }
 
+            for( int j = i + 1; j < allMatches.Count; j++ )
+            {
+               item.Info.ContextAfter.Add( allMatches[ j ].Info.UntranslatedText );
+            }
+         }
 
          var templateString = template.ToString();
-         int idx = -1;
-         while( ( idx = templateString.IndexOf( "]][[" ) ) != -1 )
-         {
-            var arg1 = templateString[ idx - 1 ];
-            var arg2 = templateString[ idx + 4 ];
-
-            var key1 = "[[" + arg1 + "]]";
-            var key2 = "[[" + arg2 + "]]";
-
-            var text1 = args[ key1 ];
-            var text2 = args[ key2 ];
-
-            var fullText = text1 + text2;
-            var fullKey = key1 + key2;
-            var newKey = "[[" + ( arg1 ) + "]]";
-
-            args.Remove( key1 );
-            args.Remove( key2 );
-            args.Add( newKey, fullText );
-            templateString = templateString.Replace( fullKey, newKey );
-         }
-
-         var success = foundIgnoredTag || ( arg != 'A' && templateString.Length > 5 );
+         var success = arg != 'A' && templateString.Length > 5;
          if( !success ) return null;
 
-         return new ParserResult( ParserResultOrigin.RichTextParser, input, templateString, false, true, true, false, args );
+         return new ParserResult( ParserResultOrigin.RichTextParser, input, templateString, false, true, true, false, allMatches );
       }
    }
 }

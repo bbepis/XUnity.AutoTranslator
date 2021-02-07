@@ -19,6 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
          Register( TranslationRequest.Type, typeof( TranslationRequest ) );
          Register( TranslationResponse.Type, typeof( TranslationResponse ) );
          Register( TranslationError.Type, typeof( TranslationError ) );
+         Register( ConfigurationMessage.Type, typeof( ConfigurationMessage ) );
       }
 
       /// <summary>

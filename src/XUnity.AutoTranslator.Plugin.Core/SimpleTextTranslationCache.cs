@@ -167,7 +167,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      string key = TextHelper.Decode( kvp[ 0 ] );
                      string value = TextHelper.Decode( kvp[ 1 ] );
 
-                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && key != value )
                      {
                         if( key.StartsWith( "r:" ) )
                         {

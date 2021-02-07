@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
-    <ProjectReference Include="..\Http.ExtProtocol\Http.ExtProtocol.csproj" />
+    <ProjectReference Include="..\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -1,4 +1,7 @@
-﻿### 1.1.3
+﻿### 1.2.0
+ * FEATURE - Support callbacks for asset bundles loaded from streams
+
+### 1.1.3
  * BUG FIX - Fixed bug that caused the GetBuiltinResource to not be found on later versions of the Unity Engine. Thanks to aqie13 on GitHub
 
 ### 1.1.2

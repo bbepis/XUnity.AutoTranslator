@@ -20,7 +20,7 @@ using XUnity.Common.Logging;
 
 namespace GoogleTranslate
 {
-   internal class GoogleTranslateEndpoint : HttpEndpoint
+   public class GoogleTranslateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {

@@ -61,6 +61,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         builder.Append( ch );
                         lastCharAdded = ch;
                      }
+                     else if( currentWhitespaceChar == '\r' && ch == '\n' )
+                     {
+                        // if this is FOLLOWED by another \r\n, we should remove it!
+                        var maybeRi = k + 1;
+                        var maybeNi = k + 2;
+                        if( k + 2 <= o )
+                        {
+                           var maybeR = text[ maybeRi ];
+                           var maybeN = text[ maybeNi ];
+                           if( maybeR == '\r' && maybeN == '\n' )
+                           {
+                              if( !addedCurrentWhitespace )
+                              {
+                                 addedCharacters++;
+                                 builder.Append( '\r' );
+                                 builder.Append( '\n' );
+                                 addedCurrentWhitespace = true;
+                              }
+
+                              addedCharacters++;
+                              builder.Append( '\r' );
+                              builder.Append( '\n' );
+                              lastCharAdded = '\n';
+
+                              k++;
+                           }
+                        }
+                     }
                      else
                      {
                         addedCurrentWhitespace = false;

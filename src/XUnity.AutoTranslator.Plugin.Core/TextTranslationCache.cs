@@ -284,10 +284,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      foreach( var ukvp in untranslatedResult.Arguments )
                      {
-                        var untranslatedToken = ukvp.Value;
-                        if( translatedResult.Arguments.TryGetValue( ukvp.Key, out var translatedToken ) )
+                        var key = ukvp.Key;
+                        var untranslatedToken = ukvp.Info.UntranslatedText;
+                        var translatedToken = translatedResult.Arguments.FirstOrDefault( x => x.Key == key );
+                        if( translatedToken != null )
                         {
-                           AddTokenTranslation( untranslatedToken, translatedToken, TranslationScopes.None );
+                           AddTokenTranslation( untranslatedToken, translatedToken.Info.UntranslatedText, TranslationScopes.None );
                         }
                      }
                   }
@@ -308,10 +310,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         foreach( var ukvp in untranslatedResult.Arguments )
                         {
-                           var untranslatedToken = ukvp.Value;
-                           if( translatedResult.Arguments.TryGetValue( ukvp.Key, out var translatedToken ) )
+                           var key = ukvp.Key;
+                           var untranslatedToken = ukvp.Info.UntranslatedText;
+                           var translatedToken = translatedResult.Arguments.FirstOrDefault( x => x.Key == key );
+                           if( translatedToken != null )
                            {
-                              AddTokenTranslation( untranslatedToken, translatedToken, scope );
+                              AddTokenTranslation( untranslatedToken, translatedToken.Info.UntranslatedText, scope );
                            }
                         }
                      }
