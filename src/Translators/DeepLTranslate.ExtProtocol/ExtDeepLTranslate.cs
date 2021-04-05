@@ -116,12 +116,6 @@ namespace DeepLTranslate.ExtProtocol
          _handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
          _client = new HttpClient( _handler, true );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Mozilla", "5.0" ) );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(Windows NT 10.0; Win64; x64)" ) );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "AppleWebKit", "537.36" ) );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(KHTML, like Gecko)" ) );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Chrome", "80.0.3987.149" ) );
-         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Safari", "537.36" ) );
          _client.DefaultRequestHeaders.TryAddWithoutValidation( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36" );
       }
 
