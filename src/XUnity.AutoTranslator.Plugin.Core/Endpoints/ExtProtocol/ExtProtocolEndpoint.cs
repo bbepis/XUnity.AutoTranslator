@@ -254,7 +254,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       {
          EnsureInitialized();
 
-         while( _initializing && !_failed ) yield return new WaitForSeconds( 0.2f );
+         while( _initializing && !_failed )
+         {
+            var instruction = Features.GetWaitForSecondsRealtime( 0.2f );
+            if( instruction != null )
+            {
+               yield return instruction;
+            }
+            else
+            {
+               yield return null;
+            }
+         }
 
          if( _failed ) context.Fail( "External process failed." );
 

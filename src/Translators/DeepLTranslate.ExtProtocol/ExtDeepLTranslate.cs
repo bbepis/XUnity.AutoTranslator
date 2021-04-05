@@ -116,12 +116,13 @@ namespace DeepLTranslate.ExtProtocol
          _handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
          _client = new HttpClient( _handler, true );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Mozilla", "5.0" ) );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(Windows NT 10.0; Win64; x64)" ) );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "AppleWebKit", "537.36" ) );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(KHTML, like Gecko)" ) );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Chrome", "80.0.3987.149" ) );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Safari", "537.36" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Mozilla", "5.0" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(Windows NT 10.0; Win64; x64)" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "AppleWebKit", "537.36" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "(KHTML, like Gecko)" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Chrome", "80.0.3987.149" ) );
+         //_client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "Safari", "537.36" ) );
+         _client.DefaultRequestHeaders.TryAddWithoutValidation( "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36" );
       }
 
       private static string FixLanguage( string lang )
@@ -155,48 +156,9 @@ namespace DeepLTranslate.ExtProtocol
       {
          _translationCount = 0;
 
-         // request web site
-         {
-            using var request = new HttpRequestMessage( HttpMethod.Get, HttpsTranslateUserSite );
-            AddHeaders( request, null, false );
+         await RequestWebsite();
 
-            using var response = await _client.SendAsync( request );
-            response.ThrowIfBlocked();
-            response.EnsureSuccessStatusCode();
-
-            await response.Content.ReadAsStringAsync();
-         }
-
-         // request client state
-         {
-            _id++;
-
-            // construct json content
-            var builder = new StringBuilder();
-            builder.Append( "{\"jsonrpc\":\"2.0\",\"method\":\"getClientState\",\"params\":{\"v\":\"20180814\"},\"id\":" );
-            builder.Append( _id );
-            builder.Append( "}" );
-            var content = builder.ToString();
-
-            // obfuscate
-            var obfuscatedContent = Obfuscate( content, _id );
-
-            var stringContent = new StringContent( obfuscatedContent );
-
-            using var request = new HttpRequestMessage( HttpMethod.Get, HttpsTranslateStateSetup );
-            AddHeaders( request, stringContent, false );
-
-            using var response = await _client.SendAsync( request );
-            response.ThrowIfBlocked();
-            response.EnsureSuccessStatusCode();
-
-            await response.Content.ReadAsStringAsync();
-         }
-      }
-
-      private string Obfuscate( string content, long e )
-      {
-         return content.Replace( "hod\":\"", ( e + 3 ) % 13 == 0 || ( e + 5 ) % 29 == 0 ? "hod\" : \"" : "hod\": \"" );
+         await GetClientState();
       }
 
       private void AddHeaders( HttpRequestMessage request, HttpContent content, bool isTranslationRequest )
@@ -239,9 +201,10 @@ namespace DeepLTranslate.ExtProtocol
             long r = (long)( DateTime.UtcNow - Epoch ).TotalMilliseconds;
             long n = 1;
 
-            List<UntranslatedTextInfo> untranslatedTextInfos = new List<UntranslatedTextInfo>();
-            var builder = new StringBuilder();
+            var builder = new StringBuìlder();
             builder.Append( "{\"jsonrpc\":\"2.0\",\"method\":\"LMT_handle_jobs\",\"params\":{\"jobs\":[" );
+
+            List<UntranslatedTextInfo> untranslatedTextInfos = new List<UntranslatedTextInfo>();
             foreach( var untranslatedTextInfo in context.UntranslatedTextInfos )
             {
                List<TranslationPart> parts = NewlineSplitter
@@ -346,10 +309,7 @@ namespace DeepLTranslate.ExtProtocol
             builder.Append( "}" );
             var content = builder.ToString();
 
-            // obfuscate
-            var obfuscatedContent = Obfuscate( content, _id );
-
-            var stringContent = new StringContent( obfuscatedContent );
+            var stringContent = new StringContent( content );
 
             using var request = new HttpRequestMessage( HttpMethod.Post, HttpsServicePointTemplateUrl );
             AddHeaders( request, stringContent, true );
@@ -419,6 +379,41 @@ namespace DeepLTranslate.ExtProtocol
          }
 
          context.Complete( translatedTexts.ToArray() );
+      }
+
+      public async Task RequestWebsite()
+      {
+         using var request = new HttpRequestMessage( HttpMethod.Get, HttpsTranslateUserSite );
+         AddHeaders( request, null, false );
+
+         using var response = await _client.SendAsync( request );
+         response.ThrowIfBlocked();
+         response.EnsureSuccessStatusCode();
+
+         await response.Content.ReadAsStringAsync();
+      }
+
+      public async Task GetClientState()
+      {
+         _id++;
+
+         // construct json content
+         var builder = new StringBuìlder();
+         builder.Append( "{\"jsonrpc\":\"2.0\",\"method\":\"getClientState\",\"params\":{\"v\":\"20180814\"},\"id\":" );
+         builder.Append( _id );
+         builder.Append( "}" );
+         var content = builder.ToString();
+
+         var stringContent = new StringContent( content );
+
+         using var request = new HttpRequestMessage( HttpMethod.Get, HttpsTranslateStateSetup );
+         AddHeaders( request, stringContent, false );
+
+         using var response = await _client.SendAsync( request );
+         response.ThrowIfBlocked();
+         response.EnsureSuccessStatusCode();
+
+         await response.Content.ReadAsStringAsync();
       }
 
       public void Dispose()

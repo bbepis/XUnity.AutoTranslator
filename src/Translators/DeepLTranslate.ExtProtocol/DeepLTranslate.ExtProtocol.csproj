@@ -14,6 +14,27 @@
     <ProjectReference Include="..\Common.ExtProtocol\Common.ExtProtocol.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MiscUtilities">
+      <HintPath>..\..\..\libs\MiscUtilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="ILRepack" AfterTargets="Build">
+    <PropertyGroup>
+      <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
+    </PropertyGroup>
+    <ItemGroup>
+      <InputAssemblies Include="MiscUtilities.dll" />
+    </ItemGroup>
+    <Message Text="MERGING: @(InputAssemblies->'%(Filename)') into $(OutputAssembly)" Importance="High" />
+    <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
+  </Target>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)Newtonsoft.Json.dll&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;)" />
   </Target>

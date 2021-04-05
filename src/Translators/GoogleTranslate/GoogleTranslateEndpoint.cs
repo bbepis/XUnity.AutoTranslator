@@ -50,6 +50,8 @@ namespace GoogleTranslate
 
       private CookieContainer _cookieContainer;
       private bool _hasSetup = false;
+      //private long m = 425635;
+      //private long s = 1953544246;
       private long m = 427761;
       private long s = 1179739010;
       private int _translationsPerRequest = 10;
