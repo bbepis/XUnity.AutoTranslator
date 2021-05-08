@@ -72,11 +72,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      string key = TextHelper.Decode( kvp[ 0 ] );
                      string value = TextHelper.Decode( kvp[ 1 ] );
 
-                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                     if( !string.IsNullOrEmpty( key ) )
                      {
                         if( isSubstitutionFile )
                         {
-                           Settings.Replacements[ key ] = value;
+                           if( !string.IsNullOrEmpty( value ) )
+                           {
+                              Settings.Replacements[ key ] = value;
+                           }
                         }
                         else if( isPreprocessorFile )
                         {

@@ -10,12 +10,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       public XuaViewModel(
          List<ToggleViewModel> toggles,
-         DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> dropdown,
+         DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> translatorDropdown,
+         DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> fallbackDropdown,
          List<ButtonViewModel> commandButtons,
          List<LabelViewModel> labels )
       {
          Toggles = toggles;
-         Dropdown = dropdown;
+         TranslatorDropdown = translatorDropdown;
+         FallbackDropdown = fallbackDropdown;
          CommandButtons = commandButtons;
          Labels = labels;
       }
@@ -24,7 +26,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public List<ToggleViewModel> Toggles { get; }
 
-      public DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> Dropdown { get; }
+      public DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> TranslatorDropdown { get; }
+
+      public DropdownViewModel<TranslatorDropdownOptionViewModel, TranslationEndpointManager> FallbackDropdown { get; }
 
       public List<ButtonViewModel> CommandButtons { get; }
 

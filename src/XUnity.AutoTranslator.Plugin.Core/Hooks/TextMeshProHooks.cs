@@ -7,6 +7,7 @@ using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.MonoMod;
@@ -29,6 +30,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          typeof( TMP_Text_SetCharArray_Hook1 ),
          typeof( TMP_Text_SetCharArray_Hook2 ),
          typeof( TMP_Text_SetCharArray_Hook3 ),
+      };
+
+      public static readonly Type[] DisableScrollInTmp = new[] {
+         typeof( TMP_Text_maxVisibleCharacters_Hook ),
       };
    }
 
@@ -194,6 +199,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          _original( __instance, value );
 
          Postfix( __instance );
+      }
+   }
+
+   [HookingHelperPriority( HookPriority.Last )]
+   internal static class TMP_Text_maxVisibleCharacters_Hook
+   {
+      static bool Prepare( object instance )
+      {
+         return ClrTypes.TMP_Text != null;
+      }
+
+      static MethodBase TargetMethod( object instance )
+      {
+         return AccessToolsShim.Property( ClrTypes.TMP_Text, "maxVisibleCharacters" )?.GetSetMethod();
+      }
+
+      static void Prefix( object __instance, ref int value )
+      {
+         var info = __instance.GetTextTranslationInfo();
+         if( info != null && info.IsTranslated && 0 < value )
+         {
+            value = 99999;
+         }
+      }
+
+      static Action<object, int> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<object, int>>();
+      }
+
+      static void MM_Detour( object __instance, int value )
+      {
+         Prefix( __instance, ref value );
+
+         _original( __instance, value );
       }
    }
 

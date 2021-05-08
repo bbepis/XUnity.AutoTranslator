@@ -332,7 +332,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <returns></returns>
       public bool TryGetTranslation( string untranslatedText, bool allowRegex, out string value )
       {
-         var key = new UntranslatedText( untranslatedText, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, false );
+         var key = new UntranslatedText( untranslatedText, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, false, Settings.TemplateAllNumberAway );
 
          bool result;
          string untemplated;

@@ -59,9 +59,27 @@ namespace XUnity.Common.Utilities
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
+      /// <param name="types"></param>
+      /// <param name="forceMonoModHooks"></param>
+      public static void PatchAll( IEnumerable<Type[]> types, bool forceMonoModHooks )
+      {
+         foreach( var typeCollection in types )
+         {
+            foreach( var type in typeCollection )
+            {
+               var hooked = PatchType( type, forceMonoModHooks );
+               if( hooked ) break;
+            }
+            
+         }
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
       /// <param name="type"></param>
       /// <param name="forceMonoModHooks"></param>
-      public static void PatchType( Type type, bool forceMonoModHooks )
+      public static bool PatchType( Type type, bool forceMonoModHooks )
       {
          MethodBase original = null;
          try
@@ -108,6 +126,8 @@ namespace XUnity.Common.Utilities
                         type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
                         XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through forced MonoMod hooks. {suffix}" );
+
+                        return true;
                      }
                      else
                      {
@@ -137,6 +157,8 @@ namespace XUnity.Common.Utilities
                         }
 
                         XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+
+                        return true;
                      }
                      catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                      {
@@ -162,6 +184,8 @@ namespace XUnity.Common.Utilities
                               type.GetMethod( "MM_Init", flags )?.Invoke( null, new object[] { hook } );
 
                               XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
+
+                              return true;
                            }
                            else
                            {
@@ -192,6 +216,8 @@ namespace XUnity.Common.Utilities
                XuaLogger.Common.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
             }
          }
+
+         return false;
       }
 
       private static object CreateHarmonyMethod( MethodInfo method, int? priority )

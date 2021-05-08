@@ -192,7 +192,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool? _isOnlyTemplate;
 
-      public UntranslatedText( string originalText, bool isFromSpammingComponent, bool removeInternalWhitespace, bool whitespaceBetweenWords, bool enableTemplating = true )
+      public UntranslatedText( string originalText, bool isFromSpammingComponent, bool removeInternalWhitespace, bool whitespaceBetweenWords, bool enableTemplating, bool templateAllNumbersAway )
       {
          IsFromSpammingComponent = isFromSpammingComponent;
 
@@ -210,7 +210,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               TemplatedText = originalText.TemplatizeByReplacements();
+               TemplatedText = templateAllNumbersAway ? originalText.TemplatizeByReplacementsAndNumbers() : originalText.TemplatizeByReplacements();
                if( TemplatedText != null )
                {
                   originalText = TemplatedText.Template;

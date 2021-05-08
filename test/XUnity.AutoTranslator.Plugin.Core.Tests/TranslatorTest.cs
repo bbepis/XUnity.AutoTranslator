@@ -7,7 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Tests
 {
-   public class TranslatorTest
+   public abstract class TranslatorTest
    {
       private static List<IMonoBehaviour_Update> _behavioursRequiringUpdates;
 
@@ -57,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       }
    }
 
-   public class TranslatorTest<TTranslateEndpoint> : TranslatorTest
+   public abstract class TranslatorTest<TTranslateEndpoint> : TranslatorTest
       where TTranslateEndpoint : ITranslateEndpoint, new()
    {
       private static TTranslateEndpoint _translator;

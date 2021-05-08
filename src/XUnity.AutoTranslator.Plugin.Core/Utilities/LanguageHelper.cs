@@ -67,14 +67,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return DefaultSymbolCheck( text );
       }
 
-      internal static bool ContainsVariableSymbols(string text)
+      /// <summary>
+      /// Checks if the text contains a variable.
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static bool ContainsVariableSymbols(string text)
       {
          var fidx = text.IndexOf( '{' );
          return fidx > -1
             && text.IndexOf( '}', fidx ) > fidx;
       }
 
-      internal static bool IsRedirected( this string text )
+      /// <summary>
+      /// Check if the text has been redirected through the MakeRedirected method.
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static bool IsRedirected( this string text )
       {
          if( text.Length > 0 )
          {
@@ -92,7 +102,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
-      internal static string FixRedirected( this string text )
+      /// <summary>
+      /// This is the reverse of the MakeRedirected method. 
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static string FixRedirected( this string text )
       {
          switch( Settings.RedirectedResourceDetectionStrategy )
          {
@@ -113,7 +128,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return text;
       }
 
-      internal static string MakeRedirected( this string text )
+      /// <summary>
+      /// Transforms the text in such a way that the plugin can recognize it when
+      /// it is displayed in a UI component. This is to avoid translating the text.
+      /// </summary>
+      /// <param name="text"></param>
+      /// <returns></returns>
+      public static string MakeRedirected( this string text )
       {
          switch( Settings.RedirectedResourceDetectionStrategy )
          {

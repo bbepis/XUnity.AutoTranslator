@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Extensions;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {
@@ -122,12 +123,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
             var item = allMatches[ i ];
             for( int j = 0; j < i; j++ )
             {
-               item.Info.ContextBefore.Add( allMatches[ j ].Info.UntranslatedText );
+               var before = allMatches[ j ].Info.UntranslatedText;
+               if( !before.IsNullOrWhiteSpace() )
+               {
+                  item.Info.ContextBefore.Add( before );
+               }
             }
 
             for( int j = i + 1; j < allMatches.Count; j++ )
             {
-               item.Info.ContextAfter.Add( allMatches[ j ].Info.UntranslatedText );
+               var after = allMatches[ j ].Info.UntranslatedText;
+               if( !after.IsNullOrWhiteSpace() )
+               {
+                  item.Info.ContextAfter.Add( after );
+               }
             }
          }
 

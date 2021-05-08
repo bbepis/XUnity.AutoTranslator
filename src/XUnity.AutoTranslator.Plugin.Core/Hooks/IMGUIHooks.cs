@@ -17,30 +17,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
 {
    internal static class IMGUIHooks
    {
-      public static readonly Type[] All = new[] {
+      public static readonly Type[][] All = new[] {
          //typeof( GUIStyle_Internal_Draw_Hook ),
          //typeof( GUIStyle_Internal_Draw2_Hook ),
          //typeof( GUIStyle_Internal_DrawCursor_Hook ),
-
-         typeof( GUI_BeginGroup_Hook ),
-         typeof( GUI_Box_Hook ),
-         typeof( GUI_DoRepeatButton_Hook ),
-         typeof( GUI_DoLabel_Hook ),
-         typeof( GUI_DoButton_Hook ),
-         typeof( GUI_DoModalWindow_Hook ),
-         typeof( GUI_DoWindow_Hook ),
-         typeof( GUI_DoButtonGrid_Hook ),
-         typeof( GUI_DoToggle_Hook ),
-
-         typeof( GUI_BeginGroup_Hook_New ),
-         typeof( GUI_DoLabel_Hook_New ),
-         typeof( GUI_DoButton_Hook_New ),
-         typeof( GUI_DoButtonGrid_Hook_2018 ),
-         typeof( GUI_DoButtonGrid_Hook_2019 ),
-         typeof( GUI_DoToggle_Hook_New ),
+         
+         new[] { typeof( GUI_BeginGroup_Hook_New ), typeof( GUI_BeginGroup_Hook ) },
+         new[] { typeof( GUI_DoLabel_Hook_New ), typeof( GUI_DoLabel_Hook ) },
+         new[] { typeof( GUI_DoButton_Hook_New ), typeof( GUI_DoButton_Hook ) },
+         new[] { typeof( GUI_DoButtonGrid_Hook_2019 ), typeof( GUI_DoButtonGrid_Hook_2018 ), typeof( GUI_DoButtonGrid_Hook ) },
+         new[] { typeof( GUI_DoToggle_Hook_New ), typeof( GUI_DoToggle_Hook ) },
+         new[] { typeof( GUI_Box_Hook ) },
+         new[] { typeof( GUI_DoRepeatButton_Hook ) },
+         new[] { typeof( GUI_DoModalWindow_Hook ) },
+         new[] { typeof( GUI_DoWindow_Hook ) },
       };
 
-      internal static bool Use2018StyleIMGUI = AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } ) != null;
+      //internal static bool Use2018StyleIMGUI = AccessToolsShim.Method( ClrTypes.GUIStyle, "Internal_Draw", new[] { typeof( Rect ), typeof( GUIContent ), typeof( bool ), typeof( bool ), typeof( bool ), typeof( bool ) } ) != null;
    }
 
    //[HookingHelperPriority( HookPriority.Last )]
@@ -171,7 +164,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return !IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -204,7 +197,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -303,7 +296,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return !IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -336,7 +329,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -369,7 +362,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return !IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -402,7 +395,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -511,7 +504,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return !IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -549,7 +542,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
+         return ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -587,7 +580,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
+         return ClrTypes.GUI != null && ClrTypes.GUI_ToolbarButtonSize != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -625,7 +618,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return !IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -660,7 +653,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
    {
       static bool Prepare( object instance )
       {
-         return IMGUIHooks.Use2018StyleIMGUI && ClrTypes.GUI != null;
+         return ClrTypes.GUI != null;
       }
 
       static MethodBase TargetMethod( object instance )

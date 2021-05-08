@@ -1,4 +1,13 @@
-﻿### 4.15.0
+﻿### 4.16.0
+ * BREAKING CHANGE - Changed load order of translation files in Text directory. Zip files are now lowest priority and files inside zip files are also prioritized alphabetically. Now reflects the same behaviour as redirected resources.
+ * BREAKING CHANGE - Changes to IMGUI handling of numbers. This may cause previous translations to break
+ * FEATURE - UI to control fallback endpoint
+ * MISC - Caching of result of "sr" regexes, allowing it to be used for IMGUI and potentially increasing performance for scenarios where the same text is being translated through a regex all the tim
+ * MISC - New configuration "TemplateAllNumbersAway", that will ensure all numbers are templated away before being send to translator/being stored in translation file
+ * MISC - New configuration "ReloadTranslationsOnFileChange", that will automatically reload files when a translation file changes
+ * MISC - Publication of various minor APIs related to resource redirection
+
+### 4.15.0
  * FEATURE - Added DeepL support
  * FEATURE - New setting for automated fallback translation endpoint
  * FEATURE - Extensions to ITranslateEndpoint interface allowing handling of contextual translation information

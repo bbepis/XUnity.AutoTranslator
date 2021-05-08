@@ -127,11 +127,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var translatable = LanguageHelper.IsTranslatable( text );
          if( translatable )
          {
-            return new UntranslatedText( text, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
+            return new UntranslatedText( text, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
          }
          else
          {
-            return new UntranslatedText( text, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+            return new UntranslatedText( text, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
          }
       }
 

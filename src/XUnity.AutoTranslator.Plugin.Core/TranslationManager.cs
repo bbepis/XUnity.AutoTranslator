@@ -89,12 +89,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( fallbackEndpoint == primaryEndpoint )
                   {
-                     XuaLogger.AutoTranslator.Error( "Error occurred during the initialization of the selected translate endpoint. Cannot use same fallback endpoint as primary." );
+                     XuaLogger.AutoTranslator.Warn( "Cannot use same fallback endpoint as primary." );
                   }
-                  else
-                  {
-                     CurrentEndpoint = primaryEndpoint;
-                  }
+                  CurrentEndpoint = primaryEndpoint;
                }
             }
             else if( !string.IsNullOrEmpty( Settings.ServiceEndpoint ) )

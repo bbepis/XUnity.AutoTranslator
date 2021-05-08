@@ -19,9 +19,11 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
-   class TextTranslationCache : IReadOnlyTextTranslationCache
+   sealed class TextTranslationCache : IReadOnlyTextTranslationCache, IDisposable
    {
       private static readonly char[] TranslationSplitters = new char[] { '=' };
+
+      public event Action TextTranslationFileChanged;
 
       private Dictionary<IReadOnlyTextTranslationCache, CompositeTextTranslationCache> _compositeCaches = new Dictionary<IReadOnlyTextTranslationCache, CompositeTextTranslationCache>();
 
@@ -50,8 +52,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private object _writeToFileSync = new object();
       private Dictionary<string, string> _newTranslations = new Dictionary<string, string>();
-
+      private bool disposedValue;
       private readonly DirectoryInfo _pluginDirectory;
+      private SafeFileWatcher _fileWatcher;
 
       public TextTranslationCache()
       {
@@ -61,8 +64,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          LoadStaticTranslations();
 
+         if( Settings.ReloadTranslationsOnFileChange )
+         {
+            try
+            {
+               Directory.CreateDirectory( Settings.TranslationsPath );
+               _fileWatcher = new SafeFileWatcher( Settings.TranslationsPath );
+               _fileWatcher.DirectoryUpdated += FileWatcher_DirectoryUpdated;
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while initializing translation file watching for text." );
+            }
+         }
+
          // start function to write translations to file
          MaintenanceHelper.AddMaintenanceFunction( SaveNewTranslationsToDisk, 1 );
+      }
+
+      private void FileWatcher_DirectoryUpdated()
+      {
+         TextTranslationFileChanged?.Invoke();
       }
 
       public TextTranslationCache( DirectoryInfo pluginDirectory )
@@ -96,7 +118,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return Directory.GetFiles( _pluginDirectory?.FullName ?? Settings.TranslationsPath, $"*", SearchOption.AllDirectories )
             .Where( x => x.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) || x.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
             .Where( x => !x.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
-            .Select( x => new FileInfo( x ).FullName );
+            .Select( x => new FileInfo( x ) )
+            .Select( fi => new
+            {
+               IsZipped = fi.FullName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ),
+               FileInfo = fi
+            } )
+            .OrderByDescending( x => x.IsZipped )
+            .ThenByDescending( x => x.FileInfo.FullName, StringComparer.OrdinalIgnoreCase )
+            .Select( x => x.FileInfo.FullName );
       }
 
       internal CompositeTextTranslationCache GetOrCreateCompositeCache( IReadOnlyTextTranslationCache primary )
@@ -159,7 +189,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   LoadTranslationsInFile( mainTranslationFile, true );
                }
-               foreach( var fullFileName in GetTranslationFiles().Reverse().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
+               foreach( var fullFileName in GetTranslationFiles().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
                {
                   try
                   {
@@ -219,8 +249,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                foreach( var kvp in _translations.ToList() )
                {
                   // also add a modified version of the translation
-                  var ukey = new UntranslatedText( kvp.Key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
-                  var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+                  var ukey = new UntranslatedText( kvp.Key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
+                  var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
                   if( ukey.Original_Text_ExternallyTrimmed != kvp.Key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed, TranslationScopes.None, false ) )
                   {
                      AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed, TranslationScopes.None );
@@ -239,8 +269,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   foreach( var kvp in scopeKvp.Value.Translations.ToList() )
                   {
                      // also add a modified version of the translation
-                     var ukey = new UntranslatedText( kvp.Key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
-                     var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+                     var ukey = new UntranslatedText( kvp.Key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
+                     var uvalue = new UntranslatedText( kvp.Value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
                      if( ukey.Original_Text_ExternallyTrimmed != kvp.Key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed, scope, false ) )
                      {
                         AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed, scope );
@@ -597,16 +627,32 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   if( fullFileName.EndsWith( ".zip", StringComparison.OrdinalIgnoreCase ) )
                   {
-                     using( var zipInputStream = new ZipInputStream( stream ) )
+                     var zf = new ZipFile( stream );
+                     var entries = zf.GetEntries()
+                        .OrderByDescending( x => x.Name, StringComparer.OrdinalIgnoreCase );
+
+                     foreach( var entry in entries )
                      {
-                        while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                        if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
                         {
-                           if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
-                           {
-                              LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile );
-                           }
+                           var zipInputStream = zf.GetInputStream( entry );
+                           LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile );
                         }
                      }
+
+                     //using( var zipInputStream = new ZipInputStream( stream ) )
+                     //{
+                     //   while( zipInputStream.GetNextEntry() is ZipEntry entry )
+                     //   {
+                     //      if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
+                     //      {
+                     //         LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile );
+                     //      }
+                     //   }
+                     //}
+
+
+                     zf.Close();
                   }
                   else
                   {
@@ -658,16 +704,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( _newTranslations.Count > 0 )
                {
-                  using( var stream = File.Open( Settings.AutoTranslationsFilePath, FileMode.Append, FileAccess.Write ) )
-                  using( var writer = new StreamWriter( stream, Encoding.UTF8 ) )
+                  _fileWatcher?.Disable();
+                  try
                   {
-                     foreach( var kvp in _newTranslations )
+                     using( var stream = File.Open( Settings.AutoTranslationsFilePath, FileMode.Append, FileAccess.Write ) )
+                     using( var writer = new StreamWriter( stream, Encoding.UTF8 ) )
                      {
-                        writer.WriteLine( TextHelper.Encode( kvp.Key ) + '=' + TextHelper.Encode( kvp.Value ) );
+                        foreach( var kvp in _newTranslations )
+                        {
+                           writer.WriteLine( TextHelper.Encode( kvp.Key ) + '=' + TextHelper.Encode( kvp.Value ) );
+                        }
+                        writer.Flush();
                      }
-                     writer.Flush();
+                     _newTranslations.Clear();
                   }
-                  _newTranslations.Clear();
+                  finally
+                  {
+                     _fileWatcher?.Enable();
+                  }
                }
             }
          }
@@ -843,8 +897,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                AddTranslation( key, value, scope );
 
                // also add a modified version of the translation
-               var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
-               var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+               var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
+               var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
                if( ukey.Original_Text_ExternallyTrimmed != key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed, scope, false ) )
                {
                   AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed, scope );
@@ -1495,6 +1549,27 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public List<RegexTranslationSplitter> SplitterRegexes { get; }
          public HashSet<string> RegisteredSplitterRegexes { get; }
          public HashSet<string> FailedRegexLookups { get; set; }
+      }
+
+      private void Dispose( bool disposing )
+      {
+         if( !disposedValue )
+         {
+            if( disposing )
+            {
+               _fileWatcher?.Dispose();
+               _fileWatcher = null;
+            }
+
+            disposedValue = true;
+         }
+      }
+
+      public void Dispose()
+      {
+         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+         Dispose( disposing: true );
+         GC.SuppressFinalize( this );
       }
    }
 }

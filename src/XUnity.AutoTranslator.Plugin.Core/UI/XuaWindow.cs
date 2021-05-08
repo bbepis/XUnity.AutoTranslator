@@ -10,12 +10,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    internal class XuaWindow
    {
       private const int WindowId = 5464332;
-      private const float WindowHeight = 565;
+      private const float WindowHeight = 596;
       private const float WindowWidth = 320;
 
       private Rect _windowRect = new Rect( 20, 20, WindowWidth, WindowHeight );
 
       private DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager> _endpointDropdown;
+      private DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager> _fallbackDropdown;
       private XuaViewModel _viewModel;
       private bool _isMouseDownOnWindow = false;
 
@@ -125,14 +126,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             }
 
             // GROUP
-            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 1 ) + ( GUIUtil.ComponentSpacing * ( 2 ) ) - GUIUtil.HalfComponentSpacing;
+            groupHeight = GUIUtil.LabelHeight + ( GUIUtil.RowHeight * 2 ) + ( GUIUtil.ComponentSpacing * 2 );
             GUI.Box( GUIUtil.R( GUIUtil.HalfComponentSpacing, posy, WindowWidth - GUIUtil.ComponentSpacing, groupHeight ), "" );
 
             GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.LabelHeight ), "---- Select a Translator ----", GUIUtil.LabelCenter );
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
 
-            GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight ), "Translator: " );
+            GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth + 10, GUIUtil.LabelHeight ), "Translator: " );
             float endpointDropdownPosy = posy;
+            posy += GUIUtil.RowHeight + GUIUtil.HalfComponentSpacing;
+
+            GUI.Label( GUIUtil.R( col1x, posy, GUIUtil.LabelWidth, GUIUtil.LabelHeight ), "Fallback: " );
+            float fallbackDropdownPosy = posy;
             posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
 
             // GROUP
@@ -150,8 +155,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
                posy += GUIUtil.RowHeight + GUIUtil.ComponentSpacing;
             }
 
-            var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.Dropdown ) );
-            endpointDropdown.OnGUI();
+            var endpointDropdown = _endpointDropdown ?? ( _endpointDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, endpointDropdownPosy, col2, _viewModel.TranslatorDropdown ) );
+            var isShown = endpointDropdown.OnGUI(true);
+
+            var fallbackDropdown = _fallbackDropdown ?? ( _fallbackDropdown = new DropdownGUI<TranslatorDropdownOptionViewModel, TranslationEndpointManager>( col2x, fallbackDropdownPosy, col2, _viewModel.FallbackDropdown ) );
+            fallbackDropdown.OnGUI( !isShown );
 
             GUI.Label( GUIUtil.R( col1x, posy, col12, GUIUtil.RowHeight * 5 ), GUI.tooltip, GUIUtil.LabelRich );
 
