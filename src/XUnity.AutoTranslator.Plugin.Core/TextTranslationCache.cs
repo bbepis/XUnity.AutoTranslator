@@ -310,7 +310,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( untranslatedResult != null )
                {
                   var translatedResult = parser.Parse( kvp.Value, TranslationScopes.None );
-                  if( translatedResult != null && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                  if( translatedResult != null && untranslatedResult.Arguments.Count == translatedResult.Arguments.Count )
                   {
                      foreach( var ukvp in untranslatedResult.Arguments )
                      {
@@ -336,7 +336,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( untranslatedResult != null )
                   {
                      var translatedResult = parser.Parse( kvp.Value, scope );
-                     if( translatedResult != null && untranslatedResult.Arguments.Count == untranslatedResult.Arguments.Count )
+                     if( translatedResult != null && untranslatedResult.Arguments.Count == translatedResult.Arguments.Count )
                      {
                         foreach( var ukvp in untranslatedResult.Arguments )
                         {

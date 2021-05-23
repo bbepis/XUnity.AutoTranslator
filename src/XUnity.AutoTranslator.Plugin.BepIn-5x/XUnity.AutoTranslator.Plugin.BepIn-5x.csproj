@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <Version>4.16.0</Version>
+    <Version>4.16.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

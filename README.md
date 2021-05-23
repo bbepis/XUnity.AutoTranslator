@@ -181,7 +181,8 @@ The supported translators are:
  * [DeepLTranslate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Does not require authentication.
    * No limitations, but unstable. Remarkable quality.
  * [DeepLTranslateLegitimate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Requires an  API Key.
-   * $4.99 per month and $20 per million characters translated that month. Expensive but remarkable quality.
+   * $4.99 per month and $20 per million characters translated that month. 
+   * Free up to 0.5 million characters per month.
    * For now, you must subscribe to DeepL API (for Developers). - DOES NOT WORK WITH DeepL Pro (Starter, Advanced and Ultimate)
  * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
    * No limitations, but unstable.
@@ -366,6 +367,7 @@ MaxDelay=7                       ;OPTIONAL, used for throttling DeepL
 
 [DeepLLegitimate]
 ApiKey=                          ;OPTIONAL, required if DeepLLegitimate is configured
+Free=False                       ;OPTIONAL, required if DeepLLegitimate is configured
 
 [Custom]
 Url=                             ;Optional, needed if CustomTranslated is configured

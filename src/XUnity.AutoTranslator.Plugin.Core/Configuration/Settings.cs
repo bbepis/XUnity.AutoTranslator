@@ -127,6 +127,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool TemplateAllNumberAway;
       public static bool ReloadTranslationsOnFileChange;
       public static bool DisableTextMeshProScrollInEffects;
+      public static bool CacheParsedTranslations;
 
       public static string TextureDirectory;
       public static bool EnableTextureTranslation;
@@ -249,6 +250,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             TemplateAllNumberAway = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TemplateAllNumberAway", false );
             ReloadTranslationsOnFileChange = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ReloadTranslationsOnFileChange", false );
             DisableTextMeshProScrollInEffects = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "DisableTextMeshProScrollInEffects", ApplicationName.Equals( "SamuraiVandalism", StringComparison.OrdinalIgnoreCase ) );
+            CacheParsedTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheParsedTranslations", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();

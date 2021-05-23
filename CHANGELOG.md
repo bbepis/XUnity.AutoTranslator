@@ -1,4 +1,9 @@
-﻿### 4.16.0
+﻿### 4.16.1
+ * MISC - Allow free developer API to be used with DeepL
+ * BUG FIX - Fixed bug that would often incorrectly cache parsed translations and made the feature optional
+ * BUG FIX - Fixed bug that would cause token translations not to be read correctly in certain situations
+
+### 4.16.0
  * BREAKING CHANGE - Changed load order of translation files in Text directory. Zip files are now lowest priority and files inside zip files are also prioritized alphabetically. Now reflects the same behaviour as redirected resources.
  * BREAKING CHANGE - Changes to IMGUI handling of numbers. This may cause previous translations to break
  * FEATURE - UI to control fallback endpoint

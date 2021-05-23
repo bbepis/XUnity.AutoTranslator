@@ -53,7 +53,7 @@ namespace DeepLTranslate.ExtProtocol
             | SecurityProtocolType.Tls12;
       }
 
-      private static readonly string HttpsServicePointTemplateUrl = "https://api.deepl.com/v2/translate?auth_key={0}";
+      private string _httpsServicePointTemplateUrl = "https://api.deepl.com/v2/translate?auth_key={0}";
 
       private HttpClient _client;
       private HttpClientHandler _handler;
@@ -66,7 +66,19 @@ namespace DeepLTranslate.ExtProtocol
 
       public void Initialize( string config )
       {
-         _apiKey = config;
+         var parts = config.Split( new[] { '\n' }, StringSplitOptions.None );
+
+         _apiKey = parts[0];
+
+         var free = parts[ 1 ];
+         if(string.Equals(free, "true", StringComparison.OrdinalIgnoreCase))
+         {
+            _httpsServicePointTemplateUrl = "https://api-free.deepl.com/v2/translate?auth_key={0}";
+         }
+         else
+         {
+            _httpsServicePointTemplateUrl = "https://api.deepl.com/v2/translate?auth_key={0}";
+         }
       }
 
       private void CreateClientAndHandler()
@@ -81,7 +93,7 @@ namespace DeepLTranslate.ExtProtocol
          _handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
          _client = new HttpClient( _handler, true );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "XUnity", "4.16.0" ) );
+         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "XUnity", "4.16.1" ) );
          _client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( "*/*" ) );
       }
 
@@ -115,10 +127,10 @@ namespace DeepLTranslate.ExtProtocol
 
          var form = new FormUrlEncodedContent( parameters );
 
-         using var request = new HttpRequestMessage( HttpMethod.Post, HttpsServicePointTemplateUrl );
+         using var request = new HttpRequestMessage( HttpMethod.Post, _httpsServicePointTemplateUrl );
 
          // create request
-         using var response = await _client.PostAsync( string.Format( HttpsServicePointTemplateUrl, _apiKey ), form );
+         using var response = await _client.PostAsync( string.Format( _httpsServicePointTemplateUrl, _apiKey ), form );
          response.ThrowIfBlocked();
          response.EnsureSuccessStatusCode();
 

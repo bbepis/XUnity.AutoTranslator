@@ -49,7 +49,10 @@ namespace DeepLTranslate
          if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
 
-         ConfigForExternalProcess = context.GetOrCreateSetting( ConfigurationSectionName, "ApiKey", "" );
+         var apiKey = context.GetOrCreateSetting( ConfigurationSectionName, "ApiKey", "" );
+         var isFree = context.GetOrCreateSetting( ConfigurationSectionName, "Free", false );
+
+         ConfigForExternalProcess = string.Join( "\n", new[] { apiKey, isFree.ToString() } );
          if( string.IsNullOrEmpty( ConfigForExternalProcess ) ) throw new EndpointInitializationException( $"The endpoint requires an API key which has not been provided." );
 
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( "DeepLTranslate.ExtProtocol.ExtDeepLTranslateLegitimate, DeepLTranslate.ExtProtocol" ), Base64FormattingOptions.None );
