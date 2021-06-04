@@ -1,4 +1,7 @@
-﻿### 4.16.1
+﻿### 4.16.2
+ * BUG FIX - DeepLLegitimate no longer selectable if no API key has been configured
+
+### 4.16.1
  * MISC - Allow free developer API to be used with DeepL
  * BUG FIX - Fixed bug that would often incorrectly cache parsed translations and made the feature optional
  * BUG FIX - Fixed bug that would cause token translations not to be read correctly in certain situations

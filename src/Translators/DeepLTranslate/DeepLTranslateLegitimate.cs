@@ -52,8 +52,9 @@ namespace DeepLTranslate
          var apiKey = context.GetOrCreateSetting( ConfigurationSectionName, "ApiKey", "" );
          var isFree = context.GetOrCreateSetting( ConfigurationSectionName, "Free", false );
 
+         if( string.IsNullOrEmpty( apiKey ) ) throw new EndpointInitializationException( $"The endpoint requires an API key which has not been provided." );
+
          ConfigForExternalProcess = string.Join( "\n", new[] { apiKey, isFree.ToString() } );
-         if( string.IsNullOrEmpty( ConfigForExternalProcess ) ) throw new EndpointInitializationException( $"The endpoint requires an API key which has not been provided." );
 
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( "DeepLTranslate.ExtProtocol.ExtDeepLTranslateLegitimate, DeepLTranslate.ExtProtocol" ), Base64FormattingOptions.None );
       }
