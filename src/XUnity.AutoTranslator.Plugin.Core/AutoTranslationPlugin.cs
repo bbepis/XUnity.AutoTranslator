@@ -2333,7 +2333,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private TranslationEndpointManager GetTranslationEndpoint( ParserTranslationContext context, bool allowFallback )
       {
          var endpoint = context?.Endpoint ?? TranslationManager.CurrentEndpoint;
-         if( allowFallback && endpoint.HasFailedDueToConsecutiveErrors && TranslationManager.IsFallbackAvailableFor( endpoint ) )
+         if( allowFallback && endpoint != null && endpoint.HasFailedDueToConsecutiveErrors && TranslationManager.IsFallbackAvailableFor( endpoint ) )
          {
             XuaLogger.AutoTranslator.Warn( "Falling back to fallback translator in order to perform translation." );
 

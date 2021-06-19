@@ -1,4 +1,8 @@
-﻿### 4.16.2
+﻿### 4.16.3
+ * MISC - Make "MaxConcurrency" property in HttpEndpoint and WwwEndpoint virtual
+ * BUG FIX - Fixed bug that caused exception spam if no endpoint were selected
+
+### 4.16.2
  * BUG FIX - DeepLLegitimate no longer selectable if no API key has been configured
 
 ### 4.16.1
