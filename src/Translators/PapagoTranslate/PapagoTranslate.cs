@@ -80,7 +80,7 @@ namespace PapagoTranslate
       {
          if( _resetAfter == 0 || _translationCount % _resetAfter == 0 )
          {
-            _translationCount = 0;
+            _translationCount = 1;
             _resetAfter = RandomNumbers.Next( 150, 200 );
 
             var enumerator = SetupVersion();

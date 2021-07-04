@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             _fail( reason, exception );
 
-            throw new TranslationContextException();
+            throw new TranslationContextException( reason, exception );
          }
          finally
          {
@@ -94,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             _fail( reason, null );
 
-            throw new TranslationContextException();
+            throw new TranslationContextException( reason );
          }
          finally
          {

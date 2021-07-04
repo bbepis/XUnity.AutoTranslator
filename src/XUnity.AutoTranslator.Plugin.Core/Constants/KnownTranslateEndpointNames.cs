@@ -13,7 +13,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Constants
       /// <summary>
       /// Gets the id used by GoogleTranslate.
       /// </summary>
-      public const string GoogleTranslate = "GoogleTranslate";
+      public const string GoogleTranslateV2 = "GoogleTranslateV2";
 
       /// <summary>
       /// Gets the id used by GoogleTranslate legitimate.

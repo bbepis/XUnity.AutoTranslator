@@ -121,7 +121,7 @@ namespace GoogleTranslate
          if( !_hasSetup || _translationCount % _resetAfter == 0 )
          {
             _resetAfter = RandomNumbers.Next( 75, 125 );
-            _translationCount = 0;
+            _translationCount = 1;
             _reqId = RandomNumbers.Next( 0, 100000 ); //maybe divide by 10 and multiply?
 
             _hasSetup = true;
