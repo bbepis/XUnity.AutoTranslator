@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static readonly char[] TranslationSplitters = new char[] { '=' };
 
-      private Dictionary<string, string> _translations = new Dictionary<string, string>();
+      protected readonly Dictionary<string, string> _translations = new Dictionary<string, string>();
       private List<RegexTranslation> _defaultRegexes = new List<RegexTranslation>();
       private HashSet<string> _registeredRegexes = new HashSet<string>();
 
@@ -103,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <summary>
       /// Indicates if the translation cache is empty.
       /// </summary>
-      public bool IsEmpty => ( _translations.Count + _defaultRegexes.Count ) == 0;
+      public virtual bool IsEmpty => ( _translations.Count + _defaultRegexes.Count ) == 0;
 
       internal void LoadTranslationFiles( bool overrideLaterWithEarlier )
       {
@@ -209,12 +209,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private bool HasTranslated( string key )
+      protected virtual bool HasTranslated( string key )
       {
          return _translations.ContainsKey( key );
       }
 
-      private void AddTranslation( string key, string value, bool allowOverride )
+      protected virtual void AddTranslation( string key, string value, bool allowOverride )
       {
          if( key != null && value != null )
          {
@@ -230,7 +230,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       /// <param name="key"></param>
       /// <param name="value"></param>
-      public void AddTranslationToCache( string key, string value )
+      public virtual void AddTranslationToCache( string key, string value )
       {
          var hadTranslated = HasTranslated( key );
 
@@ -330,7 +330,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// <param name="allowRegex"></param>
       /// <param name="value"></param>
       /// <returns></returns>
-      public bool TryGetTranslation( string untranslatedText, bool allowRegex, out string value )
+      public virtual bool TryGetTranslation( string untranslatedText, bool allowRegex, out string value )
       {
          var key = new UntranslatedText( untranslatedText, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, false, Settings.TemplateAllNumberAway );
 
