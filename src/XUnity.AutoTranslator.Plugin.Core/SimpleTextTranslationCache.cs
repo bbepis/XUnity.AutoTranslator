@@ -20,6 +20,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static readonly char[] TranslationSplitters = new char[] { '=' };
 
+      /// <summary>
+      /// Internal translation dictionary used to store translations.
+      /// </summary>
       protected readonly Dictionary<string, string> _translations = new Dictionary<string, string>();
       private List<RegexTranslation> _defaultRegexes = new List<RegexTranslation>();
       private HashSet<string> _registeredRegexes = new HashSet<string>();
@@ -184,7 +187,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         }
                         else
                         {
-                           AddTranslation( key, value.MakeRedirected(), allowOverride );
+                           AddTranslationInternal( key, value.MakeRedirected(), allowOverride );
                         }
                      }
                   }
@@ -209,18 +212,47 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private void AddTranslationInternal( string key, string value, bool allowOverride )
+      {
+         if( key != null && value != null )
+         {
+            if( allowOverride || !HasTranslated( key ) )
+            {
+               AddTranslation( key, value );
+            }
+         }
+      }
+
+      /// <summary>
+      /// Checks if the given text has already been translated. Only use in
+      /// relation to check if new translations should be added to the internal
+      /// dictionary.
+      /// </summary>
+      /// <param name="key"></param>
+      /// <returns></returns>
       protected virtual bool HasTranslated( string key )
       {
          return _translations.ContainsKey( key );
       }
 
-      protected virtual void AddTranslation( string key, string value, bool allowOverride )
+      /// <summary>
+      /// Adds the translations to the internal cache.
+      /// </summary>
+      /// <param name="key"></param>
+      /// <param name="value"></param>
+      protected virtual void AddTranslation( string key, string value )
+      {
+         _translations[ key ] = value;
+      }
+
+      [Obsolete("Do not use. Function only exists in case someone calls it through reflection.")]
+      private void AddTranslation( string key, string value, bool allowOverride )
       {
          if( key != null && value != null )
          {
-            if( allowOverride || !_translations.ContainsKey( key ) )
+            if( allowOverride || !HasTranslated( key ) )
             {
-               _translations[ key ] = value;
+               AddTranslation( key, value );
             }
          }
       }
@@ -236,7 +268,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !hadTranslated )
          {
-            AddTranslation( key, value.MakeRedirected(), false );
+            AddTranslationInternal( key, value.MakeRedirected(), false );
 
             QueueNewTranslationForDisk( key, value, hadTranslated );
          }
