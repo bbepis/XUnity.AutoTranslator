@@ -1,4 +1,9 @@
-﻿### 4.16.3
+﻿### 4.17.0
+ * FEATURE - Additional public APIs in relation to SimpleTextTranslationCache
+ * CHANGE - Default endpoint changed to GoogleTranslateV2
+ * MISC - Improved error logging in GoogleTranslate
+
+### 4.16.3
  * MISC - Make "MaxConcurrency" property in HttpEndpoint and WwwEndpoint virtual
  * BUG FIX - Fixed bug that caused exception spam if no endpoint were selected
 
