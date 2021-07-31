@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Utilities
 {
@@ -10,18 +11,26 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
       {
          if( Settings.EnableTranslationScoping )
          {
-            if( ui is Component component )
+            try
             {
-               return GetScopeFromComponent( component );
+               if( ui is Component component )
+               {
+                  return GetScopeFromComponent( component );
+               }
+               else if( ui is GUIContent guic ) // not same as spamming component because we allow nulls
+               {
+                  return TranslationScopes.None;
+               }
+               else
+               {
+                  // TODO: Could be an array of all loaded scenes instead!
+                  return SceneManagerHelper.GetActiveSceneId();
+               }
             }
-            else if( ui is GUIContent guic ) // not same as spamming component because we allow nulls
+            catch( System.MissingMemberException e )
             {
-               return TranslationScopes.None;
-            }
-            else
-            {
-               // TODO: Could be an array of all loaded scenes instead!
-               return SceneManagerHelper.GetActiveSceneId();
+               XuaLogger.AutoTranslator.Error( e, "A 'missing member' error occurred while retriving translation scope. Disabling translation scopes." );
+               Settings.EnableTranslationScoping = false;
             }
          }
          return TranslationScopes.None;

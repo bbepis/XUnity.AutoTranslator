@@ -232,18 +232,47 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( resizeTextForBestFitValue != null )
                      {
                         var resizeTextMinSizeValue = ClrTypes.Text_Properties.ResizeTextMinSize?.Get( ui );
+                        var resizeTextMaxSizeValue = ClrTypes.Text_Properties.ResizeTextMaxSize?.Get( ui );
+
+                        var minSize = result.AutoResizeCommand.GetMinSize() ?? 1d;
+                        if( ClrTypes.Text_Properties.ResizeTextMinSize != null )
+                        {
+                           int minSizeCorrected = double.IsNaN( minSize ) ? 1 : (int)minSize;
+                           ClrTypes.Text_Properties.ResizeTextMinSize.Set( ui, minSizeCorrected );
+                        }
+
+                        var maxSize = result.AutoResizeCommand.GetMaxSize();
+                        if( maxSize.HasValue && ClrTypes.Text_Properties.ResizeTextMaxSize != null )
+                        {
+                           int maxSizeCorrected = double.IsNaN( maxSize.Value ) ? 1 : (int)maxSize.Value; // 1 == infinitely large
+                           ClrTypes.Text_Properties.ResizeTextMaxSize?.Set( ui, maxSizeCorrected );
+                        }
 
                         var shouldAutoResize = result.AutoResizeCommand.ShouldAutoResize();
                         ClrTypes.Text_Properties.ResizeTextForBestFit.Set( ui, shouldAutoResize );
-                        ClrTypes.Text_Properties.ResizeTextMinSize?.Set( ui, 1 );
 
                         if( isUntouched )
                         {
                            _unresizeFont += g =>
                            {
                               ClrTypes.Text_Properties.ResizeTextForBestFit.Set( g, resizeTextForBestFitValue );
-                              ClrTypes.Text_Properties.ResizeTextMinSize?.Set( g, resizeTextMinSizeValue );
                            };
+
+                           if( ClrTypes.Text_Properties.ResizeTextMinSize != null )
+                           {
+                              _unresizeFont += g =>
+                              {
+                                 ClrTypes.Text_Properties.ResizeTextMinSize.Set( g, resizeTextMinSizeValue );
+                              };
+                           }
+
+                           if( maxSize.HasValue && ClrTypes.Text_Properties.ResizeTextMaxSize != null )
+                           {
+                              _unresizeFont += g =>
+                              {
+                                 ClrTypes.Text_Properties.ResizeTextMaxSize.Set( g, resizeTextMaxSizeValue );
+                              };
+                           }
                         }
                      }
                   }
@@ -450,10 +479,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( result.AutoResizeCommand != null )
                   {
                      var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
-                     var enableAutoSizingValue = enableAutoSizingProperty.Get( ui );
+                     var fontSizeMinProperty = type.CachedProperty( "fontSizeMin" );
+                     var fontSizeMaxProperty = type.CachedProperty( "fontSizeMax" );
 
-                     if( enableAutoSizingValue != null )
+                     if( enableAutoSizingProperty != null )
                      {
+                        var enableAutoSizingValue = enableAutoSizingProperty.Get( ui );
+                        var fontSizeMinValue = fontSizeMinProperty?.Get( ui );
+                        var fontSizeMaxValue = fontSizeMaxProperty?.Get( ui );
+
+                        var minSize = result.AutoResizeCommand.GetMinSize();
+                        if( minSize.HasValue && fontSizeMinProperty != null )
+                        {
+                           float minSizeCorrected = double.IsNaN( minSize.Value ) ? 0f : (float)minSize.Value;
+                           fontSizeMinProperty?.Set( ui, minSizeCorrected );
+                        }
+
+                        var maxSize = result.AutoResizeCommand.GetMaxSize();
+                        if( maxSize.HasValue && fontSizeMaxProperty != null )
+                        {
+                           float maxSizeCorrected = double.IsNaN( maxSize.Value ) ? float.MaxValue : (float)maxSize.Value;
+                           fontSizeMaxProperty?.Set( ui, maxSizeCorrected );
+                        }
+
                         var shouldAutoResize = result.AutoResizeCommand.ShouldAutoResize();
                         enableAutoSizingProperty.Set( ui, shouldAutoResize );
 
@@ -463,6 +511,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            {
                               enableAutoSizingProperty.Set( g, enableAutoSizingValue );
                            };
+
+                           if( minSize.HasValue && fontSizeMinProperty != null )
+                           {
+                              _unresizeFont += g =>
+                              {
+                                 fontSizeMinProperty.Set( g, fontSizeMinValue );
+                              };
+                           }
+
+                           if( maxSize.HasValue && fontSizeMaxProperty != null )
+                           {
+                              _unresizeFont += g =>
+                              {
+                                 fontSizeMaxProperty.Set( g, fontSizeMaxValue );
+                              };
+                           }
                         }
                      }
                   }

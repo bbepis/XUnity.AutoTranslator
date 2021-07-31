@@ -3,5 +3,7 @@
    interface IFontAutoResizeCommand
    {
       bool ShouldAutoResize();
+      double? GetMinSize();
+      double? GetMaxSize();
    }
 }

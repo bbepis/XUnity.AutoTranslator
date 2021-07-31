@@ -67,7 +67,7 @@ namespace GoogleTranslate
          return ( Math.Abs( longRand % ( max - min ) ) + min );
       }
 
-      public override string Id => "GoogleTranslateV2";
+      public override string Id => KnownTranslateEndpointNames.GoogleTranslateV2;
 
       public override string FriendlyName => "Google! Translate (v2)";
 

@@ -184,12 +184,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var mainTranslationFile = new FileInfo( Settings.AutoTranslationsFilePath ).FullName;
                var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
                var preprocessorsFile = new FileInfo( Settings.PreprocessorsFilePath ).FullName;
+               var postprocessorsFile = new FileInfo( Settings.PostprocessorsFilePath ).FullName;
 
                if( _pluginDirectory == null )
                {
                   LoadTranslationsInFile( mainTranslationFile, true );
                }
-               foreach( var fullFileName in GetTranslationFiles().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
+               foreach( var fullFileName in GetTranslationFiles().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile, postprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
                {
                   try
                   {
@@ -489,7 +490,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
 
-               if( context.IsExecutable( Settings.ApplicationName ) )
+               if( context.IsApplicable() )
                {
                   string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
                   if( kvp.Length == 2 )

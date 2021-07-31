@@ -21,38 +21,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
          Directory.CreateDirectory( Settings.TranslationsPath );
          var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
          var preprocessorsFile = new FileInfo( Settings.PreprocessorsFilePath ).FullName;
+         var postprocessorsFile = new FileInfo( Settings.PostprocessorsFilePath ).FullName;
 
-         LoadTranslationsInFile( substitutionFile, true, false );
-         LoadTranslationsInFile( preprocessorsFile, false, true );
+         LoadTranslationsInFile( substitutionFile, true, false, false );
+         LoadTranslationsInFile( preprocessorsFile, false, true, false );
+         LoadTranslationsInFile( postprocessorsFile, false, false, true );
       }
 
-      private static void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile )
+      private static void LoadTranslationsInFile( string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile, bool isPostprocessorsFile )
       {
          var fileExists = File.Exists( fullFileName );
-         if( fileExists || isSubstitutionFile || isPreprocessorFile )
+         if( fileExists )
          {
-            if( fileExists )
+            using( var stream = File.OpenRead( fullFileName ) )
             {
-               using( var stream = File.OpenRead( fullFileName ) )
-               {
-                     LoadTranslationsInStream( stream, fullFileName, isSubstitutionFile, isPreprocessorFile );
-               }
+               LoadTranslationsInStream( stream, fullFileName, isSubstitutionFile, isPreprocessorFile, isPostprocessorsFile );
             }
-            else if( isSubstitutionFile || isPreprocessorFile )
-            {
-               var fi = new FileInfo( fullFileName );
-               Directory.CreateDirectory( fi.Directory.FullName );
+         }
+         else
+         {
+            var fi = new FileInfo( fullFileName );
+            Directory.CreateDirectory( fi.Directory.FullName );
 
-               using( var stream = File.Create( fullFileName ) )
-               {
-                  stream.Write( new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3 ); // UTF-8 BOM
-                  stream.Close();
-               }
+            using( var stream = File.Create( fullFileName ) )
+            {
+               stream.Write( new byte[] { 0xEF, 0xBB, 0xBF }, 0, 3 ); // UTF-8 BOM
+               stream.Close();
             }
          }
       }
 
-      private static void LoadTranslationsInStream( Stream stream, string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile )
+      private static void LoadTranslationsInStream( Stream stream, string fullFileName, bool isSubstitutionFile, bool isPreprocessorFile, bool isPostProcessorFile )
       {
          if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
 
@@ -64,7 +63,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translatioOrDirective in translations )
             {
-               if( context.IsExecutable( Settings.ApplicationName ) )
+               if( context.IsApplicable() )
                {
                   string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
                   if( kvp.Length == 2 )
@@ -84,6 +83,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         else if( isPreprocessorFile )
                         {
                            Settings.Preprocessors[ key ] = value;
+                        }
+                        else if( isPostProcessorFile )
+                        {
+                           Settings.Postprocessors[ key ] = value;
                         }
                      }
                   }

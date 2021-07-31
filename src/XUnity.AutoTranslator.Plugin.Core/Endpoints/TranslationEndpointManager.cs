@@ -514,6 +514,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                translatedText = RomanizationHelper.PostProcess( translatedText, Settings.TranslationPostProcessing );
             }
 
+            foreach( var kvp in Settings.Postprocessors )
+            {
+               translatedText = translatedText.Replace( kvp.Key, kvp.Value );
+            }
+
             if( Settings.ForceSplitTextAfterCharacters > 0 )
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );

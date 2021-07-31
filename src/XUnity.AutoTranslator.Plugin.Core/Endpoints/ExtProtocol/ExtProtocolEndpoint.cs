@@ -233,7 +233,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                var request = new ConfigurationMessage
                {
                   Id = id,
-                  Config = ConfigForExternalProcess,
+                  Config = configForExternalProcess,
                };
                var payload = ExtProtocolConvert.Encode( request );
 

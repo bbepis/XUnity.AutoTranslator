@@ -156,6 +156,7 @@ namespace XUnity.Common.Constants
          public static CachedProperty LineSpacing = ClrTypes.Text?.CachedProperty( "lineSpacing" );
          public static CachedProperty ResizeTextForBestFit = ClrTypes.Text?.CachedProperty( "resizeTextForBestFit" );
          public static CachedProperty ResizeTextMinSize = ClrTypes.Text?.CachedProperty( "resizeTextMinSize" );
+         public static CachedProperty ResizeTextMaxSize = ClrTypes.Text?.CachedProperty( "resizeTextMaxSize" );
       }
 
       public static class InputField_Properties

@@ -1,4 +1,11 @@
-﻿### 4.17.0
+﻿### 4.18.0
+ * FEATURE - Improved AutoResize command to enable min/max font size control
+ * FEATURE - Added translation file directive allowing control of tranlations/resizing based on resolution size
+ * FEATURE - Added new '_Postprocessors.txt' file that can make substitutions to the text returned from the translation endpoint
+ * MISC - Changed default value of EnableTranslationScoping to True
+ * BUG FIX - Fixed bug where GoogleTranslate could no longer be properly selected a translate endpoint
+
+### 4.17.0
  * FEATURE - Additional public APIs in relation to SimpleTextTranslationCache
  * CHANGE - Default endpoint changed to GoogleTranslateV2
  * MISC - Improved error logging in GoogleTranslate

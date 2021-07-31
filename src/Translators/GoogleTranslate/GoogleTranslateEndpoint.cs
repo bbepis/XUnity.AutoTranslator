@@ -63,7 +63,7 @@ namespace GoogleTranslate
          _cookieContainer = new CookieContainer();
       }
 
-      public override string Id => KnownTranslateEndpointNames.GoogleTranslateV2;
+      public override string Id => "GoogleTranslate";
 
       public override string FriendlyName => "Google! Translate";
 
