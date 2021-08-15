@@ -28,9 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
-    </Reference>
+     <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

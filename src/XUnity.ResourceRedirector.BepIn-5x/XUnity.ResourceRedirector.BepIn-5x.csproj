@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
     <ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" />
   </ItemGroup>
@@ -14,9 +15,6 @@
   <ItemGroup>
     <Reference Include="BepInEx">
       <HintPath>..\..\libs\BepInEx 5.0\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 

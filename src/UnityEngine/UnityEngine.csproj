@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+   <PropertyGroup>
+      <TargetFramework>net35</TargetFramework>
+      <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      <WarningLevel>0</WarningLevel>
+      <Optimize>false</Optimize>
+   </PropertyGroup>
+
+</Project>

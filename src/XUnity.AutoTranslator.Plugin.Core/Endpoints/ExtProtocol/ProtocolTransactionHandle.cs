@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Shim;
+﻿using XUnity.AutoTranslator.Plugin.Core.Shim;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol

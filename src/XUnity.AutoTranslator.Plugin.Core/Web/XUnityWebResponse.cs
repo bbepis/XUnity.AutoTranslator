@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Net;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Shim;
 
