@@ -141,15 +141,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
       }
    }
 
-   class TextureTranslationCache
+   sealed class TextureTranslationCache : IDisposable
    {
+      public event Action TextureTranslationFileChanged;
+
       private Dictionary<string, TranslatedImage> _translatedImages = new Dictionary<string, TranslatedImage>( StringComparer.InvariantCultureIgnoreCase );
       private HashSet<string> _untranslatedImages = new HashSet<string>();
       private Dictionary<string, string> _keyToFileName = new Dictionary<string, string>();
+      private SafeFileWatcher _fileWatcher;
+      private bool _disposed;
 
       public TextureTranslationCache()
       {
+         if( Settings.ReloadTranslationsOnFileChange )
+         {
+            try
+            {
+               Directory.CreateDirectory( Settings.TexturesPath );
+               _fileWatcher = new SafeFileWatcher( Settings.TexturesPath );
+               _fileWatcher.DirectoryUpdated += FileWatcher_DirectoryUpdated;
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while initializing translation file watching for textures." );
+            }
+         }
+      }
 
+      private void FileWatcher_DirectoryUpdated()
+      {
+         TextureTranslationFileChanged?.Invoke();
       }
 
       private IEnumerable<string> GetTextureFiles()
@@ -289,6 +310,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void RenameFileWithKey( string name, string key, string newKey )
       {
+         _fileWatcher?.Disable();
          try
          {
             if( _keyToFileName.TryGetValue( key, out var currentFileName ) )
@@ -310,38 +332,50 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.AutoTranslator.Error( e, $"An error occurred while trying to rename file with key '{key}'." );
          }
+         finally
+         {
+            _fileWatcher?.Enable();
+         }
       }
 
       internal void RegisterImageFromData( string textureName, string key, byte[] data )
       {
-         var name = textureName.SanitizeForFileSystem();
-         var originalHash = HashHelper.Compute( data );
-
-         // allow hash and key to be the same; only store one of them then!
-         string fileName;
-         if( key == originalHash )
+         _fileWatcher?.Disable();
+         try
          {
-            fileName = name + " [" + key + "].png";
+            var name = textureName.SanitizeForFileSystem();
+            var originalHash = HashHelper.Compute( data );
+
+            // allow hash and key to be the same; only store one of them then!
+            string fileName;
+            if( key == originalHash )
+            {
+               fileName = name + " [" + key + "].png";
+            }
+            else
+            {
+               fileName = name + " [" + key + "-" + originalHash + "].png";
+            }
+
+            var fullName = Path.Combine( Settings.TexturesPath, fileName );
+            File.WriteAllBytes( fullName, data );
+            XuaLogger.AutoTranslator.Info( "Dumped texture file: " + fileName );
+
+            _keyToFileName[ key ] = fullName;
+
+            if( Settings.LoadUnmodifiedTextures )
+            {
+               var source = new FileSystemTranslatedImageSource( fullName );
+               RegisterTranslatedImage( fullName, key, data, source );
+            }
+            else
+            {
+               RegisterUntranslatedImage( key );
+            }
          }
-         else
+         finally
          {
-            fileName = name + " [" + key + "-" + originalHash + "].png";
-         }
-
-         var fullName = Path.Combine( Settings.TexturesPath, fileName );
-         File.WriteAllBytes( fullName, data );
-         XuaLogger.AutoTranslator.Info( "Dumped texture file: " + fileName );
-
-         _keyToFileName[ key ] = fullName;
-
-         if( Settings.LoadUnmodifiedTextures )
-         {
-            var source = new FileSystemTranslatedImageSource( fullName );
-            RegisterTranslatedImage( fullName, key, data, source );
-         }
-         else
-         {
-            RegisterUntranslatedImage( key );
+            _fileWatcher?.Enable();
          }
       }
 
@@ -382,6 +416,26 @@ namespace XUnity.AutoTranslator.Plugin.Core
          data = null;
          image = null;
          return false;
+      }
+
+      private void Dispose( bool disposing )
+      {
+         if( !_disposed )
+         {
+            if( disposing )
+            {
+               _fileWatcher?.Dispose();
+            }
+
+            _disposed = true;
+         }
+      }
+
+      public void Dispose()
+      {
+         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+         Dispose( disposing: true );
+         GC.SuppressFinalize( this );
       }
    }
 }

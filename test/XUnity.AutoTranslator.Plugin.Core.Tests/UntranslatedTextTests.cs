@@ -14,12 +14,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [Theory( DisplayName = "Can_Substitute" )]
       [InlineData( "がんばれ、遥", "がんばれ、{{A}}" )]
       [InlineData( "がんばれ、Haruka", "がんばれ、{{A}}" )]
+      [InlineData( "がんばれ、Haruka... Here's an arbitrary number: 0.423 isn't that nice?", "がんばれ、{{A}}... Here's an arbitrary number: {{B}} isn't that nice?" )]
+      [InlineData( "HS2_BetterHScenes 2.6.2", "HS{{A}}_BetterHScenes {{B}}" )]
+      [InlineData( "Slope: 38,6°", "Slope: {{A}}°" )]
+      [InlineData( "Here's a date and time: 2021/05-06 11:43**", "Here's a date and time: {{A}} {{B}}**" )]
+      [InlineData( "Version 1.0.*-beta ::123::", "Version {{A}}.*-beta ::{{B}}::" )]
+      [InlineData( "Version 1.0.*-beta 456::123::", "Version {{A}}.*-beta {{B}}::" )]
+      [InlineData( "3::", "{{A}}::" )]
+      [InlineData( "::3::", "::{{A}}::" )]
+      [InlineData( "::3", "::{{A}}" )]
+      [InlineData( "::3abc", "::{{A}}abc" )]
+      [InlineData( "ABCDEF 3", "ABCDEF {{A}}" )]
+      [InlineData( "ABCDEF-3", "ABCDEF-{{A}}" )]
+      [InlineData( "3 ABCDEF", "{{A}} ABCDEF" )]
+      [InlineData( "3-ABCDEF", "{{A}}-ABCDEF" )]
       public void Can_Substitute( string input, string expectedTemplate )
       {
          Settings.Replacements[ "Haruka" ] = "Haruka";
          Settings.Replacements[ "遥" ] = "Haruka";
 
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.Equal( expectedTemplate, untranslatedText.TemplatedOriginal_Text );
          Assert.False( untranslatedText.IsOnlyTemplate );
@@ -33,7 +47,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          Settings.Replacements[ "Haruka" ] = "Haruka";
          Settings.Replacements[ "遥" ] = "Haruka";
 
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.Equal( expectedTemplate, untranslatedText.TemplatedOriginal_Text );
          Assert.True( untranslatedText.IsOnlyTemplate );
@@ -48,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\r\r\r\n \n　Hello  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
       public void Can_Trim_Surrounding_Whitespace( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
-         var untranslatedText = new UntranslatedText( input, false, false, false );
+         var untranslatedText = new UntranslatedText( input, false, false, false, true, true );
 
          Assert.Equal( input, untranslatedText.TemplatedOriginal_Text_InternallyTrimmed );
          Assert.Equal( expectedTrimmedText, untranslatedText.TemplatedOriginal_Text_FullyTrimmed );
@@ -65,7 +79,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "What are\n  \nyou doing?", "What are  you doing?" )]
       public void Can_Trim_Internal_Whitespace_English( string input, string expectedTrimmedText )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, true );
+         var untranslatedText = new UntranslatedText( input, false, true, true, true, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TemplatedOriginal_Text_FullyTrimmed );
       }
@@ -78,7 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "Hello\n\nWhat\nYou", "Hello\n\nWhatYou" )]
       public void Can_Trim_Internal_Whitespace( string input, string expectedTrimmedText )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TemplatedOriginal_Text_FullyTrimmed );
       }
@@ -96,7 +110,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\r\r\r\n \n　Hell\no  \r\n", "Hello", "\r\r\r\r\n \n　", "  \r\n" )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TemplatedOriginal_Text_FullyTrimmed );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
@@ -112,7 +126,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "\r\n \r\nFPS:\n  \n 60.53", "FPS:  {{A}}", "\r\n \r\n", null )]
       public void Can_Trim_Internal_And_Surrounding_Whitespace_And_Template( string input, string expectedTrimmedText, string expectedLeadingWhitespace, string expectedTrailingWhitespace )
       {
-         var untranslatedText = new UntranslatedText( input, true, true, false );
+         var untranslatedText = new UntranslatedText( input, true, true, false, true, true );
 
          Assert.Equal( expectedTrimmedText, untranslatedText.TemplatedOriginal_Text_FullyTrimmed );
          Assert.Equal( expectedLeadingWhitespace, untranslatedText.LeadingWhitespace );
@@ -125,7 +139,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "He  \n\nllo" )]
       public void Are_References_The_Same( string input )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
@@ -143,7 +157,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "He  \r\t\t\nllo" )]
       public void Are_References_The_Correct_With_Internal_Whitespace( string input )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
@@ -161,7 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       [InlineData( "   \r\t\t\n\nHello   " )]
       public void Are_References_The_Correct_With_External_Whitespace( string input )
       {
-         var untranslatedText = new UntranslatedText( input, false, true, false );
+         var untranslatedText = new UntranslatedText( input, false, true, false, true, true );
 
          Assert.True( ReferenceEquals( input, untranslatedText.Original_Text ) );
          Assert.False( ReferenceEquals( input, untranslatedText.Original_Text_ExternallyTrimmed ) );
@@ -194,7 +208,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       {
          Settings.Replacements[ "遥" ] = "Haruka";
 
-         var untranslatedText = new UntranslatedText( input, false, true, whitespaceBetweenWords );
+         var untranslatedText = new UntranslatedText( input, false, true, whitespaceBetweenWords, true, true );
 
          Assert.Equal( TemplatedOriginal_Text, untranslatedText.TemplatedOriginal_Text );
          Assert.Equal( TemplatedOriginal_Text_ExternallyTrimmed, untranslatedText.TemplatedOriginal_Text_ExternallyTrimmed );

@@ -72,7 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                   continue;
                }
 
-               if( context.IsExecutable( Settings.ApplicationName ) )
+               if( context.IsApplicable() )
                {
                   string[] kvp = translatioOrDirective.Split( Splitters, StringSplitOptions.None );
                   if( kvp.Length == 2 )

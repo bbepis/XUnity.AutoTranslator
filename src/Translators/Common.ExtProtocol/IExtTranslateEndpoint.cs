@@ -16,5 +16,11 @@ namespace Common.ExtProtocol
       /// so it can be implemented in an asynchronous fashion.
       /// </summary>
       Task Translate( ITranslationContext context );
+
+      /// <summary>
+      /// Initializes the endpoint with the specified configuration.
+      /// </summary>
+      /// <param name="config"></param>
+      void Initialize( string config );
    }
 }

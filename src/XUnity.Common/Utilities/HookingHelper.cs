@@ -60,9 +60,27 @@ namespace XUnity.Common.Utilities
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
+      /// <param name="types"></param>
+      /// <param name="forceMonoModHooks"></param>
+      public static void PatchAll( IEnumerable<Type[]> types, bool forceMonoModHooks )
+      {
+         foreach( var typeCollection in types )
+         {
+            foreach( var type in typeCollection )
+            {
+               var hooked = PatchType( type, forceMonoModHooks );
+               if( hooked ) break;
+            }
+
+         }
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
       /// <param name="type"></param>
       /// <param name="forceExternHooks"></param>
-      public static void PatchType( Type type, bool forceExternHooks )
+      public static bool PatchType( Type type, bool forceExternHooks )
       {
          MethodBase original = null;
          IntPtr originalPtr = IntPtr.Zero;
@@ -104,7 +122,7 @@ namespace XUnity.Common.Utilities
                   {
                      XuaLogger.Common.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
                   }
-                  return;
+                  return false;
                }
 
                var prefix = type.GetMethod( "Prefix", flags );
@@ -112,7 +130,7 @@ namespace XUnity.Common.Utilities
                var finalizer = type.GetMethod( "Finalizer", flags );
                if( original == null || forceExternHooks || Harmony == null || ( prefix == null && postfix == null && finalizer == null ) )
                {
-                  PatchWithExternHooks( type, original, originalPtr, true );
+                  return PatchWithExternHooks( type, original, originalPtr, true );
                }
                else if( original != null )
                {
@@ -137,10 +155,12 @@ namespace XUnity.Common.Utilities
                      }
 
                      XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through Harmony hooks." );
+
+                     return true;
                   }
                   catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
                   {
-                     PatchWithExternHooks( type, original, originalPtr, false );
+                     return PatchWithExternHooks( type, original, originalPtr, false );
                   }
                }
                else
@@ -160,9 +180,11 @@ namespace XUnity.Common.Utilities
                XuaLogger.Common.Warn( e, $"An error occurred while patching property/method. Failing hook: '{type.Name}'." );
             }
          }
+
+         return false;
       }
 
-      private static void PatchWithExternHooks( Type type, MethodBase original, IntPtr originalPtr, bool forced )
+      private static bool PatchWithExternHooks( Type type, MethodBase original, IntPtr originalPtr, bool forced )
       {
          var flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
 
@@ -171,7 +193,7 @@ namespace XUnity.Common.Utilities
             if( originalPtr == IntPtr.Zero )
             {
                XuaLogger.Common.Warn( $"Could not hook '{type.Name}'. Likely due differences between different versions of the engine or text framework." );
-               return;
+               return false;
             }
 
             var mldetour = type.GetMethod( "ML_Detour", flags )?.MethodHandle.GetFunctionPointer();
@@ -180,6 +202,7 @@ namespace XUnity.Common.Utilities
                ClrTypes.Imports.GetMethod( "Hook", flags ).Invoke( null, new object[] { originalPtr, mldetour.Value } );
 
                XuaLogger.Common.Debug( $"Hooked {type.Name} through MelonMod Imports.Hook method." );
+               return true;
             }
             else
             {
@@ -191,13 +214,13 @@ namespace XUnity.Common.Utilities
             if( original == null )
             {
                XuaLogger.Common.Warn( $"Cannot hook '{type.Name}'. Could not locate the original method. Failing hook: '{type.Name}'." );
-               return;
+               return false;
             }
 
             if( ClrTypes.Hook == null || ClrTypes.NativeDetour == null )
             {
                XuaLogger.Common.Warn( $"Cannot hook '{original.DeclaringType.FullName}.{original.Name}'. MonoMod hooks is not supported in this runtime as MonoMod is not loaded. Failing hook: '{type.Name}'." );
-               return;
+               return false;
             }
 
             var mmdetour = type.GetMethod( "Get_MM_Detour", flags )?.Invoke( null, null ) ?? type.GetMethod( "MM_Detour", flags );
@@ -227,6 +250,8 @@ namespace XUnity.Common.Utilities
                {
                   XuaLogger.Common.Debug( $"Hooked {original.DeclaringType.FullName}.{original.Name} through MonoMod hooks. {suffix}" );
                }
+
+               return true;
             }
             else
             {
@@ -240,6 +265,8 @@ namespace XUnity.Common.Utilities
                }
             }
          }
+
+         return false;
       }
 
       private static object CreateHarmonyMethod( MethodInfo method, int? priority )

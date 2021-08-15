@@ -13,5 +13,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       RemoveAllDiacritics          = 1 << 1,
       RemoveApostrophes            = 1 << 2,
       ReplaceWideCharacters        = 1 << 3,
+      ReplaceHtmlEntities          = 1 << 4,
    }
 }

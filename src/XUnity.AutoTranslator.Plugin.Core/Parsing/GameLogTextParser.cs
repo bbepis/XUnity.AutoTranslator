@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 
@@ -22,10 +23,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
       {
          var reader = new StringReader( input );
          bool containsTranslatable = false;
-         //bool containsTranslated = false;
          var template = new StringBuilder( input.Length );
-         var args = new Dictionary<string, string>();
-         var reverseArgs = new Dictionary<string, string>();
+         var args = new List<ArgumentedUntranslatedTextInfo>();
          var arg = 'A';
 
          string line = null;
@@ -37,17 +36,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                {
                   // template it!
                   containsTranslatable = true;
-                  if( reverseArgs.TryGetValue( line, out var existingKey ) )
+
+                  var key = "[[" + ( arg++ ) + "]]";
+                  template.Append( key ).Append( '\n' );
+                  args.Add( new ArgumentedUntranslatedTextInfo
                   {
-                     template.Append( existingKey ).Append( '\n' );
-                  }
-                  else
-                  {
-                     var key = "[[" + ( arg++ ) + "]]";
-                     template.Append( key ).Append( '\n' );
-                     args.Add( key, line );
-                     reverseArgs[ line ] = key;
-                  }
+                     Info = new UntranslatedTextInfo( line )
+                  } );
                }
                else
                {

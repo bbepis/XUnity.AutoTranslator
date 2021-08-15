@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using XUnity.AutoTranslator.Plugin.Core.Shim;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -14,6 +15,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    {
       public static string PostProcess( string text, TextPostProcessing postProcessing )
       {
+         if( ( postProcessing & TextPostProcessing.ReplaceHtmlEntities ) != 0 )
+         {
+            text = WebUtility.HtmlDecode( text );
+         }
          if( ( postProcessing & TextPostProcessing.ReplaceMacronWithCircumflex ) != 0 )
          {
             text = ConvertMacronToCircumflex( text );

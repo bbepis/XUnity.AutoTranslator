@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Translators\BingTranslateLegitimate\BingTranslateLegitimate.csproj" />
     <ProjectReference Include="..\Translators\BingTranslate\BingTranslate.csproj" />
     <ProjectReference Include="..\Translators\CustomTranslate\CustomTranslate.csproj" />
+    <ProjectReference Include="..\Translators\DeepLTranslate\DeepLTranslate.csproj" />
     <ProjectReference Include="..\Translators\ezTransXP\ezTransXP.csproj" />
     <ProjectReference Include="..\Translators\GoogleTranslateCompat\GoogleTranslateCompat.csproj" />
     <ProjectReference Include="..\Translators\GoogleTranslateLegitimate\GoogleTranslateLegitimate.csproj" />

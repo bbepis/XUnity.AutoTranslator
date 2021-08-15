@@ -28,7 +28,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool SaveResultGlobally { get; private set; }
 
-      public TranslationEndpointManager Endpoint { get; private set; }
+      public bool AllowFallback { get; private set; }
+
+      public TranslationEndpointManager Endpoint { get; internal set; }
 
       public HashSet<ParserTranslationContext> Contexts { get; private set; }
 
@@ -37,6 +39,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public HashSet<KeyAnd<InternalTranslationResult>> TranslationResults { get; private set; }
 
       public UntranslatedText Key { get; private set; }
+
+      public UntranslatedTextInfo UntranslatedTextInfo { get; set; }
 
       public string TranslatedText { get; set; }
 
@@ -60,8 +64,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void Associate( UntranslatedText key, object ui, InternalTranslationResult translationResult, ParserTranslationContext context, bool saveResultGlobally )
+      public void Associate(
+         UntranslatedText key,
+         object ui,
+         InternalTranslationResult translationResult,
+         ParserTranslationContext context,
+         UntranslatedTextInfo untranslatedTextInfo,
+         bool saveResultGlobally,
+         bool allowFallback )
       {
+         AllowFallback = allowFallback || AllowFallback;
+
+         if( UntranslatedTextInfo == null && untranslatedTextInfo != null )
+         {
+            UntranslatedTextInfo = untranslatedTextInfo;
+         }
+
          // if just one of the things associated with this job, wants to save it, we shall!
          SaveResultGlobally = SaveResultGlobally || saveResultGlobally;
 

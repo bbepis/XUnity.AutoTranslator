@@ -28,7 +28,8 @@ namespace XUnity.ResourceRedirector
       /// </summary>
       public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset )
       {
-         return asset.GetExtensionData<ResourceExtensionData>()?.HasBeenRedirected == true;
+         var ext = asset.GetExtensionData<ResourceExtensionData>();
+         return ext != null && ext.HasBeenRedirected;
       }
 
       /// <summary>

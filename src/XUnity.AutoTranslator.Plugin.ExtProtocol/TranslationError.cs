@@ -18,15 +18,22 @@ namespace XUnity.AutoTranslator.Plugin.ExtProtocol
       /// </summary>
       public string Reason { get; set; }
 
+      /// <summary>
+      /// Gets or sets the status code used to determine the reason for failure.
+      /// </summary>
+      public StatusCode FailureCode { get; set; }
+
       internal override void Decode( TextReader reader )
       {
          Id = new Guid( reader.ReadLine() );
+         FailureCode = (StatusCode)int.Parse( reader.ReadLine() );
          Reason = reader.ReadToEnd();
       }
 
       internal override void Encode( TextWriter writer )
       {
          writer.WriteLine( Id.ToString() );
+         writer.WriteLine( (int)FailureCode );
          writer.Write( Reason );
       }
    }

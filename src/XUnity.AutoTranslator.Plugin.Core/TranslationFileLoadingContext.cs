@@ -9,15 +9,23 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal class TranslationFileLoadingContext
    {
+      private static readonly Func<ResolutionCheckVariables, bool> DefaultResolutionCheck = x => true;
+
       private HashSet<string> _executables = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
       private HashSet<int> _levels = new HashSet<int>();
       private HashSet<string> _enabledTags = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
+      private Func<ResolutionCheckVariables, bool> _resolutionCheck = DefaultResolutionCheck;
 
-      public bool IsExecutable( string executable )
+      public bool IsApplicable()
+      {
+         return IsValidExecutable() && _resolutionCheck( new ResolutionCheckVariables( Settings.ScreenWidth, Settings.ScreenHeight ) );
+      }
+
+      public bool IsValidExecutable()
       {
          if( _executables.Count == 0 ) return true;
 
-         return _executables.Contains( executable );
+         return _executables.Contains( Settings.ApplicationName );
       }
 
       public HashSet<int> GetLevels()
@@ -57,6 +65,62 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public override string ToString()
          {
             return "#set level " + string.Join( ",", Levels.Select( x => x.ToString( CultureInfo.InvariantCulture ) ).ToArray() );
+         }
+      }
+
+      public struct ResolutionCheckVariables
+      {
+         public ResolutionCheckVariables( int width, int height )
+         {
+            Width = width;
+            Height = height;
+         }
+
+         public int Width { get; }
+
+         public int Height { get; }
+      }
+
+      public class SetRequiredResolutionTranslationFileDirective : TranslationFileDirective
+      {
+         private readonly string _expression;
+         private readonly Func<ResolutionCheckVariables, bool> _predicate;
+
+         public SetRequiredResolutionTranslationFileDirective( string expression )
+         {
+            _expression = expression;
+            _predicate = DynamicLinq.DynamicExpression.ParseLambda<ResolutionCheckVariables, bool>( expression ).Compile();
+         }
+
+         public override void ModifyContext( TranslationFileLoadingContext context )
+         {
+            if( !Settings.EnableTranslationScoping ) return;
+
+            context._resolutionCheck = _predicate;
+         }
+
+         public override string ToString()
+         {
+            return "#set required-resolution " + _expression;
+         }
+      }
+
+      public class UnsetRequiredResolutionTranslationFileDirective : TranslationFileDirective
+      {
+         public UnsetRequiredResolutionTranslationFileDirective()
+         {
+         }
+
+         public override void ModifyContext( TranslationFileLoadingContext context )
+         {
+            if( !Settings.EnableTranslationScoping ) return;
+
+            context._resolutionCheck = DefaultResolutionCheck;
+         }
+
+         public override string ToString()
+         {
+            return "#unset required-resolution";
          }
       }
 
@@ -203,6 +267,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          switch( setType )
          {
+            case "required-resolution":
+               return new TranslationFileLoadingContext.SetRequiredResolutionTranslationFileDirective( argument );
             case "level":
                return new TranslationFileLoadingContext.SetLevelTranslationFileDirective( ParseCommaSeperatedListAsIntArray( argument ) );
             case "exe":
@@ -217,6 +283,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          switch( setType )
          {
+            case "required-resolution":
+               return new TranslationFileLoadingContext.UnsetRequiredResolutionTranslationFileDirective();
             case "level":
                return new TranslationFileLoadingContext.UnsetLevelTranslationFileDirective( ParseCommaSeperatedListAsIntArray( argument ) );
             case "exe":

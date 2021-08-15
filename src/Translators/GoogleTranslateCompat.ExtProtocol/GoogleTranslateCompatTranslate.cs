@@ -62,7 +62,7 @@ namespace GoogleTranslateCompat.ExtProtocol
          if( !_hasSetup || _translationCount % _resetAfter == 0 )
          {
             _resetAfter = RandomNumbers.Next( 75, 125 );
-            _translationCount = 0;
+            _translationCount = 1;
 
             _hasSetup = true;
 

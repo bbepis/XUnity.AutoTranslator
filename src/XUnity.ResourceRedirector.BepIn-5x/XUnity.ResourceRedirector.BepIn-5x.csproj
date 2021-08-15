@@ -3,11 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
     <RootNamespace>XUnity.ResourceRedirector.BepIn_5x</RootNamespace>
-    <Version>1.1.3</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XUnity.Common.Managed\XUnity.Common.Managed.csproj" />
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
     <ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" />
   </ItemGroup>
@@ -15,9 +16,6 @@
   <ItemGroup>
     <Reference Include="BepInEx">
       <HintPath>..\..\libs\BepInEx 5.0\BepInEx.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 

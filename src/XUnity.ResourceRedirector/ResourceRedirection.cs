@@ -465,6 +465,30 @@ namespace XUnity.ResourceRedirector
                      }
                   }
                }
+               else if( context.Parameters.LoadType == AssetBundleLoadType.LoadFromStream )
+               {
+                  if( context.Bundle == null )
+                  {
+                     var name = AssetBundleHelper.PathForLoadedInMemoryBundle ?? "Unnamed";
+
+                     XuaLogger.ResourceRedirector.Warn( $"Could not load a stream asset bundle ({name}) likely due to conflicting CAB-string. Retrying with randomized CAB-string." );
+
+                     var binary = context.Parameters.Stream.ReadFully( 0 );
+                     if( !forceRandomizeWhenInMemory )
+                     {
+                        // if randomization is foced, this is handled through other callback
+                        CabHelper.RandomizeCabWithAnyLength( binary );
+                     }
+
+                     var bundle = AssetBundle.LoadFromMemory( binary, 0 ); // dont pass crc, since we modified the bundle!
+                     if( bundle != null )
+                     {
+                        context.Bundle = bundle;
+                        context.Complete(
+                           skipRemainingPostfixes: true );
+                     }
+                  }
+               }
             }
          }
       }
@@ -815,7 +839,6 @@ namespace XUnity.ResourceRedirector
 
             _isFiringAsset = true;
 
-            // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAssetsPerCall;
             var len1 = list1.Count;
             for( int i = 0; i < len1; i++ )
@@ -875,7 +898,6 @@ namespace XUnity.ResourceRedirector
 
             _isFiringAsset = true;
 
-            // handle "per call" hooks first
             var list1 = PrefixRedirectionsForAsyncAssetsPerCall;
             var len1 = list1.Count;
             for( int i = 0; i < len1; i++ )

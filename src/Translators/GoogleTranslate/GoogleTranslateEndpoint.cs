@@ -20,7 +20,7 @@ using XUnity.Common.Logging;
 
 namespace GoogleTranslate
 {
-   internal class GoogleTranslateEndpoint : HttpEndpoint
+   public class GoogleTranslateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {
@@ -50,6 +50,8 @@ namespace GoogleTranslate
 
       private CookieContainer _cookieContainer;
       private bool _hasSetup = false;
+      //private long m = 425635;
+      //private long s = 1953544246;
       private long m = 427761;
       private long s = 1179739010;
       private int _translationsPerRequest = 10;
@@ -61,7 +63,7 @@ namespace GoogleTranslate
          _cookieContainer = new CookieContainer();
       }
 
-      public override string Id => KnownTranslateEndpointNames.GoogleTranslate;
+      public override string Id => "GoogleTranslate";
 
       public override string FriendlyName => "Google! Translate";
 
@@ -123,7 +125,7 @@ namespace GoogleTranslate
          if( !_hasSetup || _translationCount % _resetAfter == 0 )
          {
             _resetAfter = RandomNumbers.Next( 75, 125 );
-            _translationCount = 0;
+            _translationCount = 1;
 
             _hasSetup = true;
 
@@ -217,7 +219,7 @@ namespace GoogleTranslate
                var untranslatedLinesCount = untranslatedLines.Length;
                var translatedText = string.Empty;
 
-               for( int i = 0; i < untranslatedLinesCount; i++ )
+               for( int i = 0 ; i < untranslatedLinesCount ; i++ )
                {
                   if( current >= translatedLines.Length ) context.Fail( "Batch operation received incorrect number of translations." );
 
@@ -270,14 +272,17 @@ namespace GoogleTranslate
       private void InspectResponse( XUnityWebResponse response )
       {
          CookieCollection cookies = response.NewCookies;
-         foreach( Cookie cookie in cookies )
+         if( cookies != null )
          {
-            // redirect cookie to correct domain
-            cookie.Domain = ".googleapis.com";
-         }
+            foreach( Cookie cookie in cookies )
+            {
+               // redirect cookie to correct domain
+               cookie.Domain = ".googleapis.com";
+            }
 
-         // FIXME: Is this needed? Should already be added
-         _cookieContainer.Add( cookies );
+            // FIXME: Is this needed? Should already be added
+            _cookieContainer.Add( cookies );
+         }
       }
 
       public IEnumerator SetupTKK()
@@ -365,7 +370,7 @@ namespace GoogleTranslate
 
       private long Vi( long r, string o )
       {
-         for( var t = 0; t < o.Length; t += 3 )
+         for( var t = 0 ; t < o.Length ; t += 3 )
          {
             long a = o[ t + 2 ];
             a = a >= 'a' ? a - 87 : a - '0';
@@ -380,7 +385,7 @@ namespace GoogleTranslate
       {
          List<long> S = new List<long>();
 
-         for( var v = 0; v < r.Length; v++ )
+         for( var v = 0 ; v < r.Length ; v++ )
          {
             long A = r[ v ];
             if( 128 > A )
@@ -409,7 +414,7 @@ namespace GoogleTranslate
          const string D = "+-3^+b+-f";
          long p = m;
 
-         for( var b = 0; b < S.Count; b++ )
+         for( var b = 0 ; b < S.Count ; b++ )
          {
             p += S[ b ];
             p = Vi( p, F );

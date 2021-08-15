@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net35</TargetFramework>
-    <Version>4.13.0</Version>
+    <Version>4.18.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj" />
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,9 +17,6 @@
     </Reference>
     <Reference Include="ExIni">
       <HintPath>..\..\libs\ExIni.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 

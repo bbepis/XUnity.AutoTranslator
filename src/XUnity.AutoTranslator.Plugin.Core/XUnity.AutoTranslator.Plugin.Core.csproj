@@ -11,8 +11,9 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DevelopmentDependency>True</DevelopmentDependency>
     <TargetFramework>net35</TargetFramework>
-    <Version>4.13.0</Version>
+    <Version>4.18.0</Version>
     <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +22,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.xml</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,18 +44,16 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" PrivateAssets="All" />
   </ItemGroup>
 
-  <Target Name="ILRepack" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="ILRepack" AfterTargets="Build">
     <PropertyGroup>
       <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
     </PropertyGroup>
@@ -83,9 +81,10 @@
 
   <ItemGroup>
     <Folder Include="Textures\" />
+    <Folder Include="Text\" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="ILRepack">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
       <Output TaskParameter="Assemblies" ItemName="Targets" />
     </GetAssemblyIdentity>

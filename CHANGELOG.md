@@ -1,4 +1,61 @@
-﻿### 4.13.0
+﻿### 4.18.0
+ * FEATURE - Improved AutoResize command to enable min/max font size control
+ * FEATURE - Added translation file directive allowing control of tranlations/resizing based on resolution size
+ * FEATURE - Added new '_Postprocessors.txt' file that can make substitutions to the text returned from the translation endpoint
+ * MISC - Changed default value of EnableTranslationScoping to True
+ * BUG FIX - Fixed bug where GoogleTranslate could no longer be properly selected a translate endpoint
+
+### 4.17.0
+ * FEATURE - Additional public APIs in relation to SimpleTextTranslationCache
+ * CHANGE - Default endpoint changed to GoogleTranslateV2
+ * MISC - Improved error logging in GoogleTranslate
+
+### 4.16.3
+ * MISC - Make "MaxConcurrency" property in HttpEndpoint and WwwEndpoint virtual
+ * BUG FIX - Fixed bug that caused exception spam if no endpoint were selected
+
+### 4.16.2
+ * BUG FIX - DeepLLegitimate no longer selectable if no API key has been configured
+
+### 4.16.1
+ * MISC - Allow free developer API to be used with DeepL
+ * BUG FIX - Fixed bug that would often incorrectly cache parsed translations and made the feature optional
+ * BUG FIX - Fixed bug that would cause token translations not to be read correctly in certain situations
+
+### 4.16.0
+ * BREAKING CHANGE - Changed load order of translation files in Text directory. Zip files are now lowest priority and files inside zip files are also prioritized alphabetically. Now reflects the same behaviour as redirected resources.
+ * BREAKING CHANGE - Changes to IMGUI handling of numbers. This may cause previous translations to break
+ * FEATURE - UI to control fallback endpoint
+ * MISC - Caching of result of "sr" regexes, allowing it to be used for IMGUI and potentially increasing performance for scenarios where the same text is being translated through a regex all the tim
+ * MISC - New configuration "TemplateAllNumbersAway", that will ensure all numbers are templated away before being send to translator/being stored in translation file
+ * MISC - New configuration "ReloadTranslationsOnFileChange", that will automatically reload files when a translation file changes
+ * MISC - Publication of various minor APIs related to resource redirection
+
+### 4.15.0
+ * FEATURE - Added DeepL support
+ * FEATURE - New setting for automated fallback translation endpoint
+ * FEATURE - Extensions to ITranslateEndpoint interface allowing handling of contextual translation information
+ * MISC - Added HTML Entity decoding during postprocessing (enabled by default if configuration is reset)
+ * BUG FIX - Fixed issue related to newline handling
+ * BUG FIX - Fixed issue that could cause text not to be displayed in older versions of Unity
+ * BUG FIX - Fixed issue that could cause out-of-process hosted translation endpoints to fail in certain situations
+ * BUG FIX - Fixed issue where out-of-process translation endpoints would sometimes get shutdown before the game
+ * BUG FIX - Fixed issue where redirected resources were not always identified as such during standard translations
+ * BUG FIX - Fixed issue that could cause web requests timeout after a long period rather than fail immediately in certain situations
+ * BUG FIX - Fixed issue with GoogleTranslateV2 that could cause it to fail if untranslated texts included certain characters
+
+### 4.14.0
+ * FEATURE - New version of GoogleTranslate endpoint that supports new API. May replace replace old GoogleTranslate endpoint in the future
+ * MISC - Made more log statements affected by silent mode
+ * MISC - Changed behaviour of the copy to clipboard feature. Now it will always copy to clipboard when text is being translated on a text component
+ * MISC - Support for older versions of UTAGE
+ * MISC - Fixed some log statements to no longer indicate error in case an error did not occur during hooking
+ * MISC - Updated user agents for API requests
+ * MISC - Improved SpriteRenderer support
+ * BUG FIX - Fixed a bug that could cause crash in older versions of the Unity Engine
+ * BUG FIX - Fixed a bug that could occur during dynamic code generation in certain situations
+
+### 4.13.0
  * FEATURE - API that allows external plugins to take some degree of control of how a game is translated
  * FEATURE - Can now output text that exceeds the maximum length if configured through 'OutputTooLongText'
  * MISC - Increased max value of 'MaxCharactersPerTranslation' from 1000 to 2500

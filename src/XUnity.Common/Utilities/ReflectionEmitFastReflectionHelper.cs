@@ -145,6 +145,10 @@ namespace XUnity.Common.Utilities
          }
 
          il.Emit( fieldInfo.IsStatic ? OpCodes.Ldsfld : OpCodes.Ldfld, fieldInfo );
+         if( fieldInfo.FieldType.IsValueType != typeof( F ).IsValueType )
+         {
+            il.Emit( OpCodes.Box, fieldInfo.FieldType );
+         }
          il.Emit( OpCodes.Ret );
 
          return (Func<T, F>)dm.CreateDelegate( typeof( Func<T, F> ) );
@@ -172,7 +176,25 @@ namespace XUnity.Common.Utilities
          }
 
          il.Emit( OpCodes.Ldarg_1 );
-         il.Emit( OpCodes.Castclass, fieldInfo.FieldType );
+         if( fieldInfo.FieldType == typeof( F ) )
+         {
+
+         }
+         else if( fieldInfo.FieldType.IsValueType != typeof( F ).IsValueType )
+         {
+            if( fieldInfo.FieldType.IsValueType )
+            {
+               il.Emit( OpCodes.Unbox, fieldInfo.FieldType );
+            }
+            else
+            {
+               il.Emit( OpCodes.Box, fieldInfo.FieldType );
+            }
+         }
+         else
+         {
+            il.Emit( OpCodes.Castclass, fieldInfo.FieldType );
+         }
 
          il.Emit( fieldInfo.IsStatic ? OpCodes.Stsfld : OpCodes.Stfld, fieldInfo );
          il.Emit( OpCodes.Ret );

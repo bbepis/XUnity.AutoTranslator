@@ -35,7 +35,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       /// Gets the maximum concurrency for the endpoint. This specifies how many times "Translate"
       /// can be called before it returns.
       /// </summary>
-      public int MaxConcurrency => 1;
+      public virtual int MaxConcurrency => 1;
 
       /// <summary>
       /// Gets the maximum number of translations that can be served per translation request.

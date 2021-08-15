@@ -9,6 +9,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
@@ -135,24 +136,46 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessToolsShim.Property( UnityTypes.SpriteRenderer, "sprite" )?.GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Prefix( object __instance, ref Sprite value )
       {
-         Texture2D _ = null;
-         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
+         Texture2D texture;
+         var prev = CallOrigin.ImageHooksEnabled;
+         CallOrigin.ImageHooksEnabled = false;
+         try
+         {
+            texture = value.texture;
+         }
+         finally
+         {
+            CallOrigin.ImageHooksEnabled = prev;
+         }
+         AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref value, ref texture, true, false );
       }
 
-      static Action<object, object> _original;
+      //public static void Postfix( object __instance, ref Sprite value )
+      //{
+      //   Texture2D _ = null;
+      //   AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
+      //}
+
+      static Action<object, Sprite> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, object>>();
+         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
       }
 
-      static void MM_Detour( object __instance, object sprite )
+      static void MM_Detour( object __instance, Sprite sprite )
       {
+         //var prev = sprite;
+         Prefix( __instance, ref sprite );
+
          _original( __instance, sprite );
 
-         Postfix( __instance );
+         //if( prev != sprite )
+         //{
+         //   Postfix( __instance, ref sprite );
+         //}
       }
    }
 
@@ -261,7 +284,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return ClrTypes.MaskableGraphic != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -300,7 +323,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return ClrTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -333,7 +356,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return ClrTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -366,7 +389,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return ClrTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -399,7 +422,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return ClrTypes.RawImage != null;
       }
 
       static MethodBase TargetMethod( object instance )

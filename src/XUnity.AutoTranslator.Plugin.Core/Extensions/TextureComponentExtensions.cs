@@ -9,9 +9,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class TextureComponentExtensions
    {
-      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object ui )
+      public static ImageTranslationInfo GetOrCreateImageTranslationInfo(this object obj, Texture2D originalTexture)
       {
-         return ui.GetOrCreateExtensionData<ImageTranslationInfo>();
+         if (obj == null) return null;
+
+         var iti = obj.GetOrCreateExtensionData<ImageTranslationInfo>();
+         if (iti.Original == null) iti.Initialize(originalTexture);
+
+         return iti;
       }
 
       public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this object texture )

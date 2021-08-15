@@ -11,8 +11,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       private Action<TSelection> _onSelected;
 
-      public DropdownViewModel( IEnumerable<TDropdownOptionViewModel> options, Action<TSelection> onSelected )
+      public DropdownViewModel(
+         string noSelection,
+         string noSelectionTooltip,
+         string unselect,
+         string unselectTooltip,
+         IEnumerable<TDropdownOptionViewModel> options,
+         Action<TSelection> onSelected )
       {
+         NoSelection = noSelection;
+         NoSelectionTooltip = noSelectionTooltip;
+         Unselect = unselect;
+         UnselectTooltip = unselectTooltip;
          _onSelected = onSelected;
 
          Options = new List<TDropdownOptionViewModel>();
@@ -29,6 +39,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public TDropdownOptionViewModel CurrentSelection { get; set; }
 
       public List<TDropdownOptionViewModel> Options { get; set; }
+      public string NoSelection { get; }
+      public string NoSelectionTooltip { get; }
+      public string Unselect { get; }
+      public string UnselectTooltip { get; }
 
       public void Select( TDropdownOptionViewModel option )
       {
@@ -64,11 +78,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       private GUIContent _normal;
       private GUIContent _disabled;
 
-      public TranslatorDropdownOptionViewModel( Func<bool> isSelected, TranslationEndpointManager selection ) : base( selection.Endpoint.FriendlyName, isSelected, () => selection.Error == null, selection )
+      public TranslatorDropdownOptionViewModel( bool fallback, Func<bool> isSelected, TranslationEndpointManager selection ) : base( selection.Endpoint.FriendlyName, isSelected, () => selection.Error == null, selection )
       {
-         _selected = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CURRENT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} is the currently selected translator that will be used to perform translations." );
-         _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because the initialization failed. {selection.Error?.Message}" );
-         _normal = new GUIContent( selection.Endpoint.FriendlyName, $"<b>SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} will be selected as translator." );
+         if( fallback )
+         {
+            _selected = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CURRENT FALLBACK TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} is the currently selected fallback translator that will be used to perform translations when the primary translator fails." );
+            _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT FALLBACK TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because the initialization failed. {selection.Error?.Message}" );
+            _normal = new GUIContent( selection.Endpoint.FriendlyName, $"<b>SELECT FALLBACK TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} will be selected as fallback translator." );
+         }
+         else
+         {
+            _selected = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CURRENT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} is the currently selected translator that will be used to perform translations." );
+            _disabled = new GUIContent( selection.Endpoint.FriendlyName, $"<b>CANNOT SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} cannot be selected because the initialization failed. {selection.Error?.Message}" );
+            _normal = new GUIContent( selection.Endpoint.FriendlyName, $"<b>SELECT TRANSLATOR</b>\n{selection.Endpoint.FriendlyName} will be selected as translator." );
+         }
       }
 
       public override GUIContent Text

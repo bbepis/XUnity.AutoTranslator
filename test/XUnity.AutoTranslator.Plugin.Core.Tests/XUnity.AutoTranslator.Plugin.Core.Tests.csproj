@@ -14,6 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Translators\BingTranslateLegitimate\BingTranslateLegitimate.csproj" />
+    <ProjectReference Include="..\..\src\Translators\Common.ExtProtocol.Executor\Common.ExtProtocol.Executor.csproj" />
+    <ProjectReference Include="..\..\src\Translators\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
+    <ProjectReference Include="..\..\src\Translators\DeepLTranslate\DeepLTranslate.csproj" />
+    <ProjectReference Include="..\..\src\Translators\GoogleTranslate\GoogleTranslate.csproj" />
     <ProjectReference Include="..\..\src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
   </ItemGroup>
 

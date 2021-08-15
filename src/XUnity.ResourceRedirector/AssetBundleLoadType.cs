@@ -15,6 +15,12 @@
       /// </summary>
       LoadFromMemory,
 
+      /// <summary>
+      /// Indicates that the asset bundle is being loaded through a call to 'LoadFromStream' or 'LoadFromStreamAsync'.
+      /// </summary>
+      LoadFromStream,
+
       // other places, online resource, etc.
+
    }
 }

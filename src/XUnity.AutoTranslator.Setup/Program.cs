@@ -45,11 +45,11 @@ namespace XUnity.AutoTranslator.Setup
          {
             var managedDir = Path.Combine( gamePath, launcher.Data.Name, "Managed" );
             AddFile( Path.Combine( managedDir, "0Harmony.dll" ), Resources._0Harmony, true );
-            AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni );
-            AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher );
-            AddFile( Path.Combine( managedDir, "Mono.Cecil.dll" ), Resources.Mono_Cecil_0_10_4_0 );
-            AddFile( Path.Combine( managedDir, "MonoMod.RuntimeDetour.dll" ), Resources.MonoMod_RuntimeDetour );
-            AddFile( Path.Combine( managedDir, "MonoMod.Utils.dll" ), Resources.MonoMod_Utils );
+            AddFile( Path.Combine( managedDir, "ExIni.dll" ), Resources.ExIni, true );
+            AddFile( Path.Combine( managedDir, "ReiPatcher.exe" ), Resources.ReiPatcher, true );
+            AddFile( Path.Combine( managedDir, "Mono.Cecil.dll" ), Resources.Mono_Cecil_0_10_4_0, true );
+            AddFile( Path.Combine( managedDir, "MonoMod.RuntimeDetour.dll" ), Resources.MonoMod_RuntimeDetour, true );
+            AddFile( Path.Combine( managedDir, "MonoMod.Utils.dll" ), Resources.MonoMod_Utils, true );
             AddFile( Path.Combine( managedDir, "XUnity.Common.dll" ), Resources.XUnity_Common, true );
             AddFile( Path.Combine( managedDir, "XUnity.Common.Managed.dll" ), Resources.XUnity_Common_Managed, true );
             AddFile( Path.Combine( managedDir, "XUnity.ResourceRedirector.dll" ), Resources.XUnity_ResourceRedirector, true );
@@ -65,6 +65,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( translatorsPath, "CustomTranslate.dll" ), Resources.CustomTranslate, true );
             AddFile( Path.Combine( translatorsPath, "GoogleTranslate.dll" ), Resources.GoogleTranslate, true );
             AddFile( Path.Combine( translatorsPath, "GoogleTranslateCompat.dll" ), Resources.GoogleTranslateCompat, true );
+            AddFile( Path.Combine( translatorsPath, "DeepLTranslate.dll" ), Resources.DeepLTranslate, true );
             AddFile( Path.Combine( translatorsPath, "GoogleTranslateLegitimate.dll" ), Resources.GoogleTranslateLegitimate, true );
             AddFile( Path.Combine( translatorsPath, "LecPowerTranslator15.dll" ), Resources.LecPowerTranslator15, true );
             AddFile( Path.Combine( translatorsPath, "ezTransXP.dll" ), Resources.ezTransXP, true );
@@ -75,9 +76,11 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( fullNetPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "ezTransXP.ExtProtocol.exe" ), Resources.ezTransXP_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "GoogleTranslateCompat.ExtProtocol.dll" ), Resources.GoogleTranslateCompat_ExtProtocol, true );
-            AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.exe" ), Resources.Common_ExtProtocol, true );
-            AddFile( Path.Combine( fullNetPath, "Http.ExtProtocol.exe" ), Resources.Http_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "DeepLTranslate.ExtProtocol.dll" ), Resources.DeepLTranslate_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.dll" ), Resources.Common_ExtProtocol, true );
+            AddFile( Path.Combine( fullNetPath, "Http.ExtProtocol.dll" ), Resources.Http_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Common.ExtProtocol.Executor.exe" ), Resources.Common_ExtProtocol_Executor, true );
+            AddFile( Path.Combine( fullNetPath, "Newtonsoft.Json.dll" ), Resources.Newtonsoft_Json, true );
 
             // create an .ini file for each launcher, if it does not already exist
             var iniInfo = new FileInfo( Path.Combine( reiPath, Path.GetFileNameWithoutExtension( launcher.Executable.Name ) + ".ini" ) );

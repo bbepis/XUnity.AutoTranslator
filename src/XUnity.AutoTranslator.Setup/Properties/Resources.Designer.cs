@@ -133,6 +133,26 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] DeepLTranslate {
+            get {
+                object obj = ResourceManager.GetObject("DeepLTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] DeepLTranslate_ExtProtocol {
+            get {
+                object obj = ResourceManager.GetObject("DeepLTranslate_ExtProtocol", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] ExIni {
             get {
                 object obj = ResourceManager.GetObject("ExIni", resourceCulture);
@@ -306,6 +326,16 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         internal static byte[] MonoMod_Utils {
             get {
                 object obj = ResourceManager.GetObject("MonoMod_Utils", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Newtonsoft_Json {
+            get {
+                object obj = ResourceManager.GetObject("Newtonsoft_Json", resourceCulture);
                 return ((byte[])(obj));
             }
         }

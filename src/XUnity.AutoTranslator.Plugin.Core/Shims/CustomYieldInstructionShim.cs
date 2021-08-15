@@ -31,11 +31,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
          {
             if( !_startTime.HasValue )
             {
-               _startTime = Time.realtimeSinceStartup;
+               _startTime = TimeSupport.Time.realtimeSinceStartup;
             }
 
             var startTime = _startTime.Value;
-            var time = Time.realtimeSinceStartup - startTime;
+            var time = TimeSupport.Time.realtimeSinceStartup - startTime;
 
             if( time > InGameTimeout )
             {

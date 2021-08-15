@@ -15,11 +15,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
 
       public string[] UntranslatedTexts => _context.UntranslatedTexts;
       public string UntranslatedText => _context.UntranslatedText;
+      public UntranslatedTextInfo UntranslatedTextInfo => _context.UntranslatedTextInfo;
+      public UntranslatedTextInfo[] UntranslatedTextInfos => _context.UntranslatedTextInfos;
       public string SourceLanguage => _context.SourceLanguage;
       public string DestinationLanguage => _context.DestinationLanguage;
 
       public string ResponseData { get; internal set; }
       internal WwwRequestInfo RequestInfo { get; private set; }
+      public object UserState
+      {
+         get => _context.UserState;
+         set => _context.UserState = value;
+      }
 
       void IWwwRequestCreationContext.Complete( WwwRequestInfo requestInfo )
       {

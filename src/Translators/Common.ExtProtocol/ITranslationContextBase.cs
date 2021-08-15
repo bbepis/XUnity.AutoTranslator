@@ -20,6 +20,18 @@ namespace Common.ExtProtocol
       string[] UntranslatedTexts { get; }
 
       /// <summary>
+      /// Gets the first untranslated text info.
+      /// </summary>
+      UntranslatedTextInfo UntranslatedTextInfo { get; }
+
+      /// <summary>
+      /// Gets all the untranslated texts. The number of texts
+      /// in array cannot be greater than the MaxTranslationsPerRequest
+      /// in the ITranslateEndpoint interface.
+      /// </summary>
+      UntranslatedTextInfo[] UntranslatedTextInfos { get; }
+
+      /// <summary>
       /// Gets the source language.
       /// </summary>
       string SourceLanguage { get; }
@@ -41,5 +53,10 @@ namespace Common.ExtProtocol
       /// </summary>
       /// <param name="reason"></param>
       void Fail( string reason );
+
+      /// <summary>
+      /// Gets or sets user state that is maintained between various callbacks.
+      /// </summary>
+      object UserState { get; set; }
    }
 }

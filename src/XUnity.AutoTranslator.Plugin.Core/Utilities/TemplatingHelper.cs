@@ -8,55 +8,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class TemplatingHelper
    {
-      private static readonly HashSet<char> Numbers = new HashSet<char>
-      {
-         '0',
-         '1',
-         '2',
-         '3',
-         '4',
-         '5',
-         '6',
-         '7',
-         '8',
-         '9',
-         '０',
-         '１',
-         '２',
-         '３',
-         '４',
-         '５',
-         '６',
-         '７',
-         '８',
-         '９'
-      };
-
-      private static readonly HashSet<char> NumbersWithDot = new HashSet<char>
-      {
-         '0',
-         '1',
-         '2',
-         '3',
-         '4',
-         '5',
-         '6',
-         '7',
-         '8',
-         '9',
-         '０',
-         '１',
-         '２',
-         '３',
-         '４',
-         '５',
-         '６',
-         '７',
-         '８',
-         '９',
-         '.'
-      };
-
       public static bool ContainsUntemplatedCharacters( string text )
       {
          bool isParameter = false;
@@ -98,33 +49,59 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return false;
       }
 
+      public static TemplatedString TemplatizeByReplacementsAndNumbers( this string str )
+      {
+         var templatedString = str.TemplatizeByReplacements();
+         if( templatedString == null )
+         {
+            return str.TemplatizeByNumbers();
+         }
+         else
+         {
+            return templatedString.Template.TemplatizeByNumbers( templatedString );
+         }
+      }
+
       public static TemplatedString TemplatizeByReplacements( this string str )
       {
          if( Settings.Replacements.Count == 0 ) return null;
 
          var dict = new Dictionary<string, string>();
          char arg = 'A';
+         bool succeeded = false;
 
          foreach( var kvp in Settings.Replacements )
          {
             var original = kvp.Key;
             var replacement = kvp.Value;
 
-            string key = null;
-            int idx = -1;
-            while( ( idx = str.IndexOf( original ) ) != -1 )
+            if( string.IsNullOrEmpty( replacement ) )
             {
-               if( key == null )
+               int idx = -1;
+               while( ( idx = str.IndexOf( original ) ) != -1 )
                {
-                  key = "{{" + arg++ + "}}";
-                  dict.Add( key, replacement );
+                  succeeded = true;
+                  str = str.Remove( idx, original.Length );
                }
+            }
+            else
+            {
+               string key = null;
+               int idx = -1;
+               while( ( idx = str.IndexOf( original ) ) != -1 )
+               {
+                  if( key == null )
+                  {
+                     key = "{{" + arg++ + "}}";
+                     dict.Add( key, replacement );
+                  }
 
-               str = str.Remove( idx, original.Length ).Insert( idx, key );
+                  str = str.Remove( idx, original.Length ).Insert( idx, key );
+               }
             }
          }
 
-         if( dict.Count > 0 )
+         if( dict.Count > 0 || succeeded )
          {
             return new TemplatedString( str, dict );
          }
@@ -134,100 +111,115 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          }
       }
 
-      public static TemplatedString TemplatizeByNumbers( this string str )
+      public static bool IsNumberOrDotOrControl( char c )
       {
+         return ( '*' <= c && c <= ':' ) || ( '０' <= c && c <= '９' );
+      }
+
+      public static bool IsNumber( char c )
+      {
+         return ( '0' <= c && c <= '9' ) || ( '０' <= c && c <= '９' );
+      }
+
+      public static TemplatedString TemplatizeByNumbers( this string str, TemplatedString existingTemplatedString = null )
+      {
+         var offset = 0;
+         if( existingTemplatedString != null )
+         {
+            offset = existingTemplatedString.Arguments.Count;
+            str = existingTemplatedString.Template;
+         }
+
          var dict = new Dictionary<string, string>();
-         bool isNumber = false;
+         bool isHandlingPotentialVariable = false;
+         //bool hasNumberInVariable = false;
          StringBuilder carg = null;
-         char arg = 'A';
+         char arg = (char)( 'A' + offset );
+         int sidx = -1;
+         int lidx = -1;
+         // if it has ANY numbers of in the range, it's fine.
+
+         // must start and end with number!
 
          for( int i = 0; i < str.Length; i++ )
          {
             var c = str[ i ];
-            if( isNumber )
+            if( isHandlingPotentialVariable )
             {
-               if( NumbersWithDot.Contains( c ) )
+               if( IsNumber( c ) )
+               {
+                  lidx = i;
+               }
+               //hasNumberInVariable = hasNumberInVariable || IsNumber( c );
+
+               if( IsNumberOrDotOrControl( c ) )
                {
                   carg.Append( c );
                }
-               else
+               else// if( hasNumberInVariable )
                {
+                  var diff = i - lidx - 1;
+                  carg.Remove( carg.Length - diff, diff );
+
                   // end current number
                   var variable = carg.ToString();
-                  var ok = true;
-                  var c1 = variable[ 0 ];
-                  if( c1 == '.' )
-                  {
-                     if( variable.Length == 1 )
-                     {
-                        ok = false;
-                     }
-                     else
-                     {
-                        var c2 = variable[ 1 ];
-                        ok = Numbers.Contains( c2 );
-                     }
-                  }
-
-                  if( ok && !dict.ContainsKey( variable ) )
-                  {
-                     dict.Add( variable, "{{" + arg + "}}" );
-                     arg++;
-                  }
+                  var argName = "{{" + arg + "}}";
+                  dict.Add( argName, variable );
+                  arg++;
 
                   carg = null;
-                  isNumber = false;
+                  isHandlingPotentialVariable = false;
+
+                  str = str.Remove( sidx, lidx - sidx + 1 ).Insert( sidx, argName );
+                  i += argName.Length - variable.Length;
                }
+               //else
+               //{
+               //   carg = null;
+               //   isHandlingPotentialVariable = false;
+               //}
             }
-            else
+            else if( IsNumber( c ) )
             {
-               if( NumbersWithDot.Contains( c ) )
-               {
-                  isNumber = true;
-                  carg = new StringBuilder();
-                  carg.Append( c );
-               }
+               isHandlingPotentialVariable = true;
+               //hasNumberInVariable = true;
+               carg = new StringBuilder();
+               carg.Append( c );
+               sidx = i;
+               lidx = i;
             }
          }
 
          if( carg != null )
          {
+            var diff = str.Length - lidx - 1;
+            carg.Remove( carg.Length - diff, diff );
+
             // end current number
             var variable = carg.ToString();
-            var ok = true;
-            var c1 = variable[ 0 ];
-            if( c1 == '.' )
-            {
-               if( variable.Length == 1 )
-               {
-                  ok = false;
-               }
-               else
-               {
-                  var c2 = variable[ 1 ];
-                  ok = Numbers.Contains( c2 );
-               }
-            }
+            var argName = "{{" + arg + "}}";
+            dict.Add( argName, variable );
 
-            if( ok && !dict.ContainsKey( variable ) )
-            {
-               dict.Add( variable, "{{" + arg + "}}" );
-               arg++;
-            }
+            str = str.Remove( sidx, str.Length - sidx - diff ).Insert( sidx, argName );
          }
 
          if( dict.Count > 0 )
          {
-            foreach( var kvp in dict )
+            var resultDictionary = existingTemplatedString?.Arguments ?? dict;
+
+            if( dict != resultDictionary )
             {
-               str = str.Replace( kvp.Key, kvp.Value );
+               foreach( var kvp in dict )
+               {
+                  resultDictionary.Add( kvp.Key, kvp.Value );
+               }
             }
 
-            return new TemplatedString( str, dict.ToDictionary( x => x.Value, x => x.Key ) );
+            return new TemplatedString( str, resultDictionary );
          }
          else
          {
-            return null;
+            return existingTemplatedString;
          }
       }
    }

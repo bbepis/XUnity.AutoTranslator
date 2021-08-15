@@ -29,6 +29,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public object Translated { get; private set; }
 
+      public Sprite TranslatedSprite { get; set; }
+
       public bool IsTranslated { get; set; }
 
       public bool IsDumped { get; set; }

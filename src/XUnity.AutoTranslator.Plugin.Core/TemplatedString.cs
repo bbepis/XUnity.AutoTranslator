@@ -62,8 +62,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var c = translatedText[ i ];
             if( c == ' ' || c == '　' ) continue;
-
-            if( c == translatorFriendlyKey[ cidx ] )
+            
+            if( char.ToUpperInvariant( c ) == char.ToUpperInvariant( translatorFriendlyKey[ cidx ] ) )
             {
                if( cidx == 0 )
                {

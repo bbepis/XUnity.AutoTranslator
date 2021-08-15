@@ -12,6 +12,8 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Text
 {
+
+
    internal class DefaultTextComponentManipulator : ITextComponentManipulator
    {
       private static readonly string TextPropertyName = "text";

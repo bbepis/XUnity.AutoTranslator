@@ -7,6 +7,7 @@ using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Utilities;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Shims
@@ -36,14 +37,22 @@ namespace XUnity.AutoTranslator.Plugin.Shims
       {
          if( Settings.EnableTranslationScoping )
          {
-            if( ui is ITextComponent text )
+            try
             {
-               return text.GetScope();
+               if( ui is ITextComponent text )
+               {
+                  return text.GetScope();
+               }
+               else
+               {
+                  // TODO: Could be an array of all loaded scenes instead!
+                  return GetActiveSceneId();
+               }
             }
-            else
+            catch( System.MissingMemberException e )
             {
-               // TODO: Could be an array of all loaded scenes instead!
-               return GetActiveSceneId();
+               XuaLogger.AutoTranslator.Error( e, "A 'missing member' error occurred while retriving translation scope. Disabling translation scopes." );
+               Settings.EnableTranslationScoping = false;
             }
          }
          return TranslationScopes.None;

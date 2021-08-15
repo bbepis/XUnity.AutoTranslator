@@ -26,28 +26,46 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          _x = x;
          _y = y;
          _width = width;
-         _noSelection = new GUIContent( "----", "<b>SELECT TRANSLATOR</b>\nNo translator is currently selected, which means no new translations will be performed. Please select one from the dropdown." );
-         _unselect = new GUIContent( "----", "<b>UNSELECT TRANSLATOR</b>\nThis will unselect the current translator, which means no new translations will be performed." );
+         _noSelection = new GUIContent( viewModel.NoSelection, viewModel.NoSelectionTooltip );
+         _unselect = new GUIContent( viewModel.Unselect, viewModel.UnselectTooltip );
 
          _viewModel = viewModel;
       }
 
-      public void OnGUI()
+      public bool OnGUI(bool enabled)
       {
-         bool clicked = GUI.Button( GUIUtil.R( _x, _y, _width, GUIUtil.RowHeight ), _viewModel.CurrentSelection?.Text ?? _noSelection, _isShown ? GUIUtil.NoMarginButtonPressedStyle : GUI.skin.button );
-         if( clicked )
-         {
-            _isShown = !_isShown;
-         }
+         var previouslyEnabled = GUI.enabled;
 
-         if( _isShown )
+         try
          {
-            ShowDropdown( _x, _y + GUIUtil.RowHeight, _width, GUI.skin.button );
-         }
+            GUI.enabled = enabled;
 
-         if( !clicked && Event.current.isMouse )
+            bool clicked = GUI.Button( GUIUtil.R( _x, _y, _width, GUIUtil.RowHeight ), _viewModel.CurrentSelection?.Text ?? _noSelection, _isShown ? GUIUtil.NoMarginButtonPressedStyle : GUI.skin.button );
+            if( clicked )
+            {
+               _isShown = !_isShown;
+            }
+
+            if( !enabled )
+            {
+               _isShown = false;
+            }
+
+            if( _isShown )
+            {
+               ShowDropdown( _x, _y + GUIUtil.RowHeight, _width, GUI.skin.button );
+            }
+
+            if( !clicked && Event.current.isMouse )
+            {
+               _isShown = false;
+            }
+
+            return _isShown;
+         }
+         finally
          {
-            _isShown = false;
+            GUI.enabled = previouslyEnabled;
          }
       }
 

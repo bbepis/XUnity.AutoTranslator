@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>C:\Proj\Secret\XUnity.AutoTranslator\src\XUnity.AutoTranslator.Plugin.ExtProtocol\bin\Release\net35\XUnity.AutoTranslator.Plugin.ExtProtocol.xml</DocumentationFile>
+     <DocumentationFile>bin\Release\net35\XUnity.AutoTranslator.Plugin.ExtProtocol.xml</DocumentationFile>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

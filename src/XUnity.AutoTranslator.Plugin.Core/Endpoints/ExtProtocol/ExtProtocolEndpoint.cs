@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Web;
@@ -23,6 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
    /// </summary>
    public abstract class ExtProtocolEndpoint : IMonoBehaviour_Update, ITranslateEndpoint, IDisposable
    {
+      private static readonly System.Random Rng = new System.Random();
+
       private readonly Dictionary<Guid, ProtocolTransactionHandle> _transactionHandles = new Dictionary<Guid, ProtocolTransactionHandle>();
       private readonly object _sync = new object();
 
@@ -32,6 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       private bool _startedThread;
       private bool _initializing;
       private bool _failed;
+      private float _lastRequestTimestamp;
 
       /// <summary>
       /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
@@ -65,11 +67,48 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       protected string Arguments { get; set; }
 
       /// <summary>
+      /// Gets the minimum delay to wait before sending a new request.
+      /// </summary>
+      protected float MinDelay { get; set; }
+
+      /// <summary>
+      /// Gets the maximum delay to wait before sending a new request.
+      /// </summary>
+      protected float MaxDelay { get; set; }
+
+      /// <summary>
+      /// Gets the name of the configuration section this translator uses, if any.
+      /// </summary>
+      protected virtual string ConfigurationSectionName => null;
+
+      /// <summary>
+      /// Gets or sets the config the external endpoing will be provided in its Initialize method.
+      /// </summary>
+      protected string ConfigForExternalProcess { get; set; }
+
+      /// <summary>
       /// Called during initialization. Use this to initialize plugin or throw exception if impossible.
       ///
       /// Must set the ExecutablePath and optionally the Arguments property.
       /// </summary>
-      public abstract void Initialize( IInitializationContext context );
+      public virtual void Initialize( IInitializationContext context )
+      {
+         string exePath = null;
+         if( ConfigurationSectionName != null )
+         {
+            exePath = context.GetOrCreateSetting<string>( ConfigurationSectionName, "ExecutableLocation", null );
+         }
+
+         if( string.IsNullOrEmpty( exePath ) )
+         {
+            exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\Common.ExtProtocol.Executor.exe" );
+         }
+
+         var fileExists = File.Exists( exePath );
+         if( !fileExists ) throw new EndpointInitializationException( $"Could not find any executable at '{exePath}'" );
+
+         ExecutablePath = exePath;
+      }
 
       private void EnsureInitialized()
       {
@@ -90,8 +129,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             if( _process == null )
             {
+               string fullPath = ExecutablePath;
+               if( !Path.IsPathRooted( fullPath ) )
+               {
+                  try
+                  {
+                     fullPath = Path.Combine( PathsHelper.Instance.GameRoot, ExecutablePath );
+                  }
+                  catch
+                  {
+                     fullPath = Path.Combine( Environment.CurrentDirectory, ExecutablePath );
+                  }
+               }
+
                _process = new Process();
-               _process.StartInfo.FileName = Path.Combine( PathsHelper.Instance.GameRoot, ExecutablePath );
+               _process.StartInfo.FileName = fullPath;
                _process.StartInfo.Arguments = Arguments;
                _process.StartInfo.WorkingDirectory = new FileInfo( ExecutablePath ).Directory.FullName;
                _process.EnableRaisingEvents = false;
@@ -104,13 +156,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
                // wait a second...
                _process.WaitForExit( 2500 );
+
             }
 
             if( _process.HasExited )
             {
                return;
             }
+
+            SendConfigurationIfRequired();
             _initializing = false;
+
 
             while( !_disposed )
             {
@@ -133,11 +189,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// </summary>
       public virtual void Update()
       {
-         if( Time.frameCount % 30 == 0 )
+         if( TimeSupport.Time.frameCount % 30 == 0 )
          {
             lock( _sync )
             {
-               var time = Time.realtimeSinceStartup;
+               var time = TimeSupport.Time.realtimeSinceStartup;
 
                List<Guid> idsToRemove = null;
                foreach( var kvp in _transactionHandles )
@@ -151,7 +207,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                      }
 
                      idsToRemove.Add( kvp.Key );
-                     kvp.Value.SetCompleted( null, "Request timed out." );
+                     kvp.Value.SetCompleted( null, "Request timed out.", StatusCode.Unknown );
                   }
                }
 
@@ -166,6 +222,31 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          }
       }
 
+      private void SendConfigurationIfRequired()
+      {
+         var configForExternalProcess = ConfigForExternalProcess;
+         if( configForExternalProcess != null )
+         {
+            var id = Guid.NewGuid();
+
+            try
+            {
+               var request = new ConfigurationMessage
+               {
+                  Id = id,
+                  Config = configForExternalProcess,
+               };
+               var payload = ExtProtocolConvert.Encode( request );
+
+               _process.StandardInput.WriteLine( payload );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, $"An error occurred while sending configuration to external process for '{GetType().Name}'." );
+            }
+         }
+      }
+
       /// <summary>
       /// Attempt to translated the provided untranslated text. Will be used in a "coroutine",
       /// so it can be implemented in an asynchronous fashion.
@@ -174,9 +255,43 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       {
          EnsureInitialized();
 
-         while( _initializing && !_failed ) yield return CoroutineHelper.Instance.CreateWaitForSeconds( 0.2f ); 
+         while( _initializing && !_failed )
+         {
+            var instruction = CoroutineHelper.Instance.GetWaitForSecondsRealtime( 0.2f );
+            if( instruction != null )
+            {
+               yield return instruction;
+            }
+            else
+            {
+               yield return null;
+            }
+         }
 
          if( _failed ) context.Fail( "External process failed." );
+
+         var totalDelay = (float)( Rng.Next( (int)( ( MaxDelay - MinDelay ) * 1000 ) ) + ( MinDelay * 1000 ) ) / 1000;
+         var timeSinceLast = TimeSupport.Time.realtimeSinceStartup - _lastRequestTimestamp;
+         if( timeSinceLast < totalDelay )
+         {
+            var remainingDelay = totalDelay - timeSinceLast;
+
+            var instruction = Features.GetWaitForSecondsRealtime( remainingDelay );
+            if( instruction != null )
+            {
+               yield return instruction;
+            }
+            else
+            {
+               float start = TimeSupport.Time.realtimeSinceStartup;
+               var end = start + remainingDelay;
+               while( TimeSupport.Time.realtimeSinceStartup < end )
+               {
+                  yield return null;
+               }
+            }
+         }
+         _lastRequestTimestamp = TimeSupport.Time.realtimeSinceStartup;
 
          var result = new ProtocolTransactionHandle();
          var id = Guid.NewGuid();
@@ -193,7 +308,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                Id = id,
                SourceLanguage = context.SourceLanguage,
                DestinationLanguage = context.DestinationLanguage,
-               UntranslatedTexts = context.UntranslatedTexts
+               UntranslatedTextInfos = context.UntranslatedTextInfos.Select( x => x.ToTransmittable() ).ToArray()
             };
             var payload = ExtProtocolConvert.Encode( request );
 
@@ -201,7 +316,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          }
          catch( Exception e )
          {
-            result.SetCompleted( null, e.Message );
+            result.SetCompleted( null, e.Message, StatusCode.Unknown );
          }
 
          // yield-wait for completion
@@ -234,7 +349,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             if( _transactionHandles.TryGetValue( message.Id, out var result ) )
             {
-               result.SetCompleted( message.TranslatedTexts, null );
+               result.SetCompleted( message.TranslatedTexts, null, StatusCode.OK );
                _transactionHandles.Remove( message.Id );
             }
          }
@@ -246,7 +361,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             if( _transactionHandles.TryGetValue( message.Id, out var result ) )
             {
-               result.SetCompleted( null, message.Reason );
+               result.SetCompleted( null, message.Reason, message.FailureCode );
                _transactionHandles.Remove( message.Id );
             }
          }

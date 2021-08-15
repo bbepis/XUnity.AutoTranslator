@@ -16,6 +16,30 @@ namespace Http.ExtProtocol.Executor
 
       public IExtTranslateEndpoint Endpoint { get; }
 
+      //public async Task Test()
+      //{
+      //   var context = new TranslationContext(
+      //      new[]
+      //      {
+      //         new TransmittableUntranslatedTextInfo
+      //         {
+      //            UntranslatedText = "おはよう",
+      //            ContextAfter = new string[0],
+      //            ContextBefore = new string[0]
+      //         }
+      //      },
+      //      "ja",
+      //      "en" );
+      //   try
+      //   {
+      //      await Endpoint.Translate( context );
+      //   }
+      //   catch( Exception e )
+      //   {
+      //      context.FailWithoutThrowing( "An error occurred in the pipeline.", e );
+      //   }
+      //}
+
       public async Task RunAsync()
       {
          var usedIds = new HashSet<Guid>();
@@ -32,52 +56,61 @@ namespace Http.ExtProtocol.Executor
                var receivedPayload = reader.ReadLine();
                if( string.IsNullOrEmpty( receivedPayload ) ) return;
 
-               var message = ExtProtocolConvert.Decode( receivedPayload ) as TranslationRequest;
+               var message = ExtProtocolConvert.Decode( receivedPayload );
                if( message == null ) return;
-
                if( !usedIds.Add( message.Id ) ) return;
 
-               var context = new TranslationContext( message.UntranslatedTexts, message.SourceLanguage, message.DestinationLanguage );
-               try
+               if( message is ConfigurationMessage configurationMessage )
                {
-                  await Endpoint.Translate( context );
+                  Endpoint.Initialize( configurationMessage.Config );
                }
-               catch( Exception e )
+               else if( message is TranslationRequest translationMessage )
                {
-                  context.FailWithoutThrowing( "An error occurred in the pipeline.", e );
-               }
-
-
-               ProtocolMessage response;
-               if( !string.IsNullOrEmpty( context.ErrorMessage ) || context.Error != null )
-               {
-                  string errorMessage = context.ErrorMessage;
-                  if( context.Error != null )
+                  var context = new TranslationContext( translationMessage.UntranslatedTextInfos, translationMessage.SourceLanguage, translationMessage.DestinationLanguage );
+                  try
                   {
-                     if( !string.IsNullOrEmpty( errorMessage ) )
-                     {
-                        errorMessage += Environment.NewLine;
-                     }
-                     errorMessage += context.Error.ToString();
+                     await Endpoint.Translate( context );
+                  }
+                  catch( Exception e )
+                  {
+                     context.FailWithoutThrowing( "An error occurred in the pipeline.", e );
                   }
 
-                  response = new TranslationError
+                  ProtocolMessage response;
+                  if( !string.IsNullOrEmpty( context.ErrorMessage ) || context.Error != null )
                   {
-                     Id = message.Id,
-                     Reason = errorMessage
-                  };
+                     string errorMessage = context.ErrorMessage;
+                     if( context.Error != null )
+                     {
+                        if( !string.IsNullOrEmpty( errorMessage ) )
+                        {
+                           errorMessage += Environment.NewLine;
+                        }
+                        errorMessage += context.Error.ToString();
+                     }
+
+                     response = new TranslationError
+                     {
+                        Id = translationMessage.Id,
+                        Reason = errorMessage
+                     };
+                  }
+                  else
+                  {
+                     response = new TranslationResponse
+                     {
+                        Id = translationMessage.Id,
+                        TranslatedTexts = context.TranslatedTexts
+                     };
+                  }
+
+                  var translatedPayload = ExtProtocolConvert.Encode( response );
+                  writer.WriteLine( translatedPayload );
                }
                else
                {
-                  response = new TranslationResponse
-                  {
-                     Id = message.Id,
-                     TranslatedTexts = context.TranslatedTexts
-                  };
+                  return;
                }
-
-               var translatedPayload = ExtProtocolConvert.Encode( response );
-               writer.WriteLine( translatedPayload );
             }
          }
       }

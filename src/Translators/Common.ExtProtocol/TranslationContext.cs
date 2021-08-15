@@ -1,21 +1,28 @@
 ﻿using System;
+using System.Linq;
+using XUnity.AutoTranslator.Plugin.ExtProtocol;
 
 namespace Common.ExtProtocol
 {
    public class TranslationContext : ITranslationContext
    {
+      private string[] _untranslatedTexts;
+
       public TranslationContext(
-         string[] untranslatedTexts,
+         TransmittableUntranslatedTextInfo[] untranslatedTexts,
          string sourceLanguage,
-         string destinationLanguage)
+         string destinationLanguage )
       {
-         UntranslatedTexts = untranslatedTexts;
+         UntranslatedTextInfos = untranslatedTexts.Select( x => new UntranslatedTextInfo( x ) ).ToArray();
          SourceLanguage = sourceLanguage;
          DestinationLanguage = destinationLanguage;
       }
 
       public string UntranslatedText => UntranslatedTexts[ 0 ];
-      public string[] UntranslatedTexts { get; }
+      public string[] UntranslatedTexts => _untranslatedTexts ?? ( _untranslatedTexts = UntranslatedTextInfos.Select( x => x.UntranslatedText ).ToArray() );
+      public UntranslatedTextInfo UntranslatedTextInfo => UntranslatedTextInfos[ 0 ];
+      public UntranslatedTextInfo[] UntranslatedTextInfos { get; }
+
       public string SourceLanguage { get; }
       public string DestinationLanguage { get; }
 
@@ -24,7 +31,7 @@ namespace Common.ExtProtocol
       public string[] TranslatedTexts { get; private set; }
       public string ErrorMessage { get; private set; }
       public Exception Error { get; private set; }
-
+      public object UserState { get; set; }
 
       public void Complete( string translatedText )
       {

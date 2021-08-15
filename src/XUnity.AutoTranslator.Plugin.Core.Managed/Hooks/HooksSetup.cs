@@ -107,6 +107,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             if( Settings.EnableTextMeshPro )
             {
                HookingHelper.PatchAll( TextMeshProHooks.All, Settings.ForceMonoModHooks );
+
+               if( Settings.DisableTextMeshProScrollInEffects )
+               {
+                  HookingHelper.PatchAll( TextMeshProHooks.DisableScrollInTmp, Settings.ForceMonoModHooks );
+               }
             }
          }
          catch( Exception e )

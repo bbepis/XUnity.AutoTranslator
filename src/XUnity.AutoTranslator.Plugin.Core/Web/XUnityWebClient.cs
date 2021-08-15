@@ -38,7 +38,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          var handle = ev.UserState as XUnityWebResponse;
 
-         handle.SetCompleted( _responseCode.Value, ev.Result, responseHeaders, _responseCookies, ev.Error );
+         try
+         {
+            handle.SetCompleted( _responseCode.HasValue ? _responseCode.Value : HttpStatusCode.BadRequest, ev.Result, responseHeaders, _responseCookies, ev.Error );
+         }
+         catch( Exception )
+         {
+            handle.SetCompleted( _responseCode.HasValue ? _responseCode.Value : HttpStatusCode.BadRequest, null, responseHeaders, _responseCookies, ev.Error );
+         }
       }
 
       private void UnityWebClient_DownloadStringCompleted( object sender, XUnityDownloadStringCompletedEventArgs ev )
@@ -47,7 +54,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          var handle = ev.UserState as XUnityWebResponse;
 
-         handle.SetCompleted( _responseCode.Value, ev.Result, responseHeaders, _responseCookies, ev.Error );
+         try
+         {
+            handle.SetCompleted( _responseCode.HasValue ? _responseCode.Value : HttpStatusCode.BadRequest, ev.Result, responseHeaders, _responseCookies, ev.Error );
+         }
+         catch( Exception )
+         {
+            handle.SetCompleted( _responseCode.HasValue ? _responseCode.Value : HttpStatusCode.BadRequest, null, responseHeaders, _responseCookies, ev.Error );
+         }
       }
 
       /// <summary>

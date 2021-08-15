@@ -43,6 +43,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
+            else if( type == UnityTypes.TextArea2D )
+            {
+               manipulator = new TextArea2DComponentManipulator();
+            }
             else
             {
                manipulator = new DefaultTextComponentManipulator( type );
@@ -371,33 +375,62 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
       }
 
-      public void SetTexture( object ui, object texture )
+#warning INTERFACE CHANGED
+      public Sprite SetTexture( object ui, object texture, Sprite sprite, bool isPrefixHooked )
       {
-         if( ui == null ) return;
+         if( ui == null ) return null;
 
-         var currentTexture = (Texture2D)ui.GetTexture();
+         var currentTexture = ui.GetTexture();
 
-         if( !Equals( currentTexture, texture ) )
+         if( currentTexture != texture )
          {
-            // This logic is only used in legacy mode and is not verified with NGUI
-
-            var type = ui.GetType();
-            type.CachedProperty( MainTexturePropertyName )?.Set( ui, texture );
-            type.CachedProperty( TexturePropertyName )?.Set( ui, texture );
-            type.CachedProperty( CapitalMainTexturePropertyName )?.Set( ui, texture );
-
-            // special handling for UnityEngine.UI.Image
-            var material = type.CachedProperty( "material" )?.Get( ui );
-            if( material != null )
+            if( Settings.EnableSpriteRendererHooking && ui is SpriteRenderer sr )
             {
-               var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
-               var materialTexture = mainTextureProperty?.Get( material );
-               if( ReferenceEquals( materialTexture, currentTexture ) )
+               if( isPrefixHooked )
                {
-                  mainTextureProperty?.Set( material, texture );
+                  return SafeCreateSprite( sr, sprite, texture );
+               }
+               else
+               {
+                  return SafeSetSprite( sr, sprite, texture );
+               }
+            }
+            else
+            {
+               // This logic is only used in legacy mode and is not verified with NGUI
+               var type = ui.GetType();
+               type.CachedProperty( MainTexturePropertyName )?.Set( ui, texture );
+               type.CachedProperty( TexturePropertyName )?.Set( ui, texture );
+               type.CachedProperty( CapitalMainTexturePropertyName )?.Set( ui, texture );
+
+               // special handling for UnityEngine.UI.Image
+               var material = type.CachedProperty( "material" )?.Get( ui );
+               if( material != null )
+               {
+                  var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
+                  var materialTexture = mainTextureProperty?.Get( material );
+                  if( ReferenceEquals( materialTexture, currentTexture ) )
+                  {
+                     mainTextureProperty?.Set( material, texture );
+                  }
                }
             }
          }
+
+         return null;
+      }
+
+      private static Sprite SafeSetSprite( SpriteRenderer sr, Sprite sprite, Texture2D texture )
+      {
+         var newSprite = Sprite.Create( texture, sprite != null ? sprite.rect : sr.sprite.rect, Vector2.zero );
+         sr.sprite = newSprite;
+         return newSprite;
+      }
+
+      private static Sprite SafeCreateSprite( SpriteRenderer sr, Sprite sprite, Texture2D texture )
+      {
+         var newSprite = Sprite.Create( texture, sprite != null ? sprite.rect : sr.sprite.rect, Vector2.zero );
+         return newSprite;
       }
 
       public void SetAllDirtyEx( object ui )
@@ -410,7 +443,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          {
             UnityTypes.Graphic.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
-         else
+         else if( !( ui is SpriteRenderer ) )
          {
             AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
          }

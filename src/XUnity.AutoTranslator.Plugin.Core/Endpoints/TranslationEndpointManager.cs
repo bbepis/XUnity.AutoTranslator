@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
@@ -18,6 +19,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 {
    internal class TranslationEndpointManager
    {
+      private class PriorTranslation
+      {
+         public string UntranslatedText { get; set; }
+
+         public float Time { get; set; }
+      }
+
+      //private static readonly Regex NewlineSplitter = new Regex( @"([\s]*[\r\n]+[\s]*)" );
+      //private static readonly float MaxPriorTranslationAge = 100;
+      //private static readonly int MaxPriorTranslations = 3;
+
+      private List<PriorTranslation> _priorTranslations;
       private Dictionary<string, byte> _failedTranslations;
       private Dictionary<UntranslatedText, TranslationJob> _unstartedJobs;
       private Dictionary<UntranslatedText, TranslationJob> _ongoingJobs;
@@ -37,6 +50,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          _failedTranslations = new Dictionary<string, byte>();
          _unstartedJobs = new Dictionary<UntranslatedText, TranslationJob>();
          _ongoingJobs = new Dictionary<UntranslatedText, TranslationJob>();
+         _priorTranslations = new List<PriorTranslation>();
 
          _translations = new Dictionary<string, string>();
          _reverseTranslations = new Dictionary<string, string>();
@@ -236,8 +250,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             AddTranslation( key, value );
 
             // also add a modified version of the translation
-            var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords );
-            var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords );
+            var ukey = new UntranslatedText( key, false, true, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
+            var uvalue = new UntranslatedText( value, false, true, Settings.ToLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
             if( ukey.Original_Text_ExternallyTrimmed != key && !HasTranslated( ukey.Original_Text_ExternallyTrimmed ) )
             {
                AddTranslation( ukey.Original_Text_ExternallyTrimmed, uvalue.Original_Text_ExternallyTrimmed );
@@ -285,12 +299,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          return text;
       }
 
+      public UntranslatedTextInfo PrepareUntranslatedText( string unpreparedUntranslatedText, TranslationJob job )
+      {
+         var untranslatedText = job.Key.PrepareUntranslatedText( unpreparedUntranslatedText );
+         var info = job.UntranslatedTextInfo;
+         if( info != null )
+         {
+            return new UntranslatedTextInfo( untranslatedText, info.ContextBefore, info.ContextAfter );
+         }
+         else
+         {
+            return new UntranslatedTextInfo( untranslatedText );
+         }
+      }
+
       public void HandleNextBatch()
       {
          try
          {
             var kvps = _unstartedJobs.Take( Endpoint.MaxTranslationsPerRequest ).ToList();
-            var untranslatedTexts = new List<string>();
+            var untranslatedTexts = new List<UntranslatedTextInfo>();
             var jobs = new List<TranslationJob>();
 
             foreach( var kvp in kvps )
@@ -304,7 +332,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                if( job.IsTranslatable )
                {
                   var unpreparedUntranslatedText = GetTextToTranslate( job );
-                  var untranslatedText = job.Key.PrepareUntranslatedText( unpreparedUntranslatedText );
+                  var untranslatedText = PrepareUntranslatedText( unpreparedUntranslatedText, job );
                   if( CanTranslate( unpreparedUntranslatedText ) )
                   {
                      jobs.Add( job );
@@ -320,7 +348,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                      job.State = TranslationJobState.Failed;
                      job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
-                     Manager.InvokeJobFailed( job );
+                     InvokeJobFailedWithFallbaack( job );
                   }
                }
                else
@@ -369,7 +397,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
             if( job.IsTranslatable )
             {
                var unpreparedUntranslatedText = GetTextToTranslate( job );
-               var untranslatedText = job.Key.PrepareUntranslatedText( unpreparedUntranslatedText );
+               var untranslatedText = PrepareUntranslatedText( unpreparedUntranslatedText, job );
                if( CanTranslate( unpreparedUntranslatedText ) )
                {
                   _ongoingJobs[ key ] = job;
@@ -390,7 +418,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   job.State = TranslationJobState.Failed;
                   job.ErrorMessage = "The endpoint failed to perform this translation 3 or more times.";
 
-                  Manager.InvokeJobFailed( job );
+                  InvokeJobFailedWithFallbaack( job );
                }
             }
             else
@@ -485,6 +513,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                translatedText = RomanizationHelper.PostProcess( translatedText, Settings.TranslationPostProcessing );
             }
 
+            foreach( var kvp in Settings.Postprocessors )
+            {
+               translatedText = translatedText.Replace( kvp.Key, kvp.Value );
+            }
+
             if( Settings.ForceSplitTextAfterCharacters > 0 )
             {
                translatedText = translatedText.SplitToLines( Settings.ForceSplitTextAfterCharacters, '\n', ' ', '　' );
@@ -534,9 +567,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
                RegisterTranslationFailureFor( key.TemplatedOriginal_Text );
 
-               Manager.InvokeJobFailed( job );
-
                XuaLogger.AutoTranslator.Error( $"Failed: '{job.Key.TemplatedOriginal_Text}'" );
+
+               InvokeJobFailedWithFallbaack( job );
             }
          }
          else
@@ -574,6 +607,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          }
       }
 
+      private void InvokeJobFailedWithFallbaack( TranslationJob job )
+      {
+         if( job.AllowFallback && Manager.IsFallbackAvailableFor( this ) && !Manager.FallbackEndpoint.HasFailedDueToConsecutiveErrors )
+         {
+            XuaLogger.AutoTranslator.Warn( $"Retrying translation for '{job.Key.TemplatedOriginal_Text}' against fallback endpoint instead." );
+
+            job.Endpoint = Manager.FallbackEndpoint;
+            Manager.FallbackEndpoint.AddUnstartedJob( job.Key, job );
+         }
+         else
+         {
+            Manager.InvokeJobFailed( job );
+         }
+      }
+
       private IEnumerator EnableBatchingAfterDelay()
       {
          yield return CoroutineHelper.Instance.CreateWaitForSeconds( 60f );
@@ -588,11 +636,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          UntranslatedText key,
          InternalTranslationResult translationResult,
          ParserTranslationContext context,
+         UntranslatedTextInfo untranslatedTextContext,
          bool checkOtherEndpoints,
          bool saveResultGlobally,
-         bool isTranslatable )
+         bool isTranslatable,
+         bool allowFallback )
       {
-         var added = AssociateWithExistingJobIfPossible( ui, key, translationResult, context, saveResultGlobally );
+         var added = AssociateWithExistingJobIfPossible( ui, key, translationResult, context, untranslatedTextContext, saveResultGlobally, allowFallback );
          if( added )
          {
             return null;
@@ -607,7 +657,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                var endpoint = endpoints[ i ];
                if( endpoint == this ) continue;
 
-               added = endpoint.AssociateWithExistingJobIfPossible( ui, key, translationResult, context, saveResultGlobally );
+               added = endpoint.AssociateWithExistingJobIfPossible( ui, key, translationResult, context, untranslatedTextContext, saveResultGlobally, allowFallback );
                if( added )
                {
                   return null;
@@ -618,22 +668,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Queued: '" + key.TemplatedOriginal_Text + "'" );
 
          var newJob = new TranslationJob( this, key, saveResultGlobally, isTranslatable );
-         newJob.Associate( key, ui, translationResult, context, saveResultGlobally );
+         newJob.Associate( key, ui, translationResult, context, untranslatedTextContext, saveResultGlobally, allowFallback );
 
          return AddUnstartedJob( key, newJob );
       }
 
-      private bool AssociateWithExistingJobIfPossible( object ui, UntranslatedText key, InternalTranslationResult translationResult, ParserTranslationContext context, bool saveResultGlobally )
+      private bool AssociateWithExistingJobIfPossible(
+         object ui,
+         UntranslatedText key,
+         InternalTranslationResult translationResult,
+         ParserTranslationContext context,
+         UntranslatedTextInfo untranslatedTextContext,
+         bool saveResultGlobally,
+         bool allowFallback )
       {
          if( _unstartedJobs.TryGetValue( key, out TranslationJob unstartedJob ) )
          {
-            unstartedJob.Associate( key, ui, translationResult, context, saveResultGlobally );
+            unstartedJob.Associate( key, ui, translationResult, context, untranslatedTextContext, saveResultGlobally, allowFallback );
             return true;
          }
 
          if( _ongoingJobs.TryGetValue( key, out TranslationJob ongoingJob ) )
          {
-            ongoingJob.Associate( key, ui, translationResult, context, saveResultGlobally );
+            ongoingJob.Associate( key, ui, translationResult, context, untranslatedTextContext, saveResultGlobally, allowFallback );
             return true;
          }
 
@@ -716,11 +773,40 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          _failedTranslations[ untranslatedText ] = count;
       }
 
-      public IEnumerator Translate( string[] untranslatedTexts, string from, string to, Action<string[]> success, Action<string, Exception> failure )
+      public IEnumerator Translate( UntranslatedTextInfo[] untranslatedTextInfos, string from, string to, Action<string[]> success, Action<string, Exception> failure )
       {
          var startTime = Time.realtimeSinceStartup;
-         var context = new TranslationContext( untranslatedTexts, from, to, success, failure );
+         var context = new TranslationContext( untranslatedTextInfos, from, to, success, failure );
          _ongoingTranslations++;
+
+         //if( untranslatedTextInfos.Length > 0 && untranslatedTextInfos.Length <= 2 )
+         //{
+         //   var maxLength = untranslatedTextInfos.Max( x => x.UntranslatedText.Length );
+         //   var untranslatedTextInfo = untranslatedTextInfos.First( x => x.UntranslatedText.Length == maxLength );
+         //   if( untranslatedTextInfo.ContextBefore.Count == 0 )
+         //   {
+         //      foreach( var priorTranslation in _priorTranslations )
+         //      {
+         //         if( startTime - priorTranslation.Time < MaxPriorTranslationAge )
+         //         {
+         //            untranslatedTextInfo.ContextBefore.Add( priorTranslation.UntranslatedText );
+         //         }
+         //      }
+         //      var parts = NewlineSplitter.Split( untranslatedTextInfo.UntranslatedText );
+         //      foreach( var part in parts )
+         //      {
+         //         var isGarbage = NewlineSplitter.IsMatch( part );
+         //         if( !isGarbage )
+         //         {
+         //            _priorTranslations.Add( new PriorTranslation { Time = startTime, UntranslatedText = part } ); ;
+         //         }
+         //      }
+         //      while( _priorTranslations.Count > MaxPriorTranslations )
+         //      {
+         //         _priorTranslations.RemoveAt( 0 );
+         //      }
+         //   }
+         //}
 
          try
          {
