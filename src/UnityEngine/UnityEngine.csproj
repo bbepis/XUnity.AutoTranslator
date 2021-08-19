@@ -1,10 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
    <PropertyGroup>
-      <TargetFramework>net35</TargetFramework>
+      <TargetFrameworks>net35;net472</TargetFrameworks>
       <AssemblyVersion>0.0.0.0</AssemblyVersion>
       <WarningLevel>0</WarningLevel>
       <Optimize>false</Optimize>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
    </PropertyGroup>
+
+   <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+     <DefineConstants>IL2CPP</DefineConstants>
+   </PropertyGroup>
+
+   <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+     <Reference Include="Il2Cppmscorlib">
+       <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
+     </Reference>
+      <Reference Include="UnhollowerBaseLib">
+         <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
+      </Reference>
+      <Reference Include="UnhollowerRuntimeLib">
+         <HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
+      </Reference>
+   </ItemGroup>
 
 </Project>

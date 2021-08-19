@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Tests
 {
@@ -17,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
 
          ServicePointManager.ServerCertificateValidationCallback += ( a1, a2, a3, a4 ) => true;
          TimeSupport.Time = new DotNetTime();
-         Features.SupportsWaitForSecondsRealtime = false;
+         UnityFeatures.SupportsWaitForSecondsRealtime = false;
 
          ThreadPool.QueueUserWorkItem( Run );
       }

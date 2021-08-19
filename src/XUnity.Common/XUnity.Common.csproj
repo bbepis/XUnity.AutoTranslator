@@ -23,7 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\libs\MonoMod\Mono.Cecil.dll</HintPath>
     </Reference>

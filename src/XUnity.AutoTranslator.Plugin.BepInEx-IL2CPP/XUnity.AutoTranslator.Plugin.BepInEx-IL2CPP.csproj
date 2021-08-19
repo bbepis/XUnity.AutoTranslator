@@ -3,10 +3,11 @@
   <PropertyGroup>
     <RootNamespace>XUnity.AutoTranslator.Plugin.BepInEx_IL2CPP</RootNamespace>
     <TargetFramework>net472</TargetFramework>
-    <Version>4.13.0</Version>
+    <Version>4.18.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj" />
   </ItemGroup>
 
@@ -25,9 +26,6 @@
     </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -124,8 +124,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          AutoTranslator.SetTranslator( this );
          TranslationRegistry.SetRegistry( this );
 
-         Paths.Initialize();
-
          // because we only use harmony/MonoMod through reflection due to
          // version compatibility issues, we call this method to
          // ensure that it is loaded before we attempt to obtain
@@ -1040,7 +1038,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                var originalTexture = tti.Original.Target;
                var translatedTexture = tti.Translated;
-               if( texture == originalTexture && tti.IsTranslated )
+               if( Equals( texture, originalTexture ) && tti.IsTranslated )
                {
                   // if the texture is the original, we update the sprite
                   if( tti.TranslatedSprite != null )
@@ -1058,7 +1056,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      }
                   }
                }
-               else if( texture == translatedTexture ) // can only happen if && tti.IsTranslated
+               else if( Equals( texture, translatedTexture ) ) // can only happen if && tti.IsTranslated
                {
                   // if the texture is the translated, we do not need to do anything
                }
@@ -1115,7 +1113,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( Settings.EnableLegacyTextureLoading || !isCompatible )
                            {
-                              var newSprite = source.SetTexture( tti.GetTranslatedTexture(), sprite, isPrefixHooked );
+                              var newSprite = (Sprite)source.SetTexture( tti.GetTranslatedTexture(), sprite, isPrefixHooked );
                               if( newSprite != null )
                               {
                                  tti.TranslatedSprite = newSprite;
@@ -2332,15 +2330,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            onTextStabilized: () =>
                            {
                               // if we already have translation loaded in our _translatios dictionary, simply load it and set text
-                              string translation;
-                              if( tc.TryGetTranslation( textKey, true, false, scope, out translation ) )
+                              if( tc.TryGetTranslation( textKey, true, false, scope, out _ ) )
                               {
                                  // no need to do anything !
                               }
                               else
                               {
                                  // Lets try not to spam a service that might not be there...
-                                 var endpoint = GetTranslationEndpoint( context, true );
+                                 endpoint = GetTranslationEndpoint( context, true );
                                  if( endpoint != null )
                                  {
                                     // once the text has stabilized, attempt to look it up

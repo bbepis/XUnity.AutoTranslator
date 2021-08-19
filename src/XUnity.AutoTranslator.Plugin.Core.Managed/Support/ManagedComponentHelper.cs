@@ -375,14 +375,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
       }
 
-#warning INTERFACE CHANGED
-      public Sprite SetTexture( object ui, object texture, Sprite sprite, bool isPrefixHooked )
+      public object SetTexture( object ui, object textureObj, object spriteObj, bool isPrefixHooked )
       {
          if( ui == null ) return null;
+         var sprite = (Sprite)spriteObj;
+         var texture = (Texture2D)textureObj;
 
          var currentTexture = ui.GetTexture();
 
-         if( currentTexture != texture )
+         if( !Equals( currentTexture, texture ) )
          {
             if( Settings.EnableSpriteRendererHooking && ui is SpriteRenderer sr )
             {
@@ -534,6 +535,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          var format = texture2d.format;
          return dataType == ImageFormat.PNG
             || ( dataType == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
+      }
+
+      public int GetScreenWidth()
+      {
+         return Screen.width;
+      }
+
+      public int GetScreenHeight()
+      {
+         return Screen.height;
       }
    }
 }

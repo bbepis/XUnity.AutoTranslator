@@ -18,11 +18,16 @@ namespace UnityEngine.SceneManagement
          get;
       }
 
+#if IL2CPP
+      public static unsafe UnityAction<Scene, LoadSceneMode> sceneLoaded
+      {
+         get => throw new NotImplementedException();
+         set => throw new NotImplementedException();
+      }
+#else
       public static event UnityAction<Scene, LoadSceneMode> sceneLoaded;
+#endif
 
-      public static event UnityAction<Scene> sceneUnloaded;
-
-      public static event UnityAction<Scene, Scene> activeSceneChanged;
 
       public static Scene GetActiveScene()
       {
@@ -204,29 +209,5 @@ namespace UnityEngine.SceneManagement
       }
 
       private static extern void INTERNAL_CALL_MoveGameObjectToScene( GameObject go, ref Scene scene );
-
-      private static void Internal_SceneLoaded( Scene scene, LoadSceneMode mode )
-      {
-         if( SceneManager.sceneLoaded != null )
-         {
-            SceneManager.sceneLoaded( scene, mode );
-         }
-      }
-
-      private static void Internal_SceneUnloaded( Scene scene )
-      {
-         if( SceneManager.sceneUnloaded != null )
-         {
-            SceneManager.sceneUnloaded( scene );
-         }
-      }
-
-      private static void Internal_ActiveSceneChanged( Scene previousActiveScene, Scene newActiveScene )
-      {
-         if( SceneManager.activeSceneChanged != null )
-         {
-            SceneManager.activeSceneChanged( previousActiveScene, newActiveScene );
-         }
-      }
    }
 }

@@ -8,6 +8,10 @@ using System.Text;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
+
 namespace UnityEngine
 {
    public class Object
@@ -82,7 +86,11 @@ namespace UnityEngine
 
       public static T Instantiate<T>( T original, Transform parent, bool worldPositionStays ) where T : Object => throw new NotImplementedException();
 
+#if IL2CPP
+      public static Il2CppArrayBase<T> FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
+#else
       public static T[] FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
+#endif
 
       public static T FindObjectOfType<T>() where T : Object => throw new NotImplementedException();
 

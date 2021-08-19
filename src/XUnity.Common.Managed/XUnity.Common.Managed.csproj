@@ -6,13 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

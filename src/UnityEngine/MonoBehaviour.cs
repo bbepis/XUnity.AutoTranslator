@@ -12,6 +12,16 @@ namespace UnityEngine
 {
    public class MonoBehaviour : Behaviour
    {
+      public MonoBehaviour( IntPtr ptr )
+      {
+
+      }
+
+      public MonoBehaviour()
+      {
+
+      }
+
       public Coroutine StartCoroutine( IEnumerator routine ) => throw new NotImplementedException();
 
       public Coroutine StartCoroutine( string methodName, object value ) => throw new NotImplementedException();

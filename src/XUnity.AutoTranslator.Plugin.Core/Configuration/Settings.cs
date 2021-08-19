@@ -9,6 +9,7 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Parsing;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Shims;
 using XUnity.AutoTranslator.Plugin.Utilities;
@@ -190,9 +191,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             try
             {
-               var res = Screen.currentResolution;
-               ScreenWidth = res.width;
-               ScreenHeight = res.height;
+               ScreenWidth = ComponentHelper.Instance.GetScreenWidth();
+               ScreenHeight = ComponentHelper.Instance.GetScreenHeight();
                XuaLogger.AutoTranslator.Debug( "Screen resolution determine to be: " + ScreenWidth + "x" + ScreenHeight );
             }
             catch( Exception e )

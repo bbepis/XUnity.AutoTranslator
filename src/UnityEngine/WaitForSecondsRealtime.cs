@@ -12,7 +12,7 @@ namespace UnityEngine
 {
    public class WaitForSecondsRealtime : CustomYieldInstruction
    {
-      private float waitTime;
+      public float waitTime { get; set; }
 
       public override bool keepWaiting => Time.realtimeSinceStartup < waitTime;
 

@@ -284,7 +284,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.MaskableGraphic != null;
+         return UnityTypes.MaskableGraphic != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -323,7 +323,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.Image != null;
+         return UnityTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -356,7 +356,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.Image != null;
+         return UnityTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -389,7 +389,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.Image != null;
+         return UnityTypes.Image != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -422,7 +422,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.RawImage != null;
+         return UnityTypes.RawImage != null;
       }
 
       static MethodBase TargetMethod( object instance )

@@ -58,9 +58,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       bool HasIgnoredName( object ui );
 
-
-
-
       string GetTextureName( object texture, string fallbackName );
 
       void LoadImageEx( object texture, byte[] data, ImageFormat dataType, object originalTexture );
@@ -77,8 +74,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       object GetTexture( object ui );
 
-      void SetTexture( object ui, object texture );
+      object SetTexture( object ui, object textureObj, object spriteObj, bool isPrefixHooked );
 
       void SetAllDirtyEx( object ui );
+
+      int GetScreenWidth();
+
+      int GetScreenHeight();
    }
 }

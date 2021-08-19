@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using UnityEngine.Rendering;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
@@ -321,9 +320,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return null;
       }
 
-      public void SetTexture( object ui, object texture )
+      public object SetTexture( object ui, object texture, bool isPrefixedHooked )
       {
-
+         return null;
       }
 
       public void SetAllDirtyEx( object ui )
@@ -367,6 +366,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          var format = texture2d.format;
          return dataType == ImageFormat.PNG
             || ( dataType == ImageFormat.TGA && ( format == TextureFormat.ARGB32 || format == TextureFormat.RGBA32 || format == TextureFormat.RGB24 ) );
+      }
+
+      public object SetTexture( object ui, object textureObj, object spriteObj, bool isPrefixHooked )
+      {
+         throw new NotImplementedException();
+      }
+
+      public int GetScreenWidth()
+      {
+         return Screen.width;
+      }
+
+      public int GetScreenHeight()
+      {
+         return Screen.height;
       }
    }
 }

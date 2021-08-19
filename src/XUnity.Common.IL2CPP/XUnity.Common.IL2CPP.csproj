@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
   </ItemGroup>
 
@@ -22,9 +23,6 @@
     </Reference>
     <Reference Include="UnhollowerRuntimeLib">
       <HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

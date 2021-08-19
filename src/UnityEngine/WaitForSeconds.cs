@@ -13,7 +13,7 @@ namespace UnityEngine
    [StructLayout( LayoutKind.Sequential )]
    public sealed class WaitForSeconds : YieldInstruction
    {
-      internal float m_Seconds;
+      public float m_Seconds { get; set; }
 
       public WaitForSeconds( float seconds )
       {

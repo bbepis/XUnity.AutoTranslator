@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj" />
   </ItemGroup>
   
@@ -21,9 +22,6 @@
     </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

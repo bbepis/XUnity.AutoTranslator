@@ -1,4 +1,4 @@
-﻿using XUnity.AutoTranslator.Plugin.Core.Shim;
+﻿using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 using XUnity.Common.Support;
 

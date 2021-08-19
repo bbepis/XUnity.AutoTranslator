@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using XUnity.AutoTranslator.Plugin.Core.Shim;
+using XUnity.AutoTranslator.Plugin.Core.Shims;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {

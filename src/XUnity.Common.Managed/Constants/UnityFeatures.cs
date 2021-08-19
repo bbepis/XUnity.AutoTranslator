@@ -19,7 +19,7 @@ namespace XUnity.Common.Constants
       public static bool SupportsClipboard { get; } = false;
       public static bool SupportsCustomYieldInstruction { get; } = false;
       public static bool SupportsSceneManager { get; } = false;
-      public static bool SupportsWaitForSecondsRealtime { get; internal set; } = false;
+      public static bool SupportsWaitForSecondsRealtime { get; set; } = false;
 
       static UnityFeatures()
       {

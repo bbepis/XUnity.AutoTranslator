@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using UnhollowerRuntimeLib;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -70,9 +71,7 @@ namespace XUnity.AutoTranslator.Plugin.Shims
 
       public void RegisterSceneLoadCallback( Action<int> sceneLoaded )
       {
-         UnityAction<Scene, LoadSceneMode> action = new Action<Scene, LoadSceneMode>( ( scene, mode ) => sceneLoaded( scene.buildIndex ) );
-
-         SceneManager_add_sceneLoaded( action );
+         SceneManager_add_sceneLoaded( new Action<Scene, LoadSceneMode>( ( scene, mode ) => sceneLoaded( scene.buildIndex ) ) );
 
          //SceneManager.add_sceneLoaded(
          //   new Action<Scene, LoadSceneMode>( ( scene, mode ) => sceneLoaded( scene.buildIndex ) ) );

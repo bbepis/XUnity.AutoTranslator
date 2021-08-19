@@ -207,12 +207,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.TMP_Text != null;
+         return UnityTypes.TMP_Text != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( ClrTypes.TMP_Text, "maxVisibleCharacters" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TMP_Text, "maxVisibleCharacters" )?.GetSetMethod();
       }
 
       static void Prefix( object __instance, ref int value )

@@ -29,12 +29,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.TextArea2D != null;
+         return UnityTypes.TextArea2D != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( ClrTypes.TextArea2D, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextArea2D, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -62,12 +62,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.TextArea2D != null;
+         return UnityTypes.TextArea2D != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( ClrTypes.TextArea2D, "TextData" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextArea2D, "TextData" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -95,12 +95,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
    {
       static bool Prepare( object instance )
       {
-         return ClrTypes.TextData != null;
+         return UnityTypes.TextData != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return ClrTypes.TextData.GetConstructor( new[] { typeof( string ) } );
+         return UnityTypes.TextData.GetConstructor( new[] { typeof( string ) } );
       }
 
       static void Postfix( object __instance, string text )

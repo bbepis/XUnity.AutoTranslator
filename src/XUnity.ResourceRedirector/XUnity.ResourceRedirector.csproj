@@ -25,10 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-     <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
   </ItemGroup>
 
   <ItemGroup>

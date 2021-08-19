@@ -126,9 +126,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return Helper.GetTexture( ui );
       }
 
-      public static void SetTexture( this object ui, object texture )
+      public static object SetTexture( this object ui, object texture, object sprite, bool isPrefixHooked )
       {
-         Helper.SetTexture( ui, texture );
+         return Helper.SetTexture( ui, texture, sprite, isPrefixHooked );
       }
 
       public static void SetAllDirtyEx( this object ui )

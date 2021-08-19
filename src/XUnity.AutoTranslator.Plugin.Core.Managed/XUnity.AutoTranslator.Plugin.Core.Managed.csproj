@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
     <ProjectReference Include="..\XUnity.Common.Managed\XUnity.Common.Managed.csproj" />
     <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
@@ -22,9 +23,6 @@
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
       <HintPath>..\..\libs\MonoMod\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\libs\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
 

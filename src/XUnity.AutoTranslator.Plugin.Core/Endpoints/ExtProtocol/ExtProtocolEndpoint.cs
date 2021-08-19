@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
    /// </summary>
    public abstract class ExtProtocolEndpoint : IMonoBehaviour_Update, ITranslateEndpoint, IDisposable
    {
-      private static readonly System.Random Rng = new System.Random();
+      private static readonly Random Rng = new Random();
 
       private readonly Dictionary<Guid, ProtocolTransactionHandle> _transactionHandles = new Dictionary<Guid, ProtocolTransactionHandle>();
       private readonly object _sync = new object();
@@ -34,6 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       private bool _initializing;
       private bool _failed;
       private float _lastRequestTimestamp;
+      private string _gameRoot;
 
       /// <summary>
       /// Gets the id of the ITranslateEndpoint that is used as a configuration parameter.
@@ -93,6 +94,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// </summary>
       public virtual void Initialize( IInitializationContext context )
       {
+         _gameRoot = PathsHelper.Instance.GameRoot;
+
          string exePath = null;
          if( ConfigurationSectionName != null )
          {
@@ -134,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
                {
                   try
                   {
-                     fullPath = Path.Combine( PathsHelper.Instance.GameRoot, ExecutablePath );
+                     fullPath = Path.Combine( _gameRoot, ExecutablePath );
                   }
                   catch
                   {
@@ -257,7 +260,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
          while( _initializing && !_failed )
          {
-            var instruction = CoroutineHelper.Instance.GetWaitForSecondsRealtime( 0.2f );
+            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( 0.2f );
             if( instruction != null )
             {
                yield return instruction;
@@ -276,7 +279,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             var remainingDelay = totalDelay - timeSinceLast;
 
-            var instruction = Features.GetWaitForSecondsRealtime( remainingDelay );
+            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( remainingDelay );
             if( instruction != null )
             {
                yield return instruction;
