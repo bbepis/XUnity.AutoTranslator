@@ -7,6 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 {
    internal static class EnumerableExtensions
    {
+#if MANAGED
       public static HashSet<T> ToHashSet<T>( this IEnumerable<T> ts )
       {
          var hashSet = new HashSet<T>();
@@ -26,6 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          return hashSet;
       }
+#endif
 
       public static void AddRange<T>( this ICollection<T> collection, IEnumerable<T> values )
       {

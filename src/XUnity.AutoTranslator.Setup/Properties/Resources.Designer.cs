@@ -423,16 +423,6 @@ namespace XUnity.AutoTranslator.Setup.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] XUnity_Common_Managed {
-            get {
-                object obj = ResourceManager.GetObject("XUnity_Common_Managed", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] XUnity_ResourceRedirector {
             get {
                 object obj = ResourceManager.GetObject("XUnity_ResourceRedirector", resourceCulture);

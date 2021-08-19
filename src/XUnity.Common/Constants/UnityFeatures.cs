@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if MANAGED
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -72,3 +75,6 @@ namespace XUnity.Common.Constants
       }
    }
 }
+
+
+#endif

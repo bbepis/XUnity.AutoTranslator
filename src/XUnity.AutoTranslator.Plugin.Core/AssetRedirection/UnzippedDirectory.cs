@@ -14,7 +14,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
    internal class UnzippedDirectory : IDisposable
    {
       private static readonly char[] PathSeparators = new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
-      private static readonly string _loweredCurrentDirectory = PathsHelper.Instance.GameRoot.ToLowerInvariant();
+      private static readonly string _loweredCurrentDirectory = PathsHelper.GameRoot.ToLowerInvariant();
       private readonly string _root;
       private readonly bool _cacheNormalFiles;
       private DirectoryEntry _rootDirectory;

@@ -129,22 +129,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ezTransXP", "src\Translator
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ezTransXP.ExtProtocol", "src\Translators\ezTransXP.ExtProtocol\ezTransXP.ExtProtocol.csproj", "{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.Common.IL2CPP", "src\XUnity.Common.IL2CPP\XUnity.Common.IL2CPP.csproj", "{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.Common.Managed", "src\XUnity.Common.Managed\XUnity.Common.Managed.csproj", "{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core.Managed", "src\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj", "{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.Core.IL2CPP", "src\XUnity.AutoTranslator.Plugin.Core.IL2CPP\XUnity.AutoTranslator.Plugin.Core.IL2CPP.csproj", "{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.MelonMod", "src\XUnity.AutoTranslator.Plugin.MelonMod\XUnity.AutoTranslator.Plugin.MelonMod.csproj", "{332A2D79-680C-4641-B823-2F7DA87952E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP", "src\XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP\XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP.csproj", "{11D631E6-0376-4913-BE3F-B7D7EDC2CD72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP", "src\XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP\XUnity.AutoTranslator.Plugin.BepInEx-IL2CPP.csproj", "{11D631E6-0376-4913-BE3F-B7D7EDC2CD72}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepLTranslate.ExtProtocol", "src\Translators\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj", "{40E5D1F8-87F5-4BEF-8731-84335D4AC8C3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepLTranslate", "src\Translators\DeepLTranslate\DeepLTranslate.csproj", "{0DDB7B41-D86A-4810-8C2B-8F75DDF95E6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityEngine", "src\UnityEngine\UnityEngine.csproj", "{715ECB82-01FD-4FD1-AEDA-24EFE6391D6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityEngine", "src\UnityEngine\UnityEngine.csproj", "{715ECB82-01FD-4FD1-AEDA-24EFE6391D6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -482,22 +479,6 @@ Global
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|Any CPU.Build.0 = Release|x86
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.ActiveCfg = Release|Any CPU
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D}.Release|x86.Build.0 = Release|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Debug|x86.Build.0 = Debug|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Release|x86.ActiveCfg = Release|Any CPU
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7}.Release|x86.Build.0 = Release|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Debug|x86.Build.0 = Debug|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Release|x86.ActiveCfg = Release|Any CPU
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067}.Release|x86.Build.0 = Release|Any CPU
 		{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -601,8 +582,6 @@ Global
 		{70A12896-52AF-444C-99EE-7D8E779741CA} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{B75BB3F8-13D6-4124-BFA4-CA7EF8A92EA1} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
 		{32E7E8D4-A0F7-47E9-95CA-60E928E06F2D} = {7A01BA34-3B96-4910-AC70-462BA59417CB}
-		{E2A3F61B-94B0-4D79-A31F-76D92644D2B7} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
-		{83B82DEE-BB0D-4DCE-AF27-5BF2C8F60067} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{6FFCA691-FCD9-4A90-AF6C-5182D0545A4F} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{BF12E6EB-F4FB-4CBF-9B3B-36CCED2164B9} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}
 		{332A2D79-680C-4641-B823-2F7DA87952E5} = {0F9B38FC-4E57-4B83-AF0B-0993B8470823}

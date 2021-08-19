@@ -1,12 +1,13 @@
-﻿using System;
+﻿#if MANAGED
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System;
 using System.Linq;
 using System.Reflection;
 using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Constants
 {
-#pragma warning disable CS1591 // Really could not care less..
-
    public static class UnityTypes
    {
       // TextMeshPro
@@ -201,3 +202,5 @@ namespace XUnity.Common.Constants
       }
    }
 }
+
+#endif

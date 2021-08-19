@@ -1,7 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using UnityEngine;
+using XUnity.Common.Constants;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
+
+#if IL2CPP
+using UnhollowerRuntimeLib;
+#endif
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
@@ -10,25 +19,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// </summary>
    internal static class ClipboardHelper
    {
-      private static IClipboardHelper _instance;
+#if IL2CPP
+      private static readonly Func<Il2CppSystem.Type, int, object> GUIUtility_GetStateObject;
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      public static IClipboardHelper Instance
+      static ClipboardHelper()
       {
-         get
+         try
          {
-            if( _instance == null )
-            {
-               _instance = ActivationHelper.Create<IClipboardHelper>(
-                  typeof( ClipboardHelper ).Assembly,
-                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
-                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
-            }
-            return _instance;
+            GUIUtility_GetStateObject =
+               (Func<Il2CppSystem.Type, int, object>)ExpressionHelper.CreateTypedFastInvoke(
+                  typeof( GUIUtility ).GetMethod(
+                     "GetStateObject",
+                     BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
+                     null,
+                     new Type[] { typeof( Il2CppSystem.Type ), typeof( int ) },
+                     null
+                  ) );
          }
+         catch { }
       }
+#endif
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
@@ -57,23 +67,51 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
          var text = builder.ToString();
 
-         Instance.CopyToClipboard( text );
+         CopyToClipboard( text );
       }
-   }
 
-   /// <summary>
-   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-   /// </summary>
-   public interface IClipboardHelper
-   {
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      void CopyToClipboard( string text );
+#if MANAGED
+      public static void CopyToClipboard( string text )
+      {
+         try
+         {
+            TextEditor editor = (TextEditor)GUIUtility.GetStateObject( typeof( TextEditor ), GUIUtility.keyboardControl );
+            editor.text = text;
+            editor.SelectAll();
+            editor.Copy();
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
+         }
+      }
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      bool SupportsClipboard();
+      public static bool SupportsClipboard()
+      {
+         return UnityFeatures.SupportsClipboard;
+      }
+#endif
+
+#if IL2CPP
+      public static void CopyToClipboard( string text )
+      {
+         try
+         {
+            TextEditor editor = (TextEditor)GUIUtility_GetStateObject( Il2CppType.Of<TextEditor>(), GUIUtility.keyboardControl );
+            editor.text = text;
+            editor.SelectAll();
+            editor.Copy();
+         }
+         catch( Exception e )
+         {
+            XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
+         }
+      }
+
+      public static bool SupportsClipboard()
+      {
+         return GUIUtility_GetStateObject != null;
+      }
+#endif
    }
 }

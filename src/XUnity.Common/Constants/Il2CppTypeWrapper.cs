@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if IL2CPP
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System;
 
 namespace XUnity.Common.Constants
 {
@@ -16,3 +19,5 @@ namespace XUnity.Common.Constants
       public IntPtr ClassPointer { get; }
    }
 }
+
+#endif

@@ -19,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,18 +61,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 【アイシャドウ】カラー=[Eye Shadow] Color
-        ///【アクセサリ(スロット０１)】カラー=[Accessory 01] Color
-        ///【アクセサリ(スロット０１)】ツヤの色=[Accessory 01] Shine Color
-        ///【アクセサリ(スロット０２)】カラー=[Accessory 02] Color
-        ///【アクセサリ(スロット０２)】ツヤの色=[Accessory 02] Shine Color
-        ///【アクセサリ(スロット０３)】カラー=[Accessory 03] Color
-        ///【アクセサリ(スロット０３)】ツヤの色=[Accessory 03] Shine Color
-        ///【アクセサリ(スロット０４)】カラー=[Accessory 04] Color
-        ///【アクセサリ(スロット０４)】ツヤの色=[Accessory 04] Shine Color
-        ///【アクセサリ(スロット０５)】カラー=[Accessory 05] Color
-        ///【アクセサリ(スロット０５)】ツヤの色=[Accessory 05] Shine Color
-        ///【アクセサリ(スロット０６)】カラー=[Accessory 06] C [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to X軸=X
+        ///Y軸=Y
+        ///Z軸=Z
+        ///アイシャドウの種類=Eyeshadow Type
+        ///アイシャドウの色=Eye Shadow Color
+        ///アイシャドウの設定=Eye Shadow
+        ///アイテム=Item
+        ///アイテムリスト=Item List
+        ///アイドル=Idol
+        ///アイドルニーソックス=Idol Kneesocks
+        ///アイドルに戻す=Default Idol
+        ///アイドルパンプス=Idol Pumps
+        ///アイドルワンピ=Idol One-Piece
+        ///アイドル手袋=Idol Gloves
+        ///アイドル服=Idol Outfit
+        ///アイラインの色=Eyeliner Color
+        ///アイライン上の種類=Upper Eyeliner Type
+        ///アイライン下の種類=Lower Eyeliner Type
+        ///アウターの種類=Outerwear Type
+        ///アウトラインの幅=Outline Thickness
+        ///アウトラインの濃さ=Outline Density
+        ///アウトラインの色=Outline Color
+        ///アウトラインの色を個別に設定する=Enable Outline Color Adjustment
+        ///アクセサリ= [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string StaticTranslations {
             get {

@@ -10,9 +10,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DevelopmentDependency>True</DevelopmentDependency>
-    <TargetFramework>net35</TargetFramework>
+    <TargetFrameworks>net35;net472</TargetFrameworks>
     <Version>1.0.3</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
@@ -21,6 +26,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
   </PropertyGroup>
+
+   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+      <DefineConstants>MANAGED</DefineConstants>
+   </PropertyGroup>
+
+   <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+      <DefineConstants>IL2CPP</DefineConstants>
+   </PropertyGroup>
+   
+   <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+      <Reference Include="UnhollowerBaseLib">
+         <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
+      </Reference>
+      <Reference Include="UnhollowerRuntimeLib">
+         <HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
+      </Reference>
+      <Reference Include="Il2Cppmscorlib">
+         <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
+      </Reference>
+   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Mono.Cecil">

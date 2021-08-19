@@ -21,7 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
       {
          if( !CachedFonts.TryGetValue( size, out object font ) )
          {
-            font = FontHelper.Instance.GetTextFont( size );
+            font = FontHelper.GetTextFont( size );
             CachedFonts.Add( size, font );
          }
          return font;
@@ -34,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
             try
             {
                _hasReadTextMeshProFont = true;
-               TextMeshProOverrideFont = FontHelper.Instance.GetTextMeshProFont();
+               TextMeshProOverrideFont = FontHelper.GetTextMeshProFont();
             }
             catch( Exception e )
             {

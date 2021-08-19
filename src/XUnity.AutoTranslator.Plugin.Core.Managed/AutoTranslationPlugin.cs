@@ -420,7 +420,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal static string[] GetSupportedFonts()
       {
-         return FontHelper.Instance.GetOSInstalledFontNames();
+         return FontHelper.GetOSInstalledFontNames();
       }
 
       private void OnEndpointSelected( TranslationEndpointManager endpoint )
@@ -3352,7 +3352,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void PrintObjects()
       {
 
-         using( var stream = File.Open( Path.Combine( PathsHelper.Instance.GameRoot, "hierarchy.txt" ), FileMode.Create ) )
+         using( var stream = File.Open( Path.Combine( PathsHelper.GameRoot, "hierarchy.txt" ), FileMode.Create ) )
          using( var writer = new StreamWriter( stream ) )
          {
             foreach( var root in GetAllRoots() )

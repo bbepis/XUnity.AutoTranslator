@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\src\Translators\GoogleTranslate\GoogleTranslate.csproj" />
     <ProjectReference Include="..\..\src\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj" />
     <ProjectReference Include="..\..\src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
-    <ProjectReference Include="..\..\src\XUnity.Common.Managed\XUnity.Common.Managed.csproj" />
   </ItemGroup>
 
 </Project>

@@ -75,7 +75,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       };
 
       private readonly ITranslatedImageSource _source;
-      private WeakReference<byte[]> _weakData;
+      private XUnity.Common.Utilities.WeakReference<byte[]> _weakData;
       private byte[] _data;
 
       public TranslatedImage( string fileName, byte[] data, ITranslatedImageSource source )
@@ -101,7 +101,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else
             {
-               _weakData = WeakReference<byte[]>.Create( value );
+               _weakData = XUnity.Common.Utilities.WeakReference<byte[]>.Create( value );
             }
          }
          get
