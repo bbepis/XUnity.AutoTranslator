@@ -632,7 +632,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   var start = Time.realtimeSinceStartup;
 
-                  var spriteRenderers = GameObject.FindObjectsOfType<SpriteRenderer>();
+                  var spriteRenderers = ComponentHelper.FindObjectsOfType<SpriteRenderer>();
                   foreach( var sr in spriteRenderers )
                   {
                      // simulate a hook
@@ -655,7 +655,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void QueueNewUntranslatedForClipboard( string untranslatedText )
       {
-         if( Settings.CopyToClipboard && ClipboardHelper.Instance.SupportsClipboard() )
+         if( Settings.CopyToClipboard && ClipboardHelper.SupportsClipboard() )
          {
             // Perhaps this should be the original, but that might have unexpected consequences for external tools??
             if( !_textsToCopyToClipboard.Contains( untranslatedText ) )
@@ -2758,7 +2758,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             TranslationManager.Update();
 
-            if( ClipboardHelper.Instance.SupportsClipboard() )
+            if( ClipboardHelper.SupportsClipboard() )
             {
                CopyToClipboard();
             }
@@ -3383,7 +3383,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
          {
             // scan all textures and update
-            var textures = GameObject.FindObjectsOfType<Texture2D>();
+            var textures = ComponentHelper.FindObjectsOfType<Texture2D>();
             foreach( var texture in textures )
             {
                Texture2D t = texture;
@@ -3391,7 +3391,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             //// scan all components and set dirty
-            //var components = GameObject.FindObjectsOfType<Component>();
+            //var components = ComponentHelper.FindObjectsOfType<Component>();
             //foreach( var component in components )
             //{
             //   component.SetAllDirtyEx();
@@ -3401,7 +3401,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private IEnumerable<GameObject> GetAllRoots()
       {
-         var objects = GameObject.FindObjectsOfType<GameObject>();
+         var objects = ComponentHelper.FindObjectsOfType<GameObject>();
          foreach( var obj in objects )
          {
             if( obj.transform != null && obj.transform.parent == null )

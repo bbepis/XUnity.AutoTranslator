@@ -13,6 +13,18 @@ namespace XUnity.Common.Utilities
 {
    public static class Il2CppUtilities
    {
+      public static class Factory<TComponent>
+      {
+         public static readonly Func<IntPtr, TComponent> CreateProxyComponent =
+            (Func<IntPtr, TComponent>)ExpressionHelper.CreateTypedFastInvoke(
+               typeof( TComponent ).GetConstructor(
+                  BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
+                  null,
+                  new Type[] { typeof( IntPtr ) },
+                  null
+               ) );
+      }
+
       private static Dictionary<string, IntPtr> ourImagesMap;
 
       public static Func<object, uint> GetGarbageCollectionHandle =

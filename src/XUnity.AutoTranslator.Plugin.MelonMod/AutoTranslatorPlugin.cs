@@ -13,6 +13,7 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.MelonMod;
+using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;
 
@@ -31,13 +32,6 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          _monoBehaviour = PluginLoader.Load();
 
          AutoTranslatorBehaviour.Create();
-
-         //_monoBehaviour.Start();
-      }
-
-      public override void OnUpdate()
-      {
-         //_monoBehaviour.Update();
       }
    }
 

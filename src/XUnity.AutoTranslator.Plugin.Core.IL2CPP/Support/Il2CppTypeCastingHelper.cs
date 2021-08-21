@@ -1,5 +1,6 @@
 ﻿using System;
 using UnhollowerBaseLib;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
@@ -34,7 +35,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
                return castedObject != null;
             }
 
-            castedObject = (TObject)Activator.CreateInstance( typeof( TObject ), instancePointer );
+            
+
+            castedObject = Il2CppUtilities.Factory<TObject>.CreateProxyComponent( instancePointer );
             return castedObject != null;
          }
          else

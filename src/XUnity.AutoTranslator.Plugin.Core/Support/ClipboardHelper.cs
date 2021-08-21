@@ -19,27 +19,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// </summary>
    internal static class ClipboardHelper
    {
-#if IL2CPP
-      private static readonly Func<Il2CppSystem.Type, int, object> GUIUtility_GetStateObject;
-
-      static ClipboardHelper()
-      {
-         try
-         {
-            GUIUtility_GetStateObject =
-               (Func<Il2CppSystem.Type, int, object>)ExpressionHelper.CreateTypedFastInvoke(
-                  typeof( GUIUtility ).GetMethod(
-                     "GetStateObject",
-                     BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
-                     null,
-                     new Type[] { typeof( Il2CppSystem.Type ), typeof( int ) },
-                     null
-                  ) );
-         }
-         catch { }
-      }
-#endif
-
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
@@ -97,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
       {
          try
          {
-            TextEditor editor = (TextEditor)GUIUtility_GetStateObject( Il2CppType.Of<TextEditor>(), GUIUtility.keyboardControl );
+            TextEditor editor = (TextEditor)GUIUtility.GetStateObject( Il2CppType.Of<TextEditor>(), GUIUtility.keyboardControl );
             editor.text = text;
             editor.SelectAll();
             editor.Copy();
@@ -110,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
       public static bool SupportsClipboard()
       {
-         return GUIUtility_GetStateObject != null;
+         return UnityTypes.GUIUtility_Methods.GetStateObject != null;
       }
 #endif
    }

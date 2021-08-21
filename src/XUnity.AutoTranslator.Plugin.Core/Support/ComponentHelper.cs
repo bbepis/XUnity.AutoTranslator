@@ -1,6 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using XUnity.Common.Utilities;
+using XUnity.AutoTranslator.Plugin.Core.Extensions;
+
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
@@ -21,6 +26,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
             }
             return _instance;
          }
+      }
+
+      public static T[] FindObjectsOfType<T>()
+         where T : UnityEngine.Object
+      {
+#if IL2CPP
+         var il2cppType = Il2CppSystem.Type.internal_from_handle( IL2CPP.il2cpp_class_get_type( Il2CppClassPointerStore<T>.NativeClassPtr ) );
+         var objects = UnityEngine.Object.FindObjectsOfType( il2cppType );
+#else
+         var objects = UnityEngine.Object.FindObjectsOfType( typeof( T ) );
+#endif
+         if( objects == null ) return null;
+
+         var typedArr = new T[ objects.Length ];
+         for( int i = 0 ; i < typedArr.Length ; i++ )
+         {
+            objects[ i ].TryCastTo<T>( out var castedObj );
+            typedArr[ i ] = castedObj;
+         }
+
+         return typedArr;
       }
    }
 

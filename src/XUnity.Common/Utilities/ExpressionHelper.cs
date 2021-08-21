@@ -20,6 +20,17 @@ namespace XUnity.Common.Utilities
       public static Delegate CreateTypedFastInvoke( MethodBase method )
       {
          if( method == null ) throw new ArgumentNullException( "method" );
+         return CreateTypedFastInvokeUnchecked( method );
+      }
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="method"></param>
+      /// <returns></returns>
+      public static Delegate CreateTypedFastInvokeUnchecked( MethodBase method )
+      {
+         if( method == null ) return null;
          if( method.IsGenericMethod ) throw new ArgumentException( "The provided method must not be generic.", "method" );
 
          if( method is MethodInfo methodInfo )

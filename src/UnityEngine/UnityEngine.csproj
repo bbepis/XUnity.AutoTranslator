@@ -12,6 +12,10 @@
      <DefineConstants>IL2CPP</DefineConstants>
    </PropertyGroup>
 
+   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+      <DefineConstants>MANAGED</DefineConstants>
+   </PropertyGroup>
+
    <ItemGroup Condition="'$(TargetFramework)'=='net472'">
      <Reference Include="Il2Cppmscorlib">
        <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>

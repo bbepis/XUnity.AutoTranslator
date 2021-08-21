@@ -15,6 +15,9 @@ using UnhollowerBaseLib;
 namespace UnityEngine
 {
    public class Object
+#if IL2CPP
+      : Il2CppSystem.Object
+#endif
    {
       public string name
       {
@@ -36,7 +39,13 @@ namespace UnityEngine
 
       public static void DestroyImmediate( Object obj ) => throw new NotImplementedException();
 
+#if IL2CPP
+      public static Il2CppReferenceArray<Object> FindObjectsOfType( Il2CppSystem.Type type ) => throw new NotImplementedException();
+      public static Il2CppArrayBase<T> FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
+#else
       public static Object[] FindObjectsOfType( Type type ) => throw new NotImplementedException();
+      public static T[] FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
+#endif
 
       public static void DontDestroyOnLoad( Object target ) => throw new NotImplementedException();
 
@@ -50,11 +59,7 @@ namespace UnityEngine
 
       public static Object[] FindObjectsOfTypeAll( Type type ) => throw new NotImplementedException();
 
-      public override string ToString() => throw new NotImplementedException();
-
       public int GetInstanceID() => throw new NotImplementedException();
-
-      public override int GetHashCode() => throw new NotImplementedException();
 
       public override bool Equals( object other ) => throw new NotImplementedException();
 
@@ -85,12 +90,6 @@ namespace UnityEngine
       public static T Instantiate<T>( T original, Transform parent ) where T : Object => throw new NotImplementedException();
 
       public static T Instantiate<T>( T original, Transform parent, bool worldPositionStays ) where T : Object => throw new NotImplementedException();
-
-#if IL2CPP
-      public static Il2CppArrayBase<T> FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
-#else
-      public static T[] FindObjectsOfType<T>() where T : Object => throw new NotImplementedException();
-#endif
 
       public static T FindObjectOfType<T>() where T : Object => throw new NotImplementedException();
 
