@@ -1,4 +1,6 @@
-﻿using System;
+﻿#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

@@ -49,6 +49,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          CopyToClipboard( text );
       }
 
+      public static bool SupportsClipboard()
+      {
+         return UnityFeatures.SupportsClipboard;
+      }
+
 #if MANAGED
       public static void CopyToClipboard( string text )
       {
@@ -63,11 +68,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          {
             XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
          }
-      }
-
-      public static bool SupportsClipboard()
-      {
-         return UnityFeatures.SupportsClipboard;
       }
 #endif
 
@@ -85,11 +85,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          {
             XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
          }
-      }
-
-      public static bool SupportsClipboard()
-      {
-         return UnityTypes.GUIUtility_Methods.GetStateObject != null;
       }
 #endif
    }

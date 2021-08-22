@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\AutoTranslationPlugin.cs" Link="AutoTranslationPlugin.cs" />
     <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\FallbackTgaImageLoader.cs" Link="Textures\FallbackTgaImageLoader.cs" />
     <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\ITextureLoader.cs" Link="Textures\ITextureLoader.cs" />
     <Compile Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\Textures\LoadImageImageLoader.cs" Link="Textures\LoadImageImageLoader.cs" />

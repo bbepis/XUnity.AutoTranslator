@@ -333,7 +333,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             FromLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( FromLanguage );
             ToLanguageUsesWhitespaceBetweenWords = LanguageHelper.RequiresWhitespaceUponLineMerging( Language );
 
-            if( EnableTranslationScoping && !TranslationScopeHelper.Instance.SupportsSceneManager() )
+            if( EnableTranslationScoping && !TranslationScopeHelper.SupportsSceneManager() )
             {
                EnableTranslationScoping = false;
 

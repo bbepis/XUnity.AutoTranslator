@@ -101,7 +101,6 @@
 
   <ItemGroup>
     <Folder Include="Textures\" />
-    <Folder Include="Text\" />
   </ItemGroup>
 
 </Project>

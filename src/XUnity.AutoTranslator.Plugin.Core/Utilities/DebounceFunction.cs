@@ -20,15 +20,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       {
          if( _current != null )
          {
-            CoroutineHelper.Instance.Stop( _current );
+            CoroutineHelper.Stop( _current );
          }
 
-         _current = CoroutineHelper.Instance.Start( Run() );
+         _current = CoroutineHelper.Start( Run() );
       }
 
       private IEnumerator Run()
       {
-         yield return CoroutineHelper.Instance.CreateWaitForSeconds( _delaySeconds );
+         yield return CoroutineHelper.CreateWaitForSeconds( _delaySeconds );
 
          _callback();
 

@@ -287,15 +287,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( _currentScheduledTask != null )
             {
-               CoroutineHelper.Instance.Stop( _currentScheduledTask );
+               CoroutineHelper.Stop( _currentScheduledTask );
             }
-            _currentScheduledTask = CoroutineHelper.Instance.Start( ScheduleFileWriting() );
+            _currentScheduledTask = CoroutineHelper.Start( ScheduleFileWriting() );
          }
       }
 
       private IEnumerator ScheduleFileWriting()
       {
-         yield return CoroutineHelper.Instance.CreateWaitForSeconds( 1 );
+         yield return CoroutineHelper.CreateWaitForSeconds( 1 );
 
          _currentScheduledTask = null;
          ThreadPool.QueueUserWorkItem( SaveNewTranslationsToDisk );

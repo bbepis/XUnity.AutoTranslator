@@ -260,7 +260,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 
          while( _initializing && !_failed )
          {
-            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( 0.2f );
+            var instruction = CoroutineHelper.CreateWaitForSecondsRealtime( 0.2f );
             if( instruction != null )
             {
                yield return instruction;
@@ -279,7 +279,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
          {
             var remainingDelay = totalDelay - timeSinceLast;
 
-            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( remainingDelay );
+            var instruction = CoroutineHelper.CreateWaitForSecondsRealtime( remainingDelay );
             if( instruction != null )
             {
                yield return instruction;

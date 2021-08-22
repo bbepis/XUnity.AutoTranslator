@@ -183,7 +183,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( cache.HasAnyResizeCommands )
             {
                var segments = text.gameObject.GetPathSegments(); // TODO: Perhaps... cache these segments?????
-               var scope = TranslationScopeHelper.Instance.GetScope( ui );
+               var scope = TranslationScopeHelper.GetScope( ui );
                if( cache.TryGetUIResize( segments, scope, out var result ) )
                {
                   if( result.AutoResizeCommand != null )
@@ -434,7 +434,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var text = (Component)ui;
 
                var segments = text.gameObject.GetPathSegments();
-               var scope = TranslationScopeHelper.Instance.GetScope( ui );
+               var scope = TranslationScopeHelper.GetScope( ui );
                if( cache.TryGetUIResize( segments, scope, out var result ) )
                {
                   if( result.AutoResizeCommand != null )

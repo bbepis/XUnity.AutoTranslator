@@ -202,7 +202,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var name = texture.GetTextureName( null ); // name may be duplicate, WILL be duplicate!
                if( name == null ) return;
 
-               name += "|" + TranslationScopeHelper.Instance.GetActiveSceneId().ToString();
+               name += "|" + TranslationScopeHelper.GetActiveSceneId().ToString();
 
                var result = SetupKeyForNameWithFallback( name, texture );
 

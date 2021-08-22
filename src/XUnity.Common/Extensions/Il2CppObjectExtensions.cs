@@ -10,7 +10,7 @@ using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using XUnity.Common.Constants;
 
-namespace XUnity.Common.IL2CPP.Extensions
+namespace XUnity.Common.Extensions
 {
    public static class ObjectExtensions
    {

@@ -9,6 +9,8 @@ using System.Reflection;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
@@ -110,6 +112,16 @@ namespace XUnity.Common.Constants
       public static class GameObject_Methods
       {
          public static readonly IntPtr SetActive = Il2CppUtilities.GetIl2CppMethod( UnityTypes.GameObject?.ClassPointer, "SetActive", typeof( void ), typeof( bool ) );
+
+         public static readonly Func<GameObject, Il2CppSystem.Type, Component> GetComponent =
+            (Func<GameObject, Il2CppSystem.Type, Component>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( GameObject ).GetMethod(
+                  "GetComponent",
+                  BindingFlags.Public | BindingFlags.Instance,
+                  null,
+                  new Type[] { typeof( Il2CppSystem.Type ) },
+                  null
+               ) );
       }
 
       public static class TextMesh_Methods
@@ -167,7 +179,7 @@ namespace XUnity.Common.Constants
 
       public static class GUIUtility_Methods
       {
-         public static readonly Func<Il2CppSystem.Type, int, object> GetStateObject = (Func<Il2CppSystem.Type, int, object>)ExpressionHelper.CreateTypedFastInvoke(
+         public static readonly Func<Il2CppSystem.Type, int, object> GetStateObject = (Func<Il2CppSystem.Type, int, object>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
             typeof( GUIUtility ).GetMethod(
                "GetStateObject",
                BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
@@ -175,6 +187,19 @@ namespace XUnity.Common.Constants
                new Type[] { typeof( Il2CppSystem.Type ), typeof( int ) },
                null
             ) );
+      }
+
+      public static class SceneManager_Methods
+      {
+         public static readonly Action<UnityAction<Scene, LoadSceneMode>> add_sceneLoaded =
+            (Action<UnityAction<Scene, LoadSceneMode>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( SceneManager ).GetMethod(
+                  "add_sceneLoaded",
+                  BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic,
+                  null,
+                  new Type[] { typeof( UnityAction<Scene, LoadSceneMode> ) },
+                  null
+               ) );
       }
 
       private static Il2CppTypeWrapper FindType( string name )
@@ -198,7 +223,7 @@ namespace XUnity.Common.Constants
             }
 
             var ptr = Il2CppUtilities.GetIl2CppClass( @namespace, typeName );
-            if( ptr == System.IntPtr.Zero ) return null;
+            if( ptr == IntPtr.Zero ) return null;
 
             Type wrapperType = null;
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();

@@ -7,10 +7,10 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.IL2CPP.Text;
+using XUnity.AutoTranslator.Plugin.Core.Text;
 using XUnity.AutoTranslator.Plugin.Core.Textures;
 using XUnity.Common.Constants;
-using XUnity.Common.IL2CPP.Extensions;
+using XUnity.Common.Extensions;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
@@ -69,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 
             if( !ignoreComponentState )
             {
-               var behaviour = component.CastTo<Behaviour>();
+               component.TryCastTo<Behaviour>( out var behaviour);
                if( !go.activeInHierarchy || behaviour?.enabled == false ) // legacy "isActiveAndEnabled"
                {
                   return false;

@@ -122,7 +122,7 @@ namespace BaiduTranslate
          {
             var delay = _delay - timeSinceLast;
 
-            var instruction = CoroutineHelper.Instance.CreateWaitForSecondsRealtime( delay );
+            var instruction = CoroutineHelper.CreateWaitForSecondsRealtime( delay );
             if( instruction != null )
             {
                yield return instruction;

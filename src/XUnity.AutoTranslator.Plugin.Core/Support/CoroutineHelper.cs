@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
+using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Support
@@ -11,67 +13,53 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
    /// </summary>
    public static class CoroutineHelper
    {
-      private static ICoroutineHelper _instance;
-
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      public static ICoroutineHelper Instance
+      public static WaitForSeconds CreateWaitForSeconds( float seconds )
       {
-         get
-         {
-            if( _instance == null )
-            {
-               _instance = ActivationHelper.Create<ICoroutineHelper>(
-                  typeof( CoroutineHelper ).Assembly,
-                  "XUnity.AutoTranslator.Plugin.Core.Managed.dll",
-                  "XUnity.AutoTranslator.Plugin.Core.IL2CPP.dll" );
-            }
-            return _instance;
-         }
-         set
-         {
-            _instance = value;
-         }
+         return new WaitForSeconds( seconds );
       }
-   }
 
-   /// <summary>
-   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-   /// </summary>
-   public interface ICoroutineHelper
-   {
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <param name="coroutine"></param>
-      /// <returns></returns>
-      object Start( IEnumerator coroutine );
+      public static IEnumerator CreateWaitForSecondsRealtime( float delay )
+      {
+         // Could be bad... WaitForSecondsRealtime could be shimmed away, even if IEnumerator is supported
+         if( UnityFeatures.SupportsWaitForSecondsRealtime )
+         {
+            return GetWaitForSecondsRealtimeInternal( delay );
+         }
+         return null;
+      }
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <param name="coroutine"></param>
-      void Stop( object coroutine );
+      private static IEnumerator GetWaitForSecondsRealtimeInternal( float delay )
+      {
+         return new WaitForSecondsRealtime( delay );
+      }
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <param name="seconds"></param>
-      /// <returns></returns>
-      object CreateWaitForSeconds( float seconds );
+      public static bool SupportsCustomYieldInstruction()
+      {
+         return UnityFeatures.SupportsCustomYieldInstruction;
+      }
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <param name="seconds"></param>
-      /// <returns></returns>
-      object CreateWaitForSecondsRealtime( float seconds );
+#if IL2CPP
+      public static object Start( IEnumerator coroutine )
+      {
+         return Il2CppCoroutines.Start( coroutine );
+      }
 
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <returns></returns>
-      bool SupportsCustomYieldInstruction();
+      public static void Stop( object coroutine )
+      {
+         Il2CppCoroutines.Stop( (IEnumerator)coroutine );
+      }
+#endif
+
+#if MANAGED
+      public static object Start( IEnumerator coroutine )
+      {
+         return AutoTranslationPlugin.Current.StartCoroutine( coroutine );
+      }
+
+      public static void Stop( object coroutine )
+      {
+         AutoTranslationPlugin.Current.StopCoroutine( (Coroutine)coroutine );
+      }
+#endif
    }
 }

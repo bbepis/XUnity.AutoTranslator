@@ -1,7 +1,4 @@
-﻿#if MANAGED
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +25,11 @@ namespace XUnity.Common.Constants
       {
          try
          {
-            SupportsClipboard = UnityTypes.TextEditor?.GetProperty( "text" )?.GetSetMethod() != null;
+            SupportsClipboard = UnityTypes.TextEditor
+#if IL2CPP
+               ?.ProxyType
+#endif
+               ?.GetProperty( "text" )?.GetSetMethod() != null;
          }
          catch( Exception )
          {
@@ -48,7 +49,11 @@ namespace XUnity.Common.Constants
          {
             SupportsSceneManager = UnityTypes.Scene != null
                && UnityTypes.SceneManager != null
+#if MANAGED
                && UnityTypes.SceneManager.GetMethod("add_sceneLoaded", All) != null;
+#else
+               && UnityTypes.SceneManager_Methods.add_sceneLoaded != null;
+#endif
          }
          catch( Exception )
          {
@@ -57,7 +62,11 @@ namespace XUnity.Common.Constants
 
          try
          {
-            SupportsMouseScrollDelta = UnityTypes.Input.GetProperty( "mouseScrollDelta" ) != null;
+            SupportsMouseScrollDelta = UnityTypes.Input
+#if IL2CPP
+               ?.ProxyType
+#endif
+               ?.GetProperty( "mouseScrollDelta" ) != null;
          }
          catch( Exception )
          {
@@ -75,6 +84,3 @@ namespace XUnity.Common.Constants
       }
    }
 }
-
-
-#endif

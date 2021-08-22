@@ -100,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
       /// <returns></returns>
       public IEnumerator GetSupportedEnumerator()
       {
-         if( CoroutineHelper.Instance.SupportsCustomYieldInstruction() ) // requires Unity 5.3 or later
+         if( CoroutineHelper.SupportsCustomYieldInstruction() ) // requires Unity 5.3 or later
          {
             yield return this;
          }
@@ -108,7 +108,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
          {
             while( DetermineKeepWaiting() )
             {
-               yield return CoroutineHelper.Instance.CreateWaitForSeconds( 0.2f );
+               yield return CoroutineHelper.CreateWaitForSeconds( 0.2f );
             }
          }
       }

@@ -364,7 +364,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                AvailableBatchOperations--;
                var jobsArray = jobs.ToArray();
 
-               CoroutineHelper.Instance.Start(
+               CoroutineHelper.Start(
                   Translate(
                      untranslatedTexts.ToArray(),
                      Settings.FromLanguage,
@@ -404,7 +404,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
                   Manager.OngoingTranslations++;
 
                   if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Started: '" + unpreparedUntranslatedText + "'" );
-                  CoroutineHelper.Instance.Start(
+                  CoroutineHelper.Start(
                      Translate(
                         new[] { untranslatedText },
                         Settings.FromLanguage,
@@ -463,7 +463,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( !HasBatchLogicFailed )
             {
-               CoroutineHelper.Instance.Start( EnableBatchingAfterDelay() );
+               CoroutineHelper.Start( EnableBatchingAfterDelay() );
             }
 
             HasBatchLogicFailed = true;
@@ -576,7 +576,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( !HasBatchLogicFailed )
             {
-               CoroutineHelper.Instance.Start( EnableBatchingAfterDelay() );
+               CoroutineHelper.Start( EnableBatchingAfterDelay() );
             }
 
             HasBatchLogicFailed = true;
@@ -624,7 +624,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
       private IEnumerator EnableBatchingAfterDelay()
       {
-         yield return CoroutineHelper.Instance.CreateWaitForSeconds( 60f );
+         yield return CoroutineHelper.CreateWaitForSeconds( 60f );
 
          HasBatchLogicFailed = false;
 
@@ -812,7 +812,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
          {
             if( Settings.SimulateDelayedError )
             {
-               yield return CoroutineHelper.Instance.CreateWaitForSeconds( 1f );
+               yield return CoroutineHelper.CreateWaitForSeconds( 1f );
 
                context.FailWithoutThrowing( "Simulating delayed error. Press CTRL+ALT+NP8 to disable!", null );
             }
