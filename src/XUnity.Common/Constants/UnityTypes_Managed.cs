@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Constants
@@ -172,6 +173,52 @@ namespace XUnity.Common.Constants
       {
          public static CachedMethod SetMessageType = UnityTypes.TextExpansion?.CachedMethod( "SetMessageType" );
          public static CachedMethod SkipTypeWriter = UnityTypes.TextExpansion?.CachedMethod( "SkipTypeWriter" );
+      }
+
+      public static class Texture2D_Methods
+      {
+         public static readonly Action<Texture2D, byte[]> LoadImage =
+            (Action<Texture2D, byte[]>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( Texture2D ).GetMethod(
+                  "LoadImage",
+                  BindingFlags.Public | BindingFlags.Instance,
+                  null,
+                  new Type[] { typeof( byte[] ) },
+                  null
+               ) );
+
+         public static readonly Func<Texture2D, byte[]> EncodeToPNG =
+            (Func<Texture2D, byte[]>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( Texture2D ).GetMethod(
+                  "EncodeToPNG",
+                  BindingFlags.Public | BindingFlags.Instance,
+                  null,
+                  new Type[] { },
+                  null
+               ) );
+      }
+
+      public static class ImageConversions_Methods
+      {
+         public static readonly Action<Texture2D, byte[], bool> LoadImage =
+            (Action<Texture2D, byte[], bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion.GetMethod(
+                  "LoadImage",
+                  BindingFlags.Public | BindingFlags.Static,
+                  null,
+                  new Type[] { typeof( Texture2D ), typeof( byte[] ), typeof( bool ) },
+                  null
+               ) );
+
+         public static readonly Func<Texture2D, byte[]> EncodeToPNG =
+            (Func<Texture2D, byte[]>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion.GetMethod(
+                  "EncodeToPNG",
+                  BindingFlags.Public | BindingFlags.Static,
+                  null,
+                  new Type[] { typeof( Texture2D ) },
+                  null
+               ) );
       }
 
       private static Type FindType( string name )

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnhollowerBaseLib;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
@@ -87,6 +88,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
       public bool IsPlaceholder()
       {
          return false;
+      }
+
+      public bool IsEnabledInSettings()
+      {
+         return Settings.EnableTextMesh;
       }
    }
 }

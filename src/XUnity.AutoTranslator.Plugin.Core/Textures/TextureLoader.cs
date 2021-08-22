@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Managed.Textures;
 using XUnity.Common.Logging;
 
@@ -37,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Textures
          return false;
       }
 
-      public static void Load( object texture, byte[] data, ImageFormat imageFormat )
+      public static void Load( Texture2D texture, byte[] data, ImageFormat imageFormat )
       {
          if( Loaders.TryGetValue( imageFormat, out var loader ) )
          {

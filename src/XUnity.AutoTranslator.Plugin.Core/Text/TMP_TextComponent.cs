@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnhollowerBaseLib;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
@@ -95,6 +96,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
             ref exc );
          Il2CppException.RaiseExceptionIfNecessary( exc );
          return *(bool*)(long)UnhollowerBaseLib.IL2CPP.il2cpp_object_unbox( obj );
+      }
+
+      public bool IsEnabledInSettings()
+      {
+         return Settings.EnableTextMeshPro;
       }
    }
 }

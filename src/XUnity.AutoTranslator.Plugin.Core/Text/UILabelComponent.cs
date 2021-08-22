@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnhollowerBaseLib;
 using UnityEngine;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
@@ -85,6 +86,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
       public unsafe bool SupportsRichText()
       {
          return false;
+      }
+
+      public bool IsEnabledInSettings()
+      {
+         return Settings.EnableNGUI;
       }
    }
 }

@@ -191,8 +191,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             try
             {
-               ScreenWidth = ComponentHelper.Instance.GetScreenWidth();
-               ScreenHeight = ComponentHelper.Instance.GetScreenHeight();
+               ScreenWidth = ComponentHelper.GetScreenWidth();
+               ScreenHeight = ComponentHelper.GetScreenHeight();
                XuaLogger.AutoTranslator.Debug( "Screen resolution determine to be: " + ScreenWidth + "x" + ScreenHeight );
             }
             catch( Exception e )

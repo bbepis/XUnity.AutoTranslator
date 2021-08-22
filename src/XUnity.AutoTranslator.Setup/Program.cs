@@ -53,7 +53,6 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( managedDir, "XUnity.Common.dll" ), Resources.XUnity_Common, true );
             AddFile( Path.Combine( managedDir, "XUnity.ResourceRedirector.dll" ), Resources.XUnity_ResourceRedirector, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core, true );
-            AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.Core.Managed.dll" ), Resources.XUnity_AutoTranslator_Plugin_Core_Managed, true );
             AddFile( Path.Combine( managedDir, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
 
             var translatorsPath = Path.Combine( managedDir, "Translators" );

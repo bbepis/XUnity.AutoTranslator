@@ -202,6 +202,52 @@ namespace XUnity.Common.Constants
                ) );
       }
 
+      public static class Texture2D_Methods
+      {
+         public static readonly Action<Texture2D, Il2CppStructArray<byte>> LoadImage =
+            (Action<Texture2D, Il2CppStructArray<byte>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( Texture2D ).GetMethod(
+                  "LoadImage",
+                  BindingFlags.Public | BindingFlags.Instance,
+                  null,
+                  new Type[] { typeof( Il2CppStructArray<byte> ) },
+                  null
+               ) );
+
+         public static readonly Func<Texture2D, Il2CppStructArray<byte>> EncodeToPNG =
+            (Func<Texture2D, Il2CppStructArray<byte>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               typeof( Texture2D ).GetMethod(
+                  "EncodeToPNG",
+                  BindingFlags.Public | BindingFlags.Instance,
+                  null,
+                  new Type[] { },
+                  null
+               ) );
+      }
+
+      public static class ImageConversions_Methods
+      {
+         public static readonly Action<Texture2D, Il2CppStructArray<byte>, bool> LoadImage =
+            (Action<Texture2D, Il2CppStructArray<byte>, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion?.ProxyType?.GetMethod(
+                  "LoadImage",
+                  BindingFlags.Public | BindingFlags.Static,
+                  null,
+                  new Type[] { typeof( Texture2D ), typeof( Il2CppStructArray<byte> ), typeof( bool ) },
+                  null
+               ) );
+
+         public static readonly Func<Texture2D, Il2CppStructArray<byte>> EncodeToPNG =
+            (Func<Texture2D, Il2CppStructArray<byte>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion?.ProxyType.GetMethod(
+                  "EncodeToPNG",
+                  BindingFlags.Public | BindingFlags.Static,
+                  null,
+                  new Type[] { typeof( Texture2D ) },
+                  null
+               ) );
+      }
+
       private static Il2CppTypeWrapper FindType( string name )
       {
          Initialize();

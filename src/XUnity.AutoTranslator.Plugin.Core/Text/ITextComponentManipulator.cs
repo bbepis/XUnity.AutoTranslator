@@ -9,5 +9,4 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       void SetText( object ui, string text );
    }
-
 }

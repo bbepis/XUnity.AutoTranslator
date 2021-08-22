@@ -99,8 +99,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Textures\" />
-  </ItemGroup>
-
 </Project>

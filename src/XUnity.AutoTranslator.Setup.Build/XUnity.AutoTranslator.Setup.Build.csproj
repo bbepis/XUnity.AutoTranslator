@@ -21,7 +21,6 @@
     <ProjectReference Include="..\Translators\WatsonTranslate\WatsonTranslate.csproj" />
     <ProjectReference Include="..\Translators\YandexTranslate\YandexTranslate.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Patcher\XUnity.AutoTranslator.Patcher.csproj" />
-    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core.Managed\XUnity.AutoTranslator.Plugin.Core.Managed.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
     <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
   </ItemGroup>

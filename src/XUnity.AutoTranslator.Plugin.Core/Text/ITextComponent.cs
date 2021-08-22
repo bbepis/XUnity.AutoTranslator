@@ -2,7 +2,7 @@
 using UnityEngine;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core
+namespace XUnity.AutoTranslator.Plugin.Core.Text
 {
    internal interface ITextComponent : IGarbageCollectable
    {
@@ -15,6 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       bool SupportsRichText();
 
       bool IsPlaceholder();
+
+      bool IsEnabledInSettings();
 
       Component Component { get; }
    }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if MANAGED
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,8 +14,6 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Text
 {
-
-
    internal class DefaultTextComponentManipulator : ITextComponentManipulator
    {
       private static readonly string TextPropertyName = "text";
@@ -291,3 +291,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
    }
 
 }
+
+#endif

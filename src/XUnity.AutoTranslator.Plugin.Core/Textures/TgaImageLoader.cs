@@ -1,17 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Textures;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
 {
-   class FallbackTgaImageLoader : ITextureLoader
+   class TgaImageLoader : ITextureLoader
    {
-      public void Load( object texture, byte[] data )
+      public void Load( Texture2D texture, byte[] data )
       {
          if( texture == null && data == null ) return;
 
-         Texture2D texture2D = (Texture2D)texture;
-         var format = texture2D.format;
+         var format = texture.format;
 
          using( var stream = new MemoryStream( data ) )
          using( var binaryReader = new BinaryReader( stream ) )
@@ -21,16 +22,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
             short num2 = binaryReader.ReadInt16();
             int num3 = (int)binaryReader.ReadByte();
             binaryReader.BaseStream.Seek( 1L, SeekOrigin.Current );
-            Color[] colors = new Color[ (int)num1 * (int)num2 ];
+            Color32[] colors = new Color32[ (int)num1 * (int)num2 ];
             if( format == TextureFormat.RGB24 )
             {
                if( num3 == 32 )
                {
                   for( int index = 0; index < (int)num1 * (int)num2; ++index )
                   {
-                     float b = binaryReader.ReadByte() / 255f;
-                     float g = binaryReader.ReadByte() / 255f;
-                     float r = binaryReader.ReadByte() / 255f;
+                     byte b = binaryReader.ReadByte();
+                     byte g = binaryReader.ReadByte();
+                     byte r = binaryReader.ReadByte();
                      binaryReader.ReadByte();
                      colors[ index ] = new Color( r, g, b, 1f );
                   }
@@ -39,9 +40,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
                {
                   for( int index = 0; index < (int)num1 * (int)num2; ++index )
                   {
-                     float b = binaryReader.ReadByte() / 255f;
-                     float g = binaryReader.ReadByte() / 255f;
-                     float r = binaryReader.ReadByte() / 255f;
+                     byte b = binaryReader.ReadByte();
+                     byte g = binaryReader.ReadByte();
+                     byte r = binaryReader.ReadByte();
                      colors[ index ] = new Color( r, g, b, 1f );
                   }
                }
@@ -52,10 +53,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
                {
                   for( int index = 0; index < (int)num1 * (int)num2; ++index )
                   {
-                     float b = binaryReader.ReadByte() / 255f;
-                     float g = binaryReader.ReadByte() / 255f;
-                     float r = binaryReader.ReadByte() / 255f;
-                     float a = binaryReader.ReadByte() / 255f;
+                     byte b = binaryReader.ReadByte();
+                     byte g = binaryReader.ReadByte();
+                     byte r = binaryReader.ReadByte();
+                     byte a = binaryReader.ReadByte();
                      colors[ index ] = new Color( r, g, b, a );
                   }
                }
@@ -63,15 +64,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
                {
                   for( int index = 0; index < (int)num1 * (int)num2; ++index )
                   {
-                     float b = binaryReader.ReadByte() / 255f;
-                     float g = binaryReader.ReadByte() / 255f;
-                     float r = binaryReader.ReadByte() / 255f;
+                     byte b = binaryReader.ReadByte();
+                     byte g = binaryReader.ReadByte();
+                     byte r = binaryReader.ReadByte();
                      colors[ index ] = new Color( r, g, b, 1f );
                   }
                }
             }
-            texture2D.SetPixels( colors );
-            texture2D.Apply();
+            texture.SetPixels32( colors );
+            texture.Apply();
          }
       }
 

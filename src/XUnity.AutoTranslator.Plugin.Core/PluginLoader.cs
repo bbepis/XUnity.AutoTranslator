@@ -17,32 +17,39 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       private static bool _loaded;
       private static bool _bootstrapped;
+      private static AutoTranslationPlugin _plugin;
 
       /// <summary>
       /// Loads the plugin with the specified environment.
       /// </summary>
       /// <param name="config"></param>
-      public static void LoadWithConfig( IPluginEnvironment config )
+      public static IMonoBehaviour LoadWithConfig( IPluginEnvironment config )
       {
          if( !_loaded )
          {
             _loaded = true;
             PluginEnvironment.Current = config;
 
+#if MANAGED
             var obj = new GameObject( "___XUnityAutoTranslator" );
-            var instance = obj.AddComponent<AutoTranslationPlugin>();
+            _plugin = obj.AddComponent<AutoTranslationPlugin>();
             GameObject.DontDestroyOnLoad( obj );
+#else
+            _plugin = new AutoTranslationPlugin();
+#endif
          }
+         return _plugin;
       }
 
       /// <summary>
       /// Loads the plugin with default environment.
       /// </summary>
-      public static void Load()
+      public static IMonoBehaviour Load()
       {
-         LoadWithConfig( new DefaultPluginEnvironment( true ) );
+         return LoadWithConfig( new DefaultPluginEnvironment( true ) );
       }
 
+#if MANAGED
       /// <summary>
       /// Loads the plugin in a delayed fashion.
       /// </summary>
@@ -60,19 +67,20 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          Load();
       }
-   }
 
-   internal class Bootstrapper : MonoBehaviour
-   {
-      public event Action Destroyed = delegate { };
+      internal class Bootstrapper : MonoBehaviour
+      {
+         public event Action Destroyed = delegate { };
 
-      void Start()
-      {
-         Destroy( gameObject );
+         void Start()
+         {
+            Destroy( gameObject );
+         }
+         void OnDestroy()
+         {
+            Destroyed?.Invoke();
+         }
       }
-      void OnDestroy()
-      {
-         Destroyed?.Invoke();
-      }
+#endif
    }
 }
