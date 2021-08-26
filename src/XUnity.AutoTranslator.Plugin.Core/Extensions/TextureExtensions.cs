@@ -25,6 +25,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool IsKnownImageType( this object ui )
       {
+         if( ui == null ) return false;
+
          var type = ui.GetType();
 
          return ( ui is Material || ui is SpriteRenderer )

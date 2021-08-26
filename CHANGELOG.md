@@ -1,4 +1,7 @@
-﻿### 4.18.0
+﻿### 4.18.1
+ * BUG FIX - Fixed an unhandled exception that could occur during hook callbacks
+
+### 4.18.0
  * FEATURE - Improved AutoResize command to enable min/max font size control
  * FEATURE - Added translation file directive allowing control of tranlations/resizing based on resolution size
  * FEATURE - Added new '_Postprocessors.txt' file that can make substitutions to the text returned from the translation endpoint
