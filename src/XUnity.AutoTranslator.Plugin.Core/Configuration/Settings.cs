@@ -109,6 +109,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool TextGetterCompatibilityMode;
       public static TextPostProcessing RomajiPostProcessing;
       public static TextPostProcessing TranslationPostProcessing;
+      public static TextPostProcessing RegexPostProcessing;
       public static bool ForceMonoModHooks;
       public static bool CacheRegexPatternResults;
       public static bool CacheRegexLookups;
@@ -160,9 +161,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
 
-      internal static int ScreenWidth;
-      internal static int ScreenHeight;
-
       public static void Configure()
       {
          try
@@ -191,10 +189,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             try
             {
-               var res = Screen.currentResolution;
-               ScreenWidth = res.width;
-               ScreenHeight = res.height;
-               XuaLogger.AutoTranslator.Debug( "Screen resolution determine to be: " + ScreenWidth + "x" + ScreenHeight );
+               XuaLogger.AutoTranslator.Debug( "Screen resolution determine to be: " + Screen.width + "x" + Screen.height );
             }
             catch( Exception e )
             {
@@ -243,6 +238,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             GameLogTextPaths.RemoveWhere( x => !x.StartsWith( "/" ) ); // clean up to ensure no 'empty' entries
             RomajiPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RomajiPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.RemoveApostrophes | TextPostProcessing.ReplaceHtmlEntities );
             TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.ReplaceHtmlEntities );
+            RegexPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RegexPostProcessing", TextPostProcessing.None );
             CacheRegexPatternResults = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexPatternResults", false );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", false );

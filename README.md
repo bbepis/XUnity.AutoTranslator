@@ -293,6 +293,7 @@ TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Gett
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex;ReplaceHtmlEntities ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
+RegexPostProcessing=None         ;Indicates what type of post processing to perform on the capture groups of regexes. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
 CacheRegexPatternResults=False   ;Indicates whether or not the complete result of regex-splitted translations should be output to the specified OutputFile
@@ -638,6 +639,9 @@ So what would this regex split? It would split strings like this:
 The group(s) `(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?` matches the text inside the `[]`. As you can see there are two groups. The first is requried and represents the text. The second is optional and represents the plus-/minus sign and number that comes after.
 
 The group `(?<after>[\s\S]+)` matches whatever comes after. Because of this, it will attempt to translate that text like any other, and that may flow directly back into this splitter regex.
+
+#### Regex Post Processing
+Using the configuration option `RegexPostProcessing`, it is also possible to apply post processing the to the groups of a regex. For `sr:` regexes they are only applied to groups where the identifier name ends in `_i`.
 
 ### UI Font Resizing
 It is also possible to manually control the font size of text components. This is useful when the translated text uses more space than the untranslated text.

@@ -1,4 +1,8 @@
-﻿### 4.18.1
+﻿### 4.19.0
+ * FEATURE - Added RegexPostProcessing configuration option
+ * BUG FIX - Fixed bug related to reload translations after changing screen size
+
+### 4.18.1
  * BUG FIX - Fixed an unhandled exception that could occur during hook callbacks
 
 ### 4.18.0

@@ -1416,6 +1416,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( !match.Success ) continue;
 
                      value = match.Result( regex.Translation );
+                     value = RomanizationHelper.PostProcess( value, Settings.RegexPostProcessing );
 
                      if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, value, false, TranslationType.Full, scope );
@@ -1448,6 +1449,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      if( !match.Success ) continue;
 
                      value = match.Result( regex.Translation );
+                     value = RomanizationHelper.PostProcess( value, Settings.RegexPostProcessing );
 
                      if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Info( $"Regex lookup: '{key.TemplatedOriginal_Text}' => '{value}'" );
                      AddTranslationToCache( key.TemplatedOriginal_Text, value, Settings.CacheRegexLookups, TranslationType.Full, TranslationScopes.None );
