@@ -1,4 +1,7 @@
-﻿### 4.19.0
+﻿### 4.20.0
+ * FEATURE - Added TMP_Overflow and TMP_Alignment resize commands
+
+### 4.19.0
  * FEATURE - Added RegexPostProcessing configuration option
  * BUG FIX - Fixed bug related to reload translations after changing screen size
 

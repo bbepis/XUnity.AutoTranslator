@@ -673,6 +673,10 @@ The following types of commands exists:
    * `UGUI_HorizontalOverflow(string mode)` - possible values: [wrap, overflow]
  * Commands that control vertical overflow (UGUI only):
    * `UGUI_VerticalOverflow(string mode)` - possible values: [truncate, overflow]
+ * Commands to control overflow (TMP only):
+   * `TMP_Overflow(string mode)` - [possible values](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/api/TMPro.TextOverflowModes.html)
+ * Commands to control text alignment (TMP only):
+   * `TMP_Alignment(string mode)` - [possible values](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/api/TMPro.TextAlignmentOptions.html)
 
 But stop you say! How would I determine the path to use? This plugin provides no way to easily determine this, but there are other plugins that will allow you to do this.
 

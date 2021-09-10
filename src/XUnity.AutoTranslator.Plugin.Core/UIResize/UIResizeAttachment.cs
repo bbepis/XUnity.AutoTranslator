@@ -30,7 +30,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                typeof(UGUI_ChangeLineSpacing),
                typeof(UGUI_ChangeLineSpacingByPercentage),
                typeof(UGUI_HorizontalOverflow),
-               typeof(UGUI_VerticalOverflow)
+               typeof(UGUI_VerticalOverflow),
+               typeof(TMP_Overflow),
+               typeof(TMP_Alignment),
             };
 
             //var commands = typeof( AutoTranslationPlugin ).Assembly.GetTypes()
@@ -119,6 +121,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
                   {
                      result.VerticalOverflowCommand = verticalOverflowCommand;
                      result.IsVerticalOverflowCommandScoped = scope != TranslationScopes.None;
+                  }
+
+                  if( resizeCommand is ITMP_OverflowMode overflowCommand )
+                  {
+                     result.OverflowCommand = overflowCommand;
+                     result.IsOverflowCommandScoped = scope != TranslationScopes.None;
+                  }
+
+                  if( resizeCommand is ITMP_Alignment alignmentCommand )
+                  {
+                     result.AlignmentCommand = alignmentCommand;
+                     result.IsAlignmentCommandScoped = scope != TranslationScopes.None;
                   }
                }
                else

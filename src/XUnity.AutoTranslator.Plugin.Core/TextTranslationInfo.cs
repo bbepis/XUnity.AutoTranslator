@@ -33,7 +33,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
    internal class TextTranslationInfo
    {
       private Action<object> _unresizeFont;
-      private Action<object> _unresize;
       private Action<object> _unfont;
       private HashSet<string> _redirectedTranslations;
 
@@ -437,9 +436,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             ClrTypes.UILabel_Properties.MultiLine?.Set( ui, true );
             ClrTypes.UILabel_Properties.OverflowMethod?.Set( ui, 0 );
 
-            if( _unresize == null )
+            if( _unresizeFont == null )
             {
-               _unresize = g =>
+               _unresizeFont = g =>
                {
                   ClrTypes.UILabel_Properties.UseFloatSpacing?.Set( g, useFloatSpacingPropertyValue );
                   ClrTypes.UILabel_Properties.SpacingX?.Set( g, spacingXPropertyValue );
@@ -452,30 +451,61 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var overflowModeProperty = type.CachedProperty( "overflowMode" );
             var originalOverflowMode = overflowModeProperty?.Get( ui );
-
-            // ellipsis (1) works
-            // masking (2) has a tendency to break in some versions of TMP
-            // truncate (3) works
-            if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
-            {
-               overflowModeProperty.Set( ui, 3 );
-
-               _unresize = g =>
-               {
-                  overflowModeProperty.Set( g, 2 );
-               };
-            }
+            bool changedOverflow = false;
+            bool isUntouched = _unresizeFont == null;
 
             if( cache.HasAnyResizeCommands )
             {
-               bool isUntouched = _unresizeFont == null;
-
                var text = (Component)ui;
 
                var segments = text.gameObject.GetPathSegments();
                var scope = TranslationScopeProvider.GetScope( ui );
                if( cache.TryGetUIResize( segments, scope, out var result ) )
                {
+                  if( result.OverflowCommand != null )
+                  {
+                     changedOverflow = true;
+                     if( overflowModeProperty != null )
+                     {
+                        var newOverflowMode = result.OverflowCommand.GetMode();
+                        if( newOverflowMode.HasValue )
+                        {
+                           overflowModeProperty.Set( ui, newOverflowMode );
+
+                           if( isUntouched )
+                           {
+                              _unresizeFont = g =>
+                              {
+                                 overflowModeProperty.Set( g, originalOverflowMode );
+                              };
+                           }
+                        }
+                     }
+                  }
+
+                  if( result.AlignmentCommand != null )
+                  {
+                     var alignmentProperty = type.CachedProperty( "alignment" );
+                     if( alignmentProperty != null )
+                     {
+                        var alignmentValue = alignmentProperty.Get( ui );
+                        var newAlignmentValue = result.AlignmentCommand.GetMode();
+
+                        if( newAlignmentValue.HasValue )
+                        {
+                           alignmentProperty.Set( ui, newAlignmentValue.Value );
+
+                           if( isUntouched )
+                           {
+                              _unresizeFont += g =>
+                              {
+                                 alignmentProperty.Set( g, alignmentValue );
+                              };
+                           }
+                        }
+                     }
+                  }
+
                   if( result.AutoResizeCommand != null )
                   {
                      var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
@@ -560,15 +590,31 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   }
                }
             }
+
+            if( !changedOverflow )
+            {
+               // ellipsis (1) works
+               // masking (2) has a tendency to break in some versions of TMP
+               // truncate (3) works
+               if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
+               {
+                  overflowModeProperty.Set( ui, 3 );
+
+                  if( isUntouched )
+                  {
+                     _unresizeFont = g =>
+                     {
+                        overflowModeProperty.Set( g, 2 );
+                     };
+                  }
+               }
+            }
          }
       }
 
       public void UnresizeUI( object graphic )
       {
          if( graphic == null ) return;
-
-         _unresize?.Invoke( graphic );
-         _unresize = null;
 
          _unresizeFont?.Invoke( graphic );
          _unresizeFont = null;
