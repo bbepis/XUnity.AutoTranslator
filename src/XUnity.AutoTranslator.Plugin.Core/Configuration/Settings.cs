@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly string EnglishLanguage = "en";
       public static readonly string Romaji = "romaji";
       public static readonly int MaxErrors = 5;
-      public static readonly float ClipboardDebounceTime = 0.3f;
+      public static readonly float ClipboardDebounceTime = 0.25f;
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
       public static readonly int MaxUnstartedJobs = 4000;
       public static readonly float IncreaseBatchOperationsEvery = 30;
