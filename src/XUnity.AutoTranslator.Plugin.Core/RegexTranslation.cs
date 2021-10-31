@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             startIdx++;
             var endIdx = key.LastIndexOf( '"' );
-            if( endIdx != startIdx )
+            if( endIdx != startIdx - 1 )
             {
                key = key.Substring( startIdx, endIdx - startIdx );
             }
@@ -46,7 +46,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             startIdx++;
             var endIdx = value.LastIndexOf( '"' );
-            if( endIdx != startIdx )
+            if( endIdx != startIdx - 1)
             {
                value = value.Substring( startIdx, endIdx - startIdx );
             }
