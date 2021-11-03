@@ -79,6 +79,8 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+      public static bool LogCallbackOrder { get; set; }
+
       /// <summary>
       /// Initializes the Resource Redirector.
       /// </summary>
@@ -1287,17 +1289,19 @@ namespace XUnity.ResourceRedirector
       private static void LogEventRegistration( string eventType, IEnumerable callbacks )
       {
          XuaLogger.ResourceRedirector.Debug( $"Registered new callback for {eventType}." );
-         LogCallbackOrder( eventType, callbacks );
+         LogNewCallbackOrder( eventType, callbacks );
       }
 
       private static void LogEventUnregistration( string eventType, IEnumerable callbacks )
       {
          XuaLogger.ResourceRedirector.Debug( $"Unregistered callback for {eventType}." );
-         LogCallbackOrder( eventType, callbacks );
+         LogNewCallbackOrder( eventType, callbacks );
       }
 
-      private static void LogCallbackOrder( string eventType, IEnumerable callbacks )
+      private static void LogNewCallbackOrder( string eventType, IEnumerable callbacks )
       {
+         if( !LogCallbackOrder ) return;
+
          XuaLogger.ResourceRedirector.Debug( $"New callback order for {eventType}:" );
          foreach( var redirection in callbacks )
          {

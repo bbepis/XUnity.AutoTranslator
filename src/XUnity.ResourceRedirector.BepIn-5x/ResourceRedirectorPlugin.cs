@@ -17,11 +17,20 @@ namespace XUnity.ResourceRedirector.BepIn_5x
       [Description( "Indicates whether or not all loaded resources should be logged to the console. Prepare for spam if enabled." )]
       public ConfigWrapper<bool> LogAllLoadedResources { get; set; }
 
+      [Category( "Settings" )]
+      [DisplayName( "Log callback order" )]
+      [Description( "After registering a new callback, list all callbacks for a given event in their firing order. Prepare for spam if enabled." )]
+      public ConfigWrapper<bool> LogCallbackOrder { get; set; }
+
       void Awake()
       {
          LogAllLoadedResources = Config.Wrap( new ConfigDefinition( "General", "LogAllLoadedResources" ), false );
          ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
          LogAllLoadedResources.SettingChanged += ( s, e ) => ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;
+
+         LogCallbackOrder = Config.Wrap( new ConfigDefinition( "General", "LogCallbackOrder" ), false );
+         ResourceRedirection.LogCallbackOrder = LogCallbackOrder.Value;
+         LogCallbackOrder.SettingChanged += ( s, e ) => ResourceRedirection.LogCallbackOrder = LogCallbackOrder.Value;
 
          Config.ConfigReloaded += Config_ConfigReloaded;
       }
