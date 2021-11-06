@@ -1,4 +1,7 @@
-﻿### 1.2.0
+﻿### 1.2.1
+ * MISC - Improved logging statements for redirection subscriptions allowing for less spam
+
+### 1.2.0
  * FEATURE - Support callbacks for asset bundles loaded from streams
 
 ### 1.1.3

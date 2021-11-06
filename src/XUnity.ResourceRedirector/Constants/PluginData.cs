@@ -23,6 +23,6 @@ namespace XUnity.ResourceRedirector.Constants
       /// <summary>
       /// Gets the version of the plugin.
       /// </summary>
-      public const string Version = "1.2.0";
+      public const string Version = "1.2.1";
    }
 }

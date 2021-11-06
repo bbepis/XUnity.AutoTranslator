@@ -19,11 +19,14 @@ namespace XUnity.ResourceRedirector
       {
          Callback = callback;
          Priority = priority;
+         TargetType = callback.Target?.GetType();
       }
 
       public TCallback Callback { get; }
 
       public int Priority { get; }
+
+      public Type TargetType { get; set; }
 
       public bool IsBeingCalled { get; set; }
 
@@ -51,7 +54,7 @@ namespace XUnity.ResourceRedirector
 
       public override string ToString()
       {
-         return "[" + Priority + "] " + Callback.Method.DeclaringType?.Name + "." + Callback.Method?.Name;
+         return "[" + Priority + "] " + ( TargetType?.Name ?? Callback.Method.DeclaringType?.Name ) + "." + Callback.Method?.Name;
       }
    }
 }

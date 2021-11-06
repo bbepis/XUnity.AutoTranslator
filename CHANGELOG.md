@@ -1,4 +1,7 @@
-﻿### 4.20.0
+﻿### 4.20.1
+ * Performance improvements for IMGUI translations
+
+### 4.20.0
  * FEATURE - Added TMP_Overflow and TMP_Alignment resize commands
 
 ### 4.19.0
