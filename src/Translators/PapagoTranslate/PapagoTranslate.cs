@@ -101,15 +101,20 @@ namespace PapagoTranslate
                text ) );
 
          // create token
-         var timestamp = Math.Truncate( DateTime.Now.Subtract( DateTime.MinValue.AddYears( 1969 ) ).TotalMilliseconds );
-         var key = Encoding.UTF8.GetBytes( _version );
-         var data = Encoding.UTF8.GetBytes( $"{UUID}\n{request.Address}\n{timestamp}" );
-         var token = Convert.ToBase64String( new HMACMD5( key ).ComputeHash( data ) );
+         //var timestamp = Math.Truncate( DateTime.Now.Subtract( DateTime.MinValue.AddYears( 1969 ) ).TotalMilliseconds );
+         //var key = Encoding.UTF8.GetBytes( _version );
+         //var data = Encoding.UTF8.GetBytes( $"{UUID}\n{request.Address}\n{timestamp}" );
+         //var token = Convert.ToBase64String( new HMACMD5( key ).ComputeHash( data ) );
 
          // set required headers
-         request.Headers[ "Authorization" ] = $"PPG {UUID}:{token}";
+         //request.Headers[ "Authorization" ] = $"PPG {UUID}:{token}";
+         //request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
+         //request.Headers[ "Timestamp" ] = timestamp.ToString();
+	 
+	 // temporary fix
+         request.Headers[ "Authorization" ] = "PPG 5260b88d-0520-4eed-945f-f38ec8bf8818:/g6piMaLCnK9WbYddSkMFA==";
          request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
-         request.Headers[ "Timestamp" ] = timestamp.ToString();
+         request.Headers[ "Timestamp" ] = "1638606550669";
 
          context.Complete( request );
 
