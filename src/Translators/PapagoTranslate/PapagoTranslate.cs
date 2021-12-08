@@ -25,7 +25,7 @@ namespace PapagoTranslate
       private static readonly string UrlBase = "https://papago.naver.com";
       private static readonly string UrlN2MT = "/apis/n2mt/translate"; // Neural Machine Translation
       private static readonly string UrlNSMT = "/apis/nsmt/translate"; // Statistical Machine Translation
-      private static readonly string FormUrlEncodedTemplate = "honorific=false&source={0}&target={1}&text={2}";
+      private static readonly string FormUrlEncodedTemplate = "honorific=false&source={0}&target={1}&text={2}&instant=true&dict=false";
       private static readonly Random RandomNumbers = new Random();
       private static readonly Guid UUID = Guid.NewGuid();
       private static readonly Regex PatternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Singleline );
@@ -112,8 +112,9 @@ namespace PapagoTranslate
          //request.Headers[ "Timestamp" ] = timestamp.ToString();
 	 
 	 // temporary fix
+	 request.Headers[ "User-Agent" ] = "Mozilla/5.0 (X11; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0";
+         request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded";
          request.Headers[ "Authorization" ] = "PPG 5260b88d-0520-4eed-945f-f38ec8bf8818:/g6piMaLCnK9WbYddSkMFA==";
-         request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
          request.Headers[ "Timestamp" ] = "1638606550669";
 
          context.Complete( request );
