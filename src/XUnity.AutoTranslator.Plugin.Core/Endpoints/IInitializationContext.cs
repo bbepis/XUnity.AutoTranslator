@@ -61,5 +61,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// Gets the destination language that the plugin is configured with.
       /// </summary>
       string DestinationLanguage { get; }
+
+      /// <summary>
+      /// Disables the spam checks for this endpoint.
+      /// </summary>
+      void DisableSpamChecks();
+
+      /// <summary>
+      /// Sets the translation delay.
+      /// </summary>
+      /// <param name="delayInSeconds">The translation delay in seconds. Should not be lower than 0.1 seconds.</param>
+      void SetTranslationDelay( float delayInSeconds );
    }
 }

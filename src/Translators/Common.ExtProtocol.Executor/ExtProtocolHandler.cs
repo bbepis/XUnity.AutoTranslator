@@ -42,75 +42,85 @@ namespace Http.ExtProtocol.Executor
 
       public async Task RunAsync()
       {
-         var usedIds = new HashSet<Guid>();
-
-         using( var stdout = Console.OpenStandardOutput() )
-         using( var writer = new StreamWriter( stdout ) )
-         using( var stdin = Console.OpenStandardInput() )
-         using( var reader = new StreamReader( stdin ) )
+         try
          {
-            writer.AutoFlush = true;
+            var usedIds = new HashSet<Guid>();
 
-            while( true )
+            using( var stdout = Console.OpenStandardOutput() )
+            using( var writer = new StreamWriter( stdout ) )
+            using( var stdin = Console.OpenStandardInput() )
+            using( var reader = new StreamReader( stdin ) )
             {
-               var receivedPayload = reader.ReadLine();
-               if( string.IsNullOrEmpty( receivedPayload ) ) return;
+               writer.AutoFlush = true;
 
-               var message = ExtProtocolConvert.Decode( receivedPayload );
-               if( message == null ) return;
-               if( !usedIds.Add( message.Id ) ) return;
-
-               if( message is ConfigurationMessage configurationMessage )
+               while( true )
                {
-                  Endpoint.Initialize( configurationMessage.Config );
-               }
-               else if( message is TranslationRequest translationMessage )
-               {
-                  var context = new TranslationContext( translationMessage.UntranslatedTextInfos, translationMessage.SourceLanguage, translationMessage.DestinationLanguage );
-                  try
-                  {
-                     await Endpoint.Translate( context );
-                  }
-                  catch( Exception e )
-                  {
-                     context.FailWithoutThrowing( "An error occurred in the pipeline.", e );
-                  }
+                  var receivedPayload = reader.ReadLine();
+                  if( string.IsNullOrEmpty( receivedPayload ) ) return;
 
-                  ProtocolMessage response;
-                  if( !string.IsNullOrEmpty( context.ErrorMessage ) || context.Error != null )
+                  var message = ExtProtocolConvert.Decode( receivedPayload );
+                  if( message == null ) return;
+                  if( !usedIds.Add( message.Id ) ) return;
+
+                  if( message is ConfigurationMessage configurationMessage )
                   {
-                     string errorMessage = context.ErrorMessage;
-                     if( context.Error != null )
+                     Endpoint.Initialize( configurationMessage.Config );
+                  }
+                  else if( message is TranslationRequest translationMessage )
+                  {
+                     var context = new TranslationContext( translationMessage.UntranslatedTextInfos, translationMessage.SourceLanguage, translationMessage.DestinationLanguage );
+                     try
                      {
-                        if( !string.IsNullOrEmpty( errorMessage ) )
-                        {
-                           errorMessage += Environment.NewLine;
-                        }
-                        errorMessage += context.Error.ToString();
+                        await Endpoint.Translate( context );
+                     }
+                     catch( Exception e )
+                     {
+                        context.FailWithoutThrowing( "An error occurred in the pipeline.", e );
                      }
 
-                     response = new TranslationError
+                     ProtocolMessage response;
+                     if( !string.IsNullOrEmpty( context.ErrorMessage ) || context.Error != null )
                      {
-                        Id = translationMessage.Id,
-                        Reason = errorMessage
-                     };
+                        string errorMessage = context.ErrorMessage;
+                        if( context.Error != null )
+                        {
+                           if( !string.IsNullOrEmpty( errorMessage ) )
+                           {
+                              errorMessage += Environment.NewLine;
+                           }
+                           errorMessage += context.Error.ToString();
+                        }
+
+                        response = new TranslationError
+                        {
+                           Id = translationMessage.Id,
+                           Reason = errorMessage
+                        };
+                     }
+                     else
+                     {
+                        response = new TranslationResponse
+                        {
+                           Id = translationMessage.Id,
+                           TranslatedTexts = context.TranslatedTexts
+                        };
+                     }
+
+                     var translatedPayload = ExtProtocolConvert.Encode( response );
+                     writer.WriteLine( translatedPayload );
                   }
                   else
                   {
-                     response = new TranslationResponse
-                     {
-                        Id = translationMessage.Id,
-                        TranslatedTexts = context.TranslatedTexts
-                     };
+                     return;
                   }
-
-                  var translatedPayload = ExtProtocolConvert.Encode( response );
-                  writer.WriteLine( translatedPayload );
                }
-               else
-               {
-                  return;
-               }
+            }
+         }
+         finally
+         {
+            if( Endpoint is IDisposable disposable )
+            {
+               disposable.Dispose();
             }
          }
       }

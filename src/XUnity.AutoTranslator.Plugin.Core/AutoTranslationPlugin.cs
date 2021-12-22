@@ -562,7 +562,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context, untranslatedTextContext, checkOtherEndpoints, saveResultGlobally, isTranslatable, allowFallback );
          if( added != null && isTranslatable && checkSpam && !( endpoint.Endpoint is PassthroughTranslateEndpoint ) )
          {
-            SpamChecker.PerformChecks( key.TemplatedOriginal_Text_FullyTrimmed );
+            SpamChecker.PerformChecks( key.TemplatedOriginal_Text_FullyTrimmed, endpoint );
          }
       }
 
@@ -2284,11 +2284,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
+                  var delay = endpoint?.TranslationDelay ?? Settings.DefaultTranslationDelay;
+                  var retries = endpoint?.MaxRetries ?? Settings.DefaultMaxRetries;
+
                   StartCoroutine(
                      WaitForTextStablization(
                         ui: ui,
-                        delay: 0.9f, // 0.9 second to prevent '1 second tickers' from getting translated
-                        maxTries: 60, // 50 tries, about 1 minute
+                        delay: delay, // 0.9 second to prevent '1 second tickers' from getting translated
+                        maxTries: retries, // 60 tries, about 1 minute
                         currentTries: 0,
                         onMaxTriesExceeded: () =>
                         {
@@ -2304,10 +2307,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else if( allowStartTranslationLater ) // this should only be called for immediate UI translation, theoreticalaly
          {
+            var delay = endpoint?.TranslationDelay ?? Settings.DefaultTranslationDelay;
+
             StartCoroutine(
                WaitForTextStablization(
                   textKey: textKey,
-                  delay: 0.9f,
+                  delay: delay,
                   onTextStabilized: () =>
                   {
                               // if we already have translation loaded in our _translatios dictionary, simply load it and set text

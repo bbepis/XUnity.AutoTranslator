@@ -54,9 +54,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             var httpSecurity = new HttpSecurity();
-            var context = new InitializationContext( httpSecurity, Settings.FromLanguage, Settings.Language );
 
-            CreateEndpoints( go, context );
+            CreateEndpoints( go, httpSecurity );
 
             AllEndpoints = AllEndpoints
                .OrderBy( x => x.Error != null )
@@ -132,7 +131,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void CreateEndpoints( GameObject go, InitializationContext context )
+      public void CreateEndpoints( GameObject go, HttpSecurity httpSecurity )
       {
          if( Settings.FromLanguage != Settings.Language )
          {
@@ -143,7 +142,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             foreach( var type in dynamicTypes )
             {
-               AddEndpoint( go, context, type );
+               AddEndpoint( go, httpSecurity, type );
             }
          }
          else
@@ -155,7 +154,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void AddEndpoint( GameObject go, InitializationContext context, Type type )
+      private void AddEndpoint( GameObject go, HttpSecurity httpSecurity, Type type )
       {
          ITranslateEndpoint endpoint;
          try
@@ -178,15 +177,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return;
          }
 
+         var context = new InitializationContext( httpSecurity, Settings.FromLanguage, Settings.Language );
          try
          {
             endpoint.Initialize( context );
-            var manager = new TranslationEndpointManager( endpoint, null );
+            var manager = new TranslationEndpointManager( endpoint, null, context );
             RegisterEndpoint( manager );
          }
          catch( Exception e )
          {
-            var manager = new TranslationEndpointManager( endpoint, e );
+            var manager = new TranslationEndpointManager( endpoint, e, context );
             RegisterEndpoint( manager );
          }
       }

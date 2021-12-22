@@ -40,6 +40,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float Timeout = 150.0f;
       public static string RedirectedResourcesPath;
       public static readonly int MaxImguiKeyCacheCount = 10000;
+      public static readonly float DefaultTranslationDelay = 0.9f;
+      public static readonly int DefaultMaxRetries = 67;
 
       public static Dictionary<string, string> Replacements = new Dictionary<string, string>();
       public static Dictionary<string, string> Preprocessors = new Dictionary<string, string>();

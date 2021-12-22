@@ -21,6 +21,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
 
          SourceLanguage = sourceLanguage;
          DestinationLanguage = destinationLanguage;
+         SpamChecksEnabled = true;
+         TranslationDelay = Settings.DefaultTranslationDelay;
       }
 
       /// <summary>
@@ -33,14 +35,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// </summary>
       public string DestinationLanguage { get; }
 
-      [Obsolete("This property is not reliable.", true)]
+      [Obsolete( "This property is not reliable.", true )]
       public string PluginDirectory => Settings.TranslatorsPath;
 
       public string TranslatorDirectory => Settings.TranslatorsPath;
 
+      public bool SpamChecksEnabled { get; private set; }
+
+      public float TranslationDelay { get; private set; }
+
       public void DisableCertificateChecksFor( params string[] hosts )
       {
          _security.EnableSslFor( hosts );
+      }
+
+      public void DisableSpamChecks()
+      {
+         SpamChecksEnabled = false;
       }
 
       public T GetOrCreateSetting<T>( string section, string key, T defaultValue )
@@ -56,6 +67,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       public void SetSetting<T>( string section, string key, T value )
       {
          PluginEnvironment.Current.Preferences.Set( section, key, value );
+      }
+
+      public void SetTranslationDelay( float delayInSeconds )
+      {
+         if( delayInSeconds < 0.1f )
+         {
+            throw new ArgumentException( "delayInSecond must not be lower than 0.1 seconds.", nameof( delayInSeconds ) );
+         }
+
+         TranslationDelay = delayInSeconds;
       }
    }
 }
