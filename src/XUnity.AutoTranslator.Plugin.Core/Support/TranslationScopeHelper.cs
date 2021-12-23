@@ -20,11 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Shims
          {
             try
             {
-               if( ui is ITextComponent text )
-               {
-                  return text.GetScope();
-               }
-               else if( ui is Component component )
+               if( ui is Component component )
                {
                   return GetScopeFromComponent( component );
                }

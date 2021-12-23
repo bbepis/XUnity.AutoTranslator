@@ -90,12 +90,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          if( !Manipulators.TryGetValue( type, out var manipulator ) )
          {
-            if( ui is ITextComponent )
-            {
-               manipulator = new TextComponentManipulator();
-            }
 #if MANAGED
-            else if( type == UnityTypes.TextField )
+            if( type == UnityTypes.TextField )
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
@@ -103,8 +99,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                manipulator = new TextArea2DComponentManipulator();
             }
-#endif
             else
+#endif
             {
                manipulator = new DefaultTextComponentManipulator( type );
             }
@@ -120,10 +116,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             return component.gameObject?.activeInHierarchy ?? false;
          }
-         else if( ui is ITextComponent tc )
-         {
-            return tc.Component.gameObject?.activeInHierarchy ?? false;
-         }
          return true;
       }
 
@@ -138,7 +130,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 #endif
 
          return ( Settings.EnableIMGUI && !_guiContentCheckFailed && IsGUIContentSafe( ui ) )
-            || ( ui is ITextComponent tc && tc.IsEnabledInSettings() )
 #if MANAGED
             || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.IsAssignableFrom( type ) )
@@ -192,18 +183,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var il2cppType = ui.GetIl2CppTypeSafe();
 #endif
 
-         return ( ui is ITextComponent tc && tc.SupportsRichText() )
+         return
 #if MANAGED
-            || ( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            ( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
             || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
             || DoesTextMeshProSupportRichText( ui, type )
             || ( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.IsAssignableFrom( type ) )
             || ( UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( type ) )
 #else
-            || ( il2cppType != null && (
-               ( UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
-               || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-               || DoesTextMeshProSupportRichText( ui, il2cppType, type ) ) )
+            ( il2cppType != null && (
+            ( UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+            || DoesTextMeshProSupportRichText( ui, il2cppType, type ) ) )
 #endif
             ;
       }
@@ -246,8 +237,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static bool IsSpammingComponent( this object ui )
       {
          return ui == null
-            || ( !_guiContentCheckFailed && IsGUIContentSafe( ui ) )
-            || ( ui is ITextComponent tc && tc.IsSpammingComponent() );
+            || ( !_guiContentCheckFailed && IsGUIContentSafe( ui ) );
       }
 
       private static bool _guiContentCheckFailed;
@@ -321,10 +311,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             if( ui is Component component )
             {
                return Settings.GameLogTextPaths.Contains( component.gameObject.GetPath() );
-            }
-            else if( ui is ITextComponent tc )
-            {
-               return Settings.GameLogTextPaths.Contains( tc.Component.gameObject.GetPath() );
             }
          }
          return false;
@@ -519,10 +505,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          if( obj is GameObject go )
          {
 
-         }
-         else if( obj is ITextComponent tc )
-         {
-            go = tc.Component.gameObject;
          }
          else if( obj is Component comp )
          {

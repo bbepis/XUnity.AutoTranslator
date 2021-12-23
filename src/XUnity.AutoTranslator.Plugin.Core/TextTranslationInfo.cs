@@ -136,12 +136,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             return inputField != null;
          }
-         else if( ui is ITextComponent tc && tc.Component != null )
-         {
-            component = tc.Component;
-            var go = component.gameObject;
-            return go.HasIgnoredName() || tc.IsPlaceholder();
-         }
 
          return false;
       }
