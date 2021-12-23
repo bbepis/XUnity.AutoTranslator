@@ -603,8 +603,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
          try
          {
             request = this.SetupRequest( address );
-            WebResponse webResponse = this.GetWebResponse( request );
-            Stream responseStream = webResponse.GetResponseStream();
+            using var webResponse = this.GetWebResponse( request );
+            using var responseStream = webResponse.GetResponseStream();
             buffer = this.ReadAll( responseStream, (int)webResponse.ContentLength, userToken );
             responseStream.Close();
             webResponse.Close();
@@ -715,8 +715,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
          try
          {
             request = this.SetupRequest( address );
-            WebResponse webResponse = this.GetWebResponse( request );
-            Stream responseStream = webResponse.GetResponseStream();
+            using var webResponse = this.GetWebResponse( request );
+            using var responseStream = webResponse.GetResponseStream();
             int contentLength = (int)webResponse.ContentLength;
             int count = ( ( contentLength > -1 ) && ( contentLength <= 0x8000 ) ) ? contentLength : 0x8000;
             byte[] buffer = new byte[ count ];
@@ -731,6 +731,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
                }
                stream.Write( buffer, 0, num3 );
             }
+            responseStream.Close();
+            webResponse.Close();
          }
          catch( ThreadInterruptedException )
          {
@@ -1401,9 +1403,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
             {
                stream.Write( data, 0, length );
             }
-            WebResponse webResponse = this.GetWebResponse( request );
-            Stream responseStream = webResponse.GetResponseStream();
+            using var webResponse = this.GetWebResponse( request );
+            using var responseStream = webResponse.GetResponseStream();
             buffer = this.ReadAll( responseStream, (int)webResponse.ContentLength, userToken );
+            responseStream.Close();
+            webResponse.Close();
          }
          catch( ThreadInterruptedException )
          {
@@ -1555,9 +1559,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
             requestStream.Write( bytes, 0, bytes.Length );
             requestStream.Close();
             requestStream = null;
-            WebResponse webResponse = this.GetWebResponse( request );
-            Stream responseStream = webResponse.GetResponseStream();
+            using var webResponse = this.GetWebResponse( request );
+            using var responseStream = webResponse.GetResponseStream();
             buffer = this.ReadAll( responseStream, (int)webResponse.ContentLength, userToken );
+            responseStream.Close();
+            webResponse.Close();
          }
          catch( ThreadInterruptedException )
          {
@@ -1831,9 +1837,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
                stream2.Write( buffer2, 0, length );
             }
             stream.Close();
-            WebResponse webResponse = this.GetWebResponse( request );
-            Stream responseStream = webResponse.GetResponseStream();
+            using var webResponse = this.GetWebResponse( request );
+            using var responseStream = webResponse.GetResponseStream();
             buffer3 = this.ReadAll( responseStream, (int)webResponse.ContentLength, userToken );
+            responseStream.Close();
+            webResponse.Close();
          }
          catch( ThreadInterruptedException )
          {

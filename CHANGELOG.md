@@ -2,6 +2,7 @@
  * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators
  * BUG FIX - Properly handle shutdown of ExtProtocolEndpoints
  * BUG FIX - Fixed PapagoTranslate
+ * BUG FIX - Fixed an issue related to cleanup of web resources applicable to certain runtimes
  * MISC - Reorganization of code in relation to soon-to-be merging of IL2CPP branch with master
 
 ### 4.20.1
