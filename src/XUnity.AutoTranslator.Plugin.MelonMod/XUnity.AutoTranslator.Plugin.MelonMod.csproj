@@ -19,7 +19,7 @@
       <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="MelonLoader">
-      <HintPath>..\..\libs\MelonMod03\MelonLoader.dll</HintPath>
+      <HintPath>..\..\libs\MelonMod052\MelonLoader.dll</HintPath>
     </Reference>
     <Reference Include="UnhollowerBaseLib">
       <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
