@@ -196,6 +196,8 @@ The supported translators are:
    * No limitations.
  * ezTrans XP, based on Changsinsoft's japanese-korean translator ezTrans XP. Does not require authentication, but does require the software and [Ehnd](https://github.com/sokcuri/ehnd) installed.
    * No limitations.
+ * [Sugoi Translator](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), currently requires external translator plugin.
+   * No limitations. Remarkable quality.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:

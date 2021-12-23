@@ -1,5 +1,11 @@
-﻿### 4.20.1
- * Performance improvements for IMGUI translations
+﻿### 4.21.0
+ * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators
+ * BUG FIX - Properly handle shutdown of ExtProtocolEndpoints
+ * BUG FIX - Fixed PapagoTranslate
+ * MISC - Reorganization of code in relation to soon-to-be merging of IL2CPP branch with master
+
+### 4.20.1
+ * MISC - Performance improvements for IMGUI translations
 
 ### 4.20.0
  * FEATURE - Added TMP_Overflow and TMP_Alignment resize commands
