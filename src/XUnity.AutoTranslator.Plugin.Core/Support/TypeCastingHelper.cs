@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
             IntPtr nativeClassPtr = Il2CppClassPointerStore<TObject>.NativeClassPtr;
             if( nativeClassPtr == IntPtr.Zero )
             {
-               throw new ArgumentException( $"{typeof( TObject )} is not al Il2Cpp reference type" );
+               throw new ArgumentException( $"{typeof( TObject )} is not an Il2Cpp reference type" );
             }
 
             var instancePointer = il2cppObject.Pointer;
@@ -50,5 +50,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          castedObject = default;
          return false;
       }
+
+#if IL2CPP
+      public static bool IsInstancePointerAssignableFrom( this IntPtr instancePointer, IntPtr classPointer )
+      {
+         IntPtr intPtr = IL2CPP.il2cpp_object_get_class( instancePointer );
+         return IL2CPP.il2cpp_class_is_assignable_from( classPointer, intPtr );
+      }
+#endif
    }
 }

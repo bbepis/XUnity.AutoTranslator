@@ -46,22 +46,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static void Postfix( Component __instance )
       {
-         var instance = new UILabelComponent( __instance );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.UILabel.ProxyType );
 
-         _Postfix( instance );
+         _Postfix( __instance );
       }
 
-      public static void _Postfix( ITextComponent __instance )
+      public static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
       static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         var __instance = new UILabelComponent( instance );
-
          Il2CppUtilities.InvokeMethod( UnityTypes.UILabel_Methods.set_text, instance, value );
 
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.UILabel.ProxyType );
          _Postfix( __instance );
       }
    }
@@ -86,28 +85,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static void Postfix( Component __instance )
       {
-         if( UnityTypes.UILabel.Il2CppType.IsAssignableFrom( __instance.GetIl2CppTypeSafe() ) )
+         __instance = __instance.CreateNGUIDerivedProxy();
+         if( __instance != null )
          {
-            var instance = new UILabelComponent( __instance );
-
-            _Postfix( instance );
+            _Postfix( __instance );
          }
       }
 
-      public static void _Postfix( ITextComponent __instance )
+      public static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
       }
 
       static void ML_Detour( IntPtr instance )
       {
-         var component = Il2CppUtilities.CreateProxyComponent( instance );
-         if( UnityTypes.UILabel.Il2CppType.IsAssignableFrom( component.GetIl2CppTypeSafe() ) )
+         Il2CppUtilities.InvokeMethod( UnityTypes.UIRect_Methods.OnEnable, instance );
+
+         var __instance = instance.CreateNGUIDerivedProxy();
+         if( __instance != null )
          {
-            var __instance = new UILabelComponent( component );
-
-            Il2CppUtilities.InvokeMethod( UnityTypes.UIRect_Methods.OnEnable, instance );
-
             _Postfix( __instance );
          }
       }

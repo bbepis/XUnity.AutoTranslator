@@ -47,21 +47,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( Component __instance )
       {
-         //__instance = (Component)Il2CppUtilities.CreateProxyComponentWithProxyType( __instance.Pointer, UnityTypes.Text.ProxyType );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ProxyType );
 
-         var instance = new TextComponent( __instance );
-
-         _Postfix( instance );
+         _Postfix( __instance );
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
       static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         var __instance = new TextComponent( instance );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ProxyType );
 
          Il2CppUtilities.InvokeMethod( UnityTypes.Text_Methods.set_text, instance, value );
 
@@ -89,23 +87,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( Component __instance )
       {
-         var instance = new TextComponent( __instance );
-
-         _Postfix( instance );
+         if( __instance.Pointer.IsInstancePointerAssignableFrom( UnityTypes.Text.ClassPointer ) )
+         {
+            __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ProxyType );
+            _Postfix( __instance );
+         }
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
       }
 
-      static void ML_Detour( IntPtr __instance )
+      static void ML_Detour( IntPtr instance )
       {
-         var instance = new TextComponent( __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.Text_Methods.OnEnable, instance );
 
-         Il2CppUtilities.InvokeMethod( UnityTypes.Text_Methods.OnEnable, __instance );
-
-         _Postfix( instance );
+         if( instance.IsInstancePointerAssignableFrom( UnityTypes.Text.ClassPointer ) )
+         {
+            var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ProxyType );
+            _Postfix( __instance );
+         }
       }
    }
 }

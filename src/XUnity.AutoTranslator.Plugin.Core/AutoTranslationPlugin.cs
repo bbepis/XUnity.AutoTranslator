@@ -3454,7 +3454,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var components = obj.GetComponents<Component>();
             foreach( var component in components )
             {
-               var textComponent = component.CreateWrapperTextComponentIfRequiredAndPossible();
+               var textComponent = component.CreateDerivedProxyIfRequiredAndPossible();
                if( textComponent != null )
                {
                   Hook_TextChanged( textComponent, false );

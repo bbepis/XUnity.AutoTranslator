@@ -4,7 +4,7 @@ using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Text
 {
-   internal interface ITextComponent : IGarbageCollectable
+   internal interface ITextComponent
    {
       string Text { get; set; }
 

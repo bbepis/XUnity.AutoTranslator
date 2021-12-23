@@ -36,18 +36,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
          return UnityTypes.TextMesh_Methods.set_text;
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static void ML_Detour( IntPtr __instance, IntPtr value )
+      static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         var instance = new TextMeshComponent( __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMesh_Methods.set_text, instance, value );
 
-         Il2CppUtilities.InvokeMethod( UnityTypes.TextMesh_Methods.set_text, __instance, value );
-
-         _Postfix( instance );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMesh.ProxyType );
+         _Postfix( __instance );
       }
    }
 
@@ -71,26 +70,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
             var tms = __instance.GetComponentsInternal( UnityTypes.TextMesh.Il2CppType, false, true, false, false, null );
             foreach( var tm in tms )
             {
-               var comp = new TextMeshComponent( tm.Pointer );
+               var comp = Il2CppUtilities.CreateProxyComponentWithDerivedType( tm.Pointer, UnityTypes.TextMesh.ProxyType );
                AutoTranslationPlugin.Current.Hook_TextChanged( comp, true );
             }
          }
       }
 
-      unsafe static void ML_Detour( IntPtr __instance, bool active )
+      unsafe static void ML_Detour( IntPtr instance, bool active )
       {
          // proxy way to call
-         var instance = new GameObject( __instance );
-         instance.SetActive( active );
+         var __instance = new GameObject( instance );
+         __instance.SetActive( active );
 
-         //// non-proxy way to call
-         //System.IntPtr* ptr = stackalloc System.IntPtr[ 1 ];
-         //ptr[0] = (IntPtr)( &active );
-         //System.IntPtr returnedException = IntPtr.Zero;
-         //System.IntPtr intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( UnityTypes.GameObject_Methods.SetActive, __instance, (void**)ptr, ref returnedException );
-         //Il2CppException.RaiseExceptionIfNecessary( returnedException );
-
-         _Postfix( instance, active );
+         _Postfix( __instance, active );
       }
    }
 }

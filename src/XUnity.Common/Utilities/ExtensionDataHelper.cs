@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using XUnity.Common.Extensions;
+
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
 
 namespace XUnity.Common.Utilities
 {
@@ -9,9 +14,12 @@ namespace XUnity.Common.Utilities
    /// </summary>
    public static class ExtensionDataHelper
    {
+#if IL2CPP
+      private static readonly Dictionary<Il2CppObjectBase, object> DynamicFields = new Dictionary<Il2CppObjectBase, object>( Il2CppObjectReferenceComparer.Default );
+#endif
+
       private static readonly object Sync = new object();
       private static readonly WeakDictionary<object, object> WeakDynamicFields = new WeakDictionary<object, object>();
-      private static readonly Dictionary<object, object> DynamicFields = new Dictionary<object, object>();
 
       static ExtensionDataHelper()
       {
@@ -27,7 +35,11 @@ namespace XUnity.Common.Utilities
          {
             lock( Sync )
             {
-               return WeakDynamicFields.Count + DynamicFields.Count;
+               return WeakDynamicFields.Count
+#if IL2CPP
+                  + DynamicFields.Count
+#endif
+                  ;
             }
          }
       }
@@ -42,9 +54,10 @@ namespace XUnity.Common.Utilities
       {
          lock( Sync )
          {
-            if( obj is IGarbageCollectable collectable )
+#if IL2CPP
+            if( obj is Il2CppObjectBase obj2 )
             {
-               if( DynamicFields.TryGetValue( collectable, out object value ) )
+               if( DynamicFields.TryGetValue( obj2, out object value ) )
                {
                   if( value is Dictionary<Type, object> existingDictionary )
                   {
@@ -55,15 +68,16 @@ namespace XUnity.Common.Utilities
                      var newDictionary = new Dictionary<Type, object>();
                      newDictionary.Add( value.GetType(), value );
                      newDictionary[ typeof( T ) ] = t;
-                     DynamicFields[ collectable ] = newDictionary;
+                     DynamicFields[ obj2 ] = newDictionary;
                   }
                }
                else
                {
-                  DynamicFields[ collectable ] = t;
+                  DynamicFields[ obj2 ] = t;
                }
             }
             else
+#endif
             {
                if( WeakDynamicFields.TryGetValue( obj, out object value ) )
                {
@@ -100,9 +114,10 @@ namespace XUnity.Common.Utilities
 
          lock( Sync )
          {
-            if( obj is IGarbageCollectable collectable )
+#if IL2CPP
+            if( obj is Il2CppObjectBase obj2 )
             {
-               if( DynamicFields.TryGetValue( collectable, out object value ) )
+               if( DynamicFields.TryGetValue( obj2, out object value ) )
                {
                   if( value is Dictionary<Type, object> existingDictionary )
                   {
@@ -124,7 +139,7 @@ namespace XUnity.Common.Utilities
                      newDictionary.Add( value.GetType(), value );
                      var t = new T();
                      newDictionary[ typeof( T ) ] = t;
-                     DynamicFields[ collectable ] = newDictionary;
+                     DynamicFields[ obj2 ] = newDictionary;
                      return t;
                   }
                   else
@@ -135,11 +150,12 @@ namespace XUnity.Common.Utilities
                else
                {
                   var t = new T();
-                  DynamicFields[ collectable ] = t;
+                  DynamicFields[ obj2 ] = t;
                   return t;
                }
             }
             else
+#endif
             {
                if( WeakDynamicFields.TryGetValue( obj, out object value ) )
                {
@@ -193,9 +209,10 @@ namespace XUnity.Common.Utilities
 
          lock( Sync )
          {
-            if( obj is IGarbageCollectable collectable )
+#if IL2CPP
+            if( obj is Il2CppObjectBase obj2 )
             {
-               if( DynamicFields.TryGetValue( collectable, out object value ) )
+               if( DynamicFields.TryGetValue( obj2, out object value ) )
                {
                   if( value is Dictionary<Type, object> existingDictionary )
                   {
@@ -223,6 +240,7 @@ namespace XUnity.Common.Utilities
                }
             }
             else
+#endif
             {
                if( WeakDynamicFields.TryGetValue( obj, out object value ) )
                {
@@ -265,15 +283,16 @@ namespace XUnity.Common.Utilities
          {
             WeakDynamicFields.RemoveCollectedEntries();
 
-            List<IGarbageCollectable> toRemove = null;
+#if IL2CPP
+            List<Il2CppObjectBase> toRemove = null;
             foreach( var pair in DynamicFields )
             {
                var key = pair.Key;
 
-               if( key is IGarbageCollectable gc && gc.IsCollected() )
+               if( key is Il2CppObjectBase gc && gc.IsCollected() )
                {
                   if( toRemove == null )
-                     toRemove = new List<IGarbageCollectable>();
+                     toRemove = new List<Il2CppObjectBase>();
 
                   toRemove.Add( gc );
                }
@@ -284,6 +303,7 @@ namespace XUnity.Common.Utilities
                foreach( var key in toRemove )
                   DynamicFields.Remove( key );
             }
+#endif
          }
       }
 
@@ -307,11 +327,13 @@ namespace XUnity.Common.Utilities
       {
          lock( Sync )
          {
-            if(obj is IGarbageCollectable collectable)
+#if IL2CPP
+            if(obj is Il2CppObjectBase collectable)
             {
                DynamicFields.Remove( collectable );
             }
             else
+#endif
             {
                WeakDynamicFields.Remove( obj );
             }
@@ -335,6 +357,7 @@ namespace XUnity.Common.Utilities
             }
          }
 
+#if IL2CPP
          foreach( var kvp in DynamicFields )
          {
             if( kvp.Value is Dictionary<Type, object> dictionary )
@@ -346,9 +369,10 @@ namespace XUnity.Common.Utilities
             }
             else
             {
-               yield return kvp;
+               yield return new KeyValuePair<object, object>( kvp.Key, kvp.Value );
             }
          }
+#endif
       }
    }
 }

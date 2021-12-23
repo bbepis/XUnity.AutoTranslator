@@ -29,18 +29,20 @@ namespace XUnity.Common.Extensions
 
       public unsafe static Il2CppSystem.Type GetIl2CppTypeSafe( this object that )
       {
-         var obj = (Il2CppObjectBase)that;
-
-         UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj );
-         System.IntPtr* param = null;
-         System.IntPtr exc = IntPtr.Zero;
-         System.IntPtr intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke(
-            GetIl2CppType,
-            UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj ),
-            (void**)param,
-            ref exc );
-         Il2CppException.RaiseExceptionIfNecessary( exc );
-         return intPtr != IntPtr.Zero ? new Il2CppSystem.Type( intPtr ) : null;
+         if( that is Il2CppObjectBase obj )
+         {
+            UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj );
+            System.IntPtr* param = null;
+            System.IntPtr exc = IntPtr.Zero;
+            System.IntPtr intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke(
+               GetIl2CppType,
+               UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj ),
+               (void**)param,
+               ref exc );
+            Il2CppException.RaiseExceptionIfNecessary( exc );
+            return intPtr != IntPtr.Zero ? new Il2CppSystem.Type( intPtr ) : null;
+         }
+         return null;
       }
 
       public static bool IsCollected( this Il2CppObjectBase that )

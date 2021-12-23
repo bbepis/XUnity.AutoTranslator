@@ -104,6 +104,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput );
+#else
+            if( UnityTypes.InputField != null )
+            {
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField.Il2CppType );
+               if( inputField != null )
+               {
+                  if( UnityTypes.InputField_Properties.Placeholder != null )
+                  {
+                     var placeholder = (Component)UnityTypes.InputField_Properties.Placeholder.Get( inputField );
+                     return !Il2CppObjectReferenceComparer.Default.Equals( placeholder, component );
+                  }
+               }
+            }
+
+            if( UnityTypes.TMP_InputField != null )
+            {
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField.Il2CppType );
+               if( inputField != null )
+               {
+                  if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
+                  {
+                     var placeholder = (Component)UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
+                     return !Il2CppObjectReferenceComparer.Default.Equals( placeholder, component );
+                  }
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.Il2CppType );
 #endif
 
             return inputField != null;

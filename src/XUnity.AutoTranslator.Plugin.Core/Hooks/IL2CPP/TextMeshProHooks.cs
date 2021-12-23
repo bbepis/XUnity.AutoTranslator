@@ -47,23 +47,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( Component __instance )
       {
-         var instance = new TMP_TextComponent( __instance );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshProUGUI.ProxyType );
 
-         _Postfix( instance );
+         _Postfix( __instance );
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
       }
 
-      static void ML_Detour( IntPtr __instance )
+      static void ML_Detour( IntPtr instance )
       {
-         var instance = new TMP_TextComponent( __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshProUGUI_Methods.OnEnable, instance );
 
-         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshProUGUI_Methods.OnEnable, __instance );
-
-         _Postfix( instance );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshProUGUI.ProxyType );
+         _Postfix( __instance );
       }
    }
 
@@ -87,23 +86,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( Component __instance )
       {
-         var instance = new TMP_TextComponent( __instance );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshPro.ProxyType );
 
-         _Postfix( instance );
+         _Postfix( __instance );
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
       }
 
-      static void ML_Detour( IntPtr __instance )
+      static void ML_Detour( IntPtr instance )
       {
-         var instance = new TMP_TextComponent( __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshPro_Methods.OnEnable, instance );
 
-         Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshPro_Methods.OnEnable, __instance );
-
-         _Postfix( instance );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshPro.ProxyType );
+         _Postfix( __instance );
       }
    }
 
@@ -127,23 +125,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static void Postfix( Component __instance )
       {
-         var instance = new TMP_TextComponent( __instance );
+         __instance = __instance.CreateTextMeshProDerivedProxy();
 
-         _Postfix( instance );
+         _Postfix( __instance );
       }
 
-      static void _Postfix( ITextComponent __instance )
+      static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static void ML_Detour( IntPtr __instance, IntPtr value )
+      static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         var instance = new TMP_TextComponent( __instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.TMP_Text_Methods.set_text, instance, value );
 
-         Il2CppUtilities.InvokeMethod( UnityTypes.TMP_Text_Methods.set_text, __instance, value );
-
-         _Postfix( instance );
+         var __instance = instance.CreateTextMeshProDerivedProxy();
+         _Postfix( __instance );
       }
    }
 }

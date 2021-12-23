@@ -109,6 +109,16 @@ namespace XUnity.Common.Constants
       public static readonly Il2CppTypeWrapper WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
       public static readonly Il2CppTypeWrapper Input = FindType( "UnityEngine.Input" );
 
+      public static class InputField_Properties
+      {
+         public static CachedProperty Placeholder = UnityTypes.InputField?.ProxyType.CachedProperty( "placeholder" );
+      }
+
+      public static class TMP_InputField_Properties
+      {
+         public static CachedProperty Placeholder = UnityTypes.TMP_InputField?.ProxyType.CachedProperty( "placeholder" );
+      }
+
       public static class GameObject_Methods
       {
          public static readonly IntPtr SetActive = Il2CppUtilities.GetIl2CppMethod( UnityTypes.GameObject?.ClassPointer, "SetActive", typeof( void ), typeof( bool ) );
