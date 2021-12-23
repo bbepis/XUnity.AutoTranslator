@@ -12,7 +12,7 @@
     <DevelopmentDependency>True</DevelopmentDependency>
     <TargetFramework>net35</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

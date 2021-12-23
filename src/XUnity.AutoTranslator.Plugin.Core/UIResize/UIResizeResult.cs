@@ -17,13 +17,21 @@
       public IUGUI_VerticalOverflow VerticalOverflowCommand { get; set; }
       public bool IsVerticalOverflowCommandScoped { get; set; }
 
+      public ITMP_OverflowMode OverflowCommand { get; set; }
+      public bool IsOverflowCommandScoped { get; set; }
+
+      public ITMP_Alignment AlignmentCommand { get; set; }
+      public bool IsAlignmentCommandScoped { get; set; }
+
       public bool IsEmpty()
       {
          return ResizeCommand == null
             && AutoResizeCommand == null
             && LineSpacingCommand == null
             && HorizontalOverflowCommand == null
-            && VerticalOverflowCommand == null;
+            && VerticalOverflowCommand == null
+            && OverflowCommand == null
+            && AlignmentCommand == null;
       }
 
       public UIResizeResult Copy()
@@ -63,6 +71,18 @@
          {
             VerticalOverflowCommand = otherResult.VerticalOverflowCommand;
             IsVerticalOverflowCommandScoped = otherResult.IsVerticalOverflowCommandScoped;
+         }
+
+         if( otherResult.OverflowCommand != null && ( otherResult.IsOverflowCommandScoped || ( !otherResult.IsOverflowCommandScoped && !IsOverflowCommandScoped ) ) )
+         {
+            OverflowCommand = otherResult.OverflowCommand;
+            IsOverflowCommandScoped = otherResult.IsOverflowCommandScoped;
+         }
+
+         if( otherResult.AlignmentCommand != null && ( otherResult.IsAlignmentCommandScoped || ( !otherResult.IsAlignmentCommandScoped && !IsAlignmentCommandScoped ) ) )
+         {
+            AlignmentCommand = otherResult.AlignmentCommand;
+            IsAlignmentCommandScoped = otherResult.IsAlignmentCommandScoped;
          }
       }
    }

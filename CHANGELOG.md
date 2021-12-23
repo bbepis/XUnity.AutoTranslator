@@ -1,4 +1,24 @@
-﻿### 4.18.0
+﻿### 4.21.0
+ * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators
+ * BUG FIX - Properly handle shutdown of ExtProtocolEndpoints
+ * BUG FIX - Fixed PapagoTranslate
+ * BUG FIX - Fixed an issue related to cleanup of web resources applicable to certain runtimes
+ * MISC - Reorganization of code in relation to soon-to-be merging of IL2CPP branch with master
+
+### 4.20.1
+ * MISC - Performance improvements for IMGUI translations
+
+### 4.20.0
+ * FEATURE - Added TMP_Overflow and TMP_Alignment resize commands
+
+### 4.19.0
+ * FEATURE - Added RegexPostProcessing configuration option
+ * BUG FIX - Fixed bug related to reload translations after changing screen size
+
+### 4.18.1
+ * BUG FIX - Fixed an unhandled exception that could occur during hook callbacks
+
+### 4.18.0
  * FEATURE - Improved AutoResize command to enable min/max font size control
  * FEATURE - Added translation file directive allowing control of tranlations/resizing based on resolution size
  * FEATURE - Added new '_Postprocessors.txt' file that can make substitutions to the text returned from the translation endpoint

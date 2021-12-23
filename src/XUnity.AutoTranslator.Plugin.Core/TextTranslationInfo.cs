@@ -17,7 +17,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal sealed class TextTranslationInfo
    {
-      private Action<object> _unresizeFont;
       private Action<object> _unresize;
       private Action<object> _unfont;
 
@@ -254,7 +253,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             bool isLineSpacingSet = false;
             bool isHorizontalOverflowSet = false;
             bool isVerticalOverflowSet = false;
-            bool isUntouched = _unresizeFont == null;
+            bool isUntouched = _unresize == null;
             if( cache.HasAnyResizeCommands )
             {
                var segments = text.gameObject.GetPathSegments(); // TODO: Perhaps... cache these segments?????
@@ -289,14 +288,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                         if( isUntouched )
                         {
-                           _unresizeFont += g =>
+                           _unresize += g =>
                            {
                               UnityTypes.Text_Properties.ResizeTextForBestFit.Set( g, resizeTextForBestFitValue );
                            };
 
                            if( UnityTypes.Text_Properties.ResizeTextMinSize != null )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.ResizeTextMinSize.Set( g, resizeTextMinSizeValue );
                               };
@@ -304,7 +303,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( maxSize.HasValue && UnityTypes.Text_Properties.ResizeTextMaxSize != null )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.ResizeTextMaxSize.Set( g, resizeTextMaxSizeValue );
                               };
@@ -327,7 +326,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( isUntouched )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.FontSize.Set( g, currentFontSize );
                               };
@@ -351,7 +350,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( isUntouched )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.LineSpacing.Set( g, lineSpacingValue );
                               };
@@ -374,7 +373,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( isUntouched )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.HorizontalOverflow.Set( g, horizontalOverflowValue );
                               };
@@ -397,7 +396,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( isUntouched )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  UnityTypes.Text_Properties.VerticalOverflow.Set( g, verticalOverflowValue );
                               };
@@ -422,7 +421,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( isUntouched )
                      {
-                        _unresizeFont += g =>
+                        _unresize += g =>
                         {
                            UnityTypes.Text_Properties.LineSpacing.Set( g, originalLineSpacing );
                         };
@@ -437,7 +436,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( isUntouched )
                   {
-                     _unresizeFont += g =>
+                     _unresize += g =>
                      {
                         UnityTypes.Text_Properties.VerticalOverflow.Set( g, originalVerticalOverflow );
                      };
@@ -451,7 +450,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( isUntouched )
                   {
-                     _unresizeFont += g =>
+                     _unresize += g =>
                      {
                         UnityTypes.Text_Properties.HorizontalOverflow.Set( g, originalHorizontalOverflow );
                      };
@@ -488,30 +487,61 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             var overflowModeProperty = type.CachedProperty( "overflowMode" );
             var originalOverflowMode = overflowModeProperty?.Get( ui );
-
-            // ellipsis (1) works
-            // masking (2) has a tendency to break in some versions of TMP
-            // truncate (3) works
-            if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
-            {
-               overflowModeProperty.Set( ui, 3 );
-
-               _unresize = g =>
-               {
-                  overflowModeProperty.Set( g, 2 );
-               };
-            }
+            bool changedOverflow = false;
+            bool isUntouched = _unresize == null;
 
             if( cache.HasAnyResizeCommands )
             {
-               bool isUntouched = _unresizeFont == null;
-
                var text = (Component)ui;
 
                var segments = text.gameObject.GetPathSegments();
                var scope = TranslationScopeHelper.GetScope( ui );
                if( cache.TryGetUIResize( segments, scope, out var result ) )
                {
+                  if( result.OverflowCommand != null )
+                  {
+                     changedOverflow = true;
+                     if( overflowModeProperty != null )
+                     {
+                        var newOverflowMode = result.OverflowCommand.GetMode();
+                        if( newOverflowMode.HasValue )
+                        {
+                           overflowModeProperty.Set( ui, newOverflowMode );
+
+                           if( isUntouched )
+                           {
+                              _unresize = g =>
+                              {
+                                 overflowModeProperty.Set( g, originalOverflowMode );
+                              };
+                           }
+                        }
+                     }
+                  }
+
+                  if( result.AlignmentCommand != null )
+                  {
+                     var alignmentProperty = type.CachedProperty( "alignment" );
+                     if( alignmentProperty != null )
+                     {
+                        var alignmentValue = alignmentProperty.Get( ui );
+                        var newAlignmentValue = result.AlignmentCommand.GetMode();
+
+                        if( newAlignmentValue.HasValue )
+                        {
+                           alignmentProperty.Set( ui, newAlignmentValue.Value );
+
+                           if( isUntouched )
+                           {
+                              _unresize += g =>
+                              {
+                                 alignmentProperty.Set( g, alignmentValue );
+                              };
+                           }
+                        }
+                     }
+                  }
+
                   if( result.AutoResizeCommand != null )
                   {
                      var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
@@ -543,14 +573,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                         if( isUntouched )
                         {
-                           _unresizeFont += g =>
+                           _unresize += g =>
                            {
                               enableAutoSizingProperty.Set( g, enableAutoSizingValue );
                            };
 
                            if( minSize.HasValue && fontSizeMinProperty != null )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  fontSizeMinProperty.Set( g, fontSizeMinValue );
                               };
@@ -558,7 +588,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                            if( maxSize.HasValue && fontSizeMaxProperty != null )
                            {
-                              _unresizeFont += g =>
+                              _unresize += g =>
                               {
                                  fontSizeMaxProperty.Set( g, fontSizeMaxValue );
                               };
@@ -585,7 +615,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                               if( isUntouched )
                               {
-                                 _unresizeFont += g =>
+                                 _unresize += g =>
                                  {
                                     fontSizeProperty.Set( g, currentFontSize );
                                  };
@@ -593,6 +623,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
                            }
                         }
                      }
+                  }
+               }
+            }
+
+            if( !changedOverflow )
+            {
+               // ellipsis (1) works
+               // masking (2) has a tendency to break in some versions of TMP
+               // truncate (3) works
+               if( originalOverflowMode != null && (int)originalOverflowMode == 2 )
+               {
+                  overflowModeProperty.Set( ui, 3 );
+
+                  if( isUntouched )
+                  {
+                     _unresize = g =>
+                     {
+                        overflowModeProperty.Set( g, 2 );
+                     };
                   }
                }
             }
@@ -606,9 +655,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          _unresize?.Invoke( ui );
          _unresize = null;
-
-         _unresizeFont?.Invoke( ui );
-         _unresizeFont = null;
 
          _alteredFontSize = null;
       }

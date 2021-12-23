@@ -35,6 +35,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
          // we are disabling all checks in tests
       }
 
+      public void DisableSpamChecks()
+      {
+
+      }
+
       public T GetOrCreateSetting<T>( string section, string key, T defaultValue )
       {
          var sectionPropertyInfo = _config.GetType().GetProperty( section );
@@ -59,6 +64,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Tests
       public void SetSetting<T>( string section, string key, T value )
       {
          // nothing
+      }
+
+      public void SetTranslationDelay( float delayInSeconds )
+      {
+
       }
    }
 }

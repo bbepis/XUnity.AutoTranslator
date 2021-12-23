@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Extensions;
@@ -36,12 +37,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
          _translationManager = translationManager;
       }
 
-      public void PerformChecks( string untranslatedText )
+      public void PerformChecks( string untranslatedText, TranslationEndpointManager endpoint )
       {
          CheckStaggerText( untranslatedText );
          CheckConsecutiveFrames();
-         CheckConsecutiveSeconds();
-         CheckThresholds();
+         CheckConsecutiveSeconds( endpoint );
+         CheckThresholds( endpoint );
       }
 
       public void Update()
@@ -50,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          ResetThresholdTimerIfRequired();
       }
 
-      private void CheckConsecutiveSeconds()
+      private void CheckConsecutiveSeconds( TranslationEndpointManager endpoint )
       {
          var currentSecond = (int)Time.time;
          var lastSecond = currentSecond - 1;
@@ -60,7 +61,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // we also queued something last frame, lets increment our counter
             _consecutiveSecondsTranslated++;
 
-            if( _consecutiveSecondsTranslated > Settings.MaximumConsecutiveSecondsTranslated )
+            if( _consecutiveSecondsTranslated > Settings.MaximumConsecutiveSecondsTranslated && endpoint.EnableSpamChecks )
             {
                // Shutdown, this wont be tolerated!!!
                _translationManager.ClearAllJobs();
@@ -170,7 +171,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void CheckThresholds()
+      private void CheckThresholds( TranslationEndpointManager endpoint )
       {
          if( _translationManager.UnstartedTranslations > Settings.MaxUnstartedJobs )
          {
@@ -198,7 +199,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _timeExceededThreshold = time;
             }
 
-            if( time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold )
+            if( time - _timeExceededThreshold.Value > Settings.MaxSecondsAboveTranslationThreshold && endpoint.EnableSpamChecks )
             {
                _translationManager.ClearAllJobs();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -18,7 +19,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public bool IsApplicable()
       {
-         return IsValidExecutable() && _resolutionCheck( new ResolutionCheckVariables( Settings.ScreenWidth, Settings.ScreenHeight ) );
+         return IsValidExecutable() && _resolutionCheck( new ResolutionCheckVariables( Screen.width, Screen.height ) );
       }
 
       public bool IsValidExecutable()

@@ -54,9 +54,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             var httpSecurity = new HttpSecurity();
-            var context = new InitializationContext( httpSecurity, Settings.FromLanguage, Settings.Language );
 
-            CreateEndpoints( context );
+            CreateEndpoints( httpSecurity );
 
             AllEndpoints = AllEndpoints
                .OrderBy( x => x.Error != null )
@@ -132,7 +131,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      public void CreateEndpoints( InitializationContext context )
+      public void CreateEndpoints( HttpSecurity httpSecurity )
       {
          if( Settings.FromLanguage != Settings.Language )
          {
@@ -143,7 +142,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             foreach( var type in dynamicTypes )
             {
-               AddEndpoint( context, type );
+               AddEndpoint( httpSecurity, type );
             }
          }
          else
@@ -155,7 +154,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void AddEndpoint( InitializationContext context, Type type )
+      private void AddEndpoint( HttpSecurity httpSecurity, Type type )
       {
          ITranslateEndpoint endpoint;
          try
@@ -168,15 +167,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
             return;
          }
 
+         var context = new InitializationContext( httpSecurity, Settings.FromLanguage, Settings.Language );
          try
          {
             endpoint.Initialize( context );
-            var manager = new TranslationEndpointManager( endpoint, null );
+            var manager = new TranslationEndpointManager( endpoint, null, context );
             RegisterEndpoint( manager );
          }
          catch( Exception e )
          {
-            var manager = new TranslationEndpointManager( endpoint, e );
+            var manager = new TranslationEndpointManager( endpoint, e, context );
             RegisterEndpoint( manager );
          }
       }

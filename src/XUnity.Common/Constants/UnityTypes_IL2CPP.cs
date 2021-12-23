@@ -103,8 +103,10 @@ namespace XUnity.Common.Constants
       public static readonly Il2CppTypeWrapper Scene = FindType( "UnityEngine.SceneManagement.Scene" );
       public static readonly Il2CppTypeWrapper UnityEventBase = FindType( "UnityEngine.Events.UnityEventBase" );
       public static readonly Il2CppTypeWrapper BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
-      public static readonly Il2CppTypeWrapper HorizontalWrapMode = FindType( "UnityEngine.HorizontalWrapMode" );
-      public static readonly Il2CppTypeWrapper VerticalWrapMode = FindType( "UnityEngine.VerticalWrapMode" );
+      public static readonly Type HorizontalWrapMode = FindProxyType( "UnityEngine.HorizontalWrapMode" );
+      public static readonly Type TextOverflowModes = FindProxyType( "TMPro.TextOverflowModes" );
+      public static readonly Type TextAlignmentOptions = FindProxyType( "TMPro.TextAlignmentOptions" );
+      public static readonly Type VerticalWrapMode = FindProxyType( "UnityEngine.VerticalWrapMode" );
       public static readonly Il2CppTypeWrapper Font = FindType( "UnityEngine.Font" );
       public static readonly Il2CppTypeWrapper WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
       public static readonly Il2CppTypeWrapper Input = FindType( "UnityEngine.Input" );
@@ -256,6 +258,28 @@ namespace XUnity.Common.Constants
                   new Type[] { typeof( Texture2D ) },
                   null
                ) );
+      }
+
+      private static Type FindProxyType( string name )
+      {
+         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+         foreach( var assembly in assemblies )
+         {
+            try
+            {
+               var type = assembly.GetType( name, false );
+               if( type != null )
+               {
+                  return type;
+               }
+            }
+            catch
+            {
+               // don't care!
+            }
+         }
+
+         return null;
       }
 
       private static Il2CppTypeWrapper FindType( string name )

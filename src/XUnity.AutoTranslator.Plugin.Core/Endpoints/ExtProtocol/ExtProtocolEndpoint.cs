@@ -384,7 +384,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
             {
                if( _process != null )
                {
-                  _process.Kill();
+                  //_process.Kill();
                   _process.Dispose();
                   _thread.Abort();
                }

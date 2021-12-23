@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
@@ -87,7 +89,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
                if( group.Success ) // was matched
                {
                   var value = group.Value;
-                  var translation = ignoreTranslate ? value : getTranslation( new UntranslatedTextInfo( value ) );
+                  var translation = ignoreTranslate
+                     ? RomanizationHelper.PostProcess( value, Settings.RegexPostProcessing )
+                     : getTranslation( new UntranslatedTextInfo( value ) );
                   if( translation != null )
                   {
                      result = result.Replace( replacement, translation );

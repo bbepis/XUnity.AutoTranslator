@@ -72,6 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TextureTranslationCache TextureCache;
       internal UIResizeCache ResizeCache;
       internal SpamChecker SpamChecker;
+      private Dictionary<string, UntranslatedText> CachedKeys = new Dictionary<string, UntranslatedText>( StringComparer.Ordinal );
 
       private List<Action<ComponentTranslationContext>> _shouldIgnore = new List<Action<ComponentTranslationContext>>();
 
@@ -591,7 +592,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var added = endpoint.EnqueueTranslation( ui, key, translationResult, context, untranslatedTextContext, checkOtherEndpoints, saveResultGlobally, isTranslatable, allowFallback );
          if( added != null && isTranslatable && checkSpam && !( endpoint.Endpoint is PassthroughTranslateEndpoint ) )
          {
-            SpamChecker.PerformChecks( key.TemplatedOriginal_Text_FullyTrimmed );
+            SpamChecker.PerformChecks( key.TemplatedOriginal_Text_FullyTrimmed, endpoint );
          }
       }
 
@@ -2138,221 +2139,237 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  var endpoint = GetTranslationEndpoint( context, true );
-                  if( allowStartTranslationImmediate )
-                  {
-                     // Lets try not to spam a service that might not be there...
-                     if( endpoint != null )
-                     {
-                        if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
-                        {
-                           if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
-                           {
-                              CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable, true, untranslatedTextContext );
-                           }
-                           else if( Settings.OutputTooLongText )
-                           {
-                              CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, textKey, null, context, true, true, true, isTranslatable, false, untranslatedTextContext );
-                           }
-                        }
-                     }
-
-                     return null;
-                  }
-                  else if( allowStabilizationOnTextComponent && allowStartTranslationLater && context == null ) // never stabilize a text that is contextualized or that does not support stabilization
-                  {
-                     // if we dont know what text to translate it to, we need to figure it out.
-                     // this might take a while, so add the UI text component to the ongoing operations
-                     // list, so we dont start multiple operations for it, as its text might be constantly
-                     // changing.
-                     info.IsStabilizingText = true;
-
-                     // start a coroutine, that will execute once the string of the UI text has stopped
-                     // changing. For all texts except 'story' texts, this will add a delay for exactly 
-                     // 0.5s to the translation. This is barely noticable.
-                     //
-                     // on the other hand, for 'story' texts, this will take the time that it takes
-                     // for the text to stop 'scrolling' in.
-                     try
-                     {
-
-                        Action<string> onTextStabilized = stabilizedText =>
-                        {
-                           info.IsStabilizingText = false;
-
-                           text = stabilizedText;
-
-                           // This means it has been translated through "ImmediateTranslate" function
-                           if( info?.IsTranslated == true ) return;
-
-                           info?.Reset( text );
-
-                           if( stabilizedText.IsNullOrWhiteSpace() )
-                              return;
-
-                           if( context == null )
-                           {
-                              if( CheckAndFixRedirected( ui, text, info ) )
-                                 return;
-                           }
-
-                           if( tc.IsTranslatable( stabilizedText, false, scope ) )
-                           {
-                              // potentially shortcircuit if templated is a translation
-                              var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
-
-                              // potentially shortcircuit if fully templated
-                              if( ( stabilizedTextKey.IsTemplated && !tc.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) ) || stabilizedTextKey.IsOnlyTemplate )
-                              {
-                                 var untemplatedTranslation = stabilizedTextKey.Untemplate( stabilizedTextKey.TemplatedOriginal_Text );
-                                 SetTranslatedText( ui, untemplatedTranslation, text, info );
-                                 return;
-                              }
-
-                              // once the text has stabilized, attempt to look it up
-                              if( tc.TryGetTranslation( stabilizedTextKey, true, false, scope, out translation ) )
-                              {
-                                 var isPartial = tc.IsPartial( stabilizedTextKey.TemplatedOriginal_Text, scope );
-                                 SetTranslatedText( ui, stabilizedTextKey.Untemplate( translation ), !isPartial ? text : null, info );
-                              }
-                              else
-                              {
-                                 // PREMISE: context should ALWAYS be null inside this method! That means we initialize the first layer of text parser recursion from here
-
-                                 var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
-                                 if( UnityTextParsers.GameLogTextParser.CanApply( ui ) && context == null )
-                                 {
-                                    var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText, scope, tc );
-                                    if( result != null )
-                                    {
-                                       var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
-                                       if( translatedText != null && context == null )
-                                       {
-                                          SetTranslatedText( ui, translatedText, null, info );
-                                       }
-                                       return;
-                                    }
-                                 }
-                                 if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) )
-                                 {
-                                    var result = UnityTextParsers.RegexSplittingTextParser.Parse( stabilizedText, scope, tc );
-                                    if( result != null )
-                                    {
-                                       var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
-                                       if( translatedText != null && context == null )
-                                       {
-                                          SetTranslatedText( ui, translatedText, text, info );
-                                       }
-                                       return;
-                                    }
-                                 }
-                                 if( UnityTextParsers.RichTextParser.CanApply( ui ) && !context.HasBeenParsedBy( ParserResultOrigin.RichTextParser ) )
-                                 {
-                                    var result = UnityTextParsers.RichTextParser.Parse( stabilizedText, scope );
-                                    if( result != null )
-                                    {
-                                       var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
-                                       if( translatedText != null && context == null )
-                                       {
-                                          SetTranslatedText( ui, translatedText, text, info );
-                                       }
-                                       return;
-                                    }
-                                 }
-
-                                 if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
-                                 {
-                                    if( _isInTranslatedMode && !isSpammer )
-                                       TranslationHelper.DisplayTranslationInfo( text, null );
-
-                                    // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
-                                 }
-                                 else
-                                 {
-                                    // Lets try not to spam a service that might not be there...
-                                    if( endpoint != null )
-                                    {
-                                       if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
-                                       {
-                                          if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
-                                          {
-                                             CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context, true, true, true, isStabilizedTranslatable, true, untranslatedTextContext );
-                                          }
-                                          else if( Settings.OutputTooLongText )
-                                          {
-                                             CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, stabilizedTextKey, null, context, true, true, true, isStabilizedTranslatable, false, untranslatedTextContext );
-                                          }
-                                       }
-                                    }
-                                 }
-                              }
-                           }
-                        };
-
-                        if( endpoint?.Endpoint is PassthroughTranslateEndpoint )
-                        {
-                           onTextStabilized( text );
-                        }
-                        else
-                        {
-                           CoroutineHelper.Start(
-                              WaitForTextStablization(
-                                 ui: ui,
-                                 delay: 0.9f, // 0.9 second to prevent '1 second tickers' from getting translated
-                                 maxTries: 60, // 50 tries, about 1 minute
-                                 currentTries: 0,
-                                 onMaxTriesExceeded: () =>
-                                 {
-                                    info.IsStabilizingText = false;
-                                 },
-                                 onTextStabilized: onTextStabilized ) );
-                        }
-                     }
-                     catch( Exception )
-                     {
-                        info.IsStabilizingText = false;
-                     }
-                  }
-                  else if( allowStartTranslationLater ) // this should only be called for immediate UI translation, theoreticalaly
-                  {
-                     CoroutineHelper.Start(
-                        WaitForTextStablization(
-                           textKey: textKey,
-                           delay: 0.9f,
-                           onTextStabilized: () =>
-                           {
-                              // if we already have translation loaded in our _translatios dictionary, simply load it and set text
-                              if( tc.TryGetTranslation( textKey, true, false, scope, out _ ) )
-                              {
-                                 // no need to do anything !
-                              }
-                              else
-                              {
-                                 // Lets try not to spam a service that might not be there...
-                                 endpoint = GetTranslationEndpoint( context, true );
-                                 if( endpoint != null )
-                                 {
-                                    // once the text has stabilized, attempt to look it up
-                                    if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
-                                    {
-                                       if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
-                                       {
-                                          CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable, true, untranslatedTextContext );
-                                       }
-                                       else if( Settings.OutputTooLongText )
-                                       {
-                                          CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, textKey, null, context, true, true, true, isTranslatable, false, untranslatedTextContext );
-                                       }
-                                    }
-                                 }
-                              }
-                           } ) );
-                  }
+                  TranslateByEndpoint( ui, text, textKey, isTranslatable, isSpammer, scope, info, allowStabilizationOnTextComponent, allowStartTranslationImmediate, allowStartTranslationLater, tc, untranslatedTextContext, context );
                }
             }
          }
 
          return null;
+      }
+
+      private void TranslateByEndpoint(
+         object ui, string text, UntranslatedText textKey, bool isTranslatable,
+         bool isSpammer, int scope, TextTranslationInfo info, bool allowStabilizationOnTextComponent,
+         bool allowStartTranslationImmediate, bool allowStartTranslationLater,
+         IReadOnlyTextTranslationCache tc, UntranslatedTextInfo untranslatedTextContext,
+         ParserTranslationContext context )
+      {
+         string translation;
+
+         var endpoint = GetTranslationEndpoint( context, true );
+         if( allowStartTranslationImmediate )
+         {
+            // Lets try not to spam a service that might not be there...
+            if( endpoint != null )
+            {
+               if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+               {
+                  if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
+                  {
+                     CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable, true, untranslatedTextContext );
+                  }
+                  else if( Settings.OutputTooLongText )
+                  {
+                     CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, textKey, null, context, true, true, true, isTranslatable, false, untranslatedTextContext );
+                  }
+               }
+            }
+         }
+         else if( allowStabilizationOnTextComponent && allowStartTranslationLater && context == null ) // never stabilize a text that is contextualized or that does not support stabilization
+         {
+            // if we dont know what text to translate it to, we need to figure it out.
+            // this might take a while, so add the UI text component to the ongoing operations
+            // list, so we dont start multiple operations for it, as its text might be constantly
+            // changing.
+            info.IsStabilizingText = true;
+
+            // start a coroutine, that will execute once the string of the UI text has stopped
+            // changing. For all texts except 'story' texts, this will add a delay for exactly 
+            // 0.5s to the translation. This is barely noticable.
+            //
+            // on the other hand, for 'story' texts, this will take the time that it takes
+            // for the text to stop 'scrolling' in.
+            try
+            {
+
+               Action<string> onTextStabilized = stabilizedText =>
+               {
+                  info.IsStabilizingText = false;
+
+                  text = stabilizedText;
+
+                  // This means it has been translated through "ImmediateTranslate" function
+                  if( info?.IsTranslated == true ) return;
+
+                  info?.Reset( text );
+
+                  if( stabilizedText.IsNullOrWhiteSpace() )
+                     return;
+
+                  if( context == null )
+                  {
+                     if( CheckAndFixRedirected( ui, text, info ) )
+                        return;
+                  }
+
+                  if( tc.IsTranslatable( stabilizedText, false, scope ) )
+                  {
+                     // potentially shortcircuit if templated is a translation
+                     var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
+
+                     // potentially shortcircuit if fully templated
+                     if( ( stabilizedTextKey.IsTemplated && !tc.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) ) || stabilizedTextKey.IsOnlyTemplate )
+                     {
+                        var untemplatedTranslation = stabilizedTextKey.Untemplate( stabilizedTextKey.TemplatedOriginal_Text );
+                        SetTranslatedText( ui, untemplatedTranslation, text, info );
+                        return;
+                     }
+
+                     // once the text has stabilized, attempt to look it up
+                     if( tc.TryGetTranslation( stabilizedTextKey, true, false, scope, out translation ) )
+                     {
+                        var isPartial = tc.IsPartial( stabilizedTextKey.TemplatedOriginal_Text, scope );
+                        SetTranslatedText( ui, stabilizedTextKey.Untemplate( translation ), !isPartial ? text : null, info );
+                     }
+                     else
+                     {
+                        // PREMISE: context should ALWAYS be null inside this method! That means we initialize the first layer of text parser recursion from here
+
+                        var isStabilizedTranslatable = LanguageHelper.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text );
+                        if( UnityTextParsers.GameLogTextParser.CanApply( ui ) && context == null )
+                        {
+                           var result = UnityTextParsers.GameLogTextParser.Parse( stabilizedText, scope, tc );
+                           if( result != null )
+                           {
+                              var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
+                              if( translatedText != null && context == null )
+                              {
+                                 SetTranslatedText( ui, translatedText, null, info );
+                              }
+                              return;
+                           }
+                        }
+                        if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) )
+                        {
+                           var result = UnityTextParsers.RegexSplittingTextParser.Parse( stabilizedText, scope, tc );
+                           if( result != null )
+                           {
+                              var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
+                              if( translatedText != null && context == null )
+                              {
+                                 SetTranslatedText( ui, translatedText, text, info );
+                              }
+                              return;
+                           }
+                        }
+                        if( UnityTextParsers.RichTextParser.CanApply( ui ) && !context.HasBeenParsedBy( ParserResultOrigin.RichTextParser ) )
+                        {
+                           var result = UnityTextParsers.RichTextParser.Parse( stabilizedText, scope );
+                           if( result != null )
+                           {
+                              var translatedText = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, true, false, isStabilizedTranslatable || Settings.OutputUntranslatableText, tc, context );
+                              if( translatedText != null && context == null )
+                              {
+                                 SetTranslatedText( ui, translatedText, text, info );
+                              }
+                              return;
+                           }
+                        }
+
+                        if( !isStabilizedTranslatable && !Settings.OutputUntranslatableText && !stabilizedTextKey.IsTemplated )
+                        {
+                           if( _isInTranslatedMode && !isSpammer )
+                              TranslationHelper.DisplayTranslationInfo( text, null );
+
+                           // FIXME: SET TEXT? Set it to the same? Only impact is RESIZE behaviour!
+                        }
+                        else
+                        {
+                           // Lets try not to spam a service that might not be there...
+                           if( endpoint != null )
+                           {
+                              if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+                              {
+                                 if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
+                                 {
+                                    CreateTranslationJobFor( endpoint, ui, stabilizedTextKey, null, context, true, true, true, isStabilizedTranslatable, true, untranslatedTextContext );
+                                 }
+                                 else if( Settings.OutputTooLongText )
+                                 {
+                                    CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, stabilizedTextKey, null, context, true, true, true, isStabilizedTranslatable, false, untranslatedTextContext );
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               };
+
+               if( endpoint?.Endpoint is PassthroughTranslateEndpoint )
+               {
+                  onTextStabilized( text );
+               }
+               else
+               {
+                  var delay = endpoint?.TranslationDelay ?? Settings.DefaultTranslationDelay;
+                  var retries = endpoint?.MaxRetries ?? Settings.DefaultMaxRetries;
+
+                  CoroutineHelper.Start(
+                     WaitForTextStablization(
+                        ui: ui,
+                        delay: delay, // 0.9 second to prevent '1 second tickers' from getting translated
+                        maxTries: retries, // 60 tries, about 1 minute
+                        currentTries: 0,
+                        onMaxTriesExceeded: () =>
+                        {
+                           info.IsStabilizingText = false;
+                        },
+                        onTextStabilized: onTextStabilized ) );
+               }
+            }
+            catch( Exception )
+            {
+               info.IsStabilizingText = false;
+            }
+         }
+         else if( allowStartTranslationLater ) // this should only be called for immediate UI translation, theoreticalaly
+         {
+            var delay = endpoint?.TranslationDelay ?? Settings.DefaultTranslationDelay;
+
+            CoroutineHelper.Start(
+               WaitForTextStablization(
+                  textKey: textKey,
+                  delay: delay,
+                  onTextStabilized: () =>
+                  {
+                     // if we already have translation loaded in our _translatios dictionary, simply load it and set text
+                     string translation;
+                     if( tc.TryGetTranslation( textKey, true, false, scope, out translation ) )
+                     {
+                        // no need to do anything !
+                     }
+                     else
+                     {
+                        // Lets try not to spam a service that might not be there...
+                        var endpoint = GetTranslationEndpoint( context, true );
+                        if( endpoint != null )
+                        {
+                           // once the text has stabilized, attempt to look it up
+                           if( !Settings.IsShutdown && !endpoint.HasFailedDueToConsecutiveErrors )
+                           {
+                              if( IsBelowMaxLength( text ) || endpoint == TranslationManager.PassthroughEndpoint )
+                              {
+                                 CreateTranslationJobFor( endpoint, ui, textKey, null, context, true, true, true, isTranslatable, true, untranslatedTextContext );
+                              }
+                              else if( Settings.OutputTooLongText )
+                              {
+                                 CreateTranslationJobFor( TranslationManager.PassthroughEndpoint, ui, textKey, null, context, true, true, true, isTranslatable, false, untranslatedTextContext );
+                              }
+                           }
+                        }
+                     }
+                  } ) );
+         }
       }
 
       private TranslationEndpointManager GetTranslationEndpoint( ParserTranslationContext context, bool allowFallback )
@@ -2748,7 +2765,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            var frameCount = Time.frameCount;
+
             TranslationManager.Update();
+
+            if( frameCount % 36000 == 0 && CachedKeys.Count > 0 )
+            {
+               CachedKeys.Clear();
+            }
 
             if( ClipboardHelper.SupportsClipboard() )
             {
@@ -2776,7 +2800,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             // perform this check every 100 frames!
-            if ( Time.frameCount % 100 == 0
+            if ( frameCount % 100 == 0
                && TranslationManager.OngoingTranslations == 0
                && TranslationManager.UnstartedTranslations == 0 )
             {
@@ -3097,8 +3121,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private static UntranslatedText GetCacheKey( object ui, string originalText, bool isFromSpammingComponent )
+      private UntranslatedText GetCacheKey( object ui, string originalText, bool isFromSpammingComponent )
       {
+         if( isFromSpammingComponent && CachedKeys.Count < Settings.MaxImguiKeyCacheCount )
+         {
+            if( !CachedKeys.TryGetValue( originalText, out var key ) )
+            {
+               key = new UntranslatedText( originalText, isFromSpammingComponent, !isFromSpammingComponent, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
+               CachedKeys.Add( originalText, key );
+            }
+
+            return key;
+         }
+
          return new UntranslatedText( originalText, isFromSpammingComponent, !isFromSpammingComponent, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
       }
 

@@ -196,6 +196,8 @@ The supported translators are:
    * No limitations.
  * ezTrans XP, based on Changsinsoft's japanese-korean translator ezTrans XP. Does not require authentication, but does require the software and [Ehnd](https://github.com/sokcuri/ehnd) installed.
    * No limitations.
+ * [Sugoi Translator](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), currently requires external translator plugin.
+   * No limitations. Remarkable quality.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:
@@ -293,6 +295,7 @@ TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Gett
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex;ReplaceHtmlEntities ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
+RegexPostProcessing=None         ;Indicates what type of post processing to perform on the capture groups of regexes. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
 CacheRegexPatternResults=False   ;Indicates whether or not the complete result of regex-splitted translations should be output to the specified OutputFile
@@ -639,6 +642,9 @@ The group(s) `(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?` matches the text inside 
 
 The group `(?<after>[\s\S]+)` matches whatever comes after. Because of this, it will attempt to translate that text like any other, and that may flow directly back into this splitter regex.
 
+#### Regex Post Processing
+Using the configuration option `RegexPostProcessing`, it is also possible to apply post processing the to the groups of a regex. For `sr:` regexes they are only applied to groups where the identifier name ends in `_i`.
+
 ### UI Font Resizing
 It is also possible to manually control the font size of text components. This is useful when the translated text uses more space than the untranslated text.
 
@@ -669,6 +675,10 @@ The following types of commands exists:
    * `UGUI_HorizontalOverflow(string mode)` - possible values: [wrap, overflow]
  * Commands that control vertical overflow (UGUI only):
    * `UGUI_VerticalOverflow(string mode)` - possible values: [truncate, overflow]
+ * Commands to control overflow (TMP only):
+   * `TMP_Overflow(string mode)` - [possible values](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/api/TMPro.TextOverflowModes.html)
+ * Commands to control text alignment (TMP only):
+   * `TMP_Alignment(string mode)` - [possible values](https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0/api/TMPro.TextAlignmentOptions.html)
 
 But stop you say! How would I determine the path to use? This plugin provides no way to easily determine this, but there are other plugins that will allow you to do this.
 

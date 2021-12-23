@@ -661,6 +661,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool IsKnownImageType( this object ui )
       {
+         if( ui == null ) return false;
+
 #if MANAGED
          var type = ui.GetType();
 

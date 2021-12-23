@@ -17,7 +17,7 @@ using XUnity.Common.Logging;
 
 namespace PapagoTranslate
 {
-   public class PapagoTranslate : HttpEndpoint
+   public class PapagoTranslateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "en", "ko", "zh-CN", "zh-TW", "es", "fr", "ru", "vi", "th", "id", "de", "ja", "hi", "pt" };
       private static readonly HashSet<string> SMTLanguages = new HashSet<string> { "hi", "pt" };
@@ -25,7 +25,7 @@ namespace PapagoTranslate
       private static readonly string UrlBase = "https://papago.naver.com";
       private static readonly string UrlN2MT = "/apis/n2mt/translate"; // Neural Machine Translation
       private static readonly string UrlNSMT = "/apis/nsmt/translate"; // Statistical Machine Translation
-      private static readonly string FormUrlEncodedTemplate = "honorific=false&source={0}&target={1}&text={2}";
+      private static readonly string FormUrlEncodedTemplate = "deviceId={0}&locale=en&dict=false&honorific=false&instant=true&source={1}&target={2}&text={3}";
       private static readonly Random RandomNumbers = new Random();
       private static readonly Guid UUID = Guid.NewGuid();
       private static readonly Regex PatternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Singleline );
@@ -96,17 +96,19 @@ namespace PapagoTranslate
             UrlBase + ( _isSMT ? UrlNSMT : UrlN2MT ),
             string.Format(
                FormUrlEncodedTemplate,
+               UUID,
                FixLanguage( context.SourceLanguage ),
                FixLanguage( context.DestinationLanguage ),
                text ) );
 
          // create token
-         var timestamp = Math.Truncate( DateTime.Now.Subtract( DateTime.MinValue.AddYears( 1969 ) ).TotalMilliseconds );
+         var timestamp = Math.Truncate( DateTime.UtcNow.Subtract( DateTime.MinValue.AddYears( 1969 ) ).TotalMilliseconds );
          var key = Encoding.UTF8.GetBytes( _version );
          var data = Encoding.UTF8.GetBytes( $"{UUID}\n{request.Address}\n{timestamp}" );
          var token = Convert.ToBase64String( new HMACMD5( key ).ComputeHash( data ) );
 
          // set required headers
+         request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
          request.Headers[ "Authorization" ] = $"PPG {UUID}:{token}";
          request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
          request.Headers[ "Timestamp" ] = timestamp.ToString();
