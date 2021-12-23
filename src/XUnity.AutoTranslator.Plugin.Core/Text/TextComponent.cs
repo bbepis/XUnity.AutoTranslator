@@ -86,7 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       public bool IsCollected()
       {
-         return UnhollowerBaseLib.IL2CPP.il2cpp_gchandle_get_target( _gcHandle ) == IntPtr.Zero;
+         return IL2CPP.il2cpp_gchandle_get_target( _gcHandle ) == IntPtr.Zero;
       }
 
       public unsafe bool SupportsRichText()

@@ -67,8 +67,4 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return Screen.height;
       }
    }
-
-   internal interface IComponentHelper
-   {
-   }
 }

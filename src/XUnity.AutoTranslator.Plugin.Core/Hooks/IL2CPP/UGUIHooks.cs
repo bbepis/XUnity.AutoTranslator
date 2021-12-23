@@ -47,6 +47,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( Component __instance )
       {
+         //__instance = (Component)Il2CppUtilities.CreateProxyComponentWithProxyType( __instance.Pointer, UnityTypes.Text.ProxyType );
+
          var instance = new TextComponent( __instance );
 
          _Postfix( instance );

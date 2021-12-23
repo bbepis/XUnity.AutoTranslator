@@ -1,6 +1,4 @@
-﻿#if MANAGED
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -36,6 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
       {
          var type = _type;
 
+#if MANAGED
          if( UnityTypes.AdvUguiMessageWindow != null && UnityTypes.UguiNovelText?.IsAssignableFrom( type ) == true )
          {
             var uguiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUguiMessageWindow );
@@ -190,6 +189,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                }
             }
          }
+#endif
 
          // fallback to reflective approach
          var property = _property;
@@ -197,6 +197,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
          {
             property.Set( ui, text );
 
+#if MANAGED
             if( Settings.IgnoreVirtualTextSetterCallingRules )
             {
                var newText = (string)property.Get( ui );
@@ -217,6 +218,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                   }
                }
             }
+#endif
          }
 
          // TMPro
@@ -230,6 +232,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
             }
          }
 
+#if MANAGED
          if( UnityTypes.TextExpansion_Methods.SetMessageType != null && UnityTypes.TextExpansion_Methods.SkipTypeWriter != null )
          {
             if( UnityTypes.TextExpansion.IsAssignableFrom( type ) )
@@ -238,6 +241,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                UnityTypes.TextExpansion_Methods.SkipTypeWriter.Invoke( ui );
             }
          }
+#endif
       }
 
       private static Dictionary<Type, TypeAndMethod> _textSetters = new Dictionary<Type, TypeAndMethod>();
@@ -291,5 +295,3 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
    }
 
 }
-
-#endif

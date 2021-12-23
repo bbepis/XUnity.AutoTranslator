@@ -103,16 +103,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                manipulator = new TextArea2DComponentManipulator();
             }
+#endif
             else
             {
                manipulator = new DefaultTextComponentManipulator( type );
             }
-#else
-            else
-            {
-               throw new NotImplementedException( "Unrecognized text type: " + type.FullName );
-            }
-#endif
             Manipulators[ type ] = manipulator;
          }
 
@@ -136,7 +131,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return false;
 
+#if MANAGED
          var type = ui.GetType();
+#else
+         var isIl2CppType = ui is UnhollowerBaseLib.Il2CppObjectBase;
+         var type = isIl2CppType ? ui.GetIl2CppTypeSafe() : null;
+#endif
+
 
          return ( Settings.EnableIMGUI && !_guiContentCheckFailed && IsGUIContentSafe( ui ) )
             || ( ui is ITextComponent tc && tc.IsEnabledInSettings() )
@@ -146,6 +147,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( type ) )
             || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( type ) )
             || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
+#else
+            || ( isIl2CppType && Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( type ) )
+            || ( isIl2CppType && Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.Il2CppType.IsAssignableFrom( type ) )
+            || ( isIl2CppType && Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( type ) )
+            || ( isIl2CppType && Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
 #endif
             ;
       }
@@ -161,6 +167,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             return UnityTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true
                || UnityTypes.TextMeshPro?.IsAssignableFrom( type ) == true;
+         }
+      }
+#else
+      public static bool IsKnownTextMeshProType( Il2CppSystem.Type type )
+      {
+         if( UnityTypes.TMP_Text != null )
+         {
+            return UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( type );
+         }
+         else
+         {
+            return UnityTypes.TextMeshProUGUI?.Il2CppType.IsAssignableFrom( type ) == true
+               || UnityTypes.TextMeshPro?.Il2CppType.IsAssignableFrom( type ) == true;
          }
       }
 #endif

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using UnhollowerBaseLib;
 using UnhollowerRuntimeLib;
 using XUnity.Common.Constants;
+using XUnity.Common.Utilities;
 
 namespace XUnity.Common.Extensions
 {
@@ -40,6 +41,12 @@ namespace XUnity.Common.Extensions
             ref exc );
          Il2CppException.RaiseExceptionIfNecessary( exc );
          return intPtr != IntPtr.Zero ? new Il2CppSystem.Type( intPtr ) : null;
+      }
+
+      public static bool IsCollected( this Il2CppObjectBase that )
+      {
+         var gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( that );
+         return IL2CPP.il2cpp_gchandle_get_target( gcHandle ) == IntPtr.Zero;
       }
    }
 }

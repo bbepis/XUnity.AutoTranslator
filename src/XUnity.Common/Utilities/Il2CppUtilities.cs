@@ -8,11 +8,15 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using UnhollowerBaseLib;
 using UnityEngine;
+using XUnity.Common.Logging;
 
 namespace XUnity.Common.Utilities
 {
    public static class Il2CppUtilities
    {
+      private static Dictionary<string, IntPtr> ourImagesMap;
+      private static Dictionary<Type, Func<IntPtr, Il2CppObjectBase>> FactoryFunctionsByType = new Dictionary<Type, Func<IntPtr, Il2CppObjectBase>>();
+
       public static class Factory<TComponent>
       {
          public static readonly Func<IntPtr, TComponent> CreateProxyComponent =
@@ -25,7 +29,17 @@ namespace XUnity.Common.Utilities
                ) );
       }
 
-      private static Dictionary<string, IntPtr> ourImagesMap;
+      public static Il2CppObjectBase CreateProxyComponentWithDerivedType( IntPtr ptr, Type type )
+      {
+         if( !FactoryFunctionsByType.TryGetValue( type, out var factoryFunction ) )
+         {
+            var fn = typeof( Factory<> ).MakeGenericType( type ).GetField( "CreateProxyComponent", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic ).GetValue( null );
+            factoryFunction = (Func<IntPtr, Il2CppObjectBase>)fn;
+            FactoryFunctionsByType[ type ] = factoryFunction;
+         }
+
+         return factoryFunction( ptr );
+      }
 
       public static Func<object, uint> GetGarbageCollectionHandle =
          CustomFastReflectionHelper.CreateFastFieldGetter<object, uint>(
