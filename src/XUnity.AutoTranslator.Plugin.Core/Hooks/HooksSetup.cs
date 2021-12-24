@@ -33,7 +33,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( TextGetterCompatHooks.All, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("TextGetterCompatibilityMode is not supported in IL2CPP.");
 #endif
             }
          }
@@ -57,7 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                   HookingHelper.PatchAll( ImageHooks.Sprite, Settings.ForceMonoModHooks );
                }
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("EnableTextureTranslation is not supported in IL2CPP.");
 #endif
             }
          }
@@ -76,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( ImageHooks.SpriteRenderer, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("EnableSpriteRendererHooking is not supported in IL2CPP.");
 #endif
             }
          }
@@ -97,7 +97,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( TextAssetHooks.All, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("TextAssetHooks are not supported in IL2CPP.");
 #endif
             }
          }
@@ -132,7 +132,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                   HookingHelper.PatchAll( TextMeshProHooks.DisableScrollInTmp, Settings.ForceMonoModHooks );
 #else
-                  throw new NotImplementedException();
+                  throw new NotImplementedException("DisableTextMeshProScrollInEffects is not supported in IL2CPP.");
 #endif
                }
             }
@@ -161,7 +161,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( IMGUIHooks.All, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("EnableIMGUI is not supported in IL2CPP.");
 #endif
             }
          }
@@ -200,7 +200,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( FairyGUIHooks.All, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException();
+               throw new NotImplementedException("EnableFairyGUI is not supported in IL2CPP.");
 #endif
             }
          }
@@ -223,7 +223,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                   HookingHelper.PatchAll( PluginTranslationHooks.All, Settings.ForceMonoModHooks );
 #else
-                  throw new NotImplementedException();
+                  throw new NotImplementedException("Plugin specific hooks are not supported in IL2CPP.");
 #endif
                }
                catch( Exception e )
@@ -270,7 +270,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
                _installedAssemblies.Add( assembly );
             }
 #else
-            throw new NotImplementedException();
+            throw new NotImplementedException("Plugin specific hooks are not supported in IL2CPP.");
 #endif
          }
       }

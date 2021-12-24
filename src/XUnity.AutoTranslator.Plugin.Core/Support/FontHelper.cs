@@ -16,7 +16,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 #if MANAGED
          object font = null;
 
-         var overrideFontPath = Path.Combine( PathsHelper.GameRoot, Settings.OverrideFontTextMeshPro );
+         var overrideFontPath = Path.Combine( Paths.GameRoot, Settings.OverrideFontTextMeshPro );
          if( File.Exists( overrideFontPath ) )
          {
             XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from asset bundle." );
@@ -76,7 +76,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 #endif
       }
 
-      public static object GetTextFont( int size )
+      public static Font GetTextFont( int size )
       {
          var font = Font.CreateDynamicFontFromOSFont( Settings.OverrideFont, size );
          GameObject.DontDestroyOnLoad( font );

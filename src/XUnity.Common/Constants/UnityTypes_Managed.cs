@@ -244,11 +244,6 @@ namespace XUnity.Common.Constants
 
          return null;
       }
-
-      private static Type FindTypeStrict( string name )
-      {
-         return Type.GetType( name, false );
-      }
    }
 }
 

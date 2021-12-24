@@ -111,6 +111,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // Setup 'singleton'
          Current = this;
 
+         Paths.Initialize();
+
          // because we only use harmony/MonoMod through reflection due to
          // version compatibility issues, we call this method to
          // ensure that it is loaded before we attempt to obtain
@@ -3370,7 +3372,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void PrintObjects()
       {
 
-         using( var stream = File.Open( Path.Combine( PathsHelper.GameRoot, "hierarchy.txt" ), FileMode.Create ) )
+         using( var stream = File.Open( Path.Combine( Paths.GameRoot, "hierarchy.txt" ), FileMode.Create ) )
          using( var writer = new StreamWriter( stream ) )
          {
             foreach( var root in GetAllRoots() )

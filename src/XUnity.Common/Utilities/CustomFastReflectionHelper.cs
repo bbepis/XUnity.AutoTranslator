@@ -16,7 +16,7 @@ namespace XUnity.Common.Utilities
    /// </summary>
    public static class CustomFastReflectionHelper
    {
-      private static readonly Dictionary<FastReflectionDelegateKey, FastReflectionDelegate> _MethodCache = new Dictionary<FastReflectionDelegateKey, FastReflectionDelegate>();
+      private static readonly Dictionary<FastReflectionDelegateKey, FastReflectionDelegate> MethodCache = new Dictionary<FastReflectionDelegateKey, FastReflectionDelegate>();
 
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
@@ -29,7 +29,7 @@ namespace XUnity.Common.Utilities
       {
          var key = new FastReflectionDelegateKey( method, directBoxValueAccess, forceNonVirtCall );
 
-         if( _MethodCache.TryGetValue( key, out FastReflectionDelegate dmd ) )
+         if( MethodCache.TryGetValue( key, out FastReflectionDelegate dmd ) )
             return dmd;
 
          if( ClrTypes.DynamicMethodDefinition != null )
@@ -41,7 +41,7 @@ namespace XUnity.Common.Utilities
             dmd = GetFastDelegateForSRE( method, directBoxValueAccess, forceNonVirtCall );
          }
 
-         _MethodCache.Add( key, dmd );
+         MethodCache.Add( key, dmd );
          return dmd;
       }
 

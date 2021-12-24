@@ -94,7 +94,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
       /// </summary>
       public virtual void Initialize( IInitializationContext context )
       {
-         _gameRoot = PathsHelper.GameRoot;
+         _gameRoot = Paths.GameRoot;
 
          string exePath = null;
          if( ConfigurationSectionName != null )

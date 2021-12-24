@@ -51,15 +51,11 @@ namespace XUnity.AutoTranslator.Plugin.Shims
 
       public static int GetActiveSceneId()
       {
-#if IL2CPP
-         return GetActiveSceneIdBySceneManager();
-#else
          if( UnityFeatures.SupportsSceneManager )
          {
             return GetActiveSceneIdBySceneManager();
          }
          return GetActiveSceneIdByApplication();
-#endif
       }
 
       private static int GetActiveSceneIdBySceneManager()
@@ -76,12 +72,10 @@ namespace XUnity.AutoTranslator.Plugin.Shims
 #endif
       }
 
-#if MANAGED
       private static int GetActiveSceneIdByApplication()
       {
          return Application.loadedLevel;
       }
-#endif
    }
 
 #if MANAGED

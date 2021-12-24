@@ -11,11 +11,11 @@ namespace XUnity.Common.Utilities
    /// </summary>
    internal static class ReflectionEmitFastReflectionHelper
    {
-      private static readonly Type[] _DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };
+      private static readonly Type[] DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };
 
       public static FastReflectionDelegate CreateFastDelegate( MethodBase method, bool directBoxValueAccess, bool forceNonVirtcall )
       {
-         DynamicMethod dmd = new DynamicMethod( $"FastReflection<{method.DeclaringType.FullName + "." + method.Name}>", typeof( object ), _DynamicMethodDelegateArgs, method.DeclaringType.Module, true );
+         DynamicMethod dmd = new DynamicMethod( $"FastReflection<{method.DeclaringType.FullName + "." + method.Name}>", typeof( object ), DynamicMethodDelegateArgs, method.DeclaringType.Module, true );
          ILGenerator il = dmd.GetILGenerator();
          ParameterInfo[] args = method.GetParameters();
          bool generateLocalBoxValuePtr = true;

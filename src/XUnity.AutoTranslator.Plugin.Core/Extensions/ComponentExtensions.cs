@@ -265,7 +265,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return false;
       }
 
-      private static bool IsGUIContentUnsafe( object ui ) => ui.TryCastTo<GUIContent>( out _ );
+      private static bool IsGUIContentUnsafe( object ui ) => ui is GUIContent;
 
       private static bool SetTextOnGUIContentSafe( object ui, string text )
       {
@@ -661,7 +661,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             UnityTypes.Graphic.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
-         else if( !( ui is SpriteRenderer ) )
+         else if( !( ui.TryCastTo<SpriteRenderer>( out _ ) ) )
          {
             AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
          }

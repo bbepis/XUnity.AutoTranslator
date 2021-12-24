@@ -16,11 +16,11 @@ namespace XUnity.Common.Utilities
    /// </summary>
    internal static class CecilFastReflectionHelper
    {
-      private static readonly Type[] _DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };
+      private static readonly Type[] DynamicMethodDelegateArgs = { typeof( object ), typeof( object[] ) };
 
       public static FastReflectionDelegate CreateFastDelegate( MethodBase method, bool directBoxValueAccess, bool forceNonVirtcall )
       {
-         DynamicMethodDefinition dmd = new DynamicMethodDefinition( $"FastReflection<{method.DeclaringType.FullName + "." + method.Name}>", typeof( object ), _DynamicMethodDelegateArgs );
+         DynamicMethodDefinition dmd = new DynamicMethodDefinition( $"FastReflection<{method.DeclaringType.FullName + "." + method.Name}>", typeof( object ), DynamicMethodDelegateArgs );
          ILProcessor il = dmd.GetILProcessor();
 
          ParameterInfo[] args = method.GetParameters();

@@ -30,12 +30,12 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx_Il2Cpp
 
       public AutoTranslatorPlugin()
       {
-         ConfigPath = Paths.ConfigPath;
-         TranslationPath = Paths.BepInExRootPath;
+         ConfigPath = BepInEx.Paths.ConfigPath;
+         TranslationPath = BepInEx.Paths.BepInExRootPath;
 
          _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
 
-         Il2CppProxyAssemblies.Location = Path.Combine( Paths.BepInExRootPath, "unhollowed" );
+         Il2CppProxyAssemblies.Location = Path.Combine( BepInEx.Paths.BepInExRootPath, "unhollowed" );
       }
 
       public override void Load()

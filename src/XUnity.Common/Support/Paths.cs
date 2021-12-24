@@ -11,11 +11,17 @@ namespace XUnity.Common.Support
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.
    /// </summary>
-   public static class PathsHelper
+   public static class Paths
    {
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
       public static string GameRoot => new DirectoryInfo( Application.dataPath ).Parent.FullName;
+
+      public static void Initialize()
+      {
+         // simply sets the GameRoot variable, ensuring it is initialized from the
+         // thread that calls this method
+      }
    }
 }

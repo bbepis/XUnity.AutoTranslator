@@ -9,6 +9,6 @@ namespace XUnity.ResourceRedirector.Constants
 {
    internal static class EnvironmentEx
    {
-      internal static readonly string LoweredCurrentDirectory = PathsHelper.GameRoot.ToLowerInvariant();
+      internal static readonly string LoweredCurrentDirectory = Paths.GameRoot.ToLowerInvariant();
    }
 }

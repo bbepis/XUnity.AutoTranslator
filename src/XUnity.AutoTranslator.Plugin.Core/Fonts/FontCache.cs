@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Constants;
@@ -13,13 +14,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {
    internal static class FontCache
    {
-      private static readonly Dictionary<int, object> CachedFonts = new Dictionary<int, object>();
+      private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
       private static object TextMeshProOverrideFont;
       private static bool _hasReadTextMeshProFont = false;
 
-      public static object GetOrCreate( int size )
+      public static Font GetOrCreate( int size )
       {
-         if( !CachedFonts.TryGetValue( size, out object font ) )
+         if( !CachedFonts.TryGetValue( size, out Font font ) )
          {
             font = FontHelper.GetTextFont( size );
             CachedFonts.Add( size, font );
