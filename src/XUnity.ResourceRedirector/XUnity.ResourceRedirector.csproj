@@ -1,46 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Title>XUnity Resource Redirector for Unity</Title>
-    <Description>Main development dependency for XUnity Resource Redirector.</Description>
-    <Authors>gravydevsupreme</Authors>
-    <PackageTags>unity;xunity;resource redirection</PackageTags>
-    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <DevelopmentDependency>True</DevelopmentDependency>
-    <TargetFramework>net35</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Version>1.2.1</Version>
-  </PropertyGroup>
+   <PropertyGroup>
+      <Title>XUnity Resource Redirector for Unity</Title>
+      <Description>Main development dependency for XUnity Resource Redirector.</Description>
+      <Authors>gravydevsupreme</Authors>
+      <PackageTags>unity;xunity;resource redirection</PackageTags>
+      <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+      <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+      <PackageLicenseExpression>MIT</PackageLicenseExpression>
+      <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+      <DevelopmentDependency>True</DevelopmentDependency>
+      <TargetFramework>net35</TargetFramework>
+      <LangVersion>latest</LangVersion>
+      <Version>1.2.1</Version>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-  </ItemGroup>
+   <ItemGroup>
+      <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\net35\XUnity.ResourceRedirector.xml</DocumentationFile>
-  </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <DocumentationFile>bin\Release\net35\XUnity.ResourceRedirector.xml</DocumentationFile>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
+      <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+   <ItemGroup>
+      <Compile Update="Properties\Resources.Designer.cs">
+         <DesignTime>True</DesignTime>
+         <AutoGen>True</AutoGen>
+         <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+   <ItemGroup>
+      <EmbeddedResource Update="Properties\Resources.resx">
+         <Generator>ResXFileCodeGenerator</Generator>
+         <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+   </ItemGroup>
 
 </Project>

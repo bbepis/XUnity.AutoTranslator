@@ -64,19 +64,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       static ComponentExtensions()
       {
          TexturePropertyMovers = new List<IPropertyMover>();
-         LoadProperty<string>( "name" );
-         LoadProperty<int>( "anisoLevel" );
-         LoadProperty<FilterMode>( "filterMode" );
-         LoadProperty<float>( "mipMapBias" );
-         LoadProperty<TextureWrapMode>( "wrapMode" );
+         LoadProperty<UnityEngine.Object, string>( "name" );
+         LoadProperty<Texture, int>( "anisoLevel" );
+         LoadProperty<Texture, FilterMode>( "filterMode" );
+         LoadProperty<Texture, float>( "mipMapBias" );
+         LoadProperty<Texture, TextureWrapMode>( "wrapMode" );
       }
 
-      private static void LoadProperty<TPropertyType>( string propertyName )
+      private static void LoadProperty<TObject, TPropertyType>( string propertyName )
       {
-         var property = typeof( Texture2D ).GetProperty( propertyName );
-         if( property.CanWrite && property.CanRead )
+         var property = typeof( TObject ).GetProperty( propertyName );
+         if( property != null && property.CanWrite && property.CanRead )
          {
-            TexturePropertyMovers.Add( new PropertyMover<Texture, TPropertyType>( property ) );
+            TexturePropertyMovers.Add( new PropertyMover<TObject, TPropertyType>( property ) );
          }
       }
 
@@ -114,7 +114,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui is Component component )
          {
-            return component.gameObject?.activeInHierarchy ?? false;
+            var go = component.gameObject;
+            if( go )
+            {
+               if( component is Behaviour be )
+               {
+                  return go.activeInHierarchy && be.enabled;
+               }
+               else
+               {
+                  return go.activeInHierarchy;
+               }
+            }
          }
          return true;
       }
@@ -271,7 +282,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       private static bool SetTextOnGUIContentUnsafe( object ui, string text )
       {
-         if( ui.TryCastTo<GUIContent>( out var gui ) )
+         if( ui is GUIContent gui )
          {
             gui.text = text;
             return true;
@@ -295,7 +306,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       private static bool TryGetTextFromGUIContentUnsafe( object ui, out string text )
       {
-         if( ui.TryCastTo<GUIContent>( out var gui ) )
+         if( ui is GUIContent gui )
          {
             text = gui.text;
             return true;
@@ -560,7 +571,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return go.name.Contains( XuaIgnore );
       }
 
-      public static object GetTexture( this object ui )
+      public static Texture2D GetTexture( this object ui )
       {
 #warning NOT TESTED FOR IL2CPP, but may work
          if( ui == null ) return null;
@@ -581,12 +592,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static object SetTexture( this object ui, object textureObj, object spriteObj, bool isPrefixHooked )
+      public static Sprite SetTexture( this object ui, Texture2D texture, Sprite sprite, bool isPrefixHooked )
       {
 #warning NOT TESTED FOR IL2CPP, but may work
          if( ui == null ) return null;
-         var sprite = (Sprite)spriteObj;
-         var texture = (Texture2D)textureObj;
 
          var currentTexture = ui.GetTexture();
 
@@ -616,7 +625,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                if( material != null )
                {
                   var mainTextureProperty = material.GetType().CachedProperty( MainTexturePropertyName );
-                  var materialTexture = mainTextureProperty?.Get( material );
+                  var materialTexture = (Texture2D)mainTextureProperty?.Get( material );
                   if( ReferenceEquals( materialTexture, currentTexture ) )
                   {
                      mainTextureProperty?.Set( material, texture );
@@ -692,21 +701,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return fallbackName;
       }
 
-      public static void LoadImageEx( this Texture2D texture, byte[] data, ImageFormat dataType, object originalTexture )
+      public static void LoadImageEx( this Texture2D texture, byte[] data, ImageFormat dataType, Texture2D originalTexture )
       {
          TextureLoader.Load( texture, data, dataType );
 
-         if( texture.TryCastTo<Texture2D>( out var texture2D ) && originalTexture.TryCastTo<Texture2D>( out var originalTexture2D ) )
+         if( originalTexture != null )
          {
             foreach( var prop in TexturePropertyMovers )
             {
-               prop.MoveProperty( originalTexture2D, texture2D );
+               prop.MoveProperty( originalTexture, texture );
             }
-            //texture2D.name = originalTexture2D.name;
-            //texture2D.anisoLevel = originalTexture2D.anisoLevel;
-            //texture2D.filterMode = originalTexture2D.filterMode;
-            //texture2D.mipMapBias = originalTexture2D.mipMapBias;
-            //texture2D.wrapMode = originalTexture2D.wrapMode;
          }
       }
 
@@ -726,15 +730,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static TextureDataResult GetTextureData( this object texture )
+      public static TextureDataResult GetTextureData( this Texture2D texture )
       {
 #warning Probably wont work with IL2CPP
-
-         var tex = (Texture2D)texture;
-         var width = tex.width;
-         var height = tex.height;
-
          var start = Time.realtimeSinceStartup;
+
+         var width = texture.width;
+         var height = texture.height;
 
          byte[] data = null;
          //bool nonReadable = texture.IsNonReadable();
@@ -748,7 +750,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          {
             var tmp = RenderTexture.GetTemporary( width, height, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Default );
             GL.Clear( false, true, Transparent );
-            Graphics.Blit( tex, tmp );
+            Graphics.Blit( texture, tmp );
             var previousRenderTexture = RenderTexture.active;
             RenderTexture.active = tmp;
 

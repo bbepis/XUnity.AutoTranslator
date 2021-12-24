@@ -7,11 +7,5 @@ namespace XUnity.AutoTranslator.Plugin.Core
    interface IInternalTranslator : ITranslator
    {
       void TranslateAsync( TranslationEndpointManager endpoint, string untranslatedText, Action<TranslationResult> onCompleted );
-
-      TextTranslationCache TextCache { get; }
-
-      Dictionary<string, TextTranslationCache> PluginTextCaches { get; }
-
-      TextureTranslationCache TextureCache { get; }
    }
 }

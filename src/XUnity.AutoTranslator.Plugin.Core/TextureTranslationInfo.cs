@@ -23,11 +23,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string _key;
       private byte[] _originalData;
       private bool _initialized;
-      private int _textureFormat;
+      private TextureFormat _textureFormat;
 
-      public WeakReference Original { get; private set; }
+      public XUnity.Common.Utilities.WeakReference<Texture2D> Original { get; private set; }
 
-      public object Translated { get; private set; }
+      public Texture2D Translated { get; private set; }
 
       public Sprite TranslatedSprite { get; set; }
 
@@ -39,25 +39,25 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       // INTIALIZE to set texture format???
       // We also have specialized hooks for legacy textures???
-      public void Initialize( object texture )
+      public void Initialize( Texture2D texture )
       {
          if( !_initialized )
          {
             _initialized = true;
 
             // NOT ALLOWED!!!!
-            _textureFormat = (int)( (Texture2D)texture ).format;
+            _textureFormat = texture.format;
 
             SetOriginal( texture );
          }
       }
 
-      public void SetOriginal( object texture )
+      public void SetOriginal( Texture2D texture )
       {
-         Original = new WeakReference( texture );
+         Original = XUnity.Common.Utilities.WeakReference<Texture2D>.Create( texture );
       }
 
-      private void SetTranslated( object texture )
+      private void SetTranslated( Texture2D texture )
       {
          Translated = texture;
       }
@@ -112,7 +112,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return Original.Target.GetTextureData().Data;
       }
 
-      private TextureDataResult SetupKeyForNameWithFallback( string name, object texture )
+      private TextureDataResult SetupKeyForNameWithFallback( string name, Texture2D texture )
       {
          bool detectedDuplicateName = false;
          string existingHash = null;
@@ -163,13 +163,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( detectedDuplicateName && Settings.EnableTextureDumping )
          {
             var oldKey = HashHelper.Compute( UTF8.GetBytes( name ) );
-            AutoTranslator.Internal.TextureCache.RenameFileWithKey( name, oldKey, existingHash );
+            AutoTranslationPlugin.Current.TextureCache.RenameFileWithKey( name, oldKey, existingHash );
          }
 
          return result;
       }
 
-      private void SetupHashAndData( object texture )
+      private void SetupHashAndData( Texture2D texture )
       {
          if( _key == null )
          {

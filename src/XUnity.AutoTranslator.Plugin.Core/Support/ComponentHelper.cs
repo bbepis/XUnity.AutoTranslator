@@ -33,12 +33,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          return typedArr;
       }
 
-      public static Texture2D CreateEmptyTexture2D( int originalTextureFormat )
+      public static Texture2D CreateEmptyTexture2D( TextureFormat originalTextureFormat )
       {
-         var format = (TextureFormat)originalTextureFormat;
-
          TextureFormat newFormat;
-         switch( format )
+         switch( originalTextureFormat )
          {
             case TextureFormat.RGB24:
                newFormat = TextureFormat.RGB24;
@@ -55,16 +53,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          }
 
          return new Texture2D( 2, 2, newFormat, false );
-      }
-
-      public static int GetScreenWidth()
-      {
-         return Screen.width;
-      }
-
-      public static int GetScreenHeight()
-      {
-         return Screen.height;
       }
    }
 }

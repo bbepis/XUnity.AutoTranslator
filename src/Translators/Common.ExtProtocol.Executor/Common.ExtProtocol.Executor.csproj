@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net45</TargetFramework>
-  </PropertyGroup>
+   <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net45</TargetFramework>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
-    <ProjectReference Include="..\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" />
+      <ProjectReference Include="..\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
+   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;)" />
-  </Target>
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;)" />
+   </Target>
 
 </Project>

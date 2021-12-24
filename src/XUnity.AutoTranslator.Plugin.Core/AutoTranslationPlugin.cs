@@ -103,12 +103,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _isCalledFromSceneManager = false;
       private bool _translationReloadRequest = false;
 
-      TextTranslationCache IInternalTranslator.TextCache => TextCache;
-
-      Dictionary<string, TextTranslationCache> IInternalTranslator.PluginTextCaches => PluginTextCaches;
-
-      TextureTranslationCache IInternalTranslator.TextureCache => TextureCache;
-
       /// <summary>
       /// Initialized the plugin.
       /// </summary>
@@ -116,8 +110,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          // Setup 'singleton'
          Current = this;
-         AutoTranslator.SetTranslator( this );
-         TranslationRegistry.SetRegistry( this );
 
          // because we only use harmony/MonoMod through reflection due to
          // version compatibility issues, we call this method to
@@ -469,7 +461,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             XuaLogger.AutoTranslator.Debug( "Probing whether OnLevelWasLoaded or SceneManager is supported in this version of Unity. Any warnings related to OnLevelWasLoaded coming from Unity can safely be ignored." );
-            if( TranslationScopeHelper.SupportsSceneManager() )
+            if( UnityFeatures.SupportsSceneManager )
             {
                TranslationScopeHelper.RegisterSceneLoadCallback( OnLevelWasLoadedFromSceneManager );
                XuaLogger.AutoTranslator.Debug( "SceneManager is supported in this version of Unity." );
@@ -500,8 +492,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void OnLevelWasLoaded( int id )
       {
-         var supportsSceneManager = TranslationScopeHelper.SupportsSceneManager();
-         if( !supportsSceneManager || ( supportsSceneManager && _isCalledFromSceneManager ) )
+         if( !UnityFeatures.SupportsSceneManager || ( UnityFeatures.SupportsSceneManager && _isCalledFromSceneManager ) )
          {
             if( Settings.EnableTextureScanOnSceneLoad && ( Settings.EnableTextureDumping || Settings.EnableTextureTranslation ) )
             {
@@ -648,7 +639,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void QueueNewUntranslatedForClipboard( string untranslatedText )
       {
-         if( Settings.CopyToClipboard && ClipboardHelper.SupportsClipboard() )
+         if( Settings.CopyToClipboard && UnityFeatures.SupportsClipboard )
          {
             // Perhaps this should be the original, but that might have unexpected consequences for external tools??
             if( !_textsToCopyToClipboard.Contains( untranslatedText ) )
@@ -975,7 +966,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void TranslateTexture( object ui, ref Sprite sprite, TextureReloadContext context )
       {
-         if( ui is Texture2D texture2d )
+         if( ui.TryCastTo<Texture2D>( out var texture2d ) )
          {
             TranslateTexture( null, ref sprite, ref texture2d, false, context );
          }
@@ -1106,7 +1097,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         {
                            if( Settings.EnableLegacyTextureLoading || !isCompatible )
                            {
-                              var newSprite = (Sprite)source.SetTexture( tti.GetTranslatedTexture(), sprite, isPrefixHooked );
+                              var newSprite = source.SetTexture( tti.Translated, sprite, isPrefixHooked );
                               if( newSprite != null )
                               {
                                  tti.TranslatedSprite = newSprite;
@@ -1167,7 +1158,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           var original = tti.GetOriginalTexture();
+                           var original = tti.Original.Target;
                            if( Settings.EnableLegacyTextureLoading && original != null )
                            {
                               source.SetTexture( original, null, isPrefixHooked );
@@ -1222,7 +1213,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      {
                         try
                         {
-                           var original = tti.GetOriginalTexture();
+                           var original = tti.Original.Target;
                            if( Settings.EnableLegacyTextureLoading && original != null )
                            {
                               source.SetTexture( original, null, isPrefixHooked );
@@ -1250,7 +1241,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                if( tti.IsTranslated )
                {
-                  var translated = tti.GetTranslatedTexture();
+                  var translated = tti.Translated;
                   if( translated != null )
                   {
                      texture = translated;
@@ -1258,7 +1249,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
                else
                {
-                  var original = tti.GetOriginalTexture();
+                  var original = tti.Original.Target;
                   if( original != null )
                   {
                      texture = original;
@@ -1287,7 +1278,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             CallOrigin.ImageHooksEnabled = false;
 
-            texture = texture ?? (Texture2D)source.GetTexture();
+            texture = texture ?? source.GetTexture();
             if( texture == null ) return;
 
             var info = texture.GetOrCreateTextureTranslationInfo();
@@ -2774,7 +2765,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                CachedKeys.Clear();
             }
 
-            if( ClipboardHelper.SupportsClipboard() )
+            if( UnityFeatures.SupportsClipboard )
             {
                CopyToClipboard();
             }

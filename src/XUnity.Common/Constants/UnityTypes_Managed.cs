@@ -179,8 +179,8 @@ namespace XUnity.Common.Constants
 
       public static class Texture2D_Methods
       {
-         public static readonly Action<Texture2D, byte[]> LoadImage =
-            (Action<Texture2D, byte[]>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+         public static readonly Func<Texture2D, byte[], bool> LoadImage =
+            (Func<Texture2D, byte[], bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
                typeof( Texture2D ).GetMethod(
                   "LoadImage",
                   BindingFlags.Public | BindingFlags.Instance,
@@ -202,9 +202,9 @@ namespace XUnity.Common.Constants
 
       public static class ImageConversions_Methods
       {
-         public static readonly Action<Texture2D, byte[], bool> LoadImage =
-            (Action<Texture2D, byte[], bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
-               UnityTypes.ImageConversion.GetMethod(
+         public static readonly Func<Texture2D, byte[], bool, bool> LoadImage =
+            (Func<Texture2D, byte[], bool, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion?.GetMethod(
                   "LoadImage",
                   BindingFlags.Public | BindingFlags.Static,
                   null,
@@ -214,7 +214,7 @@ namespace XUnity.Common.Constants
 
          public static readonly Func<Texture2D, byte[]> EncodeToPNG =
             (Func<Texture2D, byte[]>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
-               UnityTypes.ImageConversion.GetMethod(
+               UnityTypes.ImageConversion?.GetMethod(
                   "EncodeToPNG",
                   BindingFlags.Public | BindingFlags.Static,
                   null,

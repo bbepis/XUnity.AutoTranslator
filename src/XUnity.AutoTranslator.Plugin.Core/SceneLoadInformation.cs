@@ -18,7 +18,7 @@ namespace XUnity.AutoTranslator.Plugin
       {
          LoadedScenes = new List<SceneInformation>();
 
-         if( TranslationScopeHelper.SupportsSceneManager() )
+         if( UnityFeatures.SupportsSceneManager )
          {
             LoadBySceneManager();
          }

@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return iti;
       }
 
-      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this object texture )
+      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )
       {
          var tti = texture.GetOrCreateExtensionData<TextureTranslationInfo>();
          tti.Initialize( texture );

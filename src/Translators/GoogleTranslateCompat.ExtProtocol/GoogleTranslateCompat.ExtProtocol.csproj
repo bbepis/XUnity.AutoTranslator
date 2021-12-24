@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
-  </PropertyGroup>
+   <PropertyGroup>
+      <TargetFramework>net45</TargetFramework>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Common.ExtProtocol\Common.ExtProtocol.csproj" />
-    <ProjectReference Include="..\Http.ExtProtocol\Http.ExtProtocol.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\Common.ExtProtocol\Common.ExtProtocol.csproj" />
+      <ProjectReference Include="..\Http.ExtProtocol\Http.ExtProtocol.csproj" />
+   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;)" />
-  </Target>
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\Translators\FullNET\&quot;&#xD;&#xA;)" />
+   </Target>
 
 </Project>

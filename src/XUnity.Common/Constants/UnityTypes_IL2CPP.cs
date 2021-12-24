@@ -216,8 +216,8 @@ namespace XUnity.Common.Constants
 
       public static class Texture2D_Methods
       {
-         public static readonly Action<Texture2D, Il2CppStructArray<byte>> LoadImage =
-            (Action<Texture2D, Il2CppStructArray<byte>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+         public static readonly Func<Texture2D, Il2CppStructArray<byte>, bool> LoadImage =
+            (Func<Texture2D, Il2CppStructArray<byte>, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
                typeof( Texture2D ).GetMethod(
                   "LoadImage",
                   BindingFlags.Public | BindingFlags.Instance,
@@ -239,9 +239,9 @@ namespace XUnity.Common.Constants
 
       public static class ImageConversions_Methods
       {
-         public static readonly Action<Texture2D, Il2CppStructArray<byte>, bool> LoadImage =
-            (Action<Texture2D, Il2CppStructArray<byte>, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
-               UnityTypes.ImageConversion?.ProxyType?.GetMethod(
+         public static readonly Func<Texture2D, Il2CppStructArray<byte>, bool, bool> LoadImage =
+            (Func<Texture2D, Il2CppStructArray<byte>, bool, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
+               UnityTypes.ImageConversion?.ProxyType.GetMethod(
                   "LoadImage",
                   BindingFlags.Public | BindingFlags.Static,
                   null,

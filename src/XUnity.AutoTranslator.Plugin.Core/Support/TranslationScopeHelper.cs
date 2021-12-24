@@ -49,15 +49,6 @@ namespace XUnity.AutoTranslator.Plugin.Shims
          return component.gameObject.scene.buildIndex;
       }
 
-      public static bool SupportsSceneManager()
-      {
-#if IL2CPP
-         return UnityTypes.SceneManager_Methods.add_sceneLoaded != null;
-#else
-         return UnityFeatures.SupportsSceneManager;
-#endif
-      }
-
       public static int GetActiveSceneId()
       {
 #if IL2CPP

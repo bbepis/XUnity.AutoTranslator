@@ -7,18 +7,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class AutoTranslator
    {
-      private static IInternalTranslator _internalTranslator;
-
-      internal static void SetTranslator( IInternalTranslator translator )
-      {
-         _internalTranslator = translator;
-      }
-
-      internal static IInternalTranslator Internal => _internalTranslator;
+      internal static IInternalTranslator Internal => AutoTranslationPlugin.Current;
 
       /// <summary>
       /// Gets the translator instance.
       /// </summary>
-      public static ITranslator Default => _internalTranslator;
+      public static ITranslator Default => AutoTranslationPlugin.Current;
    }
 }

@@ -7,14 +7,14 @@
    </PropertyGroup>
 
    <ItemGroup>
-     <ProjectReference Include="..\..\src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
-     <ProjectReference Include="..\..\src\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj" />
+      <ProjectReference Include="..\..\src\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+      <ProjectReference Include="..\..\src\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj" />
    </ItemGroup>
 
    <ItemGroup>
-     <Reference Include="ICSharpCode.SharpZipLib">
-       <HintPath>..\..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
-     </Reference>
+      <Reference Include="ICSharpCode.SharpZipLib">
+         <HintPath>..\..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
+      </Reference>
    </ItemGroup>
 
 </Project>

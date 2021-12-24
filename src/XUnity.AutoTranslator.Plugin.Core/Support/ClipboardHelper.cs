@@ -49,11 +49,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          CopyToClipboard( text );
       }
 
-      public static bool SupportsClipboard()
-      {
-         return UnityFeatures.SupportsClipboard;
-      }
-
 #if MANAGED
       public static void CopyToClipboard( string text )
       {

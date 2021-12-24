@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net35</TargetFramework>
-  </PropertyGroup>
+   <PropertyGroup>
+      <TargetFramework>net35</TargetFramework>
+   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
-  </ItemGroup>
+   <ItemGroup>
+      <ProjectReference Include="..\..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+   </ItemGroup>
 
 </Project>

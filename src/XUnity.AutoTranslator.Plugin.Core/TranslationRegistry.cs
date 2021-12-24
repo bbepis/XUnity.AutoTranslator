@@ -14,17 +14,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class TranslationRegistry
    {
-      private static ITranslationRegistry _registry;
-
-      internal static void SetRegistry( ITranslationRegistry translator )
-      {
-         _registry = translator;
-      }
-
       /// <summary>
       /// Obtains the translations registry instance.
       /// </summary>
-      public static ITranslationRegistry Default => _registry;
+      public static ITranslationRegistry Default => AutoTranslationPlugin.Current;
    }
 
    /// <summary>
