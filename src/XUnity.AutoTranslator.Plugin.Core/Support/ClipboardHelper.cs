@@ -49,29 +49,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
          CopyToClipboard( text );
       }
 
+      public static void CopyToClipboard( string text )
+      {
+         try
+         {
 #if MANAGED
-      public static void CopyToClipboard( string text )
-      {
-         try
-         {
             TextEditor editor = (TextEditor)GUIUtility.GetStateObject( typeof( TextEditor ), GUIUtility.keyboardControl );
-            editor.text = text;
-            editor.SelectAll();
-            editor.Copy();
-         }
-         catch( Exception e )
-         {
-            XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
-         }
-      }
-#endif
-
-#if IL2CPP
-      public static void CopyToClipboard( string text )
-      {
-         try
-         {
+#else
             TextEditor editor = (TextEditor)GUIUtility.GetStateObject( Il2CppType.Of<TextEditor>(), GUIUtility.keyboardControl );
+#endif
             editor.text = text;
             editor.SelectAll();
             editor.Copy();
@@ -81,6 +67,5 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
             XuaLogger.Common.Error( e, "An error while copying text to clipboard." );
          }
       }
-#endif
    }
 }

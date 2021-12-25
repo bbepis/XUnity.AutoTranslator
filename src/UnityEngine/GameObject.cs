@@ -126,8 +126,11 @@ namespace UnityEngine
 
 
 
-
+#if IL2CPP
+      public extern Component GetComponent( Il2CppSystem.Type type );
+#else
       public extern Component GetComponent( Type type );
+#endif
 
 
 

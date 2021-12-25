@@ -13,28 +13,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
    {
 #if IL2CPP
       public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Il2CppSystem.Type type )
-      {
-         if( type == null ) return null;
-
-         var current = go;
-
-         while( current != null )
-         {
-            var foundComponent = UnityTypes.GameObject_Methods.GetComponent( current, type );
-            if( foundComponent != null )
-            {
-               return foundComponent;
-            }
-
-            current = current.transform?.parent?.gameObject;
-         }
-
-         return null;
-      }
-#endif
-
-#if MANAGED
+#else
       public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Type type )
+#endif
       {
          if( type == null ) return null;
 
@@ -53,7 +34,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return null;
       }
-#endif
    }
 }
 
