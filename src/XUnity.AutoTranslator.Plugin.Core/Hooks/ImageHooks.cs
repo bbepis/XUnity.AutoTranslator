@@ -1,6 +1,4 @@
-﻿#if MANAGED
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
@@ -68,7 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.DicingTextures.ClrType, "GetTexture", new[] { typeof( string ) } );
+         return AccessToolsShim.Method( UnityTypes.DicingTextures?.ClrType, "GetTexture", new[] { typeof( string ) } );
       }
 
       public static void Postfix( object __instance, ref Texture2D __result )
@@ -76,6 +75,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( ref __result, false );
       }
 
+#if MANAGED
       static Func<object, string, Texture2D> _original;
 
       static void MM_Init( object detour )
@@ -91,6 +91,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          return result;
       }
+#endif
    }
 
    internal static class Sprite_texture_Hook
@@ -102,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Sprite.ClrType, "texture" )?.GetGetMethod();
+         return AccessToolsShim.Property( UnityTypes.Sprite?.ClrType, "texture" )?.GetGetMethod();
       }
 
       static void Postfix( ref Texture2D __result )
@@ -110,14 +111,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( ref __result, true );
       }
 
-      static Func<object, Texture2D> _original;
+#if MANAGED
+      static Func<Sprite, Texture2D> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Func<object, Texture2D>>();
+         _original = detour.GenerateTrampolineEx<Func<Sprite, Texture2D>>();
       }
 
-      static Texture2D MM_Detour( object __instance )
+      static Texture2D MM_Detour( Sprite __instance )
       {
          var result = _original( __instance );
 
@@ -125,6 +127,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          return result;
       }
+#endif
    }
 
    internal static class SpriteRenderer_sprite_Hook
@@ -136,10 +139,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.SpriteRenderer.ClrType, "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.SpriteRenderer?.ClrType, "sprite" )?.GetSetMethod();
       }
 
-      public static void Prefix( object __instance, ref Sprite value )
+      public static void Prefix( SpriteRenderer __instance, ref Sprite value )
       {
          Texture2D texture;
          var prev = CallOrigin.ImageHooksEnabled;
@@ -161,14 +164,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       //   AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       //}
 
-      static Action<object, Sprite> _original;
+#if MANAGED
+      static Action<SpriteRenderer, Sprite> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
+         _original = detour.GenerateTrampolineEx<Action<SpriteRenderer, Sprite>>();
       }
 
-      static void MM_Detour( object __instance, Sprite sprite )
+      static void MM_Detour( SpriteRenderer __instance, Sprite sprite )
       {
          //var prev = sprite;
          Prefix( __instance, ref sprite );
@@ -180,6 +184,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          //   Postfix( __instance, ref sprite );
          //}
       }
+#endif
    }
 
    internal static class CubismRenderer_MainTexture_Hook
@@ -194,24 +199,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessToolsShim.Property( UnityTypes.CubismRenderer.ClrType, "MainTexture" )?.GetSetMethod();
       }
 
-      public static void Prefix( object __instance, ref Texture2D value )
+      public static void Prefix( Component __instance, ref Texture2D value )
       {
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref value, true, false );
       }
 
-      static Action<object, Texture2D> _original;
+#if MANAGED
+      static Action<Component, Texture2D> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Texture2D>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, Texture2D>>();
       }
 
-      static void MM_Detour( object __instance, ref Texture2D value )
+      static void MM_Detour( Component __instance, ref Texture2D value )
       {
          Prefix( __instance, ref value );
 
          _original( __instance, value );
       }
+#endif
    }
 
    internal static class CubismRenderer_TryInitialize_Hook
@@ -226,25 +233,27 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessToolsShim.Method( UnityTypes.CubismRenderer.ClrType, "TryInitialize" );
       }
 
-      public static void Prefix( object __instance )
+      public static void Prefix( Component __instance )
       {
          Texture2D _ = null;
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, true, true );
       }
 
-      static Action<object> _original;
+#if MANAGED
+      static Action<Component> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object>>();
+         _original = detour.GenerateTrampolineEx<Action<Component>>();
       }
 
-      static void MM_Detour( object __instance )
+      static void MM_Detour( Component __instance )
       {
          Prefix( __instance );
 
          _original( __instance );
       }
+#endif
    }
 
    internal static class Material_mainTexture_Hook
@@ -259,28 +268,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          return AccessToolsShim.Property( typeof( Material ), "mainTexture" )?.GetSetMethod();
       }
 
-      public static void Prefix( object __instance, ref Texture value )
+      public static void Prefix( Material __instance, ref Texture value )
       {
-         if( value is Texture2D texture2d )
+         if( value.TryCastTo<Texture2D>( out var texture2d ) )
          {
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref texture2d, true, false );
             value = texture2d;
          }
       }
 
-      static Action<object, Texture> _original;
+#if MANAGED
+      static Action<Material, Texture> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Texture>>();
+         _original = detour.GenerateTrampolineEx<Action<Material, Texture>>();
       }
 
-      static void MM_Detour( object __instance, ref Texture value )
+      static void MM_Detour( Material __instance, ref Texture value )
       {
          Prefix( __instance, ref value );
 
          _original( __instance, value );
       }
+#endif
    }
 
    internal static class MaskableGraphic_OnEnable_Hook
@@ -292,10 +303,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.MaskableGraphic.ClrType, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.MaskableGraphic?.ClrType, "OnEnable" );
       }
 
-      public static void Postfix( object __instance )
+      public static void Postfix( Component __instance )
       {
          var type = __instance.GetUnityType();
          if( ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
@@ -306,19 +317,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          }
       }
 
-      static Action<object> _original;
+#if MANAGED
+      static Action<Component> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object>>();
+         _original = detour.GenerateTrampolineEx<Action<Component>>();
       }
 
-      static void MM_Detour( object __instance )
+      static void MM_Detour( Component __instance )
       {
          _original( __instance );
 
          Postfix( __instance );
       }
+#endif
    }
 
    // FIXME: Cannot 'set' texture of sprite. MUST enable hook sprite
@@ -331,28 +344,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image?.ClrType, "sprite" )?.GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Postfix( Component __instance )
       {
          Texture2D _ = null;
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
-      static Action<object, Sprite> _original;
+#if MANAGED
+      static Action<Component, Sprite> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, Sprite>>();
       }
 
-      static void MM_Detour( object __instance, Sprite value )
+      static void MM_Detour( Component __instance, Sprite value )
       {
          _original( __instance, value );
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class Image_overrideSprite_Hook
@@ -364,28 +379,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "overrideSprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image?.ClrType, "overrideSprite" )?.GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Postfix( Component __instance )
       {
          Texture2D _ = null;
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
-      static Action<object, Sprite> _original;
+#if MANAGED
+      static Action<Component, Sprite> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Sprite>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, Sprite>>();
       }
 
-      static void MM_Detour( object __instance, Sprite value )
+      static void MM_Detour( Component __instance, Sprite value )
       {
          _original( __instance, value );
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class Image_material_Hook
@@ -397,28 +414,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image?.ClrType, "material" )?.GetSetMethod();
       }
 
-      public static void Postfix( object __instance )
+      public static void Postfix( Component __instance )
       {
          Texture2D _ = null;
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
-      static Action<object, Material> _original;
+#if MANAGED
+      static Action<Component, Material> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Material>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, Material>>();
       }
 
-      static void MM_Detour( object __instance, Material value )
+      static void MM_Detour( Component __instance, Material value )
       {
          _original( __instance, value );
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class RawImage_texture_Hook
@@ -430,31 +449,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.RawImage.ClrType, "texture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.RawImage?.ClrType, "texture" )?.GetSetMethod();
       }
 
-      public static void Prefix( object __instance, ref Texture value )
+      public static void Prefix( Component __instance, ref Texture value )
       {
-         if( value is Texture2D texture2d )
+         if( value.TryCastTo<Texture2D>( out var texture2d ) )
          {
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref texture2d, true, false );
             value = texture2d;
          }
       }
 
-      static Action<object, Texture> _original;
+#if MANAGED
+      static Action<Component, Texture> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, Texture>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, Texture>>();
       }
 
-      static void MM_Detour( object __instance, Texture value )
+      static void MM_Detour( Component __instance, Texture value )
       {
          Prefix( __instance, ref value );
 
          _original( __instance, value );
       }
+#endif
    }
 
    internal static class Cursor_SetCursor_Hook
@@ -474,6 +495,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChanged( ref texture, true );
       }
 
+#if MANAGED
       static Action<Texture2D, Vector2, CursorMode> _original;
 
       static void MM_Init( object detour )
@@ -487,6 +509,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          _original( texture, arg2, arg3 );
       }
+#endif
    }
 
    internal static class UIAtlas_spriteMaterial_Hook
@@ -498,7 +521,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UIAtlas.ClrType, "spriteMaterial" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UIAtlas?.ClrType, "spriteMaterial" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -507,6 +530,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, Material> _original;
 
       static void MM_Init( object detour )
@@ -520,6 +544,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UISprite_OnInit_Hook
@@ -531,7 +556,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UISprite.ClrType, "OnInit" );
+         return AccessToolsShim.Method( UnityTypes.UISprite?.ClrType, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -540,6 +565,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, true );
       }
 
+#if MANAGED
       static Action<object> _original;
 
       static void MM_Init( object detour )
@@ -553,6 +579,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UISprite_material_Hook
@@ -564,7 +591,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UISprite.ClrType, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UISprite?.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -573,6 +600,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, Material> _original;
 
       static void MM_Init( object detour )
@@ -586,6 +614,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UISprite_atlas_Hook
@@ -597,7 +626,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UISprite.ClrType, "atlas" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UISprite?.ClrType, "atlas" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -606,6 +635,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -619,6 +649,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    // Could be postfix, but SETTER will be called later
@@ -631,7 +662,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UITexture.ClrType, "mainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UITexture?.ClrType, "mainTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -640,6 +671,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -653,6 +685,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UITexture_material_Hook
@@ -664,7 +697,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UITexture.ClrType, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UITexture?.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -673,6 +706,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -686,6 +720,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UIRect_OnInit_Hook
@@ -697,7 +732,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UIRect.ClrType, "OnInit" );
+         return AccessToolsShim.Method( UnityTypes.UIRect?.ClrType, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -706,6 +741,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, true );
       }
 
+#if MANAGED
       static Action<object> _original;
 
       static void MM_Init( object detour )
@@ -719,6 +755,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UI2DSprite_sprite2D_Hook
@@ -730,7 +767,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UI2DSprite.ClrType, "sprite2D" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UI2DSprite?.ClrType, "sprite2D" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -739,6 +776,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -752,6 +790,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UI2DSprite_material_Hook
@@ -763,7 +802,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UI2DSprite.ClrType, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UI2DSprite?.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -772,6 +811,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -785,6 +825,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 
    internal static class UIPanel_clipTexture_Hook
@@ -805,6 +846,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, false );
       }
 
+#if MANAGED
       static Action<object, object> _original;
 
       static void MM_Init( object detour )
@@ -818,7 +860,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
          Postfix( __instance );
       }
+#endif
    }
 }
-
-#endif

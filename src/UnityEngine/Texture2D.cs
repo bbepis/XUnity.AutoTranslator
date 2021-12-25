@@ -8,6 +8,10 @@ using System.Text;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
+#if IL2CPP
+using UnhollowerBaseLib;
+#endif
+
 namespace UnityEngine
 {
    public sealed class Texture2D : Texture
@@ -94,11 +98,11 @@ namespace UnityEngine
 
       private static extern void INTERNAL_CALL_GetPixelBilinear( Texture2D self, float u, float v, out Color value );
 
-      public void SetPixels( Color[] colors )
-      {
-         int miplevel = 0;
-         SetPixels( colors, miplevel );
-      }
+#if IL2CPP
+      public void SetPixels( Il2CppStructArray<Color> colors ) => throw new NotImplementedException();
+#else
+      public void SetPixels( Color[] colors ) => throw new NotImplementedException();
+#endif
 
       public void SetPixels( Color[] colors, int miplevel )
       {
@@ -129,11 +133,11 @@ namespace UnityEngine
 
       private extern void SetBlockOfPixels32( int x, int y, int blockWidth, int blockHeight, Color32[] colors, int miplevel );
 
-      public void SetPixels32( Color32[] colors )
-      {
-         int miplevel = 0;
-         SetPixels32( colors, miplevel );
-      }
+#if IL2CPP
+      public void SetPixels32( Il2CppStructArray<Color32> colors ) => throw new NotImplementedException();
+#else
+      public void SetPixels32( Color32[] colors ) => throw new NotImplementedException();
+#endif
 
       public void SetPixels32( Color32[] colors, int miplevel )
       {

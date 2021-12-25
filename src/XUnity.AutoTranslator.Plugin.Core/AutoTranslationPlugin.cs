@@ -1000,7 +1000,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             CallOrigin.ImageHooksEnabled = false;
 
             var previousTextureValue = texture;
-            texture = texture ?? (Texture2D)source.GetTexture();
+            texture = texture ?? source.GetTexture();
             if( texture == null ) return;
 
             var tti = texture.GetOrCreateTextureTranslationInfo();
@@ -1019,7 +1019,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( Settings.EnableLegacyTextureLoading
                && Settings.EnableSpriteRendererHooking
                && iti?.IsTranslated == true
-               && source is SpriteRenderer sr )
+               && source.TryCastTo<SpriteRenderer>( out var sr ) )
             {
 
                var originalTexture = tti.Original.Target;

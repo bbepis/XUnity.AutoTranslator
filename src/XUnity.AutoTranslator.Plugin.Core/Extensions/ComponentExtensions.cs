@@ -141,9 +141,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
             || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( type ) )
             || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( type ) )
-#if MANAGED
             || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.UnityType.IsAssignableFrom( type ) )
-#endif
             || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
             ;
       }
@@ -523,7 +521,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          StringBuilder path = new StringBuilder();
          var segments = GetPathSegments( obj );
-         for( int i = 0 ; i < segments.Length ; i++ )
+         for( int i = 0; i < segments.Length; i++ )
          {
             path.Append( "/" ).Append( segments[ i ] );
          }
@@ -542,7 +540,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 #warning NOT TESTED FOR IL2CPP, but may work
          if( ui == null ) return null;
 
-         if( ui is SpriteRenderer spriteRenderer )
+         if( ui.TryCastTo<SpriteRenderer>( out var spriteRenderer ) )
          {
             return spriteRenderer.sprite?.texture;
          }
@@ -565,9 +563,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var currentTexture = ui.GetTexture();
 
-         if( !Equals( currentTexture, texture ) )
+         if( !UnityObjectReferenceComparer.Default.Equals( currentTexture, texture ) )
          {
-            if( Settings.EnableSpriteRendererHooking && ui is SpriteRenderer sr )
+            if( Settings.EnableSpriteRendererHooking && ui.TryCastTo<SpriteRenderer>( out var sr ) )
             {
                if( isPrefixHooked )
                {
@@ -639,17 +637,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetUnityType();
 
-         return ( ui is Material || ui is SpriteRenderer )
+         return ( ui.TryCastTo<Material>( out _ ) || ui.TryCastTo<SpriteRenderer>( out _ ) )
             || ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
             || ( UnityTypes.RawImage != null && UnityTypes.RawImage.UnityType.IsAssignableFrom( type ) )
-#if MANAGED
             || ( UnityTypes.CubismRenderer != null && UnityTypes.CubismRenderer.UnityType.IsAssignableFrom( type ) )
             || ( UnityTypes.UIWidget != null && !Equals( type, UnityTypes.UILabel?.UnityType ) && UnityTypes.UIWidget.UnityType.IsAssignableFrom( type ) )
             || ( UnityTypes.UIAtlas != null && UnityTypes.UIAtlas.UnityType.IsAssignableFrom( type ) )
             || ( UnityTypes.UITexture != null && UnityTypes.UITexture.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.UnityType.IsAssignableFrom( type ) )
-#endif
-            ;
+            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.UnityType.IsAssignableFrom( type ) );
       }
 
       public static string GetTextureName( this object texture, string fallbackName )

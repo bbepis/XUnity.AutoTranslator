@@ -27,6 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Textures
             if( verified )
             {
                Loaders[ format ] = loader;
+               XuaLogger.AutoTranslator.Info( "Registered image loader for extension: " + format );
                return true;
             }
          }

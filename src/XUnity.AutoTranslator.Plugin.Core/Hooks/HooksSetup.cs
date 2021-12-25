@@ -49,16 +49,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableTextureTranslation || Settings.EnableTextureDumping )
             {
-#if MANAGED
                HookingHelper.PatchAll( ImageHooks.All, Settings.ForceMonoModHooks );
 
                if( Settings.EnableLegacyTextureLoading || Settings.EnableSpriteHooking )
                {
                   HookingHelper.PatchAll( ImageHooks.Sprite, Settings.ForceMonoModHooks );
                }
-#else
-               throw new NotImplementedException("EnableTextureTranslation is not supported in IL2CPP.");
-#endif
             }
          }
          catch( Exception e )
@@ -73,11 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableSpriteRendererHooking && ( Settings.EnableTextureTranslation || Settings.EnableTextureDumping ) )
             {
-#if MANAGED
                HookingHelper.PatchAll( ImageHooks.SpriteRenderer, Settings.ForceMonoModHooks );
-#else
-               throw new NotImplementedException("EnableSpriteRendererHooking is not supported in IL2CPP.");
-#endif
             }
          }
          catch( Exception e )
@@ -129,11 +121,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
                if( Settings.DisableTextMeshProScrollInEffects )
                {
-#if MANAGED
                   HookingHelper.PatchAll( TextMeshProHooks.DisableScrollInTmp, Settings.ForceMonoModHooks );
-#else
-                  throw new NotImplementedException("DisableTextMeshProScrollInEffects is not supported in IL2CPP.");
-#endif
                }
             }
          }
