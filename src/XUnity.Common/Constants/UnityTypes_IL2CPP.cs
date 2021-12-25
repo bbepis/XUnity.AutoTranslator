@@ -123,8 +123,6 @@ namespace XUnity.Common.Constants
 
       public static class GameObject_Methods
       {
-         public static readonly IntPtr SetActive = Il2CppUtilities.GetIl2CppMethod( UnityTypes.GameObject?.ClassPointer, "SetActive", typeof( void ), typeof( bool ) );
-
          public static readonly Func<GameObject, Il2CppSystem.Type, Component> GetComponent =
             (Func<GameObject, Il2CppSystem.Type, Component>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
                typeof( GameObject ).GetMethod(
@@ -134,59 +132,110 @@ namespace XUnity.Common.Constants
                   new Type[] { typeof( Il2CppSystem.Type ) },
                   null
                ) );
+
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr SetActive = Il2CppUtilities.GetIl2CppMethod( UnityTypes.GameObject?.ClassPointer, "SetActive", typeof( void ), typeof( bool ) );
+         }
+#endif
       }
 
       public static class TextMesh_Methods
       {
-         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
-         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "get_text", typeof( string ) );
-         public static readonly IntPtr get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "get_richText", typeof( bool ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+            public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMesh?.ClassPointer, "get_text", typeof( string ) );
+         }
+#endif
       }
 
       public static class Text_Methods
       {
-         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
-         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_text", typeof( string ) );
-         public static readonly IntPtr get_supportRichText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_supportRichText", typeof( bool ) );
-         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "OnEnable", typeof( void ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+            public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_text", typeof( string ) );
+            public static readonly IntPtr get_supportRichText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_supportRichText", typeof( bool ) );
+            public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "OnEnable", typeof( void ) );
+         }
+#endif
       }
 
       public static class InputField_Methods
       {
-         public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+         }
+#endif
       }
 
       public static class TMP_Text_Methods
       {
-         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
-         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_text", typeof( string ) );
-         public static readonly IntPtr get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_richText", typeof( bool ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+            public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_text", typeof( string ) );
+            public static readonly IntPtr get_richText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_Text?.ClassPointer, "get_richText", typeof( bool ) );
+         }
+#endif
       }
 
       public static class TMP_InputField_Methods
       {
-         public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr get_placeholder = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TMP_InputField?.ClassPointer, "get_placeholder", "UnityEngine.UI.Graphic" );
+         }
+#endif
       }
 
       public static class TextMeshPro_Methods
       {
-         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshPro?.ClassPointer, "OnEnable", typeof( void ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshPro?.ClassPointer, "OnEnable", typeof( void ) );
+         }
+#endif
       }
 
       public static class TextMeshProUGUI_Methods
       {
-         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI?.ClassPointer, "OnEnable", typeof( void ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextMeshProUGUI?.ClassPointer, "OnEnable", typeof( void ) );
+         }
+#endif
       }
 
       public static class UILabel_Methods
       {
-         public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UILabel?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
-         public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UILabel?.ClassPointer, "get_text", typeof( string ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UILabel?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+            public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UILabel?.ClassPointer, "get_text", typeof( string ) );
+         }
+#endif
       }
 
       public static class UIRect_Methods
       {
-         public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UIRect?.ClassPointer, "OnEnable", typeof( void ) );
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.UIRect?.ClassPointer, "OnEnable", typeof( void ) );
+         }
+#endif
       }
 
       public static class GUIUtility_Methods

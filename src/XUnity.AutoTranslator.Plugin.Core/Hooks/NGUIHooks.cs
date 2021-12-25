@@ -1,6 +1,4 @@
-﻿#if IL2CPP
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -31,12 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    {
       static bool Prepare( object instance )
       {
-         return UnityTypes.UILabel_Methods.set_text != IntPtr.Zero;
-      }
-
-      static IntPtr TargetMethodPointer()
-      {
-         return UnityTypes.UILabel_Methods.set_text;
+         return UnityTypes.UILabel != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -44,25 +37,50 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
          return AccessToolsShim.Property( UnityTypes.UILabel?.ClrType, "text" )?.GetSetMethod();
       }
 
-      static void Postfix( Component __instance )
-      {
-         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.UILabel.ClrType );
-
-         _Postfix( __instance );
-      }
-
       public static void _Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
+      static void Postfix( Component __instance )
+      {
+#if IL2CPP
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.UILabel.ClrType );
+#endif
+
+         _Postfix( __instance );
+      }
+
+#if IL2CPP
+      static IntPtr TargetMethodPointer()
+      {
+         return UnityTypes.UILabel_Methods.IL2CPP.set_text;
+      }
+
       static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         Il2CppUtilities.InvokeMethod( UnityTypes.UILabel_Methods.set_text, instance, value );
+         Il2CppUtilities.InvokeMethod( UnityTypes.UILabel_Methods.IL2CPP.set_text, instance, value );
 
          var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.UILabel.ClrType );
          _Postfix( __instance );
       }
+#endif
+
+#if MANAGED
+      static Action<Component, string> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Component, string>>();
+      }
+
+      static void MM_Detour( Component __instance, string value )
+      {
+         _original( __instance, value );
+
+         Postfix( __instance );
+      }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
@@ -70,12 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
    {
       static bool Prepare( object instance )
       {
-         return UnityTypes.UIRect_Methods.OnEnable != IntPtr.Zero;
-      }
-
-      static IntPtr TargetMethodPointer()
-      {
-         return UnityTypes.UIRect_Methods.OnEnable;
+         return UnityTypes.UIRect != null;
       }
 
       static MethodBase TargetMethod( object instance )
@@ -83,23 +96,29 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
          return AccessToolsShim.Method( UnityTypes.UIRect?.ClrType, "OnEnable" );
       }
 
+      public static void _Postfix( Component __instance )
+      {
+         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+      }
+
       static void Postfix( Component __instance )
       {
-         __instance = __instance.CreateNGUIDerivedProxy();
+         __instance = __instance.GetOrCreateNGUIDerivedProxy();
          if( __instance != null )
          {
             _Postfix( __instance );
          }
       }
 
-      public static void _Postfix( Component __instance )
+#if IL2CPP
+      static IntPtr TargetMethodPointer()
       {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
+         return UnityTypes.UIRect_Methods.IL2CPP.OnEnable;
       }
 
       static void ML_Detour( IntPtr instance )
       {
-         Il2CppUtilities.InvokeMethod( UnityTypes.UIRect_Methods.OnEnable, instance );
+         Il2CppUtilities.InvokeMethod( UnityTypes.UIRect_Methods.IL2CPP.OnEnable, instance );
 
          var __instance = instance.CreateNGUIDerivedProxy();
          if( __instance != null )
@@ -107,7 +126,22 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
             _Postfix( __instance );
          }
       }
+#endif
+
+#if MANAGED
+      static Action<Component> _original;
+
+      static void MM_Init( object detour )
+      {
+         _original = detour.GenerateTrampolineEx<Action<Component>>();
+      }
+
+      static void MM_Detour( Component __instance )
+      {
+         _original( __instance );
+
+         Postfix( __instance );
+      }
+#endif
    }
 }
-
-#endif

@@ -197,13 +197,13 @@ namespace UnityEngine
          GetComponentsInternal_Renamed( typeof( T ), useSearchTypeAsArrayReturnType: false, recursive: false, includeInactive: true, reverse: false, results );
       }
 
-      public Component[] GetComponentsInChildren( Type type )
-      {
-         bool includeInactive = false;
-         return GetComponentsInChildren( type, includeInactive );
-      }
-
+#if IL2CPP
+      public Il2CppReferenceArray<Component> GetComponentsInChildren( Il2CppSystem.Type type ) => throw new NotImplementedException();
+      public Il2CppReferenceArray<Component> GetComponentsInChildren( Il2CppSystem.Type type, bool includeInactive ) => throw new NotImplementedException();
+#else
+      public Component[] GetComponentsInChildren( Type type ) => throw new NotImplementedException();
       public Component[] GetComponentsInChildren( Type type, bool includeInactive ) => throw new NotImplementedException();
+#endif
 
       public T[] GetComponentsInChildren<T>( bool includeInactive )
       {
@@ -251,10 +251,6 @@ namespace UnityEngine
 
       private extern Array GetComponentsInternal_Renamed( Type type, bool useSearchTypeAsArrayReturnType, bool recursive, bool includeInactive, bool reverse, object resultList );
 
-
-#if IL2CPP
-      public extern Il2CppSystem.Array GetComponentsInternal( Il2CppSystem.Type type, bool useSearchTypeAsArrayReturnType, bool recursive, bool includeInactive, bool reverse, object resultList );
-#endif
 
 
 

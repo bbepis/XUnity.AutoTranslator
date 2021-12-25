@@ -24,9 +24,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          {
             // 0. This method
             // 1. Postfix
-            // 2. Harmony-related trampoline method/MM_Detour
-            // 3. Original method
-            var callingMethod = new StackFrame( 3 ).GetMethod();
+            // 2. _Postfix
+            // 3. Harmony-related trampoline method/MM_Detour
+            // 4. Original method
+            var callingMethod = new StackFrame( 4 ).GetMethod();
 
             var callingAssembly = callingMethod.DeclaringType.Assembly;
 

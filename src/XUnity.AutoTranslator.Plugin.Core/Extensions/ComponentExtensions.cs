@@ -380,16 +380,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 #if IL2CPP
       public static Component CreateTextMeshProDerivedProxy( this Component ui )
       {
-         var il2cppType = ui.GetIl2CppTypeSafe();
-         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( il2cppType ) )
+         var unityType = ui.GetUnityType();
+         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
          }
-         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( il2cppType ) )
+         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
          }
-         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( il2cppType ) )
+         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
          }
@@ -413,16 +413,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return null;
       }
 
-      public static Component CreateNGUIDerivedProxy( this Component ui )
-      {
-         var il2cppType = ui.GetIl2CppTypeSafe();
-         if( UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( il2cppType ) )
-         {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.UILabel.ClrType );
-         }
-         return null;
-      }
-
       public static Component CreateNGUIDerivedProxy( this IntPtr ui )
       {
          if( UnityTypes.UILabel != null && ui.IsInstancePointerAssignableFrom( UnityTypes.UILabel.ClassPointer ) )
@@ -432,6 +422,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return null;
       }
 #endif
+
+      public static Component GetOrCreateNGUIDerivedProxy( this Component ui )
+      {
+         var unityType = ui.GetUnityType();
+         if( UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( unityType ) )
+         {
+#if IL2CPP
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.UILabel.ClrType );
+#else
+            return ui;
+#endif
+         }
+         return null;
+      }
 
       public static IEnumerable<object> GetAllTextComponentsInChildren( this object go )
       {
