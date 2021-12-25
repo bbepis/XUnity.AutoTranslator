@@ -401,7 +401,7 @@ namespace XUnity.Common.Constants
 #endif
       }
 
-      public static class ImageConversions_Methods
+      public static class ImageConversion_Methods
       {
 #if IL2CPP
          public static readonly Func<Texture2D, Il2CppStructArray<byte>, bool, bool> LoadImage =
@@ -490,7 +490,6 @@ namespace XUnity.Common.Constants
             }
 
             var ptr = Il2CppUtilities.GetIl2CppClass( @namespace, typeName );
-            if( ptr == IntPtr.Zero ) return null;
 
             Type wrapperType = null;
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -510,14 +509,22 @@ namespace XUnity.Common.Constants
                }
             }
 
-            return new TypeContainer( Il2CppType.TypeFromPointer( ptr ), wrapperType, ptr );
+            if( wrapperType != null && ptr == IntPtr.Zero )
+            {
+               XuaLogger.AutoTranslator.Warn( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
+            }
+
+            if( wrapperType != null )
+            {
+               return new TypeContainer( ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : null, wrapperType, ptr );
+            }
          }
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Warn( e, "An error occurred while resolving type: " + name );
-
-            return null;
          }
+
+         return null;
       }
 #else
       private static TypeContainer FindType( string name )

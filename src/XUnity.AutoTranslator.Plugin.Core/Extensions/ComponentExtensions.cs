@@ -82,11 +82,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       private static ITextComponentManipulator GetTextManipulator( object ui )
       {
-         var type = ui.GetType();
-         if( type == null )
+         if( ui == null )
          {
             return null;
          }
+
+         var type = ui.GetType();
 
          if( !Manipulators.TryGetValue( type, out var manipulator ) )
          {
@@ -679,9 +680,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       private static byte[] EncodeToPNGEx( Texture2D texture )
       {
-         if( UnityTypes.ImageConversions_Methods.EncodeToPNG != null )
+         if( UnityTypes.ImageConversion_Methods.EncodeToPNG != null )
          {
-            return UnityTypes.ImageConversions_Methods.EncodeToPNG( texture );
+            return UnityTypes.ImageConversion_Methods.EncodeToPNG( texture );
          }
          else if( UnityTypes.Texture2D_Methods.EncodeToPNG != null )
          {

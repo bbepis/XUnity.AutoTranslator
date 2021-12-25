@@ -15,9 +15,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
    {
       public void Load( Texture2D texture, byte[] data )
       {
-         if( UnityTypes.ImageConversions_Methods.LoadImage != null )
+         if( UnityTypes.ImageConversion_Methods.LoadImage != null )
          {
-            UnityTypes.ImageConversions_Methods.LoadImage( texture, data, false );
+            UnityTypes.ImageConversion_Methods.LoadImage( texture, data, false );
          }
          else if( UnityTypes.Texture2D_Methods.LoadImage != null )
          {
@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Managed.Textures
       public bool Verify()
       {
          return UnityTypes.Texture2D_Methods.LoadImage != null
-            || UnityTypes.ImageConversions_Methods.LoadImage != null;
+            || UnityTypes.ImageConversion_Methods.LoadImage != null;
       }
    }
 }
