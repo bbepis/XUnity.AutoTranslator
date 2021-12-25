@@ -59,7 +59,7 @@ namespace XUnity.Common.Utilities
       public static IntPtr GetIl2CppInstancePointer( object obj )
       {
          var gcHandle = GetGarbageCollectionHandle( obj );
-         var intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_gchandle_get_target( gcHandle );
+         var intPtr = IL2CPP.il2cpp_gchandle_get_target( gcHandle );
          if( intPtr == IntPtr.Zero )
          {
             throw new ObjectCollectedException( "Object was garbage collected in IL2CPP domain" );
@@ -86,7 +86,7 @@ namespace XUnity.Common.Utilities
 
          foreach( var image in ourImagesMap.Values )
          {
-            var clazz = UnhollowerBaseLib.IL2CPP.il2cpp_class_from_name( image, namespaze, className );
+            var clazz = IL2CPP.il2cpp_class_from_name( image, namespaze, className );
 
             if( clazz != IntPtr.Zero )
                return clazz;
@@ -113,7 +113,7 @@ namespace XUnity.Common.Utilities
       {
          if( !clazz.HasValue || clazz == IntPtr.Zero ) return IntPtr.Zero;
 
-         return UnhollowerBaseLib.IL2CPP.GetIl2CppMethod( clazz.Value, false, methodName, returnType, types );
+         return IL2CPP.GetIl2CppMethod( clazz.Value, false, methodName, returnType, types );
       }
 
       unsafe public static IntPtr InvokeMethod( IntPtr method, IntPtr obj, params IntPtr[] paramtbl )
@@ -128,7 +128,7 @@ namespace XUnity.Common.Utilities
          {
             IntPtr* parameters = null;
             IntPtr exp = IntPtr.Zero;
-            var returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)parameters, ref exp );
+            var returnval = IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)parameters, ref exp );
             Il2CppException.RaiseExceptionIfNecessary( exp );
             return returnval;
          }
@@ -137,7 +137,7 @@ namespace XUnity.Common.Utilities
             fixed( IntPtr* ptr = &paramtbl[ 0 ] )
             {
                IntPtr exp = IntPtr.Zero;
-               var returnval = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)ptr, ref exp );
+               var returnval = IL2CPP.il2cpp_runtime_invoke( method, obj, (void**)ptr, ref exp );
                Il2CppException.RaiseExceptionIfNecessary( exp );
                return returnval;
             }
@@ -184,7 +184,7 @@ namespace XUnity.Common.Utilities
 
       unsafe public static bool PointerToManagedBool( IntPtr ptr )
       {
-         return *(bool*)(long)UnhollowerBaseLib.IL2CPP.il2cpp_object_unbox( ptr );
+         return *(bool*)(long)IL2CPP.il2cpp_object_unbox( ptr );
       }
    }
 }

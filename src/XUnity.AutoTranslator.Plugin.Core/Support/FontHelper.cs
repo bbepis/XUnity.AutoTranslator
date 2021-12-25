@@ -11,7 +11,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Support
 {
    internal static class FontHelper
    {
+#if IL2CPP
+      public static UnhollowerBaseLib.Il2CppObjectBase GetTextMeshProFont()
+#else
       public static object GetTextMeshProFont()
+#endif
       {
 #if MANAGED
          object font = null;

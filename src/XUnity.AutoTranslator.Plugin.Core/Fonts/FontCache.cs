@@ -15,8 +15,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
    internal static class FontCache
    {
       private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
-      private static object TextMeshProOverrideFont;
       private static bool _hasReadTextMeshProFont = false;
+      private static object TextMeshProOverrideFont;
 
       public static Font GetOrCreate( int size )
       {

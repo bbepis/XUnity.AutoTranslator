@@ -6,10 +6,12 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
+using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Text;
 using XUnity.AutoTranslator.Plugin.Core.UIResize;
 using XUnity.AutoTranslator.Plugin.Shims;
 using XUnity.Common.Constants;
+using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
 using XUnity.Common.Utilities;
 
@@ -20,11 +22,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private Action<object> _unresize;
       private Action<object> _unfont;
 
-#if MANAGED
       private bool _hasCheckedTypeWriter;
       private MonoBehaviour _typewriter;
       private float? _alteredLineSpacing;
-#endif
       private int? _alteredFontSize;
 
       private bool _initialized = false;
@@ -81,29 +81,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
 
             Component inputField = null;
-#if MANAGED
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
-            if( inputField != null )
-            {
-               if( UnityTypes.InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = UnityTypes.InputField_Properties.Placeholder.Get( inputField );
-                  return !ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField?.UnityType );
-            if( inputField != null )
-            {
-               if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
-               {
-                  var placeholder = UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-                  return !ReferenceEquals( placeholder, ui );
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
-#else
             if( UnityTypes.InputField != null )
             {
                inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
@@ -112,7 +89,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( UnityTypes.InputField_Properties.Placeholder != null )
                   {
                      var placeholder = (Component)UnityTypes.InputField_Properties.Placeholder.Get( inputField );
-                     return !Il2CppObjectReferenceComparer.Default.Equals( placeholder, component );
+                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
                   }
                }
             }
@@ -125,13 +102,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
                   {
                      var placeholder = (Component)UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-                     return !Il2CppObjectReferenceComparer.Default.Equals( placeholder, component );
+                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
                   }
                }
             }
 
             inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
-#endif
 
             return inputField != null;
          }
@@ -141,7 +117,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public void ResetScrollIn( object ui )
       {
-#if MANAGED
          if( !_hasCheckedTypeWriter )
          {
             _hasCheckedTypeWriter = true;
@@ -149,26 +124,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( UnityTypes.Typewriter != null )
             {
                var component = ui as Component;
-               if( ui != null )
+               if( ui != null && component.GetComponent( UnityTypes.Typewriter.UnityType ).TryCastTo<MonoBehaviour>( out var typeWriter ) )
                {
-                  _typewriter = (MonoBehaviour)component.GetComponent( UnityTypes.Typewriter.UnityType );
+                  _typewriter = typeWriter;
                }
             }
          }
 
          if( _typewriter != null )
          {
-            AccessToolsShim.Method( UnityTypes.Typewriter.UnityType, "OnEnable" )?.Invoke( _typewriter, null );
+            AccessToolsShim.Method( UnityTypes.Typewriter.ClrType, "OnEnable" )?.Invoke( _typewriter, null );
          }
-#endif
       }
 
       public void ChangeFont( object ui )
       {
-#if MANAGED
          if( ui == null ) return;
 
-         var type = ui.GetType();
+         var type = ui.GetUnityType();
 
          if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
          {
@@ -183,7 +156,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var newFont = FontCache.GetOrCreate( (int?)Font_fontSizeProperty?.Get( previousFont ) ?? (int)Text_fontSizeProperty.Get( ui ) );
             if( newFont == null || previousFont == null ) return;
 
-            if( !ReferenceEquals( newFont, previousFont ) )
+            if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
                Text_fontProperty.Set( ui, newFont );
                _unfont = obj =>
@@ -197,13 +170,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             if( string.IsNullOrEmpty( Settings.OverrideFontTextMeshPro ) ) return;
 
-            var fontProperty = type.CachedProperty( "font" );
+            var clrType = ui.GetType();
+            var fontProperty = clrType.CachedProperty( "font" );
 
             var previousFont = fontProperty.Get( ui );
             var newFont = FontCache.GetOrCreateTextMeshProFont();
             if( newFont == null || previousFont == null ) return;
 
-            if( !ReferenceEquals( newFont, previousFont ) )
+            if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
                fontProperty.Set( ui, newFont );
                _unfont = obj =>
@@ -212,7 +186,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                };
             }
          }
-#endif
       }
 
       public void UnchangeFont( object ui )
@@ -226,16 +199,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private static float GetComponentWidth( Component component )
       {
          // this is in it's own function because if "Text" does not exist, RectTransform likely wont exist either
-         return ( (RectTransform)component.transform ).rect.width;
+         if( component.transform.TryCastTo<RectTransform>( out var rectTransform ) )
+         {
+            return rectTransform.rect.width;
+         }
+         return 0f;
       }
 
       public void ResizeUI( object ui, UIResizeCache cache )
       {
-#if MANAGED
          // do not resize if there is no object of ir it is already resized
          if( ui == null ) return;
 
-         var type = ui.GetType();
+         var type = ui.GetUnityType();
 
          if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
          {
@@ -485,7 +461,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          else if( type == UnityTypes.TextMeshPro?.UnityType || type == UnityTypes.TextMeshProUGUI?.UnityType )
          {
-            var overflowModeProperty = type.CachedProperty( "overflowMode" );
+            var clrType = ui.GetType();
+            var overflowModeProperty = clrType.CachedProperty( "overflowMode" );
             var originalOverflowMode = overflowModeProperty?.Get( ui );
             bool changedOverflow = false;
             bool isUntouched = _unresize == null;
@@ -521,7 +498,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( result.AlignmentCommand != null )
                   {
-                     var alignmentProperty = type.CachedProperty( "alignment" );
+                     var alignmentProperty = clrType.CachedProperty( "alignment" );
                      if( alignmentProperty != null )
                      {
                         var alignmentValue = alignmentProperty.Get( ui );
@@ -544,10 +521,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( result.AutoResizeCommand != null )
                   {
-                     var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
-                     var fontSizeMinProperty = type.CachedProperty( "fontSizeMin" );
-                     var fontSizeMaxProperty = type.CachedProperty( "fontSizeMax" );
-                     var fontSizeProperty = type.CachedProperty( "fontSize" );
+                     var enableAutoSizingProperty = clrType.CachedProperty( "enableAutoSizing" );
+                     var fontSizeMinProperty = clrType.CachedProperty( "fontSizeMin" );
+                     var fontSizeMaxProperty = clrType.CachedProperty( "fontSizeMax" );
+                     var fontSizeProperty = clrType.CachedProperty( "fontSize" );
                      var currentFontSize = (float?)fontSizeProperty.Get( ui );
 
                      if( enableAutoSizingProperty != null )
@@ -606,7 +583,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   if( result.ResizeCommand != null )
                   {
-                     var fontSizeProperty = type.CachedProperty( "fontSize" );
+                     var fontSizeProperty = clrType.CachedProperty( "fontSize" );
                      var currentFontSize = (float?)fontSizeProperty.Get( ui );
 
                      if( currentFontSize.HasValue )
@@ -653,7 +630,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
          }
-#endif
       }
 
       public void UnresizeUI( object ui )

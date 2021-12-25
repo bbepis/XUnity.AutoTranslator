@@ -15,7 +15,7 @@ namespace XUnity.Common.Utilities
    public static class ExtensionDataHelper
    {
 #if IL2CPP
-      private static readonly Dictionary<Il2CppObjectBase, object> DynamicFields = new Dictionary<Il2CppObjectBase, object>( Il2CppObjectReferenceComparer.Default );
+      private static readonly Dictionary<Il2CppObjectBase, object> DynamicFields = new Dictionary<Il2CppObjectBase, object>( UnityObjectReferenceComparer.Default );
 #endif
 
       private static readonly object Sync = new object();
