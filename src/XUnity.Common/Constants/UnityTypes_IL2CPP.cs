@@ -67,58 +67,58 @@ namespace XUnity.Common.Constants
       }
 
       // NGUI
-      public static readonly Il2CppTypeWrapper UILabel = FindType( "UILabel" );
-      public static readonly Il2CppTypeWrapper UIInput = FindType( "UIInput" );
-      public static readonly Il2CppTypeWrapper UIRect = FindType( "UIRect" );
+      public static readonly TypeContainer UILabel = FindType( "UILabel" );
+      public static readonly TypeContainer UIInput = FindType( "UIInput" );
+      public static readonly TypeContainer UIRect = FindType( "UIRect" );
 
       // TextMeshPro
-      public static readonly Il2CppTypeWrapper TMP_InputField = FindType( "TMPro.TMP_InputField" );
-      public static readonly Il2CppTypeWrapper TMP_Text = FindType( "TMPro.TMP_Text" );
-      public static readonly Il2CppTypeWrapper TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
-      public static readonly Il2CppTypeWrapper TextMeshPro = FindType( "TMPro.TextMeshPro" );
-      public static readonly Il2CppTypeWrapper FontAsset = FindType( "TMPro.TMP_FontAsset" );
-      public static readonly Il2CppTypeWrapper AssetBundle = FindType( "UnityEngine.AssetBundle" );
+      public static readonly TypeContainer TMP_InputField = FindType( "TMPro.TMP_InputField" );
+      public static readonly TypeContainer TMP_Text = FindType( "TMPro.TMP_Text" );
+      public static readonly TypeContainer TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
+      public static readonly TypeContainer TextMeshPro = FindType( "TMPro.TextMeshPro" );
+      public static readonly TypeContainer FontAsset = FindType( "TMPro.TMP_FontAsset" );
+      public static readonly TypeContainer AssetBundle = FindType( "UnityEngine.AssetBundle" );
 
       // Unity
-      public static readonly Il2CppTypeWrapper TextMesh = FindType( "UnityEngine.TextMesh" );
-      public static readonly Il2CppTypeWrapper Text = FindType( "UnityEngine.UI.Text" );
-      public static readonly Il2CppTypeWrapper Image = FindType( "UnityEngine.UI.Image" );
-      public static readonly Il2CppTypeWrapper RawImage = FindType( "UnityEngine.UI.RawImage" );
-      public static readonly Il2CppTypeWrapper MaskableGraphic = FindType( "UnityEngine.UI.MaskableGraphic" );
-      public static readonly Il2CppTypeWrapper Graphic = FindType( "UnityEngine.UI.Graphic" );
-      public static readonly Il2CppTypeWrapper GUIContent = FindType( "UnityEngine.GUIContent" );
-      public static readonly Il2CppTypeWrapper WWW = FindType( "UnityEngine.WWW" );
-      public static readonly Il2CppTypeWrapper InputField = FindType( "UnityEngine.UI.InputField" );
-      public static readonly Il2CppTypeWrapper GUI = FindType( "UnityEngine.GUI" );
-      public static readonly Il2CppTypeWrapper ImageConversion = FindType( "UnityEngine.ImageConversion" );
-      public static readonly Il2CppTypeWrapper Texture2D = FindType( "UnityEngine.Texture2D" );
-      public static readonly Il2CppTypeWrapper Texture = FindType( "UnityEngine.Texture" );
-      public static readonly Il2CppTypeWrapper SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
-      public static readonly Il2CppTypeWrapper Sprite = FindType( "UnityEngine.Sprite" );
-      public static readonly Il2CppTypeWrapper Object = FindType( "UnityEngine.Object" );
-      public static readonly Il2CppTypeWrapper GameObject = FindType( "UnityEngine.GameObject" );
-      public static readonly Il2CppTypeWrapper TextEditor = FindType( "UnityEngine.TextEditor" );
-      public static readonly Il2CppTypeWrapper CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
-      public static readonly Il2CppTypeWrapper SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
-      public static readonly Il2CppTypeWrapper Scene = FindType( "UnityEngine.SceneManagement.Scene" );
-      public static readonly Il2CppTypeWrapper UnityEventBase = FindType( "UnityEngine.Events.UnityEventBase" );
-      public static readonly Il2CppTypeWrapper BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
-      public static readonly Type HorizontalWrapMode = FindProxyType( "UnityEngine.HorizontalWrapMode" );
-      public static readonly Type TextOverflowModes = FindProxyType( "TMPro.TextOverflowModes" );
-      public static readonly Type TextAlignmentOptions = FindProxyType( "TMPro.TextAlignmentOptions" );
-      public static readonly Type VerticalWrapMode = FindProxyType( "UnityEngine.VerticalWrapMode" );
-      public static readonly Il2CppTypeWrapper Font = FindType( "UnityEngine.Font" );
-      public static readonly Il2CppTypeWrapper WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
-      public static readonly Il2CppTypeWrapper Input = FindType( "UnityEngine.Input" );
+      public static readonly TypeContainer TextMesh = FindType( "UnityEngine.TextMesh" );
+      public static readonly TypeContainer Text = FindType( "UnityEngine.UI.Text" );
+      public static readonly TypeContainer Image = FindType( "UnityEngine.UI.Image" );
+      public static readonly TypeContainer RawImage = FindType( "UnityEngine.UI.RawImage" );
+      public static readonly TypeContainer MaskableGraphic = FindType( "UnityEngine.UI.MaskableGraphic" );
+      public static readonly TypeContainer Graphic = FindType( "UnityEngine.UI.Graphic" );
+      public static readonly TypeContainer GUIContent = FindType( "UnityEngine.GUIContent" );
+      public static readonly TypeContainer WWW = FindType( "UnityEngine.WWW" );
+      public static readonly TypeContainer InputField = FindType( "UnityEngine.UI.InputField" );
+      public static readonly TypeContainer GUI = FindType( "UnityEngine.GUI" );
+      public static readonly TypeContainer ImageConversion = FindType( "UnityEngine.ImageConversion" );
+      public static readonly TypeContainer Texture2D = FindType( "UnityEngine.Texture2D" );
+      public static readonly TypeContainer Texture = FindType( "UnityEngine.Texture" );
+      public static readonly TypeContainer SpriteRenderer = FindType( "UnityEngine.SpriteRenderer" );
+      public static readonly TypeContainer Sprite = FindType( "UnityEngine.Sprite" );
+      public static readonly TypeContainer Object = FindType( "UnityEngine.Object" );
+      public static readonly TypeContainer GameObject = FindType( "UnityEngine.GameObject" );
+      public static readonly TypeContainer TextEditor = FindType( "UnityEngine.TextEditor" );
+      public static readonly TypeContainer CustomYieldInstruction = FindType( "UnityEngine.CustomYieldInstruction" );
+      public static readonly TypeContainer SceneManager = FindType( "UnityEngine.SceneManagement.SceneManager" );
+      public static readonly TypeContainer Scene = FindType( "UnityEngine.SceneManagement.Scene" );
+      public static readonly TypeContainer UnityEventBase = FindType( "UnityEngine.Events.UnityEventBase" );
+      public static readonly TypeContainer BaseInvokableCall = FindType( "UnityEngine.Events.BaseInvokableCall" );
+      public static readonly Type HorizontalWrapMode = FindClrType( "UnityEngine.HorizontalWrapMode" );
+      public static readonly Type TextOverflowModes = FindClrType( "TMPro.TextOverflowModes" );
+      public static readonly Type TextAlignmentOptions = FindClrType( "TMPro.TextAlignmentOptions" );
+      public static readonly Type VerticalWrapMode = FindClrType( "UnityEngine.VerticalWrapMode" );
+      public static readonly TypeContainer Font = FindType( "UnityEngine.Font" );
+      public static readonly TypeContainer WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
+      public static readonly TypeContainer Input = FindType( "UnityEngine.Input" );
 
       public static class InputField_Properties
       {
-         public static CachedProperty Placeholder = UnityTypes.InputField?.ProxyType.CachedProperty( "placeholder" );
+         public static CachedProperty Placeholder = UnityTypes.InputField?.ClrType.CachedProperty( "placeholder" );
       }
 
       public static class TMP_InputField_Properties
       {
-         public static CachedProperty Placeholder = UnityTypes.TMP_InputField?.ProxyType.CachedProperty( "placeholder" );
+         public static CachedProperty Placeholder = UnityTypes.TMP_InputField?.ClrType.CachedProperty( "placeholder" );
       }
 
       public static class GameObject_Methods
@@ -241,7 +241,7 @@ namespace XUnity.Common.Constants
       {
          public static readonly Func<Texture2D, Il2CppStructArray<byte>, bool, bool> LoadImage =
             (Func<Texture2D, Il2CppStructArray<byte>, bool, bool>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
-               UnityTypes.ImageConversion?.ProxyType.GetMethod(
+               UnityTypes.ImageConversion?.ClrType.GetMethod(
                   "LoadImage",
                   BindingFlags.Public | BindingFlags.Static,
                   null,
@@ -251,7 +251,7 @@ namespace XUnity.Common.Constants
 
          public static readonly Func<Texture2D, Il2CppStructArray<byte>> EncodeToPNG =
             (Func<Texture2D, Il2CppStructArray<byte>>)ExpressionHelper.CreateTypedFastInvokeUnchecked(
-               UnityTypes.ImageConversion?.ProxyType.GetMethod(
+               UnityTypes.ImageConversion?.ClrType.GetMethod(
                   "EncodeToPNG",
                   BindingFlags.Public | BindingFlags.Static,
                   null,
@@ -260,7 +260,7 @@ namespace XUnity.Common.Constants
                ) );
       }
 
-      private static Type FindProxyType( string name )
+      private static Type FindClrType( string name )
       {
          var assemblies = AppDomain.CurrentDomain.GetAssemblies();
          foreach( var assembly in assemblies )
@@ -282,7 +282,7 @@ namespace XUnity.Common.Constants
          return null;
       }
 
-      private static Il2CppTypeWrapper FindType( string name )
+      private static TypeContainer FindType( string name )
       {
          Initialize();
 
@@ -323,7 +323,7 @@ namespace XUnity.Common.Constants
                }
             }
 
-            return new Il2CppTypeWrapper( Il2CppType.TypeFromPointer( ptr ), wrapperType, ptr );
+            return new TypeContainer( Il2CppType.TypeFromPointer( ptr ), wrapperType, ptr );
          }
          catch( Exception e )
          {

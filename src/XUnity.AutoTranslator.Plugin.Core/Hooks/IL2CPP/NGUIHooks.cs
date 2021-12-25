@@ -41,12 +41,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UILabel?.ProxyType, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UILabel?.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( Component __instance )
       {
-         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.UILabel.ProxyType );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.UILabel.ClrType );
 
          _Postfix( __instance );
       }
@@ -60,7 +60,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
       {
          Il2CppUtilities.InvokeMethod( UnityTypes.UILabel_Methods.set_text, instance, value );
 
-         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.UILabel.ProxyType );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.UILabel.ClrType );
          _Postfix( __instance );
       }
    }
@@ -80,7 +80,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UIRect?.ProxyType, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.UIRect?.ClrType, "OnEnable" );
       }
 
       static void Postfix( Component __instance )

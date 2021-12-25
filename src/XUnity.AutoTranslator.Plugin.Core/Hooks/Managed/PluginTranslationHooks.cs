@@ -32,12 +32,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.Transform != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Transform, "SetParent", new Type[] { UnityTypes.Transform, typeof( bool ) } );
+         return AccessToolsShim.Method( UnityTypes.Transform.ClrType, "SetParent", new Type[] { UnityTypes.Transform.ClrType, typeof( bool ) } );
       }
 
       static Action<Transform, Transform, bool> _original;
@@ -75,12 +75,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.GameObject != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.GameObject, "Internal_AddComponentWithType", new Type[] { typeof( Type ) } );
+         return AccessToolsShim.Method( UnityTypes.GameObject.ClrType, "Internal_AddComponentWithType", new Type[] { typeof( Type ) } );
       }
 
       static Func<GameObject, Type, Component> _original;
@@ -112,12 +112,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.Object != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Object, "Internal_InstantiateSingle", new Type[] { typeof( UnityEngine.Object ), typeof( Vector3 ), typeof( Quaternion ) } );
+         return AccessToolsShim.Method( UnityTypes.Object.ClrType, "Internal_InstantiateSingle", new Type[] { typeof( UnityEngine.Object ), typeof( Vector3 ), typeof( Quaternion ) } );
       }
 
       static Func<UnityEngine.Object, Vector3, Quaternion, UnityEngine.Object> _original;
@@ -154,12 +154,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.Object != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Object, "Internal_InstantiateSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( Vector3 ), typeof( Quaternion ) } );
+         return AccessToolsShim.Method( UnityTypes.Object.ClrType, "Internal_InstantiateSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( Vector3 ), typeof( Quaternion ) } );
       }
 
       static Func<UnityEngine.Object, Transform, Vector3, Quaternion, UnityEngine.Object> _original;
@@ -196,12 +196,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.Object != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Object, "Internal_CloneSingle", new Type[] { typeof( UnityEngine.Object ) } );
+         return AccessToolsShim.Method( UnityTypes.Object.ClrType, "Internal_CloneSingle", new Type[] { typeof( UnityEngine.Object ) } );
       }
 
       static Func<UnityEngine.Object, UnityEngine.Object> _original;
@@ -238,12 +238,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
    {
       static bool Prepare( object instance )
       {
-         return true;
+         return UnityTypes.Object != null;
       }
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Object, "Internal_CloneSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( bool ) } );
+         return AccessToolsShim.Method( UnityTypes.Object.ClrType, "Internal_CloneSingleWithParent", new Type[] { typeof( UnityEngine.Object ), typeof( Transform ), typeof( bool ) } );
       }
 
       static Func<UnityEngine.Object, Transform, bool, UnityEngine.Object> _original;

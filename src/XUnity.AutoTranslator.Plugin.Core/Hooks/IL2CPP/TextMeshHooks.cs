@@ -45,7 +45,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          Il2CppUtilities.InvokeMethod( UnityTypes.TextMesh_Methods.set_text, instance, value );
 
-         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMesh.ProxyType );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMesh.ClrType );
          _Postfix( __instance );
       }
    }
@@ -67,10 +67,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          if( active )
          {
-            var tms = __instance.GetComponentsInternal( UnityTypes.TextMesh.Il2CppType, false, true, false, false, null );
+            var tms = __instance.GetComponentsInternal( UnityTypes.TextMesh.UnityType, false, true, false, false, null );
             foreach( var tm in tms )
             {
-               var comp = Il2CppUtilities.CreateProxyComponentWithDerivedType( tm.Pointer, UnityTypes.TextMesh.ProxyType );
+               var comp = Il2CppUtilities.CreateProxyComponentWithDerivedType( tm.Pointer, UnityTypes.TextMesh.ClrType );
                AutoTranslationPlugin.Current.Hook_TextChanged( comp, true );
             }
          }

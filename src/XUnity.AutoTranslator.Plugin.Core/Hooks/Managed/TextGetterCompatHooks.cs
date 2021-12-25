@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Text, "text" )?.GetGetMethod();
+         return AccessToolsShim.Property( UnityTypes.Text.ClrType, "text" )?.GetGetMethod();
       }
 
       static void Postfix( object __instance, ref string __result )
@@ -62,7 +62,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TMP_Text, "text" )?.GetGetMethod();
+         return AccessToolsShim.Property( UnityTypes.TMP_Text.ClrType, "text" )?.GetGetMethod();
       }
 
       static void Postfix( object __instance, ref string __result )

@@ -91,11 +91,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          if( !Manipulators.TryGetValue( type, out var manipulator ) )
          {
 #if MANAGED
-            if( type == UnityTypes.TextField )
+            if( type == UnityTypes.TextField?.ClrType )
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
-            else if( type == UnityTypes.TextArea2D )
+            else if( type == UnityTypes.TextArea2D?.ClrType )
             {
                manipulator = new TextArea2DComponentManipulator();
             }
@@ -134,109 +134,70 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui == null ) return false;
 
-#if MANAGED
-         var type = ui.GetType();
-#else
-         var type = ui.GetIl2CppTypeSafe();
-#endif
+         var type = ui.GetUnityType();
 
          return ( Settings.EnableIMGUI && !_guiContentCheckFailed && IsGUIContentSafe( ui ) )
+            || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
+            || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( type ) )
+            || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( type ) )
 #if MANAGED
-            || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
-            || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( type ) )
-            || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
-#else
-            || ( type != null && (
-               ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( type ) )
-               || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.Il2CppType.IsAssignableFrom( type ) )
-               || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( type ) )
-               || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) ) ) )
+            || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.UnityType.IsAssignableFrom( type ) )
 #endif
+            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
             ;
       }
 
 #if MANAGED
       public static bool IsKnownTextMeshProType( Type type )
-      {
-         if( UnityTypes.TMP_Text != null )
-         {
-            return UnityTypes.TMP_Text.IsAssignableFrom( type );
-         }
-         else
-         {
-            return UnityTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true
-               || UnityTypes.TextMeshPro?.IsAssignableFrom( type ) == true;
-         }
-      }
 #else
       public static bool IsKnownTextMeshProType( Il2CppSystem.Type type )
+#endif
       {
          if( UnityTypes.TMP_Text != null )
          {
-            return UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( type );
+            return UnityTypes.TMP_Text.UnityType.IsAssignableFrom( type );
          }
          else
          {
-            return UnityTypes.TextMeshProUGUI?.Il2CppType.IsAssignableFrom( type ) == true
-               || UnityTypes.TextMeshPro?.Il2CppType.IsAssignableFrom( type ) == true;
+            return UnityTypes.TextMeshProUGUI?.UnityType.IsAssignableFrom( type ) == true
+               || UnityTypes.TextMeshPro?.UnityType.IsAssignableFrom( type ) == true;
          }
       }
-#endif
 
       public static bool SupportsRichText( this object ui )
       {
          if( ui == null ) return false;
 
-         var type = ui.GetType();
-#if IL2CPP
-         var il2cppType = ui.GetIl2CppTypeSafe();
-#endif
+         var clrType = ui.GetType();
+         var unityType = ui.GetUnityType();
 
          return
+            ( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+            || DoesTextMeshProSupportRichText( ui, clrType, unityType )
 #if MANAGED
-            ( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
-            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-            || DoesTextMeshProSupportRichText( ui, type )
-            || ( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.IsAssignableFrom( type ) )
-            || ( UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( type ) )
-#else
-            ( il2cppType != null && (
-            ( UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
-            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-            || DoesTextMeshProSupportRichText( ui, il2cppType, type ) ) )
+            || ( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.UnityType.IsAssignableFrom( unityType ) )
+            || ( UnityTypes.TextField != null && UnityTypes.TextField.UnityType.IsAssignableFrom( unityType ) )
 #endif
             ;
       }
 
 #if MANAGED
-      public static bool DoesTextMeshProSupportRichText( object ui, Type type )
-      {
-         if( UnityTypes.TMP_Text != null )
-         {
-            return UnityTypes.TMP_Text.IsAssignableFrom( type ) && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
-         }
-         else
-         {
-            return ( UnityTypes.TextMeshPro?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-               || ( UnityTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true && Equals( type.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
-         }
-      }
+      public static bool DoesTextMeshProSupportRichText( object ui, Type clrType, Type unityType )
 #else
-      public static bool DoesTextMeshProSupportRichText( object ui, Il2CppSystem.Type il2cppType, Type proxyType )
+      public static bool DoesTextMeshProSupportRichText( object ui, Type clrType, Il2CppSystem.Type unityType )
+#endif
       {
          if( UnityTypes.TMP_Text != null )
          {
-            return UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( il2cppType ) && Equals( proxyType.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
+            return UnityTypes.TMP_Text.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
          }
          else
          {
-            return ( UnityTypes.TextMeshPro?.Il2CppType.IsAssignableFrom( il2cppType ) == true && Equals( proxyType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-               || ( UnityTypes.TextMeshProUGUI?.Il2CppType.IsAssignableFrom( il2cppType ) == true && Equals( proxyType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
+            return ( UnityTypes.TextMeshPro?.UnityType.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+               || ( UnityTypes.TextMeshProUGUI?.UnityType.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
          }
       }
-#endif
 
       public static bool SupportsStabilization( this object ui )
       {
@@ -389,25 +350,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             var il2cppType = ui.GetIl2CppTypeSafe();
             if( il2cppType != null )
             {
-               if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.Il2CppType.IsAssignableFrom( il2cppType ) )
+               if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( il2cppType ) )
                {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.Text.ProxyType );
+                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.Text.ClrType );
                }
-               else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.Il2CppType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( il2cppType ) )
                {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMesh.ProxyType );
+                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMesh.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.Il2CppType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( il2cppType ) )
                {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ProxyType );
+                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.Il2CppType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( il2cppType ) )
                {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ProxyType );
+                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( il2cppType ) )
                {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ProxyType );
+                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
                }
             }
 #endif
@@ -420,17 +381,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static Component CreateTextMeshProDerivedProxy( this Component ui )
       {
          var il2cppType = ui.GetIl2CppTypeSafe();
-         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.Il2CppType.IsAssignableFrom( il2cppType ) )
+         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( il2cppType ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
          }
-         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.Il2CppType.IsAssignableFrom( il2cppType ) )
+         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( il2cppType ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
          }
-         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.Il2CppType.IsAssignableFrom( il2cppType ) )
+         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( il2cppType ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
          }
          return null;
       }
@@ -439,15 +400,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( UnityTypes.TextMeshProUGUI != null && ui.IsInstancePointerAssignableFrom( UnityTypes.TextMeshProUGUI.ClassPointer ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TextMeshProUGUI.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TextMeshProUGUI.ClrType );
          }
          else if( UnityTypes.TextMeshPro != null && ui.IsInstancePointerAssignableFrom( UnityTypes.TextMeshPro.ClassPointer ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TextMeshPro.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TextMeshPro.ClrType );
          }
          else if( UnityTypes.TMP_Text != null && ui.IsInstancePointerAssignableFrom( UnityTypes.TMP_Text.ClassPointer ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TMP_Text.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.TMP_Text.ClrType );
          }
          return null;
       }
@@ -455,9 +416,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static Component CreateNGUIDerivedProxy( this Component ui )
       {
          var il2cppType = ui.GetIl2CppTypeSafe();
-         if( UnityTypes.UILabel != null && UnityTypes.UILabel.Il2CppType.IsAssignableFrom( il2cppType ) )
+         if( UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( il2cppType ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.UILabel.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.UILabel.ClrType );
          }
          return null;
       }
@@ -466,7 +427,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( UnityTypes.UILabel != null && ui.IsInstancePointerAssignableFrom( UnityTypes.UILabel.ClassPointer ) )
          {
-            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.UILabel.ProxyType );
+            return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui, UnityTypes.UILabel.ClrType );
          }
          return null;
       }
@@ -480,28 +441,28 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TMP_Text, true ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TMP_Text.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableUGUI && UnityTypes.Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.Text, true ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.Text.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableTextMesh && UnityTypes.TextMesh != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TextMesh, true ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TextMesh.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableNGUI && UnityTypes.UILabel != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.UILabel, true ) )
+            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.UILabel.UnityType, true ) )
             {
                yield return comp;
             }
@@ -652,40 +613,38 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static void SetAllDirtyEx( this object ui )
       {
-#if MANAGED
          if( ui == null ) return;
 
-         var type = ui.GetType();
+         var type = ui.GetUnityType();
 
-         if( UnityTypes.Graphic != null && UnityTypes.Graphic.IsAssignableFrom( type ) )
+         if( UnityTypes.Graphic != null && UnityTypes.Graphic.UnityType.IsAssignableFrom( type ) )
          {
-            UnityTypes.Graphic.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
+            UnityTypes.Graphic.ClrType.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
-         else if( !( ui.TryCastTo<SpriteRenderer>( out _ ) ) )
+         else if( !ui.TryCastTo<SpriteRenderer>( out _ ) )
          {
-            AccessToolsShim.Method( type, MarkAsChangedMethodName )?.Invoke( ui, null );
+            var clrType = ui.GetType();
+            AccessToolsShim.Method( clrType, MarkAsChangedMethodName )?.Invoke( ui, null );
          }
-#endif
       }
 
       public static bool IsKnownImageType( this object ui )
       {
          if( ui == null ) return false;
 
-#if MANAGED
-         var type = ui.GetType();
+         var type = ui.GetUnityType();
 
          return ( ui is Material || ui is SpriteRenderer )
-            || ( UnityTypes.Image != null && UnityTypes.Image.IsAssignableFrom( type ) )
-            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.IsAssignableFrom( type ) )
-            || ( UnityTypes.CubismRenderer != null && UnityTypes.CubismRenderer.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIWidget != null && type != UnityTypes.UILabel && UnityTypes.UIWidget.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIAtlas != null && UnityTypes.UIAtlas.IsAssignableFrom( type ) )
-            || ( UnityTypes.UITexture != null && UnityTypes.UITexture.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.IsAssignableFrom( type ) );
-#else
-         return false;
+            || ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.UnityType.IsAssignableFrom( type ) )
+#if MANAGED
+            || ( UnityTypes.CubismRenderer != null && UnityTypes.CubismRenderer.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIWidget != null && !Equals( type, UnityTypes.UILabel?.UnityType ) && UnityTypes.UIWidget.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIAtlas != null && UnityTypes.UIAtlas.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.UITexture != null && UnityTypes.UITexture.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.UnityType.IsAssignableFrom( type ) )
 #endif
+            ;
       }
 
       public static string GetTextureName( this object texture, string fallbackName )

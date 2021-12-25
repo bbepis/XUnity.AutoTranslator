@@ -25,11 +25,7 @@ namespace XUnity.Common.Constants
       {
          try
          {
-            SupportsClipboard = UnityTypes.TextEditor
-#if IL2CPP
-               ?.ProxyType
-#endif
-               ?.GetProperty( "text" )?.GetSetMethod() != null;
+            SupportsClipboard = UnityTypes.TextEditor?.ClrType.GetProperty( "text" )?.GetSetMethod() != null;
          }
          catch( Exception )
          {
@@ -50,7 +46,7 @@ namespace XUnity.Common.Constants
             SupportsSceneManager = UnityTypes.Scene != null
                && UnityTypes.SceneManager != null
 #if MANAGED
-               && UnityTypes.SceneManager.GetMethod("add_sceneLoaded", All) != null;
+               && UnityTypes.SceneManager.ClrType.GetMethod("add_sceneLoaded", All) != null;
 #else
                && UnityTypes.SceneManager_Methods.add_sceneLoaded != null;
 #endif
@@ -62,11 +58,7 @@ namespace XUnity.Common.Constants
 
          try
          {
-            SupportsMouseScrollDelta = UnityTypes.Input
-#if IL2CPP
-               ?.ProxyType
-#endif
-               ?.GetProperty( "mouseScrollDelta" ) != null;
+            SupportsMouseScrollDelta = UnityTypes.Input?.ClrType.GetProperty( "mouseScrollDelta" ) != null;
          }
          catch( Exception )
          {

@@ -10,6 +10,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Constants;
+using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
 using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
@@ -67,7 +68,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.DicingTextures, "GetTexture", new[] { typeof( string ) } );
+         return AccessToolsShim.Method( UnityTypes.DicingTextures.ClrType, "GetTexture", new[] { typeof( string ) } );
       }
 
       public static void Postfix( object __instance, ref Texture2D __result )
@@ -101,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Sprite, "texture" )?.GetGetMethod();
+         return AccessToolsShim.Property( UnityTypes.Sprite.ClrType, "texture" )?.GetGetMethod();
       }
 
       static void Postfix( ref Texture2D __result )
@@ -135,7 +136,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.SpriteRenderer, "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.SpriteRenderer.ClrType, "sprite" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, ref Sprite value )
@@ -190,7 +191,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.CubismRenderer, "MainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.CubismRenderer.ClrType, "MainTexture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, ref Texture2D value )
@@ -222,7 +223,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.CubismRenderer, "TryInitialize" );
+         return AccessToolsShim.Method( UnityTypes.CubismRenderer.ClrType, "TryInitialize" );
       }
 
       public static void Prefix( object __instance )
@@ -291,14 +292,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.MaskableGraphic, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.MaskableGraphic.ClrType, "OnEnable" );
       }
 
       public static void Postfix( object __instance )
       {
-         var type = __instance.GetType();
-         if( ( UnityTypes.Image != null && UnityTypes.Image.IsAssignableFrom( type ) )
-            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.IsAssignableFrom( type ) ) )
+         var type = __instance.GetUnityType();
+         if( ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.UnityType.IsAssignableFrom( type ) ) )
          {
             Texture2D _ = null;
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, true );
@@ -330,7 +331,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image, "sprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "sprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -363,7 +364,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image, "overrideSprite" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "overrideSprite" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -396,7 +397,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Image, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Image.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -429,7 +430,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.RawImage, "texture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.RawImage.ClrType, "texture" )?.GetSetMethod();
       }
 
       public static void Prefix( object __instance, ref Texture value )
@@ -497,7 +498,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UIAtlas, "spriteMaterial" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UIAtlas.ClrType, "spriteMaterial" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -530,7 +531,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UISprite, "OnInit" );
+         return AccessToolsShim.Method( UnityTypes.UISprite.ClrType, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -563,7 +564,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UISprite, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UISprite.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -596,7 +597,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UISprite, "atlas" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UISprite.ClrType, "atlas" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -630,7 +631,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UITexture, "mainTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UITexture.ClrType, "mainTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -663,7 +664,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UITexture, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UITexture.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -696,7 +697,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UIRect, "OnInit" );
+         return AccessToolsShim.Method( UnityTypes.UIRect.ClrType, "OnInit" );
       }
 
       public static void Postfix( object __instance )
@@ -729,7 +730,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UI2DSprite, "sprite2D" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UI2DSprite.ClrType, "sprite2D" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -762,7 +763,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UI2DSprite, "material" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UI2DSprite.ClrType, "material" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -795,7 +796,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UIPanel, "clipTexture" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UIPanel.ClrType, "clipTexture" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )

@@ -14,9 +14,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       public FairyGUITextComponentManipulator()
       {
-         _html = UnityTypes.TextField.CachedField( "html" ) ?? UnityTypes.TextField.CachedFieldByIndex( 3, typeof( bool ), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-         _text = UnityTypes.TextField.CachedProperty( "text" );
-         _htmlText = UnityTypes.TextField.CachedProperty( "htmlText" );
+         _html = UnityTypes.TextField.ClrType.CachedField( "html" ) ?? UnityTypes.TextField.ClrType.CachedFieldByIndex( 3, typeof( bool ), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+         _text = UnityTypes.TextField.ClrType.CachedProperty( "text" );
+         _htmlText = UnityTypes.TextField.ClrType.CachedProperty( "htmlText" );
       }
 
       public string GetText( object ui )

@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextArea2D, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextArea2D.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -69,7 +69,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextArea2D, "TextData" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextArea2D.ClrType, "TextData" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -102,7 +102,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return UnityTypes.TextData.GetConstructor( new[] { typeof( string ) } );
+         return UnityTypes.TextData.ClrType.GetConstructor( new[] { typeof( string ) } );
       }
 
       static void Postfix( object __instance, string text )
@@ -135,7 +135,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Text, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Text.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -168,7 +168,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Text, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.Text.ClrType, "OnEnable" );
       }
 
       static void Postfix( object __instance )

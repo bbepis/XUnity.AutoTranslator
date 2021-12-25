@@ -19,20 +19,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
       public TextArea2DComponentManipulator()
       {
-         var textDataField = UnityTypes.AdvPage.GetField( "textData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
+         var textDataField = UnityTypes.AdvPage.ClrType.GetField( "textData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
          set_textData = CustomFastReflectionHelper.CreateFastFieldSetter<object, object>( textDataField );
 
-         var statusField = UnityTypes.AdvPage.GetField( "status", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
+         var statusField = UnityTypes.AdvPage.ClrType.GetField( "status", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
          set_status = CustomFastReflectionHelper.CreateFastFieldSetter<object, object>( statusField );
 
-         var isInputSendMessageField = UnityTypes.AdvPage.GetField( "isInputSendMessage", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
+         var isInputSendMessageField = UnityTypes.AdvPage.ClrType.GetField( "isInputSendMessage", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
          set_isInputSendMessage = CustomFastReflectionHelper.CreateFastFieldSetter<object, bool>( isInputSendMessageField );
 
-         var nameTextField = UnityTypes.AdvPage.GetField( "nameText", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
+         var nameTextField = UnityTypes.AdvPage.ClrType.GetField( "nameText", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance );
          set_nameText = CustomFastReflectionHelper.CreateFastFieldSetter<object, object>( nameTextField );
 
-         _text = UnityTypes.TextArea2D.CachedProperty( "text" );
-         _TextData = UnityTypes.TextArea2D.CachedProperty( "TextData" );
+         _text = UnityTypes.TextArea2D.ClrType.CachedProperty( "text" );
+         _TextData = UnityTypes.TextArea2D.ClrType.CachedProperty( "TextData" );
       }
 
       public string GetText( object ui )
@@ -49,15 +49,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
       {
          if( UnityTypes.AdvUiMessageWindow != null && UnityTypes.AdvPage != null )
          {
-            var uiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUiMessageWindow );
+            var uiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUiMessageWindow.UnityType );
 
             var textUI = UnityTypes.AdvUiMessageWindow_Fields.text.Get( uiMessageWindow );
             var nameTextUI = UnityTypes.AdvUiMessageWindow_Fields.nameText.Get( uiMessageWindow );
 
             if( Equals( textUI, ui ) )
             {
-               var advPage = GameObject.FindObjectOfType( UnityTypes.AdvPage );
-               var textData = Activator.CreateInstance( UnityTypes.TextData, new object[] { text } );
+               var advPage = GameObject.FindObjectOfType( UnityTypes.AdvPage.UnityType );
+               var textData = Activator.CreateInstance( UnityTypes.TextData.ClrType, new object[] { text } );
 
                _TextData.Set( ui, textData ); // is this needed?
                set_textData( advPage, textData );
@@ -68,8 +68,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
             }
             else if( Equals( nameTextUI, ui ) )
             {
-               var advPage = GameObject.FindObjectOfType( UnityTypes.AdvPage );
-               var textData = Activator.CreateInstance( UnityTypes.TextData, new object[] { text } );
+               var advPage = GameObject.FindObjectOfType( UnityTypes.AdvPage.UnityType );
+               var textData = Activator.CreateInstance( UnityTypes.TextData.ClrType, new object[] { text } );
 
                _TextData.Set( ui, textData ); // is this needed?
                set_nameText( advPage, text );
@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
             }
          }
 
-         var textData2 = Activator.CreateInstance( UnityTypes.TextData, new object[] { text } );
+         var textData2 = Activator.CreateInstance( UnityTypes.TextData.ClrType, new object[] { text } );
          _text.Set( ui, text );
          _TextData.Set( ui, textData2 );
       }

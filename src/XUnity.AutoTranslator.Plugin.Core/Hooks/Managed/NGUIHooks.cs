@@ -34,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.UILabel, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.UILabel.ClrType, "text" )?.GetSetMethod();
       }
 
       public static void Postfix( object __instance )
@@ -67,12 +67,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UILabel, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.UILabel.ClrType, "OnEnable" );
       }
 
       public static void Postfix( object __instance )
       {
-         if( UnityTypes.UILabel.IsAssignableFrom( __instance.GetType() ) )
+         if( UnityTypes.UILabel.UnityType.IsAssignableFrom( __instance.GetType() ) )
          {
             AutoTranslationPlugin.Current.Hook_TextChanged( __instance, true );
          }

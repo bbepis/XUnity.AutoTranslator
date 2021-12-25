@@ -31,7 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextMesh, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextMesh.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -71,7 +71,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          if( active )
          {
-            var tms = __instance.GetComponentsInChildren( UnityTypes.TextMesh );
+            var tms = __instance.GetComponentsInChildren( UnityTypes.TextMesh.UnityType );
             foreach( var tm in tms )
             {
                AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );
@@ -111,7 +111,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       {
          if( active )
          {
-            var tms = __instance.GetComponentsInChildren( UnityTypes.TextMesh );
+            var tms = __instance.GetComponentsInChildren( UnityTypes.TextMesh.UnityType );
             foreach( var tm in tms )
             {
                AutoTranslationPlugin.Current.Hook_TextChanged( tm, true );

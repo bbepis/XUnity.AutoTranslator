@@ -42,12 +42,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.Text?.ProxyType, "text" ).GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.Text?.ClrType, "text" ).GetSetMethod();
       }
 
       static void Postfix( Component __instance )
       {
-         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ProxyType );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ClrType );
 
          _Postfix( __instance );
       }
@@ -59,7 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void ML_Detour( IntPtr instance, IntPtr value )
       {
-         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ProxyType );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ClrType );
 
          Il2CppUtilities.InvokeMethod( UnityTypes.Text_Methods.set_text, instance, value );
 
@@ -82,14 +82,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.Text?.ProxyType, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.Text?.ClrType, "OnEnable" );
       }
 
       static void Postfix( Component __instance )
       {
          if( __instance.Pointer.IsInstancePointerAssignableFrom( UnityTypes.Text.ClassPointer ) )
          {
-            __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ProxyType );
+            __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ClrType );
             _Postfix( __instance );
          }
       }
@@ -105,7 +105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
          if( instance.IsInstancePointerAssignableFrom( UnityTypes.Text.ClassPointer ) )
          {
-            var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ProxyType );
+            var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.Text.ClrType );
             _Postfix( __instance );
          }
       }

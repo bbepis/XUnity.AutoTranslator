@@ -49,7 +49,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TextWindow, "SetText", new Type[] { typeof( string ) } );
+         return AccessToolsShim.Method( UnityTypes.TextWindow.ClrType, "SetText", new Type[] { typeof( string ) } );
       }
 
       static void Postfix( object __instance )
@@ -82,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TextMeshProUGUI, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.TextMeshProUGUI.ClrType, "OnEnable" );
       }
 
       static void Postfix( object __instance )
@@ -115,7 +115,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextMeshProUGUI, "text" ).GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextMeshProUGUI.ClrType, "text" ).GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -148,7 +148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TextMeshPro, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.TextMeshPro.ClrType, "OnEnable" );
       }
 
       static void Postfix( object __instance )
@@ -181,7 +181,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextMeshPro, "text" ).GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextMeshPro.ClrType, "text" ).GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -214,7 +214,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TMP_Text, "maxVisibleCharacters" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TMP_Text.ClrType, "maxVisibleCharacters" )?.GetSetMethod();
       }
 
       static void Prefix( object __instance, ref int value )
@@ -251,7 +251,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TMP_Text, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TMP_Text.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -284,7 +284,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetText", new[] { typeof( StringBuilder ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( StringBuilder ) } );
       }
 
       static void Postfix( object __instance )
@@ -317,7 +317,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetText", new[] { typeof( string ), typeof( bool ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( string ), typeof( bool ) } );
       }
 
       static void Postfix( object __instance )
@@ -352,7 +352,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetText", new[] { typeof( string ), typeof( float ), typeof( float ), typeof( float ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( string ), typeof( float ), typeof( float ), typeof( float ) } );
       }
 
       static void Postfix( object __instance )
@@ -385,7 +385,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetCharArray", new[] { typeof( char[] ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( char[] ) } );
       }
 
       static void Postfix( object __instance )
@@ -418,7 +418,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
       }
 
       static void Postfix( object __instance )
@@ -451,7 +451,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
       }
 
       static void Postfix( object __instance )

@@ -35,9 +35,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
          var type = _type;
 
 #if MANAGED
-         if( UnityTypes.AdvUguiMessageWindow != null && UnityTypes.UguiNovelText?.IsAssignableFrom( type ) == true )
+         if( UnityTypes.AdvUguiMessageWindow != null && UnityTypes.UguiNovelText?.ClrType.IsAssignableFrom( type ) == true )
          {
-            var uguiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUguiMessageWindow );
+            var uguiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUguiMessageWindow.ClrType );
             if( uguiMessageWindow != null )
             {
 
@@ -51,7 +51,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                   var nameText = UnityTypes.AdvUguiMessageWindow_Fields.nameText.GetValue( uguiMessageWindow ) as UnityEngine.Object;
                   if( nameText )
                   {
-                     previousNameText = (string)UnityTypes.Text.CachedProperty( TextPropertyName ).Get( nameText );
+                     previousNameText = (string)UnityTypes.Text.ClrType.CachedProperty( TextPropertyName ).Get( nameText );
                   }
 
                   var engine = UnityTypes.AdvUguiMessageWindow_Properties.Engine?.Get( uguiMessageWindow )
@@ -73,7 +73,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                   else
                   {
                      var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-                     var textData = UnityTypes.TextData.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
+                     var textData = UnityTypes.TextData.ClrType.GetConstructor( new[] { typeof( string ) } ).Invoke( new[] { text } );
                      var length = (int)textData.GetType().GetProperty( "Length", flags ).GetValue( textData, null );
 
                      if( remakeTextData == null )
@@ -117,7 +117,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 
                   if( nameText )
                   {
-                     UnityTypes.Text.CachedProperty( TextPropertyName ).Set( nameText, previousNameText );
+                     UnityTypes.Text.ClrType.CachedProperty( TextPropertyName ).Set( nameText, previousNameText );
                   }
 
                   return;
@@ -125,9 +125,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
             }
          }
 
-         if( UnityTypes.TextWindow != null && UnityTypes.TextMeshPro?.IsAssignableFrom( type ) == true )
+         if( UnityTypes.TextWindow != null && UnityTypes.TextMeshPro?.ClrType.IsAssignableFrom( type ) == true )
          {
-            var textWindow = GameObject.FindObjectOfType( UnityTypes.TextWindow );
+            var textWindow = GameObject.FindObjectOfType( UnityTypes.TextWindow.ClrType );
             if( textWindow != null )
             {
                var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
@@ -137,7 +137,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
                   if( Equals( textMesh, ui ) )
                   {
                      var frames = new StackTrace().GetFrames();
-                     if( frames.Any( x => x.GetMethod().DeclaringType == UnityTypes.TextWindow ) )
+                     if( frames.Any( x => x.GetMethod().DeclaringType == UnityTypes.TextWindow.ClrType ) )
                      {
                         // If inline (sync)
 
@@ -235,7 +235,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
 #if MANAGED
          if( UnityTypes.TextExpansion_Methods.SetMessageType != null && UnityTypes.TextExpansion_Methods.SkipTypeWriter != null )
          {
-            if( UnityTypes.TextExpansion.IsAssignableFrom( type ) )
+            if( UnityTypes.TextExpansion.ClrType.IsAssignableFrom( type ) )
             {
                UnityTypes.TextExpansion_Methods.SetMessageType.Invoke( ui, 1 );
                UnityTypes.TextExpansion_Methods.SkipTypeWriter.Invoke( ui );

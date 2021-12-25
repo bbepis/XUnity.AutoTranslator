@@ -30,7 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextField, "text" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextField.ClrType, "text" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )
@@ -63,7 +63,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TextField, "htmlText" )?.GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TextField.ClrType, "htmlText" )?.GetSetMethod();
       }
 
       static void Postfix( object __instance )

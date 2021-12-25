@@ -1,20 +1,23 @@
-﻿#if IL2CPP
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using UnhollowerBaseLib;
-using UnhollowerRuntimeLib;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
+
+#if IL2CPP
+using UnhollowerBaseLib;
+using UnhollowerRuntimeLib;
+#endif
+
 
 namespace XUnity.Common.Extensions
 {
    public static class ObjectExtensions
    {
+#if IL2CPP
       private static readonly IntPtr GetIl2CppType;
 
       static ObjectExtensions()
@@ -50,7 +53,17 @@ namespace XUnity.Common.Extensions
          var gcHandle = Il2CppUtilities.GetGarbageCollectionHandle( that );
          return IL2CPP.il2cpp_gchandle_get_target( gcHandle ) == IntPtr.Zero;
       }
+
+      public static Il2CppSystem.Type GetUnityType( this object obj )
+      {
+         return obj.GetIl2CppTypeSafe();
+      }
+#else
+      public static Type GetUnityType( this object obj )
+      {
+         return obj.GetType();
+      }
+#endif
    }
 }
 
-#endif

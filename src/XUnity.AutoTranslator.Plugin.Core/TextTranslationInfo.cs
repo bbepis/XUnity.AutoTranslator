@@ -82,7 +82,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             Component inputField = null;
 #if MANAGED
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField );
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
             if( inputField != null )
             {
                if( UnityTypes.InputField_Properties.Placeholder != null )
@@ -92,7 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField );
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField?.UnityType );
             if( inputField != null )
             {
                if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
@@ -102,11 +102,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput );
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
 #else
             if( UnityTypes.InputField != null )
             {
-               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField.Il2CppType );
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
                if( inputField != null )
                {
                   if( UnityTypes.InputField_Properties.Placeholder != null )
@@ -119,7 +119,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( UnityTypes.TMP_InputField != null )
             {
-               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField.Il2CppType );
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField?.UnityType );
                if( inputField != null )
                {
                   if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
@@ -130,7 +130,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.Il2CppType );
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
 #endif
 
             return inputField != null;
@@ -151,14 +151,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var component = ui as Component;
                if( ui != null )
                {
-                  _typewriter = (MonoBehaviour)component.GetComponent( UnityTypes.Typewriter );
+                  _typewriter = (MonoBehaviour)component.GetComponent( UnityTypes.Typewriter.UnityType );
                }
             }
          }
 
          if( _typewriter != null )
          {
-            AccessToolsShim.Method( UnityTypes.Typewriter, "OnEnable" )?.Invoke( _typewriter, null );
+            AccessToolsShim.Method( UnityTypes.Typewriter.UnityType, "OnEnable" )?.Invoke( _typewriter, null );
          }
 #endif
       }
@@ -170,7 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var type = ui.GetType();
 
-         if( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
+         if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
          {
             if( string.IsNullOrEmpty( Settings.OverrideFont ) ) return;
 
@@ -192,8 +192,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                };
             }
          }
-         else if( ( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( type ) )
-            || ( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( type ) ) )
+         else if( ( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( type ) )
+            || ( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( type ) ) )
          {
             if( string.IsNullOrEmpty( Settings.OverrideFontTextMeshPro ) ) return;
 
@@ -237,7 +237,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var type = ui.GetType();
 
-         if( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
+         if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
          {
             var text = (Component)ui;
 
@@ -458,7 +458,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
          }
-         else if( type == UnityTypes.UILabel )
+         else if( type == UnityTypes.UILabel?.UnityType )
          {
             // special handling for NGUI to better handle textbox sizing
 
@@ -483,7 +483,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                };
             }
          }
-         else if( type == UnityTypes.TextMeshPro || type == UnityTypes.TextMeshProUGUI )
+         else if( type == UnityTypes.TextMeshPro?.UnityType || type == UnityTypes.TextMeshProUGUI?.UnityType )
          {
             var overflowModeProperty = type.CachedProperty( "overflowMode" );
             var originalOverflowMode = overflowModeProperty?.Get( ui );
@@ -547,6 +547,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      var enableAutoSizingProperty = type.CachedProperty( "enableAutoSizing" );
                      var fontSizeMinProperty = type.CachedProperty( "fontSizeMin" );
                      var fontSizeMaxProperty = type.CachedProperty( "fontSizeMax" );
+                     var fontSizeProperty = type.CachedProperty( "fontSize" );
+                     var currentFontSize = (float?)fontSizeProperty.Get( ui );
 
                      if( enableAutoSizingProperty != null )
                      {
@@ -593,6 +595,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
                                  fontSizeMaxProperty.Set( g, fontSizeMaxValue );
                               };
                            }
+
+                           _unresize += g =>
+                           {
+                              fontSizeProperty.Set( g, currentFontSize );
+                           };
                         }
                      }
                   }

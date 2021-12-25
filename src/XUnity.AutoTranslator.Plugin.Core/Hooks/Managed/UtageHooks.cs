@@ -34,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.AdvEngine, "JumpScenario", new Type[] { typeof( string ) } );
+         return AccessToolsShim.Method( UnityTypes.AdvEngine.ClrType, "JumpScenario", new Type[] { typeof( string ) } );
       }
 
       static void Prefix( ref string label )
@@ -66,7 +66,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.UnityEventBase, "Invoke", new Type[] { typeof( object[] ) } );
+         return AccessToolsShim.Method( UnityTypes.UnityEventBase.ClrType, "Invoke", new Type[] { typeof( object[] ) } );
       }
 
       static bool Prefix()
@@ -101,8 +101,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          try
          {
-            Method = AccessToolsShim.Method( UnityTypes.UnityEventBase, "PrepareInvoke" );
-            DefaultResult = Activator.CreateInstance( typeof( List<> ).MakeGenericType( UnityTypes.BaseInvokableCall ) );
+            Method = AccessToolsShim.Method( UnityTypes.UnityEventBase.ClrType, "PrepareInvoke" );
+            DefaultResult = Activator.CreateInstance( typeof( List<> ).MakeGenericType( UnityTypes.BaseInvokableCall.ClrType ) );
 
             return Method != null;
          }
@@ -153,7 +153,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.AdvPage, "RemakeTextData" );
+         return AccessToolsShim.Method( UnityTypes.AdvPage.ClrType, "RemakeTextData" );
       }
 
       static bool Prefix( object __instance )

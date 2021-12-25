@@ -74,25 +74,25 @@
   </ItemGroup>
 
    <!-- No idea why I need one for each -->
-   <Target Name="ILRepack" AfterTargets="Build" Condition="'$(TargetFramework)'=='net472'">
+   <Target Name="ILRepackNET472" AfterTargets="Build" Condition="'$(TargetFramework)'=='net472'">
       <PropertyGroup>
          <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
       </PropertyGroup>
       <ItemGroup>
          <InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
       </ItemGroup>
-      <Message Text="MERGING: @(InputAssemblies)->'%(Filename)') into $(OutputAssembly)" Importance="High" />
+      <Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
       <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
    </Target>
 
-   <Target Name="ILRepack" AfterTargets="Build" Condition="'$(TargetFramework)'=='net35'">
+   <Target Name="ILRepackNET35" AfterTargets="Build" Condition="'$(TargetFramework)'=='net35'">
       <PropertyGroup>
          <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
       </PropertyGroup>
       <ItemGroup>
          <InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
       </ItemGroup>
-      <Message Text="MERGING: @(InputAssemblies)->'%(Filename)') into $(OutputAssembly)" Importance="High" />
+      <Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
       <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
    </Target>
 

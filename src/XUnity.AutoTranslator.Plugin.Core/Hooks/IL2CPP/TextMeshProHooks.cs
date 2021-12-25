@@ -42,12 +42,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TextMeshProUGUI?.ProxyType, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.TextMeshProUGUI?.ClrType, "OnEnable" );
       }
 
       static void Postfix( Component __instance )
       {
-         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshProUGUI.ProxyType );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
 
          _Postfix( __instance );
       }
@@ -61,7 +61,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshProUGUI_Methods.OnEnable, instance );
 
-         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshProUGUI.ProxyType );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshProUGUI.ClrType );
          _Postfix( __instance );
       }
    }
@@ -81,12 +81,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TextMeshPro?.ProxyType, "OnEnable" );
+         return AccessToolsShim.Method( UnityTypes.TextMeshPro?.ClrType, "OnEnable" );
       }
 
       static void Postfix( Component __instance )
       {
-         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshPro.ProxyType );
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TextMeshPro.ClrType );
 
          _Postfix( __instance );
       }
@@ -100,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
       {
          Il2CppUtilities.InvokeMethod( UnityTypes.TextMeshPro_Methods.OnEnable, instance );
 
-         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshPro.ProxyType );
+         var __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( instance, UnityTypes.TextMeshPro.ClrType );
          _Postfix( __instance );
       }
    }
@@ -120,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Property( UnityTypes.TMP_Text?.ProxyType, "text" ).GetSetMethod();
+         return AccessToolsShim.Property( UnityTypes.TMP_Text?.ClrType, "text" ).GetSetMethod();
       }
 
       static void Postfix( Component __instance )
