@@ -26,8 +26,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          _x = x;
          _y = y;
          _width = width;
-         _noSelection = new GUIContent( viewModel.NoSelection, viewModel.NoSelectionTooltip );
-         _unselect = new GUIContent( viewModel.Unselect, viewModel.UnselectTooltip );
+         _noSelection = GUIUtil.CreateContent( viewModel.NoSelection, viewModel.NoSelectionTooltip );
+         _unselect = GUIUtil.CreateContent( viewModel.Unselect, viewModel.UnselectTooltip );
 
          _viewModel = viewModel;
       }
@@ -74,10 +74,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          var rect = GUIUtil.R( x, y, width, _viewModel.Options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _viewModel.Options.Count * GUIUtil.RowHeight );
 
          GUILayout.BeginArea( rect, GUIUtil.NoSpacingBoxStyle );
-         _scrollPosition = GUILayout.BeginScrollView( _scrollPosition );
+         _scrollPosition = GUILayout.BeginScrollView( _scrollPosition, GUIStyle.none );
 
          var style = _viewModel.CurrentSelection == null ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
-         if( GUILayout.Button( _unselect, style ) )
+         if( GUILayout.Button( _unselect, style, null ) )
          {
             _viewModel.Select( null );
             _isShown = false;
@@ -87,7 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          {
             style = option.IsSelected() ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
             GUI.enabled = option?.IsEnabled() ?? true;
-            if( GUILayout.Button( option.Text, style ) )
+            if( GUILayout.Button( option.Text, style, null ) )
             {
                _viewModel.Select( option );
                _isShown = false;

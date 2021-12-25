@@ -16,6 +16,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       public const float LabelHeight = 21;
       public const float RowHeight = 21;
 
+      public static GUIContent none = new GUIContent( "" );
+
       public static readonly RectOffset Empty = new RectOffset( 0, 0, 0, 0 );
 
       public static readonly GUIStyle LabelTranslation = new GUIStyle( GUI.skin.label )
@@ -67,6 +69,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             background = CreateBackgroundTexture()
          }
       };
+
+      public static GUIContent CreateContent( string text )
+      {
+         return new GUIContent( text );
+      }
+
+      public static GUIContent CreateContent( string text, string tooltip )
+      {
+#if IL2CPP
+         return new GUIContent( text, null, tooltip );
+#else
+         return new GUIContent( text, tooltip );
+#endif
+      }
 
       public static Rect R( float x, float y, float width, float height ) => new Rect( x, y, width, height );
 

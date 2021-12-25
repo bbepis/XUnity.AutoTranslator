@@ -33,9 +33,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public void OnGUI()
       {
-         GUI.Box( _windowRect, GUIContent.none, GUIUtil.GetWindowBackgroundStyle() );
+         GUI.Box( _windowRect, GUIUtil.none, GUIUtil.GetWindowBackgroundStyle() );
 
-         _windowRect = GUI.Window( WindowId, _windowRect, CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
+         _windowRect = GUI.Window( WindowId, _windowRect, (GUI.WindowFunction)CreateWindowUI, "---- XUnity.AutoTranslator UI ----" );
 
          if( GUIUtil.IsAnyMouseButtonOrScrollWheelDownSafe )
          {

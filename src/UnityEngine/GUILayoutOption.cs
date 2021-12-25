@@ -10,7 +10,11 @@ using UnityEngine.SceneManagement;
 
 namespace UnityEngine
 {
+#if IL2CPP
+   public sealed class GUILayoutOption : UnhollowerBaseLib.Il2CppObjectBase
+#else
    public sealed class GUILayoutOption
+#endif
    {
       internal enum Type
       {
@@ -34,10 +38,14 @@ namespace UnityEngine
 
       internal object value;
 
-      internal GUILayoutOption( Type type, object value )
-      {
-         this.type = type;
-         this.value = value;
-      }
+#if IL2CPP
+      internal GUILayoutOption( Type type, object value ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+#else
+      internal GUILayoutOption( Type type, object value ) => throw new NotImplementedException();
+#endif
+
+#if IL2CPP
+      public GUILayoutOption( IntPtr pointer ) : base( pointer ) => throw new NotImplementedException();
+#endif
    }
 }

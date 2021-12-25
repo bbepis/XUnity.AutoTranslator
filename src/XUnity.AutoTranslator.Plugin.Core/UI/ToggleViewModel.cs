@@ -10,8 +10,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public ToggleViewModel( string text, string enabledTooltip, string disabledTooltip, Action onToggled, Func<bool> isToggled, bool enabled = true )
       {
-         _enabled = new GUIContent( text, enabledTooltip );
-         _disabled = new GUIContent( text, disabledTooltip );
+         _enabled = GUIUtil.CreateContent( text, enabledTooltip );
+         _disabled = GUIUtil.CreateContent( text, disabledTooltip );
          OnToggled = onToggled;
          IsToggled = isToggled;
          Enabled = enabled;

@@ -12,7 +12,20 @@ namespace UnityEngine
 {
    public class GUI
    {
+#if IL2CPP
+      public sealed class WindowFunction : Il2CppSystem.MulticastDelegate
+      {
+         public WindowFunction( IntPtr value ) : base( value )
+         {
+         }
+
+         public static implicit operator GUI.WindowFunction( System.Action<int> obj0 ) => throw new NotImplementedException();
+      }
+#else
       public delegate void WindowFunction( int id );
+#endif
+
+
 
       public abstract class Scope : IDisposable
       {

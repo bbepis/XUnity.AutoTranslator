@@ -63,6 +63,11 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          AutoTranslatorPlugin._monoBehaviour.Update();
       }
 
+      void OnGUI()
+      {
+         AutoTranslatorPlugin._monoBehaviour.OnGUI();
+      }
+
       void Start()
       {
          AutoTranslatorPlugin._monoBehaviour.Start();

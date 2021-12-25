@@ -10,6 +10,9 @@
       /// </summary>
       void Start();
 
-      //void OnGUI();
+      /// <summary>
+      /// OnGUI callback
+      /// </summary>
+      void OnGUI();
    }
 }

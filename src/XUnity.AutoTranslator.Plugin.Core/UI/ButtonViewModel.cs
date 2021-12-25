@@ -7,7 +7,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
    {
       public ButtonViewModel( string text, string tooltip, Action onClicked, Func<bool> canClick )
       {
-         Text = new GUIContent( text, tooltip );
+         Text = GUIUtil.CreateContent( text, tooltip );
          OnClicked = onClicked;
          CanClick = canClick;
       }

@@ -36,9 +36,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public void OnGUI()
       {
-         GUI.Box( _windowRect, GUIContent.none, GUIUtil.GetWindowBackgroundStyle() );
+         GUI.Box( _windowRect, GUIUtil.none, GUIUtil.GetWindowBackgroundStyle() );
 
-         _windowRect = GUI.Window( WindowId, _windowRect, CreateWindowUI, "---- Translation Aggregator Options ----" );
+         _windowRect = GUI.Window( WindowId, _windowRect, (GUI.WindowFunction)CreateWindowUI, "---- Translation Aggregator Options ----" );
 
          if( GUIUtil.IsAnyMouseButtonOrScrollWheelDownSafe )
          {

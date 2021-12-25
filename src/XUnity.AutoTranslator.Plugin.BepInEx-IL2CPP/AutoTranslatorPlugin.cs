@@ -108,6 +108,11 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx_Il2Cpp
          AutoTranslatorPlugin._monoBehaviour.Update();
       }
 
+      void OnGUI()
+      {
+         AutoTranslatorPlugin._monoBehaviour.OnGUI();
+      }
+
       void Start()
       {
          AutoTranslatorPlugin._monoBehaviour.Start();

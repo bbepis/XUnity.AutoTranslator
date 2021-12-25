@@ -287,10 +287,11 @@ namespace UnityEngine
          return DoButton( GUIContent.Temp( text ), style, options );
       }
 
-      public static bool Button( GUIContent content, GUIStyle style, params GUILayoutOption[] options )
-      {
-         return DoButton( content, style, options );
-      }
+#if IL2CPP
+      public static bool Button( GUIContent content, GUIStyle style, UnhollowerBaseLib.Il2CppReferenceArray<GUILayoutOption> options ) => throw new NotImplementedException();
+#else
+      public static bool Button( GUIContent content, GUIStyle style, params GUILayoutOption[] options ) => throw new NotImplementedException();
+#endif
 
       private static bool DoButton( GUIContent content, GUIStyle style, GUILayoutOption[] options ) => throw new NotImplementedException();
 

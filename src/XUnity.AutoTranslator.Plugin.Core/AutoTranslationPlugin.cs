@@ -61,11 +61,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static bool _hasResizedCurrentComponentDuringDiscovery;
 
-#if MANAGED
       internal XuaWindow MainWindow;
       internal TranslationAggregatorWindow TranslationAggregatorWindow;
       internal TranslationAggregatorOptionsWindow TranslationAggregatorOptionsWindow;
-#endif
       internal TranslationManager TranslationManager;
       internal TextTranslationCache TextCache;
       internal Dictionary<string, TextTranslationCache> PluginTextCaches = new Dictionary<string, TextTranslationCache>( StringComparer.OrdinalIgnoreCase );
@@ -102,6 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private int _lastSpriteUpdateFrame = -1;
       private bool _isCalledFromSceneManager = false;
       private bool _translationReloadRequest = false;
+      private bool _hasUiBeenSetup = false;
 
       /// <summary>
       /// Initialized the plugin.
@@ -159,11 +158,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          // load all translations from files
          LoadTranslations( false );
-
-#if MANAGED
-         // initialize ui
-         InitializeGUI();
-#endif
 
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
@@ -254,19 +248,22 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-#if MANAGED
       private void InitializeGUI()
       {
+         DisableAutoTranslator();
          try
          {
-            DisableAutoTranslator();
+            if( !_hasUiBeenSetup )
+            {
+               _hasUiBeenSetup = true;
 
-            MainWindow = new XuaWindow( CreateXuaViewModel() );
+               MainWindow = new XuaWindow( CreateXuaViewModel() );
 
-            var vm = CreateTranslationAggregatorViewModel();
-            TranslationAggregatorWindow = new TranslationAggregatorWindow( vm );
-            TranslationAggregatorOptionsWindow = new TranslationAggregatorOptionsWindow( vm );
-      }
+               var vm = CreateTranslationAggregatorViewModel();
+               TranslationAggregatorWindow = new TranslationAggregatorWindow( vm );
+               TranslationAggregatorOptionsWindow = new TranslationAggregatorOptionsWindow( vm );
+            }
+         }
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up UI." );
@@ -363,7 +360,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          return "Running";
       }
-#endif
 
       private void ValidateConfiguration()
       {
@@ -879,12 +875,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                   QueueNewUntranslatedForClipboard( originalText );
 
-#if MANAGED
                   if( TranslationAggregatorWindow != null )
                   {
                      TranslationAggregatorWindow.OnNewTranslationAdded( originalText, text );
                   }
-#endif
                }
             }
             catch( TargetInvocationException )
@@ -982,7 +976,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private void TranslateTexture( object ui, TextureReloadContext context )
       {
          Sprite __ = null;
-         if (ui.TryCastTo<Texture2D>(out var texture2d))
+         if( ui.TryCastTo<Texture2D>( out var texture2d ) )
          {
             TranslateTexture( null, ref __, ref texture2d, false, context );
          }
@@ -1062,7 +1056,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            if (TextureCache.TryGetTranslatedImage(key, out var newData, out var translatedImage))
+            if( TextureCache.TryGetTranslatedImage( key, out var newData, out var translatedImage ) )
             {
                if( _isInTranslatedMode )
                {
@@ -1403,7 +1397,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-#region IInternalTranslator
+      #region IInternalTranslator
 
       private ComponentTranslationContext InvokeOnTranslatingCallback( object textComponent, string untranslatedText, TextTranslationInfo info )
       {
@@ -1533,7 +1527,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return false;
       }
 
-#endregion
+      #endregion
 
       private InternalTranslationResult Translate(
          string text,
@@ -2719,7 +2713,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             //{
             //   ConnectionTrackingWebClient.CloseServicePoints();
             //}
-#if MANAGED
             else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
             {
                if( MainWindow != null )
@@ -2731,7 +2724,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                ToggleTranslationAggregator();
             }
-#endif
             else if( isCtrlPressed )
             {
                if( Input.GetKeyDown( KeyCode.Keypad9 ) )
@@ -2781,19 +2773,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
                IncrementBatchOperations();
                KickoffTranslations();
 
-#if MANAGED
                TranslationAggregatorWindow?.Update();
-#endif
             }
 
-            if (_translationReloadRequest)
+            if( _translationReloadRequest )
             {
                _translationReloadRequest = false;
                ReloadTranslations();
             }
 
             // perform this check every 100 frames!
-            if ( frameCount % 100 == 0
+            if( frameCount % 100 == 0
                && TranslationManager.OngoingTranslations == 0
                && TranslationManager.UnstartedTranslations == 0 )
             {
@@ -2826,9 +2816,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-#if MANAGED
-      void OnGUI()
+      public void OnGUI()
       {
+         // initialize ui
+         InitializeGUI();
+
          try
          {
             DisableAutoTranslator();
@@ -2880,7 +2872,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             EnableAutoTranslator();
          }
       }
-#endif
 
       private void RebootPlugin()
       {
@@ -3144,9 +3135,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   var tti = kvp.Value as TextTranslationInfo;
 
-               if( tti.GetIsKnownTextComponent() && ui.IsComponentActive() )
-               {
-                  var scope = TranslationScopeHelper.GetScope( ui );
+                  if( tti.GetIsKnownTextComponent() && ui.IsComponentActive() )
+                  {
+                     var scope = TranslationScopeHelper.GetScope( ui );
 
                      if( tti != null && !tti.OriginalText.IsNullOrWhiteSpace() )
                      {
