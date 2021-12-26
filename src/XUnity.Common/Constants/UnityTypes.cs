@@ -127,6 +127,7 @@ namespace XUnity.Common.Constants
       public static readonly TypeContainer AssetBundleRequest = FindType( "UnityEngine.AssetBundleRequest" );
       public static readonly TypeContainer Resources = FindType( "UnityEngine.Resources" );
       public static readonly TypeContainer AsyncOperation = FindType( "UnityEngine.AsyncOperation" );
+      public static readonly TypeContainer TextAsset = FindType( "UnityEngine.TextAsset" );
       public static readonly Type HorizontalWrapMode = FindClrType( "UnityEngine.HorizontalWrapMode" );
       public static readonly Type TextOverflowModes = FindClrType( "TMPro.TextOverflowModes" );
       public static readonly Type TextAlignmentOptions = FindClrType( "TMPro.TextAlignmentOptions" );

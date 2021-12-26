@@ -20,7 +20,11 @@
       /// <summary>
       /// Gets the loaded assets. Override individual indices to change the asset reference that will be loaded.
       /// </summary>
+#if MANAGED
       UnityEngine.Object[] Assets { get; set; }
+#else
+      UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get; set; }
+#endif
 
       /// <summary>
       /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some

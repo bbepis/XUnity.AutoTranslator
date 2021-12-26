@@ -64,6 +64,60 @@ namespace XUnity.Common.Extensions
          return obj.GetType();
       }
 #endif
+
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <typeparam name="TObject"></typeparam>
+      /// <param name="obj"></param>
+      /// <param name="castedObject"></param>
+      /// <returns></returns>
+      public static bool TryCastTo<TObject>( this object obj, out TObject castedObject )
+      {
+         if( obj is TObject c )
+         {
+            castedObject = c;
+            return true;
+         }
+
+#if IL2CPP
+         if( obj is Il2CppObjectBase il2cppObject )
+         {
+            IntPtr nativeClassPtr = Il2CppClassPointerStore<TObject>.NativeClassPtr;
+            if( nativeClassPtr == IntPtr.Zero )
+            {
+               throw new ArgumentException( $"{typeof( TObject )} is not an Il2Cpp reference type" );
+            }
+
+            var instancePointer = il2cppObject.Pointer;
+            IntPtr intPtr = IL2CPP.il2cpp_object_get_class( instancePointer );
+            if( !IL2CPP.il2cpp_class_is_assignable_from( nativeClassPtr, intPtr ) )
+            {
+               castedObject = default;
+               return false;
+            }
+            if( RuntimeSpecificsStore.IsInjected( intPtr ) )
+            {
+               castedObject = (TObject)UnhollowerBaseLib.Runtime.ClassInjectorBase.GetMonoObjectFromIl2CppPointer( instancePointer );
+               return castedObject != null;
+            }
+
+            castedObject = Il2CppUtilities.Factory<TObject>.CreateProxyComponent( instancePointer );
+            return castedObject != null;
+         }
+#endif
+
+         castedObject = default;
+         return false;
+      }
+
+#if IL2CPP
+      public static bool IsInstancePointerAssignableFrom( this IntPtr instancePointer, IntPtr classPointer )
+      {
+         IntPtr intPtr = IL2CPP.il2cpp_object_get_class( instancePointer );
+         return IL2CPP.il2cpp_class_is_assignable_from( classPointer, intPtr );
+      }
+#endif
    }
 }
 

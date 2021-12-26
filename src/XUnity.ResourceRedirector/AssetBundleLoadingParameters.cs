@@ -7,7 +7,11 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AssetBundleLoadingParameters
    {
+#if MANAGED
       internal AssetBundleLoadingParameters( byte[] data, string path, uint crc, ulong offset, Stream stream, uint managedReadBufferSize, AssetBundleLoadType loadType )
+#else
+      internal AssetBundleLoadingParameters( UnhollowerBaseLib.Il2CppStructArray<byte> data, string path, uint crc, ulong offset, Il2CppSystem.IO.Stream stream, uint managedReadBufferSize, AssetBundleLoadType loadType )
+#endif
       {
          Binary = data;
          Path = path;
@@ -36,7 +40,11 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets or sets the stream. Only relevant for 'LoadFromStream'.
       /// </summary>
+#if MANAGED
       public Stream Stream { get; set; }
+#else
+      public Il2CppSystem.IO.Stream Stream { get; set; }
+#endif
 
       /// <summary>
       /// Gets or sets the managed read buffer size. Only relevant for 'LoadFromStream'.
@@ -46,7 +54,11 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets or sets the binary data. Only relevant for 'LoadFromMemory'.
       /// </summary>
+#if MANAGED
       public byte[] Binary { get; set; }
+#else
+      public UnhollowerBaseLib.Il2CppStructArray<byte> Binary { get; set; }
+#endif
 
       /// <summary>
       /// Gets the type of call that is loading this asset bundle.

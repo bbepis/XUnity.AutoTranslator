@@ -6,6 +6,7 @@ using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;
+using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
@@ -92,7 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
                }
             }
 
-            if( !ReferenceEquals( castedAsset, context.Asset ) )
+            if( !UnityObjectReferenceComparer.Default.Equals( castedAsset, context.Asset ) )
             {
                context.Asset = castedAsset;
             }

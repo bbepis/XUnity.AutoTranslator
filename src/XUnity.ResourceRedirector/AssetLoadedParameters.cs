@@ -7,7 +7,11 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class AssetLoadedParameters
    {
+#if MANAGED
       internal AssetLoadedParameters( string name, Type type, AssetLoadType loadType )
+#else
+      internal AssetLoadedParameters( string name, Il2CppSystem.Type type, AssetLoadType loadType )
+#endif
       {
          Name = name;
          Type = type;
@@ -22,7 +26,11 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets the type that passed to the asset load call. 
       /// </summary>
+#if MANAGED
       public Type Type { get; }
+#else
+      public Il2CppSystem.Type Type { get; }
+#endif
 
       /// <summary>
       /// Gets the type of call that loaded this asset. If 'LoadByType' or 'LoadNamedWithSubAssets' is specified

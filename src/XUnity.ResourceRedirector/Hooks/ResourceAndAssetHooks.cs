@@ -114,6 +114,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate AssetBundle OriginalMethod( AssetBundleCreateRequest __instance );
 
       static OriginalMethod _original;
@@ -135,42 +136,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-         //if( ResourceRedirection.TryGetAssetBundle( self, out var info ) )
-         //{
-         //   AssetBundle bundle;
-
-         //   if( info.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
-         //   {
-         //      bundle = info.Bundle;
-         //   }
-         //   else
-         //   {
-         //      bundle = _original( self );
-         //   }
-
-         //   if( !info.SkipAllPostfixes )
-         //   {
-         //      ResourceRedirection.Hook_AssetBundleLoaded_Postfix( info.Parameters, ref bundle );
-         //   }
-
-         //   if( bundle != null && info != null ) // should only be null if loaded through non-hooked methods
-         //   {
-         //      var path = info.Parameters.Path;
-         //      if( path != null )
-         //      {
-         //         var ext = bundle.GetOrCreateExtensionData<AssetBundleExtensionData>();
-         //         ext.Path = path;
-         //      }
-         //   }
-
-         //   return bundle;
-         //}
-         //else
-         //{
-         //   return _original( self );
-         //}
       }
+#endif
    }
 
    internal static class AssetBundleCreateRequest_DisableCompatibilityChecks_Hook
@@ -191,6 +158,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.TryGetAssetBundle( __instance, out _ );
       }
 
+#if MANAGED
       delegate void OriginalMethod( AssetBundleCreateRequest __instance );
 
       static OriginalMethod _original;
@@ -206,12 +174,8 @@ namespace XUnity.ResourceRedirector.Hooks
          {
             _original( __instance );
          }
-
-         //if( !ResourceRedirection.TryGetAssetBundle( self, out var result ) )
-         //{
-         //   _original( self );
-         //}
       }
+#endif
    }
 
    internal static class AssetBundleCreateRequest_SetEnableCompatibilityChecks_Hook
@@ -232,6 +196,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.TryGetAssetBundle( __instance, out var result );
       }
 
+#if MANAGED
       delegate void OriginalMethod( AssetBundleCreateRequest __instance, bool set );
 
       static OriginalMethod _original;
@@ -248,6 +213,7 @@ namespace XUnity.ResourceRedirector.Hooks
             _original( __instance, set );
          }
       }
+#endif
    }
 
    internal static class AssetBundle_LoadFromFileAsync_Hook
@@ -281,6 +247,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetBundleLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleCreateRequest OriginalMethod( string path, uint crc, ulong offset );
 
       static OriginalMethod _original;
@@ -302,22 +269,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-         //AssetBundleCreateRequest result;
-
-         //var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, null, 0, AssetBundleLoadType.LoadFromFile );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //if( !context.SkipOriginalCall )
-         //{
-         //   var p = context.Parameters;
-         //   result = _original( p.Path, p.Crc, p.Offset );
-         //}
-
-         //ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadFromFile_Hook
@@ -360,6 +313,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate AssetBundle OriginalMethod( string path, uint crc, ulong offset );
 
       static OriginalMethod _original;
@@ -381,31 +335,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-         //AssetBundle result;
-
-         //var parameters = new AssetBundleLoadingParameters( null, path, crc, offset, null, 0, AssetBundleLoadType.LoadFromFile );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( p.Path, p.Crc, p.Offset );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
-         //}
-
-         //if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
-         //{
-         //   var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
-         //   ext.Path = p.Path;
-         //}
-
-         //return result;
       }
+#endif
    }
 
 
@@ -429,11 +360,20 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync_Internal", typeof( byte[] ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync_Internal", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( ref byte[] binary, ref uint crc, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
+#else
+      static bool Prefix( ref UnhollowerBaseLib.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
+#endif
       {
          var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
          __state = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out __result );
@@ -450,6 +390,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetBundleLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleCreateRequest OriginalMethod( byte[] binary, uint crc );
 
       static OriginalMethod _original;
@@ -471,23 +412,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-         //AssetBundleCreateRequest result;
-
-         //var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //if( !context.SkipOriginalCall )
-         //{
-         //   var p = context.Parameters;
-         //   result = _original( p.Binary, p.Crc );
-         //}
-
-         //ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadFromMemory_Hook
@@ -499,11 +425,20 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory_Internal", typeof( byte[] ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory", typeof( byte[] ), typeof( uint ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory_Internal", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( ref byte[] binary, ref uint crc, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
+#else
+      static bool Prefix( ref UnhollowerBaseLib.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
+#endif
       {
          var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
          __state = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out __result );
@@ -529,6 +464,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate AssetBundle OriginalMethod( byte[] binary, uint crc );
 
       static OriginalMethod _original;
@@ -550,32 +486,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-         //AssetBundle result;
-
-         //var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( p.Binary, p.Crc );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
-         //}
-
-         //if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
-         //{
-         //   var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
-         //   ext.Path = p.Path;
-         //}
-
-         //return result;
       }
+#endif
    }
 
 
@@ -599,11 +511,20 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamAsyncInternal", typeof( Stream ), typeof( uint ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamAsync", typeof( Stream ), typeof( uint ), typeof( uint ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamAsyncInternal", typeof( Il2CppSystem.IO.Stream ), typeof( uint ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamAsync", typeof( Il2CppSystem.IO.Stream ), typeof( uint ), typeof( uint ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( ref Stream stream, ref uint crc, ref uint managedReadBufferSize, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
+#else
+      static bool Prefix( ref Il2CppSystem.IO.Stream stream, ref uint crc, ref uint managedReadBufferSize, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
+#endif
       {
          var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
          __state = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out __result );
@@ -621,6 +542,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetBundleLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleCreateRequest OriginalMethod( Stream stream, uint crc, uint managedReadBufferSize );
 
       static OriginalMethod _original;
@@ -642,25 +564,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-
-         //AssetBundleCreateRequest result;
-
-         //var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //if( !context.SkipOriginalCall )
-         //{
-         //   var p = context.Parameters;
-         //   result = _original( p.Stream, p.Crc, p.ManagedReadBufferSize );
-         //}
-
-         //ResourceRedirection.Hook_AssetBundleLoading_Postfix( context, result );
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadFromStream_Hook
@@ -672,11 +577,20 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamInternal", typeof( Stream ), typeof( uint ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStream", typeof( Stream ), typeof( uint ), typeof( uint ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStreamInternal", typeof( Il2CppSystem.IO.Stream ), typeof( uint ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromStream", typeof( Il2CppSystem.IO.Stream ), typeof( uint ), typeof( uint ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( ref Stream stream, ref uint crc, ref uint managedReadBufferSize, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
+#else
+      static bool Prefix( ref Il2CppSystem.IO.Stream stream, ref uint crc, ref uint managedReadBufferSize, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
+#endif
       {
          var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
          __state = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out __result );
@@ -703,6 +617,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate AssetBundle OriginalMethod( Stream stream, uint crc, uint managedReadBufferSize );
 
       static OriginalMethod _original;
@@ -724,34 +639,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-
-         //AssetBundle result;
-
-         //var parameters = new AssetBundleLoadingParameters( null, null, crc, 0, stream, managedReadBufferSize, AssetBundleLoadType.LoadFromMemory );
-         //var context = ResourceRedirection.Hook_AssetBundleLoading_Prefix( parameters, out result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( p.Stream, p.Crc, p.ManagedReadBufferSize );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetBundleLoaded_Postfix( parameters, ref result );
-         //}
-
-         //if( result != null && p.Path != null ) // should only be null if loaded through non-hooked methods
-         //{
-         //   var ext = result.GetOrCreateExtensionData<AssetBundleExtensionData>();
-         //   ext.Path = p.Path;
-         //}
-
-         //return result;
       }
+#endif
    }
 
 
@@ -798,6 +687,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( AssetBundle __instance );
 
       static OriginalMethod _original;
@@ -819,26 +709,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-
-         //UnityEngine.Object result = null;
-
-         //var parameters = new AssetLoadingParameters( null, null, AssetLoadType.LoadMainAsset );
-         //var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_returnMainAsset_Hook
@@ -870,6 +742,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( AssetBundle __instance );
 
       static OriginalMethod _original;
@@ -891,25 +764,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-         //UnityEngine.Object result = null;
-
-         //var parameters = new AssetLoadingParameters( null, null, AssetLoadType.LoadMainAsset );
-         //var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_Load_Hook
@@ -921,10 +777,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "Load", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "Load", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref UnityEngine.Object __result, ref AssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref UnityEngine.Object __result, ref AssetLoadingContext __state )
+#endif
       {
          var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
          __state = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref __result );
@@ -944,6 +808,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -965,26 +830,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-         //UnityEngine.Object result = null;
-
-         //var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
-         //var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance, p.Name, p.Type );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAsync_Hook
@@ -996,10 +843,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAsync", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAsync", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#endif
       {
          var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
          __state = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref __result );
@@ -1016,6 +871,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleRequest OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -1037,24 +893,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-         //AssetBundleRequest result = null;
-
-         //var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
-         //var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance, p.Name, p.Type );
-         //}
-
-         //ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAll_Hook
@@ -1066,10 +906,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAll", typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAll", typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref Type type, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref Il2CppSystem.Type type, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+#endif
       {
          var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
          __state = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref __result );
@@ -1080,7 +928,11 @@ namespace XUnity.ResourceRedirector.Hooks
          return !__state.SkipOriginalCall;
       }
 
+#if MANAGED
       static void Postfix( AssetBundle __instance, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
+#else
+      static void Postfix( AssetBundle __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+#endif
       {
          if( !__state.SkipAllPostfixes )
          {
@@ -1088,6 +940,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object[] OriginalMethod( AssetBundle __instance, Type type );
 
       static OriginalMethod _original;
@@ -1109,27 +962,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-
-         //UnityEngine.Object[] result = null;
-
-         //var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
-         //var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance, p.Type );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAsset_Internal_Hook
@@ -1141,10 +975,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAsset_Internal", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAsset_Internal", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref UnityEngine.Object __result, ref AssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref UnityEngine.Object __result, ref AssetLoadingContext __state )
+#endif
       {
          var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
          __state = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref __result );
@@ -1164,6 +1006,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -1185,27 +1028,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-
-         //UnityEngine.Object result = null;
-
-         //var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
-         //var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance, p.Name, p.Type );
-         //}
-
-         //if( !context.SkipAllPostfixes )
-         //{
-         //   ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAssetAsync_Internal_Hook
@@ -1217,10 +1041,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetAsync_Internal", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetAsync_Internal", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#endif
       {
          var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
          __state = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref __result );
@@ -1237,6 +1069,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleRequest OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -1258,24 +1091,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-         //AssetBundleRequest result = null;
-
-         //var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamed );
-         //var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref result );
-
-         //var p = context.Parameters;
-         //if( !context.SkipOriginalCall )
-         //{
-         //   result = _original( __instance, p.Name, p.Type );
-         //}
-
-         //ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAssetWithSubAssets_Internal_Hook
@@ -1287,10 +1104,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetWithSubAssets_Internal", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetWithSubAssets_Internal", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+#endif
       {
          if( name == string.Empty )
          {
@@ -1310,7 +1135,11 @@ namespace XUnity.ResourceRedirector.Hooks
          return !__state.SkipOriginalCall;
       }
 
+#if MANAGED
       static void Postfix( AssetBundle __instance, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
+#else
+      static void Postfix( AssetBundle __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+#endif
       {
          if( !__state.SkipAllPostfixes )
          {
@@ -1318,6 +1147,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object[] OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -1339,46 +1169,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( __instance, ref __result, ref __state );
 
          return __result;
-
-
-
-         //UnityEngine.Object[] result = null;
-
-         //if( name == string.Empty )
-         //{
-         //   var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
-         //   var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //   var p = context.Parameters;
-         //   if( !context.SkipOriginalCall )
-         //   {
-         //      result = _original( __instance, name, p.Type );
-         //   }
-
-         //   if( !context.SkipAllPostfixes )
-         //   {
-         //      ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //   }
-         //}
-         //else
-         //{
-         //   var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamedWithSubAssets );
-         //   var context = ResourceRedirection.Hook_AssetLoading_Prefix( parameters, __instance, ref result );
-
-         //   var p = context.Parameters;
-         //   if( !context.SkipOriginalCall )
-         //   {
-         //      result = _original( __instance, p.Name, p.Type );
-         //   }
-
-         //   if( !context.SkipAllPostfixes )
-         //   {
-         //      ResourceRedirection.Hook_AssetLoaded_Postfix( context.Parameters, __instance, ref result );
-         //   }
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundle_LoadAssetWithSubAssetsAsync_Internal_Hook
@@ -1390,10 +1182,18 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetWithSubAssetsAsync_Internal", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadAssetWithSubAssetsAsync_Internal", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#else
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref AssetBundleRequest __result, ref AsyncAssetLoadingContext __state )
+#endif
       {
          if( name == string.Empty )
          {
@@ -1418,6 +1218,7 @@ namespace XUnity.ResourceRedirector.Hooks
          ResourceRedirection.Hook_AssetLoading_Postfix( __state, __result );
       }
 
+#if MANAGED
       delegate AssetBundleRequest OriginalMethod( AssetBundle __instance, string name, Type type );
 
       static OriginalMethod _original;
@@ -1439,40 +1240,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-         //AssetBundleRequest result = null;
-
-         //if( name == string.Empty )
-         //{
-         //   var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
-         //   var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref result );
-
-         //   var p = context.Parameters;
-         //   if( !context.SkipOriginalCall )
-         //   {
-         //      result = _original( __instance, name, p.Type );
-         //   }
-
-         //   ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
-         //}
-         //else
-         //{
-         //   var parameters = new AssetLoadingParameters( name, type, AssetLoadType.LoadNamedWithSubAssets );
-         //   var context = ResourceRedirection.Hook_AsyncAssetLoading_Prefix( parameters, __instance, ref result );
-
-         //   var p = context.Parameters;
-         //   if( !context.SkipOriginalCall )
-         //   {
-         //      result = _original( __instance, p.Name, p.Type );
-         //   }
-
-         //   ResourceRedirection.Hook_AssetLoading_Postfix( context, result );
-         //}
-
-         //return result;
       }
+#endif
    }
 
    internal static class AssetBundleRequest_asset_Hook
@@ -1520,6 +1289,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( AssetBundleRequest __instance );
 
       static OriginalMethod _original;
@@ -1541,40 +1311,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-
-
-         //if( ResourceRedirection.TryGetAssetBundleLoadInfo( __instance, out var info ) )
-         //{
-         //   UnityEngine.Object result = null;
-
-         //   if( info.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
-         //   {
-         //      var assets = info.Assets;
-         //      if( assets != null && assets.Length > 0 )
-         //      {
-         //         result = assets[ 0 ];
-         //      }
-         //   }
-         //   else
-         //   {
-         //      result = _original( __instance );
-         //   }
-
-         //   if( !info.SkipAllPostfixes )
-         //   {
-         //      ResourceRedirection.Hook_AssetLoaded_Postfix( info.Parameters, info.Bundle, ref result );
-         //   }
-
-         //   return result;
-         //}
-         //else
-         //{
-         //   return _original( __instance );
-         //}
       }
+#endif
    }
 
    internal static class AssetBundleRequest_allAssets_Hook
@@ -1589,7 +1327,11 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Property( UnityTypes.AssetBundleRequest?.ClrType, "allAssets" )?.GetGetMethod();
       }
 
+#if MANAGED
       static bool Prefix( AssetBundleRequest __instance, ref UnityEngine.Object[] __result, ref AsyncAssetLoadInfo __state )
+#else
+      static bool Prefix( AssetBundleRequest __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
+#endif
       {
          if( ResourceRedirection.TryGetAssetBundleLoadInfo( __instance, out __state ) )
          {
@@ -1610,7 +1352,11 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       static void Postfix( ref UnityEngine.Object[] __result, ref AsyncAssetLoadInfo __state )
+#else
+      static void Postfix( ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
+#endif
       {
          if( __state != null && !__state.SkipAllPostfixes )
          {
@@ -1618,6 +1364,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
       }
 
+#if MANAGED
       delegate UnityEngine.Object[] OriginalMethod( AssetBundleRequest __instance );
 
       static OriginalMethod _original;
@@ -1639,34 +1386,8 @@ namespace XUnity.ResourceRedirector.Hooks
          Postfix( ref __result, ref __state );
 
          return __result;
-
-
-
-         //if( ResourceRedirection.TryGetAssetBundleLoadInfo( __instance, out var info ) )
-         //{
-         //   UnityEngine.Object[] result;
-
-         //   if( info.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
-         //   {
-         //      result = info.Assets;
-         //   }
-         //   else
-         //   {
-         //      result = _original( __instance );
-         //   }
-
-         //   if( !info.SkipAllPostfixes )
-         //   {
-         //      ResourceRedirection.Hook_AssetLoaded_Postfix( info.Parameters, info.Bundle, ref result );
-         //   }
-
-         //   return result;
-         //}
-         //else
-         //{
-         //   return _original( __instance );
-         //}
       }
+#endif
    }
 
    internal static class Resources_Load_Hook
@@ -1678,15 +1399,24 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "Load", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "Load", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static void Postfix( string __0, Type __1, ref UnityEngine.Object __result )
+#else
+      static void Postfix( string __0, Il2CppSystem.Type __1, ref UnityEngine.Object __result )
+#endif
       {
          var parameters = new ResourceLoadedParameters( __0, __1, ResourceLoadType.LoadNamed );
          ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref __result );
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( string path, Type systemTypeInstance );
 
       static OriginalMethod _original;
@@ -1703,6 +1433,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return __result;
       }
+#endif
    }
 
    internal static class Resources_LoadAll_Hook
@@ -1714,15 +1445,24 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "LoadAll", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "LoadAll", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static void Postfix( string __0, Type __1, ref UnityEngine.Object[] __result )
+#else
+      static void Postfix( string __0, Il2CppSystem.Type __1, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result )
+#endif
       {
          var parameters = new ResourceLoadedParameters( __0, __1, ResourceLoadType.LoadByType );
          ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref __result );
       }
 
+#if MANAGED
       delegate UnityEngine.Object[] OriginalMethod( string path, Type systemTypeInstance );
 
       static OriginalMethod _original;
@@ -1739,26 +1479,40 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return __result;
       }
+#endif
    }
 
    internal static class Resources_GetBuiltinResource_Old_Hook
    {
       static bool Prepare( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( Type ), typeof( string ) ) == null;
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( Il2CppSystem.Type ), typeof( string ) ) == null;
+#endif
       }
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( string ), typeof( Type ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( string ), typeof( Il2CppSystem.Type ) );
+#endif
       }
 
+#if MANAGED
       static void Postfix( string __0, Type __1, ref UnityEngine.Object __result )
+#else
+      static void Postfix( string __0, Il2CppSystem.Type __1, ref UnityEngine.Object __result )
+#endif
       {
          var parameters = new ResourceLoadedParameters( __0, __1, ResourceLoadType.LoadNamedBuiltIn );
          ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref __result );
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( string path, Type systemTypeInstance );
 
       static OriginalMethod _original;
@@ -1775,26 +1529,40 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return __result;
       }
+#endif
    }
 
    internal static class Resources_GetBuiltinResource_New_Hook
    {
       static bool Prepare( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( string ), typeof( Type ) ) == null;
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( string ), typeof( Il2CppSystem.Type ) ) == null;
+#endif
       }
 
       static MethodBase TargetMethod( object instance )
       {
+#if MANAGED
          return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( Type ), typeof( string ) );
+#else
+         return AccessToolsShim.Method( UnityTypes.Resources?.ClrType, "GetBuiltinResource", typeof( Il2CppSystem.Type ), typeof( string ) );
+#endif
       }
 
+#if MANAGED
       static void Postfix( Type __0, string __1, ref UnityEngine.Object __result )
+#else
+      static void Postfix( Il2CppSystem.Type __0, string __1, ref UnityEngine.Object __result )
+#endif
       {
          var parameters = new ResourceLoadedParameters( __1, __0, ResourceLoadType.LoadNamedBuiltIn );
          ResourceRedirection.Hook_ResourceLoaded_Postfix( parameters, ref __result );
       }
 
+#if MANAGED
       delegate UnityEngine.Object OriginalMethod( Type systemTypeInstance, string path );
 
       static OriginalMethod _original;
@@ -1811,6 +1579,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return __result;
       }
+#endif
    }
 
    internal static class AsyncOperation_isDone_Hook
@@ -1830,6 +1599,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate bool OriginalMethod( AsyncOperation __instance );
 
       static OriginalMethod _original;
@@ -1847,6 +1617,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
          return true;
       }
+#endif
    }
 
    internal static class AsyncOperation_progress_Hook
@@ -1866,6 +1637,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate float OriginalMethod( AsyncOperation __instance );
 
       static OriginalMethod _original;
@@ -1884,6 +1656,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return 100.0f;
       }
+#endif
    }
 
    internal static class AsyncOperation_priority_Hook
@@ -1903,6 +1676,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate int OriginalMethod( AsyncOperation __instance );
 
       static OriginalMethod _original;
@@ -1921,6 +1695,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
          return 0;
       }
+#endif
    }
 
    internal static class AsyncOperation_set_priority_Hook
@@ -1940,6 +1715,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate void OriginalMethod( AsyncOperation __instance, int value );
 
       static OriginalMethod _original;
@@ -1956,6 +1732,7 @@ namespace XUnity.ResourceRedirector.Hooks
             _original( __instance, value );
          }
       }
+#endif
    }
 
    internal static class AsyncOperation_allowSceneActivation_Hook
@@ -1975,6 +1752,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate bool OriginalMethod( AsyncOperation __instance );
 
       static OriginalMethod _original;
@@ -1992,6 +1770,7 @@ namespace XUnity.ResourceRedirector.Hooks
          }
          return true; // do not believe this has an impact
       }
+#endif
    }
 
    internal static class AsyncOperation_set_allowSceneActivation_Hook
@@ -2011,6 +1790,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate void OriginalMethod( AsyncOperation __instance, bool value );
 
       static OriginalMethod _original;
@@ -2027,6 +1807,7 @@ namespace XUnity.ResourceRedirector.Hooks
             _original( __instance, value );
          }
       }
+#endif
    }
 
    internal static class AsyncOperation_Finalize_Hook
@@ -2046,6 +1827,7 @@ namespace XUnity.ResourceRedirector.Hooks
          return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
+#if MANAGED
       delegate void OriginalMethod( AsyncOperation __instance );
 
       static OriginalMethod _original;
@@ -2062,5 +1844,6 @@ namespace XUnity.ResourceRedirector.Hooks
             _original( __instance );
          }
       }
+#endif
    }
 }

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using XUnity.Common.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using UnityEngine;
+using XUnity.Common.Extensions;
 
 #if IL2CPP
 using UnhollowerBaseLib;

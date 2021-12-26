@@ -86,11 +86,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             if( !_textAssetHooksInstalled )
             {
                _textAssetHooksInstalled = true;
-#if MANAGED
                HookingHelper.PatchAll( TextAssetHooks.All, Settings.ForceMonoModHooks );
-#else
-               throw new NotImplementedException("TextAssetHooks are not supported in IL2CPP.");
-#endif
             }
          }
          catch( Exception e )

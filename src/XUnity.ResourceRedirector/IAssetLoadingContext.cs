@@ -52,7 +52,11 @@ namespace XUnity.ResourceRedirector
       ///
       /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
       /// </summary>
+#if MANAGED
       UnityEngine.Object[] Assets { get; set; }
+#else
+      UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get; set; }
+#endif
 
       /// <summary>
       /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some

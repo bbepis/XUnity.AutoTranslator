@@ -11,6 +11,7 @@ namespace XUnity.ResourceRedirector
    {
       private AssetBundleExtensionData _ext;
       private bool _lookedForExt = false;
+      private BackingFieldOrArray _backingField;
 
       internal AssetLoadingContext( AssetLoadingParameters parameters, AssetBundle bundle )
       {
@@ -95,31 +96,17 @@ namespace XUnity.ResourceRedirector
       ///
       /// Consider using this if the load type is 'LoadByType' or 'LoadNamedWithSubAssets'.
       /// </summary>
-      public UnityEngine.Object[] Assets { get; set; }
+#if MANAGED
+      public UnityEngine.Object[] Assets { get => _backingField.Array; set => _backingField.Array = value; }
+#else
+      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
+#endif
 
       /// <summary>
       /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
       /// additional null guards to prevent NullReferenceExceptions when using it.
       /// </summary>
-      public UnityEngine.Object Asset
-      {
-         get
-         {
-            if( Assets == null || Assets.Length < 1 )
-            {
-               return null;
-            }
-            return Assets[ 0 ];
-         }
-         set
-         {
-            if( Assets == null || Assets.Length < 1 )
-            {
-               Assets = new UnityEngine.Object[ 1 ];
-            }
-            Assets[ 0 ] = value;
-         }
-      }
+      public UnityEngine.Object Asset { get => _backingField.Field; set => _backingField.Field = value; }
 
       internal bool SkipRemainingPrefixes { get; private set; }
 

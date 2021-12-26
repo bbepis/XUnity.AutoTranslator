@@ -1,6 +1,7 @@
 ﻿### 2.0.0
  * FEATURE - IL2CPP support
  * MISC - Prioritize HarmonyX hooks over MonoMod hooks
+ * MISC - Changed BepInEx setting names
 
 ### 1.2.1
  * MISC - Improved logging statements for redirection subscriptions allowing for less spam

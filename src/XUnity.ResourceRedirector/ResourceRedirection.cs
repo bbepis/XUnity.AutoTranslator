@@ -19,11 +19,6 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public static class ResourceRedirection
    {
-      private static readonly object Sync = new object();
-
-      private static readonly WeakDictionary<AssetBundleRequest, AsyncAssetLoadInfo> AssetBundleRequestToAssetBundle = new WeakDictionary<AssetBundleRequest, AsyncAssetLoadInfo>();
-      private static readonly WeakDictionary<AssetBundleCreateRequest, AsyncAssetBundleLoadInfo> AssetBundleCreateRequestToAssetBundle = new WeakDictionary<AssetBundleCreateRequest, AsyncAssetBundleLoadInfo>();
-
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerCall = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedCallback<Action<AssetLoadedContext>>> PostfixRedirectionsForAssetsPerResource = new List<PrioritizedCallback<Action<AssetLoadedContext>>>();
       private static readonly List<PrioritizedCallback<Action<ResourceLoadedContext>>> PostfixRedirectionsForResourcesPerCall = new List<PrioritizedCallback<Action<ResourceLoadedContext>>>();
@@ -79,6 +74,10 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+      /// <summary>
+      /// Gets or sets a bool indicating if the log callback
+      /// order should be logged everytime a new callback is added.
+      /// </summary>
       public static bool LogCallbackOrder { get; set; }
 
       /// <summary>
@@ -91,8 +90,6 @@ namespace XUnity.ResourceRedirector
             _initialized = true;
 
             HookingHelper.PatchAll( ResourceAndAssetHooks.GeneralHooks, false );
-
-            MaintenanceHelper.AddMaintenanceFunction( Cull, 12 );
          }
       }
 
@@ -379,6 +376,7 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+#if MANAGED
       /// <summary>
       /// Enables CAB randomization of loaded asset bundles if a conflict is detected.
       /// </summary>
@@ -494,6 +492,7 @@ namespace XUnity.ResourceRedirector
             }
          }
       }
+#endif
 
       /// <summary>
       /// Disables CAB randomization if it was previously enabled.
@@ -539,38 +538,25 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-      private static void Cull()
-      {
-         lock( Sync )
-         {
-            AssetBundleRequestToAssetBundle.RemoveCollectedEntries();
-            AssetBundleCreateRequestToAssetBundle.RemoveCollectedEntries();
-         }
-      }
-
       internal static bool TryGetAssetBundleLoadInfo( AssetBundleRequest request, out AsyncAssetLoadInfo result )
       {
-         lock( Sync )
-         {
-            return AssetBundleRequestToAssetBundle.TryGetValue( request, out result );
-         }
+         result = request.GetExtensionData<AsyncAssetLoadInfo>();
+         return result != null;
       }
 
       internal static bool TryGetAssetBundle( AssetBundleCreateRequest request, out AsyncAssetBundleLoadInfo result )
       {
-         lock( Sync )
-         {
-            return AssetBundleCreateRequestToAssetBundle.TryGetValue( request, out result );
-         }
+         result = request.GetExtensionData<AsyncAssetBundleLoadInfo>();
+         return result != null;
       }
 
       internal static bool ShouldBlockAsyncOperationMethods( AsyncOperation operation )
       {
-         return ResourceRedirection.SyncOverAsyncEnabled
+         return SyncOverAsyncEnabled
             && (
-               ( operation is AssetBundleRequest r1 && ResourceRedirection.TryGetAssetBundleLoadInfo( r1, out var result ) && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
+               ( operation.TryCastTo<AssetBundleRequest>( out var r1 ) && TryGetAssetBundleLoadInfo( r1, out var result ) && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
                ||
-               ( operation is AssetBundleCreateRequest r2 && ResourceRedirection.TryGetAssetBundle( r2, out var result2 ) && result2.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
+               ( operation.TryCastTo<AssetBundleCreateRequest>( out var r2 ) && TryGetAssetBundle( r2, out var result2 ) && result2.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
             );
       }
 
@@ -777,38 +763,37 @@ namespace XUnity.ResourceRedirector
 
       internal static void Hook_AssetBundleLoading_Postfix( AsyncAssetBundleLoadingContext context, AssetBundleCreateRequest request )
       {
-         lock( Sync )
+         if( request != null )
          {
-            if( request != null )
-            {
-               AssetBundleCreateRequestToAssetBundle[ request ] = new AsyncAssetBundleLoadInfo(
-                  context.Parameters,
-                  context.Bundle,
-                  context.SkipAllPostfixes,
-                  context.ResolveType );
-            }
+            request.SetExtensionData( new AsyncAssetBundleLoadInfo(
+               context.Parameters,
+               context.Bundle,
+               context.SkipAllPostfixes,
+               context.ResolveType ) );
          }
       }
 
       internal static void Hook_AssetLoading_Postfix( AsyncAssetLoadingContext context, AssetBundleRequest request )
       {
-         lock( Sync )
+         if( request != null )
          {
-            if( request != null )
-            {
-               AssetBundleRequestToAssetBundle[ request ] = new AsyncAssetLoadInfo(
-                  context.Parameters,
-                  context.Bundle,
-                  context.SkipAllPostfixes,
-                  context.ResolveType,
-                  context.Assets );
-            }
+            request.SetExtensionData( new AsyncAssetLoadInfo(
+               context.Parameters,
+               context.Bundle,
+               context.SkipAllPostfixes,
+               context.ResolveType,
+               context.Assets ) );
          }
       }
 
       internal static AssetLoadingContext Hook_AssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle parentBundle, ref UnityEngine.Object asset )
       {
+#if MANAGED
          UnityEngine.Object[] arr = null;
+#else
+         UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> arr = null;
+#endif
+
 
          var intention = Hook_AssetLoading_Prefix( parameters, parentBundle, ref arr );
 
@@ -829,7 +814,11 @@ namespace XUnity.ResourceRedirector
          return intention;
       }
 
+#if MANAGED
       internal static AssetLoadingContext Hook_AssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnityEngine.Object[] assets )
+#else
+      internal static AssetLoadingContext Hook_AssetLoading_Prefix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          var context = new AssetLoadingContext( parameters, bundle );
          try
@@ -966,7 +955,11 @@ namespace XUnity.ResourceRedirector
 
       internal static void Hook_AssetLoaded_Postfix( AssetLoadingParameters parameters, AssetBundle parentBundle, ref UnityEngine.Object asset )
       {
+#if MANAGED
          UnityEngine.Object[] arr;
+#else
+         UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> arr;
+#endif
          if( asset == null )
          {
             arr = new UnityEngine.Object[ 0 ];
@@ -993,14 +986,22 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+#if MANAGED
       internal static void Hook_AssetLoaded_Postfix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnityEngine.Object[] assets )
+#else
+      internal static void Hook_AssetLoaded_Postfix( AssetLoadingParameters parameters, AssetBundle bundle, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          FireAssetLoadedEvent( parameters.ToAssetLoadedParameters(), bundle, ref assets );
       }
 
       internal static void Hook_ResourceLoaded_Postfix( ResourceLoadedParameters parameters, ref UnityEngine.Object asset )
       {
+#if MANAGED
          UnityEngine.Object[] arr;
+#else
+         UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> arr;
+#endif
          if( asset == null )
          {
             arr = new UnityEngine.Object[ 0 ];
@@ -1027,12 +1028,20 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+#if MANAGED
       internal static void Hook_ResourceLoaded_Postfix( ResourceLoadedParameters parameters, ref UnityEngine.Object[] assets )
+#else
+      internal static void Hook_ResourceLoaded_Postfix( ResourceLoadedParameters parameters, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          FireResourceLoadedEvent( parameters, ref assets );
       }
 
+#if MANAGED
       internal static void FireAssetLoadedEvent( AssetLoadedParameters parameters, AssetBundle assetBundle, ref UnityEngine.Object[] assets )
+#else
+      internal static void FireAssetLoadedEvent( AssetLoadedParameters parameters, AssetBundle assetBundle, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          var originalAssets = assets?.ToArray();
          try
@@ -1091,9 +1100,10 @@ namespace XUnity.ResourceRedirector
             // handle "per resource" hooks afterwards
             if( !contextPerCall.SkipRemainingPostfixes && assets != null )
             {
-               for( int j = 0; j < assets.Length; j++ )
+               var len = assets.Length;
+               for( int j = 0; j < len; j++ )
                {
-                  var asset = new[] { assets[ j ] };
+                  var asset = assets[ j ];
                   if( asset != null )
                   {
                      var contextPerResource = new AssetLoadedContext( parameters, assetBundle, asset );
@@ -1110,9 +1120,9 @@ namespace XUnity.ResourceRedirector
                               redirection.IsBeingCalled = true;
                               redirection.Callback( contextPerResource );
 
-                              if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
+                              if( contextPerResource.Asset != null )
                               {
-                                 assets[ j ] = contextPerResource.Assets[ 0 ];
+                                 assets[ j ] = contextPerResource.Asset;
                               }
                               else
                               {
@@ -1159,7 +1169,11 @@ namespace XUnity.ResourceRedirector
          }
       }
 
+#if MANAGED
       internal static void FireResourceLoadedEvent( ResourceLoadedParameters parameters, ref UnityEngine.Object[] assets )
+#else
+      internal static void FireResourceLoadedEvent( ResourceLoadedParameters parameters, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          var originalAssets = assets?.ToArray();
          try
@@ -1218,9 +1232,10 @@ namespace XUnity.ResourceRedirector
             // handle "per resource" hooks afterwards
             if( !contextPerCall.SkipRemainingPostfixes && assets != null )
             {
-               for( int j = 0; j < assets.Length; j++ )
+               var len = assets.Length;
+               for( int j = 0; j < len; j++ )
                {
-                  var asset = new[] { assets[ j ] };
+                  var asset = assets[ j ];
                   if( asset != null )
                   {
                      var contextPerResource = new ResourceLoadedContext( parameters, asset );
@@ -1237,9 +1252,9 @@ namespace XUnity.ResourceRedirector
                               redirection.IsBeingCalled = true;
                               redirection.Callback( contextPerResource );
 
-                              if( contextPerResource.Assets != null && contextPerResource.Assets.Length == 1 && contextPerResource.Assets[ 0 ] != null )
+                              if( contextPerResource.Asset != null )
                               {
-                                 assets[ j ] = contextPerResource.Assets[ 0 ];
+                                 assets[ j ] = contextPerResource.Asset;
                               }
                               else
                               {

@@ -11,10 +11,22 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class ResourceLoadedContext : IAssetOrResourceLoadedContext
    {
+      private BackingFieldOrArray _backingField;
+
+#if MANAGED
       internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnityEngine.Object[] assets )
+#else
+      internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+#endif
       {
          Parameters = parameters;
-         Assets = assets;
+         _backingField = new BackingFieldOrArray( assets );
+      }
+
+      internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnityEngine.Object asset )
+      {
+         Parameters = parameters;
+         _backingField = new BackingFieldOrArray( asset );
       }
 
       /// <summary>
@@ -108,31 +120,17 @@ namespace XUnity.ResourceRedirector
       ///
       /// Consider using this if the load type is 'LoadByType' and you subscribed with 'OneCallbackPerLoadCall'.
       /// </summary>
-      public UnityEngine.Object[] Assets { get; set; }
+#if MANAGED
+      public UnityEngine.Object[] Assets { get => _backingField.Array; set => _backingField.Array = value; }
+#else
+      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
+#endif
 
       /// <summary>
       /// Gets the loaded asset. This is simply equal to the first index of the Assets property, with some
       /// additional null guards to prevent NullReferenceExceptions when using it.
       /// </summary>
-      public UnityEngine.Object Asset
-      {
-         get
-         {
-            if( Assets == null || Assets.Length < 1 )
-            {
-               return null;
-            }
-            return Assets[ 0 ];
-         }
-         set
-         {
-            if( Assets == null || Assets.Length < 1 )
-            {
-               Assets = new UnityEngine.Object[ 1 ];
-            }
-            Assets[ 0 ] = value;
-         }
-      }
+      public UnityEngine.Object Asset { get => _backingField.Field; set => _backingField.Field = value; }
 
       internal bool SkipRemainingPostfixes { get; set; }
    }

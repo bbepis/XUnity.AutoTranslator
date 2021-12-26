@@ -10,9 +10,9 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<DevelopmentDependency>True</DevelopmentDependency>
-		<TargetFramework>net35</TargetFramework>
+		<TargetFrameworks>net35;net472</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
-		<Version>1.2.1</Version>
+		<Version>2.0.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

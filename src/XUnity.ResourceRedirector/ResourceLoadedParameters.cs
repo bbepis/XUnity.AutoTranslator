@@ -8,7 +8,11 @@ namespace XUnity.ResourceRedirector
    /// </summary>
    public class ResourceLoadedParameters
    {
+#if MANAGED
       internal ResourceLoadedParameters( string path, Type type, ResourceLoadType loadType )
+#else
+      internal ResourceLoadedParameters( string path, Il2CppSystem.Type type, ResourceLoadType loadType )
+#endif
       {
          Path = path;
          Type = type;
@@ -23,7 +27,11 @@ namespace XUnity.ResourceRedirector
       /// <summary>
       /// Gets the type that passed to the resource load call.
       /// </summary>
+#if MANAGED
       public Type Type { get; set; }
+#else
+      public Il2CppSystem.Type Type { get; set; }
+#endif
 
       /// <summary>
       /// Gets the type of call that loaded this asset. If 'LoadByType' is specified
