@@ -158,7 +158,7 @@ namespace XUnity.Common.Utilities
 
                      return true;
                   }
-                  catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "has no body" ) == true )
+                  catch( Exception e ) when( e.FirstInnerExceptionOfType<PlatformNotSupportedException>() != null || e.FirstInnerExceptionOfType<ArgumentException>()?.Message?.Contains( "no body" ) == true )
                   {
                      return PatchWithExternHooks( type, original, originalPtr, false );
                   }

@@ -1,4 +1,7 @@
-﻿### 4.21.0
+﻿### 5.0.0
+ * FEATURE - Basic IL2CPP support through BepInEx 6 and MelonLoader
+
+### 4.21.0
  * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators
  * BUG FIX - Properly handle shutdown of ExtProtocolEndpoints
  * BUG FIX - Fixed PapagoTranslate

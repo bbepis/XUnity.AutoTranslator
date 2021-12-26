@@ -91,7 +91,6 @@ namespace XUnity.Common.Constants
       public static readonly TypeContainer TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
       public static readonly TypeContainer TextMeshPro = FindType( "TMPro.TextMeshPro" );
       public static readonly TypeContainer FontAsset = FindType( "TMPro.TMP_FontAsset" );
-      public static readonly TypeContainer AssetBundle = FindType( "UnityEngine.AssetBundle" );
 
       // Unity
       public static readonly TypeContainer GameObject = FindType( "UnityEngine.GameObject" );
@@ -123,6 +122,11 @@ namespace XUnity.Common.Constants
       public static readonly TypeContainer Font = FindType( "UnityEngine.Font" );
       public static readonly TypeContainer WaitForSecondsRealtime = FindType( "UnityEngine.WaitForSecondsRealtime" );
       public static readonly TypeContainer Input = FindType( "UnityEngine.Input" );
+      public static readonly TypeContainer AssetBundleCreateRequest = FindType( "UnityEngine.AssetBundleCreateRequest" );
+      public static readonly TypeContainer AssetBundle = FindType( "UnityEngine.AssetBundle" );
+      public static readonly TypeContainer AssetBundleRequest = FindType( "UnityEngine.AssetBundleRequest" );
+      public static readonly TypeContainer Resources = FindType( "UnityEngine.Resources" );
+      public static readonly TypeContainer AsyncOperation = FindType( "UnityEngine.AsyncOperation" );
       public static readonly Type HorizontalWrapMode = FindClrType( "UnityEngine.HorizontalWrapMode" );
       public static readonly Type TextOverflowModes = FindClrType( "TMPro.TextOverflowModes" );
       public static readonly Type TextAlignmentOptions = FindClrType( "TMPro.TextAlignmentOptions" );

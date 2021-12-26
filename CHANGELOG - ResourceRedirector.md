@@ -1,4 +1,8 @@
-﻿### 1.2.1
+﻿### 2.0.0
+ * FEATURE - IL2CPP support
+ * MISC - Prioritize HarmonyX hooks over MonoMod hooks
+
+### 1.2.1
  * MISC - Improved logging statements for redirection subscriptions allowing for less spam
 
 ### 1.2.0

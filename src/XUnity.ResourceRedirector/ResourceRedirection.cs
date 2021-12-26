@@ -109,7 +109,7 @@ namespace XUnity.ResourceRedirector
             _initializedSyncOverAsyncEnabled = true;
             SyncOverAsyncEnabled = true;
 
-            HookingHelper.PatchAll( ResourceAndAssetHooks.SyncOverAsyncHooks, true );
+            HookingHelper.PatchAll( ResourceAndAssetHooks.SyncOverAsyncHooks, false );
          }
       }
 
@@ -765,7 +765,7 @@ namespace XUnity.ResourceRedirector
             {
                XuaLogger.ResourceRedirector.Warn( "Resolving sync over async asset load, but 'SkipOriginalCall' was not set to true. Forcing it to true." );
                context.SkipOriginalCall = true;
-            }
+            }// Also, is there a nice way to replace the entire method with Harmony(X) (rather than just Prefix/Postfix) and obtain an reference to the original method that can be called as a part of it (like MonoMod detours/hooks)?
          }
          else
          {
