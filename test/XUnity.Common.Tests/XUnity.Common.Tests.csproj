@@ -17,4 +17,10 @@
       <ProjectReference Include="..\..\src\XUnity.Common\XUnity.Common.csproj" />
    </ItemGroup>
 
+   <ItemGroup>
+     <Reference Include="UnityEngine">
+       <HintPath>..\..\libs\UnityEngine.dll</HintPath>
+     </Reference>
+   </ItemGroup>
+
 </Project>
