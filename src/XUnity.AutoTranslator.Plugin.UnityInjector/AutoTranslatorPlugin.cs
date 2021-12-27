@@ -20,6 +20,8 @@ namespace XUnity.AutoTranslator.Plugin.UnityInjector
 
       public bool AllowDefaultInitializeHarmonyDetourBridge => false;
 
+      public string ModAssemblyLocation => typeof( PluginLoader ).Assembly.Location;
+
       void IPluginEnvironment.SaveConfig()
       {
          SaveConfig();

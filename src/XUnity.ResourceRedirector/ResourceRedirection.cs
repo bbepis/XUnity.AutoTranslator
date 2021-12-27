@@ -1063,7 +1063,7 @@ namespace XUnity.ResourceRedirector
                   if( asset != null )
                   {
                      var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetUnityType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
                   }
                }
             }
@@ -1195,7 +1195,7 @@ namespace XUnity.ResourceRedirector
                   if( asset != null )
                   {
                      var uniquePath = contextPerCall.GetUniqueFileSystemAssetPath( asset );
-                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
+                     XuaLogger.ResourceRedirector.Debug( $"Loaded Asset: '{asset.GetUnityType().FullName}', Load Type: '{parameters.LoadType.ToString()}', Unique Path: ({uniquePath})." );
                   }
                }
             }

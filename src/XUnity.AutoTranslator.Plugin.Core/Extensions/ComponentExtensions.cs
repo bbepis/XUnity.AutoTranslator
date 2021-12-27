@@ -138,12 +138,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetUnityType();
 
          return ( Settings.EnableIMGUI && !_guiContentCheckFailed && IsGUIContentSafe( ui ) )
-            || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
-            || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( type ) )
-            || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.UnityType.IsAssignableFrom( type ) )
-            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) )
-            ;
+            || ( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
+            || ( Settings.EnableNGUI && UnityTypes.UILabel != null && UnityTypes.UILabel.IsAssignableFrom( type ) )
+            || ( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( type ) )
+            || ( Settings.EnableFairyGUI && UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( type ) )
+            || ( Settings.EnableTextMeshPro && IsKnownTextMeshProType( type ) );
       }
 
 #if MANAGED
@@ -154,12 +153,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( UnityTypes.TMP_Text != null )
          {
-            return UnityTypes.TMP_Text.UnityType.IsAssignableFrom( type );
+            return UnityTypes.TMP_Text.IsAssignableFrom( type );
          }
          else
          {
-            return UnityTypes.TextMeshProUGUI?.UnityType.IsAssignableFrom( type ) == true
-               || UnityTypes.TextMeshPro?.UnityType.IsAssignableFrom( type ) == true;
+            return UnityTypes.TextMeshProUGUI.IsAssignableFrom( type )
+               || UnityTypes.TextMeshPro.IsAssignableFrom( type );
          }
       }
 
@@ -171,14 +170,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var unityType = ui.GetUnityType();
 
          return
-            ( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
-            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+            ( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( SupportRichTextPropertyName )?.Get( ui ), true ) )
+            || ( UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
             || DoesTextMeshProSupportRichText( ui, clrType, unityType )
-#if MANAGED
-            || ( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.UnityType.IsAssignableFrom( unityType ) )
-            || ( UnityTypes.TextField != null && UnityTypes.TextField.UnityType.IsAssignableFrom( unityType ) )
-#endif
-            ;
+            || ( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.IsAssignableFrom( unityType ) )
+            || ( UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( unityType ) );
       }
 
 #if MANAGED
@@ -189,12 +185,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( UnityTypes.TMP_Text != null )
          {
-            return UnityTypes.TMP_Text.UnityType.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
+            return UnityTypes.TMP_Text.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true );
          }
          else
          {
-            return ( UnityTypes.TextMeshPro?.UnityType.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-               || ( UnityTypes.TextMeshProUGUI?.UnityType.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
+            return ( UnityTypes.TextMeshPro.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+               || ( UnityTypes.TextMeshProUGUI.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
          }
       }
 
@@ -349,23 +345,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             var il2cppType = ui.GetIl2CppTypeSafe();
             if( il2cppType != null )
             {
-               if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( il2cppType ) )
+               if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( il2cppType ) )
                {
                   return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.Text.ClrType );
                }
-               else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.UnityType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( il2cppType ) )
                {
                   return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMesh.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( il2cppType ) )
                {
                   return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( il2cppType ) )
                {
                   return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
                }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( il2cppType ) )
+               else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.IsAssignableFrom( il2cppType ) )
                {
                   return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
                }
@@ -380,15 +376,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static Component CreateTextMeshProDerivedProxy( this Component ui )
       {
          var unityType = ui.GetUnityType();
-         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( unityType ) )
+         if( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
          }
-         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( unityType ) )
+         else if( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
          }
-         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.UnityType.IsAssignableFrom( unityType ) )
+         else if( UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.IsAssignableFrom( unityType ) )
          {
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
          }
@@ -425,7 +421,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       public static Component GetOrCreateNGUIDerivedProxy( this Component ui )
       {
          var unityType = ui.GetUnityType();
-         if( UnityTypes.UILabel != null && UnityTypes.UILabel.UnityType.IsAssignableFrom( unityType ) )
+         if( UnityTypes.UILabel != null && UnityTypes.UILabel.IsAssignableFrom( unityType ) )
          {
 #if IL2CPP
             return (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.UILabel.ClrType );
@@ -620,7 +616,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          var type = ui.GetUnityType();
 
-         if( UnityTypes.Graphic != null && UnityTypes.Graphic.UnityType.IsAssignableFrom( type ) )
+         if( UnityTypes.Graphic != null && UnityTypes.Graphic.IsAssignableFrom( type ) )
          {
             UnityTypes.Graphic.ClrType.CachedMethod( SetAllDirtyMethodName ).Invoke( ui );
          }
@@ -638,13 +634,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          var type = ui.GetUnityType();
 
          return ( ui.TryCastTo<Material>( out _ ) || ui.TryCastTo<SpriteRenderer>( out _ ) )
-            || ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.CubismRenderer != null && UnityTypes.CubismRenderer.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIWidget != null && !Equals( type, UnityTypes.UILabel?.UnityType ) && UnityTypes.UIWidget.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIAtlas != null && UnityTypes.UIAtlas.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.UITexture != null && UnityTypes.UITexture.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.UnityType.IsAssignableFrom( type ) );
+            || ( UnityTypes.Image != null && UnityTypes.Image.IsAssignableFrom( type ) )
+            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.IsAssignableFrom( type ) )
+            || ( UnityTypes.CubismRenderer != null && UnityTypes.CubismRenderer.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIWidget != null && !Equals( type, UnityTypes.UILabel?.UnityType ) && UnityTypes.UIWidget.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIAtlas != null && UnityTypes.UIAtlas.IsAssignableFrom( type ) )
+            || ( UnityTypes.UITexture != null && UnityTypes.UITexture.IsAssignableFrom( type ) )
+            || ( UnityTypes.UIPanel != null && UnityTypes.UIPanel.IsAssignableFrom( type ) );
       }
 
       public static string GetTextureName( this object texture, string fallbackName )

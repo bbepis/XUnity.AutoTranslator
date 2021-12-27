@@ -46,7 +46,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public static IMonoBehaviour Load()
       {
-         return LoadWithConfig( new DefaultPluginEnvironment( true ) );
+         return LoadWithConfig( new DefaultPluginEnvironment( true, null ) );
+      }
+
+      /// <summary>
+      /// Loads the plugin with default environment.
+      /// </summary>
+      public static IMonoBehaviour Load( bool allowDefaultInitializeHarmonyDetourBridge, string modAssemblyLocation )
+      {
+         return LoadWithConfig( new DefaultPluginEnvironment( allowDefaultInitializeHarmonyDetourBridge, modAssemblyLocation ) );
       }
 
 #if MANAGED

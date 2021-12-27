@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using ExIni;
 using MelonLoader;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -16,6 +15,10 @@ using XUnity.AutoTranslator.Plugin.MelonMod;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;
+
+#if IL2CPP
+using UnhollowerRuntimeLib;
+#endif
 
 [assembly: MelonInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
 [assembly: MelonGame( null, null )]
@@ -29,12 +32,19 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
 
       public override void OnApplicationStart()
       {
-         _monoBehaviour = PluginLoader.Load();
+#if MANAGED
+         // specify location because the mod dll is loaded by byte[]
+         PluginLoader.Load( false, Location );
+#else
+         // do not specify location, because the Core DLL is actually loaded properly from the file system
+         _monoBehaviour = PluginLoader.Load( false, null );
 
          AutoTranslatorBehaviour.Create();
+#endif
       }
    }
 
+#if IL2CPP
    internal class AutoTranslatorBehaviour : MonoBehaviour
    {
       static AutoTranslatorBehaviour()
@@ -87,4 +97,5 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          _destroying = true;
       }
    }
+#endif
 }

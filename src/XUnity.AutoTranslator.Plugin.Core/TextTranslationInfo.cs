@@ -143,7 +143,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var type = ui.GetUnityType();
 
-         if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
+         if( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
          {
             if( string.IsNullOrEmpty( Settings.OverrideFont ) ) return;
 
@@ -165,8 +165,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                };
             }
          }
-         else if( ( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.UnityType.IsAssignableFrom( type ) ) )
+         else if( ( UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( type ) )
+            || ( UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( type ) ) )
          {
             if( string.IsNullOrEmpty( Settings.OverrideFontTextMeshPro ) ) return;
 
@@ -213,7 +213,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          var type = ui.GetUnityType();
 
-         if( UnityTypes.Text != null && UnityTypes.Text.UnityType.IsAssignableFrom( type ) )
+         if( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
          {
             var text = (Component)ui;
 

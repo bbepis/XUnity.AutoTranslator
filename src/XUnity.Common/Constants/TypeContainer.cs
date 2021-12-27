@@ -30,6 +30,15 @@ namespace XUnity.Common.Constants
 #else
       public Type UnityType { get; }
 #endif
+
+#if IL2CPP
+      public bool IsAssignableFrom( Il2CppSystem.Type unityType )
+#else
+      public bool IsAssignableFrom( Type unityType )
+#endif
+      {
+         return UnityType != null && UnityType.IsAssignableFrom( unityType );
+      }
    }
 }
 

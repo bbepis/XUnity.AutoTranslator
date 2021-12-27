@@ -309,8 +309,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       public static void Postfix( Component __instance )
       {
          var type = __instance.GetUnityType();
-         if( ( UnityTypes.Image != null && UnityTypes.Image.UnityType.IsAssignableFrom( type ) )
-            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.UnityType.IsAssignableFrom( type ) ) )
+         if( ( UnityTypes.Image != null && UnityTypes.Image.IsAssignableFrom( type ) )
+            || ( UnityTypes.RawImage != null && UnityTypes.RawImage.IsAssignableFrom( type ) ) )
          {
             Texture2D _ = null;
             AutoTranslationPlugin.Current.Hook_ImageChangedOnComponent( __instance, ref _, false, true );

@@ -15,11 +15,17 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private string _configPath;
       private string _dataFolder;
 
-      public DefaultPluginEnvironment( bool allowDefaultInitializeHarmonyDetourBridge )
+      public DefaultPluginEnvironment( bool allowDefaultInitializeHarmonyDetourBridge, string mainModAssemblyLocation )
       {
          _dataFolder = Path.Combine( Paths.GameRoot, "AutoTranslator" );
          _configPath = Path.Combine( _dataFolder, "Config.ini" );
          AllowDefaultInitializeHarmonyDetourBridge = allowDefaultInitializeHarmonyDetourBridge;
+
+         ModAssemblyLocation = mainModAssemblyLocation;
+         if( string.IsNullOrEmpty( ModAssemblyLocation ) )
+         {
+            ModAssemblyLocation = typeof( PluginLoader ).Assembly.Location;
+         }
       }
 
       public IniFile Preferences
@@ -35,6 +41,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       public string ConfigPath => _dataFolder;
 
       public bool AllowDefaultInitializeHarmonyDetourBridge { get; }
+
+      public string ModAssemblyLocation { get; private set; }
 
       public void SaveConfig()
       {
