@@ -56,7 +56,7 @@ namespace DeepLTranslate
             context.SetSetting( "DeepL", "MinDelaySeconds", MinimumMinDelaySeconds );
          }
 
-         MaxDelay = context.GetOrCreateSetting( "DeepL", "MaxDelaySeconds", 7.0f );
+         MaxDelay = context.GetOrCreateSetting( "DeepL", "MaxDelaySeconds", 6.0f );
          if( MaxDelay < MinimumMaxDelaySeconds )
          {
             XuaLogger.AutoTranslator.Warn( $"[DeepL] Cannot set MaxDelaySeconds below {MinimumMaxDelaySeconds} second(s). Setting MaxDelaySeconds={MinimumMaxDelaySeconds}" );

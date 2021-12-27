@@ -1,114 +1,135 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Title>XUnity AutoTranslator for Unity</Title>
-    <Description>Main development dependency for XUnity Auto Translator.</Description>
-    <Authors>gravydevsupreme</Authors>
-    <PackageTags>unity;xunity;machine translation</PackageTags>
-    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <DevelopmentDependency>True</DevelopmentDependency>
-    <TargetFrameworks>net35;net472</TargetFrameworks>
-    <Version>5.0.0</Version>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Title>XUnity AutoTranslator for Unity</Title>
+		<Description>Main development dependency for XUnity Auto Translator.</Description>
+		<Authors>gravydevsupreme</Authors>
+		<PackageTags>unity;xunity;machine translation</PackageTags>
+		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<DevelopmentDependency>True</DevelopmentDependency>
+		<TargetFrameworks>net35;net472</TargetFrameworks>
+		<Version>5.0.0</Version>
+		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\net35\XUnity.AutoTranslator.Plugin.Core.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\$(TargetFramework)\XUnity.AutoTranslator.Plugin.Core.xml</DocumentationFile>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
-    <DefineConstants>MANAGED</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+		<DefineConstants>MANAGED</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
-    <DefineConstants>IL2CPP</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+		<DefineConstants>IL2CPP</DefineConstants>
+	</PropertyGroup>
 
-   <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-      <Reference Include="UnhollowerBaseLib">
-         <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
-      </Reference>
-      <Reference Include="UnhollowerRuntimeLib">
-         <HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
-      </Reference>
-      <Reference Include="Il2Cppmscorlib">
-         <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
-      </Reference>
-   </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+		<Reference Include="UnhollowerBaseLib">
+			<HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
+		</Reference>
+		<Reference Include="UnhollowerRuntimeLib">
+			<HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="All" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="ExIni">
-      <HintPath>..\..\libs\ExIni.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\..\libs\MonoMod\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\libs\MonoMod\MonoMod.RuntimeDetour.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="ExIni">
+			<HintPath>..\..\libs\ExIni.dll</HintPath>
+		</Reference>
+		<Reference Include="ICSharpCode.SharpZipLib">
+			<HintPath>..\..\libs\ICSharpCode.SharpZipLib.dll</HintPath>
+		</Reference>
+		<Reference Include="Mono.Cecil">
+			<HintPath>..\..\libs\MonoMod\Mono.Cecil.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.RuntimeDetour">
+			<HintPath>..\..\libs\MonoMod\MonoMod.RuntimeDetour.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.Utils">
+			<HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
-    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" PrivateAssets="All" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+		<ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" PrivateAssets="All" />
+		<ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
+		<ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" PrivateAssets="All" />
+	</ItemGroup>
 
-   <!-- No idea why I need one for each -->
-   <Target Name="ILRepackNET472" AfterTargets="Build" Condition="'$(TargetFramework)'=='net472'">
-      <PropertyGroup>
-         <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
-      </PropertyGroup>
-      <ItemGroup>
-         <InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
-      </ItemGroup>
-      <Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
-      <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
-   </Target>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-   <Target Name="ILRepackNET35" AfterTargets="Build" Condition="'$(TargetFramework)'=='net35'">
-      <PropertyGroup>
-         <WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
-      </PropertyGroup>
-      <ItemGroup>
-         <InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
-      </ItemGroup>
-      <Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
-      <ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
-   </Target>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<!-- No idea why I need one for each -->
+	<Target Name="ILRepackNET472" AfterTargets="Build" Condition="'$(TargetFramework)'=='net472'">
+		<PropertyGroup>
+			<WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
+		</PropertyGroup>
+		<ItemGroup>
+			<InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
+		</ItemGroup>
+		<Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
+		<ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
+	</Target>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<Target Name="ILRepackNET35" AfterTargets="Build" Condition="'$(TargetFramework)'=='net35'">
+		<PropertyGroup>
+			<WorkingDirectory>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)</WorkingDirectory>
+		</PropertyGroup>
+		<ItemGroup>
+			<InputAssemblies Include="ICSharpCode.SharpZipLib.dll" />
+		</ItemGroup>
+		<Message Text="MERGING: @(InputAssemblies)-&gt;'%(Filename)') into $(OutputAssembly)" Importance="High" />
+		<ILRepack OutputType="$(OutputType)" MainAssembly="$(AssemblyName).dll" OutputAssembly="$(AssemblyName).dll" InputAssemblies="@(InputAssemblies)" InternalizeExcludeAssemblies="@(InternalizeExcludeAssemblies)" WorkingDirectory="$(WorkingDirectory)" />
+	</Target>
+
+	<!-- PostBuildEvent -->
+	<Target Name="PostBuildNET35" AfterTargets="ILRepackNET35" Condition="'$(TargetFramework)'=='net35'">
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+			<Output TaskParameter="Assemblies" ItemName="Targets" />
+		</GetAssemblyIdentity>
+		<ItemGroup>
+			<VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+		</ItemGroup>
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.xml&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.pdb&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.dll&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.xml&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.pdb&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.dll&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.xml&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.pdb&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.dll&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.xml&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.pdb&quot; &quot;$(SolutionDir)dist\Developer\Developer\&quot;&#xD;&#xA;   COPY /Y &quot;$(SolutionDir)README.md&quot; &quot;$(SolutionDir)dist\Developer\Developer\README (AutoTranslator).md&quot;&#xD;&#xA;   &quot;$(SolutionDir)tools\xzip.exe&quot; &quot;$(SolutionDir)dist\Developer&quot; &quot;$(SolutionDir)dist\XUnity.AutoTranslator-Developer-@(VersionNumber).zip&quot;&#xD;&#xA;)" />
+	</Target>
+
+	<Target Name="PostBuildNET472" AfterTargets="ILRepackNET472" Condition="'$(TargetFramework)'=='net472'">
+		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+			<Output TaskParameter="Assemblies" ItemName="Targets" />
+		</GetAssemblyIdentity>
+		<ItemGroup>
+			<VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+		</ItemGroup>
+		<Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.xml&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.pdb&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.dll&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.xml&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.pdb&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.dll&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.xml&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.pdb&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.dll&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.xml&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.pdb&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\&quot;&#xD;&#xA;   COPY /Y &quot;$(SolutionDir)README.md&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP\Developer\README (AutoTranslator).md&quot;&#xD;&#xA;   &quot;$(SolutionDir)tools\xzip.exe&quot; &quot;$(SolutionDir)dist\Developer-IL2CPP&quot; &quot;$(SolutionDir)dist\XUnity.AutoTranslator-Developer-IL2CPP-@(VersionNumber).zip&quot;&#xD;&#xA;)" />
+	</Target>
 
 </Project>

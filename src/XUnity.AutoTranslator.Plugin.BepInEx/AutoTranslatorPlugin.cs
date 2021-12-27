@@ -9,7 +9,7 @@ using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 
-namespace XUnity.AutoTranslator.Plugin.BepIn_5x
+namespace XUnity.AutoTranslator.Plugin.BepInEx
 {
    [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
    public class AutoTranslatorPlugin : BaseUnityPlugin, IPluginEnvironment

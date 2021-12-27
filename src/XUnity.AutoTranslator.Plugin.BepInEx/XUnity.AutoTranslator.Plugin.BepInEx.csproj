@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net35</TargetFramework>
+    <Version>5.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+    <ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>..\..\libs\BepInEx 5.0\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="ExIni">
+      <HintPath>..\..\libs\ExIni.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <VersionNumber Include="$([System.Text.RegularExpressions.Regex]::Replace(&quot;%(Targets.Version)&quot;, &quot;^(.+?)(\.0+)$&quot;, &quot;$1&quot;))" />
+    </ItemGroup>
+    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;   for %25%25f in (&quot;$(SolutionDir)dist\Translators\*&quot;) do XCOPY /Y /I &quot;%25%25f&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\Translators\&quot;&#xD;&#xA;   for %25%25f in (&quot;$(SolutionDir)dist\Translators\FullNET\*&quot;) do XCOPY /Y /I &quot;%25%25f&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\Translators\FullNET\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)ExIni.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.Core.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.AutoTranslator.Plugin.ExtProtocol.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.Common.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\core\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)XUnity.ResourceRedirector.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.ResourceRedirector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(SolutionDir)src\XUnity.ResourceRedirector.BepInEx\$(OutDir)XUnity.ResourceRedirector.BepInEx.dll&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.ResourceRedirector\&quot;&#xD;&#xA;   XCOPY /Y /I &quot;$(TargetDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\XUnity.AutoTranslator\&quot;&#xD;&#xA;   COPY /Y &quot;$(SolutionDir)README.md&quot; &quot;$(SolutionDir)dist\BepInEx\BepInEx\plugins\README (AutoTranslator).md&quot;&#xD;&#xA;   &quot;$(SolutionDir)tools\xzip.exe&quot; &quot;$(SolutionDir)dist\BepInEx&quot; &quot;$(SolutionDir)dist\XUnity.AutoTranslator-BepInEx-@(VersionNumber).zip&quot;&#xD;&#xA;)" />
+  </Target>
+
+</Project>

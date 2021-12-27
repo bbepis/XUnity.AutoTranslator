@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.IL2CPP;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,15 +8,15 @@ using System.Linq;
 using System.Text;
 using XUnity.ResourceRedirector.Constants;
 
-namespace XUnity.ResourceRedirector.BepIn_5x
+namespace XUnity.ResourceRedirector.BepInEx
 {
    [BepInPlugin( PluginData.Identifier, PluginData.Name, PluginData.Version )]
-   public class ResourceRedirectorPlugin : BaseUnityPlugin
+   public class ResourceRedirectorPlugin : BasePlugin
    {
       public static ConfigEntry<bool> LogAllLoadedResources { get; set; }
       public static ConfigEntry<bool> LogCallbackOrder { get; set; }
 
-      void Awake()
+      public override void Load()
       {
          LogAllLoadedResources = Config.Bind( new ConfigDefinition( "Diagnostics", "Log all loaded resources" ), false );
          ResourceRedirection.LogAllLoadedResources = LogAllLoadedResources.Value;

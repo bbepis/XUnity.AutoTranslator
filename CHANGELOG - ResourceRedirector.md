@@ -1,7 +1,8 @@
 ﻿### 2.0.0
- * FEATURE - IL2CPP support
+ * FEATURE - IL2CPP support through BepInEx 6 and MelonLoader
  * MISC - Prioritize HarmonyX hooks over MonoMod hooks
  * MISC - Changed BepInEx setting names
+ * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
 
 ### 1.2.1
  * MISC - Improved logging statements for redirection subscriptions allowing for less spam

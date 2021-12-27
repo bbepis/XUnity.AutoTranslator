@@ -81,7 +81,7 @@ The file structure should like like this
 ### BepInEx Plugin
 REQUIRES: [BepInEx plugin manager](https://github.com/BepInEx/BepInEx) (follow its installation instructions first!). 
 
- 1. Download XUnity.AutoTranslator-BepIn-5x-{VERSION}.zip from [releases](../../releases).
+ 1. Download XUnity.AutoTranslator-BepInEx-{VERSION}.zip from [releases](../../releases).
  2. Extract directly into the game directory, such that the plugin dlls are placed in BepInEx folder.
  3. Launch the game.
  4. Due to various considerations, not all text hooks are enabled by default, so if you find that the game or parts of the game are not being properly translated it may be worth going into the configuration file and enable some of the disabled text frameworks! The configuration file is created when the game is launched.
@@ -90,7 +90,7 @@ The file structure should like like this:
 ```
 {GameDirectory}/BepInEx/core/XUnity.Common.dll
 {GameDirectory}/BepInEx/plugins/XUnity.ResourceRedirector/XUnity.ResourceRedirector.dll
-{GameDirectory}/BepInEx/plugins/XUnity.ResourceRedirector/XUnity.ResourceRedirector.BepIn-5x.dll
+{GameDirectory}/BepInEx/plugins/XUnity.ResourceRedirector/XUnity.ResourceRedirector.BepInEx.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.Core.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.BepIn.dll
 {GameDirectory}/BepInEx/plugins/XUnity.AutoTranslator/XUnity.AutoTranslator.Plugin.ExtProtocol.dll
@@ -456,7 +456,7 @@ MonoMod hooks are hooks are created at runtime, but not through the Harmony depe
 MonoMod solves both of these problems. In order to use MonoMod hooks the libraries `MonoMod.RuntimeDetours.dll`, `MonoMod.Utils.dll` and `Mono.Cecil.dll` must be available to the plugin. These are optional dependencies.
 
 These are only available in the following packages:
- * `XUnity.AutoTranslator-BepIn-5x-{VERSION}.zip` (because all dependencies are distributed with BepInEx 5.x)
+ * `XUnity.AutoTranslator-BepInEx-{VERSION}.zip` (because all dependencies are distributed with BepInEx 5.x)
  * `XUnity.AutoTranslator-IPA-{VERSION}.zip` (because all dependencies are included in the package)
  * `XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip` (because all dependencies are included in the package)
 

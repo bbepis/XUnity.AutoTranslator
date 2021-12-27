@@ -18,7 +18,7 @@ using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;
 
-namespace XUnity.AutoTranslator.Plugin.BepInEx_Il2Cpp
+namespace XUnity.AutoTranslator.Plugin.BepInEx
 {
    [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
    public class AutoTranslatorPlugin : BasePlugin, IPluginEnvironment
@@ -30,12 +30,12 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx_Il2Cpp
 
       public AutoTranslatorPlugin()
       {
-         ConfigPath = BepInEx.Paths.ConfigPath;
-         TranslationPath = BepInEx.Paths.BepInExRootPath;
+         ConfigPath = global::BepInEx.Paths.ConfigPath;
+         TranslationPath = global::BepInEx.Paths.BepInExRootPath;
 
          _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
 
-         Il2CppProxyAssemblies.Location = Path.Combine( BepInEx.Paths.BepInExRootPath, "unhollowed" );
+         Il2CppProxyAssemblies.Location = Path.Combine( global::BepInEx.Paths.BepInExRootPath, "unhollowed" );
       }
 
       public override void Load()

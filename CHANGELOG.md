@@ -1,5 +1,7 @@
 ﻿### 5.0.0
  * FEATURE - Basic IL2CPP support through BepInEx 6 and MelonLoader
+ * FEATURE - MelonLoader support
+ * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
 
 ### 4.21.0
  * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators
