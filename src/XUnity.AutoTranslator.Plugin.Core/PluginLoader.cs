@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
@@ -15,9 +16,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class PluginLoader
    {
+      private static AutoTranslationPlugin Plugin;
+
       private static bool _loaded;
       private static bool _bootstrapped;
-      private static AutoTranslationPlugin _plugin;
 
       /// <summary>
       /// Loads the plugin with the specified environment.
@@ -32,13 +34,19 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
 #if MANAGED
             var obj = new GameObject( "___XUnityAutoTranslator" );
-            _plugin = obj.AddComponent<AutoTranslationPlugin>();
+            obj.hideFlags = HideFlags.HideAndDontSave;
+            Plugin = obj.AddComponent<AutoTranslationPlugin>();
+            Plugin.hideFlags = HideFlags.HideAndDontSave;
             GameObject.DontDestroyOnLoad( obj );
 #else
-            _plugin = new AutoTranslationPlugin();
+            Plugin = new AutoTranslationPlugin();
+            var obj = new GameObject( "___XUnityAutoTranslator" );
+            obj.hideFlags = HideFlags.HideAndDontSave;
+            obj.AddComponent<AutoTranslatorProxyBehaviour>();
+            GameObject.DontDestroyOnLoad( obj );
 #endif
          }
-         return _plugin;
+         return Plugin;
       }
 
       /// <summary>
@@ -46,15 +54,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       public static IMonoBehaviour Load()
       {
-         return LoadWithConfig( new DefaultPluginEnvironment( true, null ) );
+         return LoadWithConfig( new DefaultPluginEnvironment( true ) );
       }
 
       /// <summary>
       /// Loads the plugin with default environment.
       /// </summary>
-      public static IMonoBehaviour Load( bool allowDefaultInitializeHarmonyDetourBridge, string modAssemblyLocation )
+      public static IMonoBehaviour Load( bool allowDefaultInitializeHarmonyDetourBridge )
       {
-         return LoadWithConfig( new DefaultPluginEnvironment( allowDefaultInitializeHarmonyDetourBridge, modAssemblyLocation ) );
+         return LoadWithConfig( new DefaultPluginEnvironment( allowDefaultInitializeHarmonyDetourBridge ) );
       }
 
 #if MANAGED
@@ -87,6 +95,36 @@ namespace XUnity.AutoTranslator.Plugin.Core
          void OnDestroy()
          {
             Destroyed?.Invoke();
+         }
+      }
+#endif
+
+#if IL2CPP
+      internal class AutoTranslatorProxyBehaviour : MonoBehaviour
+      {
+         static AutoTranslatorProxyBehaviour()
+         {
+            UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<AutoTranslatorProxyBehaviour>();
+         }
+
+         public AutoTranslatorProxyBehaviour( IntPtr value ) : base( value )
+         {
+
+         }
+
+         void Update()
+         {
+            Plugin.Update();
+         }
+
+         void OnGUI()
+         {
+            Plugin.OnGUI();
+         }
+
+         void Start()
+         {
+            Plugin.Start();
          }
       }
 #endif

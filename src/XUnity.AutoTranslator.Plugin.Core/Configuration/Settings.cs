@@ -170,7 +170,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       {
          try
          {
-            var fi = new FileInfo( PluginEnvironment.Current.ModAssemblyLocation );
+            var fi = new FileInfo( typeof( Settings ).Assembly.Location );
             var di = fi.Directory;
             TranslatorsPath = Path.Combine( di.FullName, TranslatorsFolder );
 

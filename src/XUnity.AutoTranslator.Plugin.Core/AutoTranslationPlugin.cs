@@ -59,7 +59,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       internal static AutoTranslationPlugin Current;
 
-      private static bool _hasResizedCurrentComponentDuringDiscovery;
+      private bool _hasResizedCurrentComponentDuringDiscovery;
 
       internal XuaWindow MainWindow;
       internal TranslationAggregatorWindow TranslationAggregatorWindow;

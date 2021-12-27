@@ -40,8 +40,6 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
 
       public bool AllowDefaultInitializeHarmonyDetourBridge => false;
 
-      public string ModAssemblyLocation => typeof( PluginLoader ).Assembly.Location;
-
       public IniFile ReloadConfig()
       {
          if( !File.Exists( _configPath ) )

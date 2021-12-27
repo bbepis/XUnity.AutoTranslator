@@ -23,8 +23,6 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
    [BepInPlugin( GUID: PluginData.Identifier, Name: PluginData.Name, Version: PluginData.Version )]
    public class AutoTranslatorPlugin : BasePlugin, IPluginEnvironment
    {
-      public static IMonoBehaviour _monoBehaviour;
-
       private IniFile _file;
       private string _configPath;
 
@@ -40,9 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
 
       public override void Load()
       {
-         _monoBehaviour = PluginLoader.LoadWithConfig( this );
-
-         AutoTranslatorBehaviour.Create();
+         PluginLoader.LoadWithConfig( this );
       }
 
       public IniFile Preferences
@@ -58,8 +54,6 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
       public string TranslationPath { get; }
 
       public bool AllowDefaultInitializeHarmonyDetourBridge => false;
-
-      public string ModAssemblyLocation => typeof( PluginLoader ).Assembly.Location;
 
       public IniFile ReloadConfig()
       {
@@ -79,59 +73,6 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
       public void SaveConfig()
       {
          _file.Save( _configPath );
-      }
-   }
-
-   internal class AutoTranslatorBehaviour : MonoBehaviour
-   {
-      static AutoTranslatorBehaviour()
-      {
-         ClassInjector.RegisterTypeInIl2Cpp<AutoTranslatorBehaviour>();
-      }
-
-      private static GameObject _obj;
-      private static AutoTranslatorBehaviour _comp;
-      private static bool _destroying;
-
-      internal static void Create()
-      {
-         _obj = new GameObject();
-         GameObject.DontDestroyOnLoad( _obj );
-         _comp = _obj.AddComponent<AutoTranslatorBehaviour>();
-      }
-
-      public AutoTranslatorBehaviour( IntPtr value ) : base( value )
-      {
-
-      }
-
-      void Update()
-      {
-         AutoTranslatorPlugin._monoBehaviour.Update();
-      }
-
-      void OnGUI()
-      {
-         AutoTranslatorPlugin._monoBehaviour.OnGUI();
-      }
-
-      void Start()
-      {
-         AutoTranslatorPlugin._monoBehaviour.Start();
-      }
-
-      void OnDestroy()
-      {
-         if( !_destroying )
-         {
-            XuaLogger.AutoTranslator.Warn( "Recreating plugin behaviour because it was destroyed..." );
-            Create();
-         }
-      }
-
-      void OnApplicationQuit()
-      {
-         _destroying = true;
       }
    }
 }
