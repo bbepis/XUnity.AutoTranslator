@@ -10,7 +10,7 @@ using XUnity.Common.Constants;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Shims
+namespace XUnity.AutoTranslator.Plugin.Utilities
 {
    internal static class TranslationScopeHelper
    {

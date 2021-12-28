@@ -9,7 +9,7 @@ using XUnity.Common.Extensions;
 using UnhollowerBaseLib;
 #endif
 
-namespace XUnity.AutoTranslator.Plugin.Core.Support
+namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class ComponentHelper
    {

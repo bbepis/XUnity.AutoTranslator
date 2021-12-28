@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Support;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 

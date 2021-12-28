@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
 {

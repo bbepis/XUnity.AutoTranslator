@@ -12,7 +12,7 @@ using XUnity.Common.Utilities;
 using UnhollowerRuntimeLib;
 #endif
 
-namespace XUnity.AutoTranslator.Plugin.Core.Support
+namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.

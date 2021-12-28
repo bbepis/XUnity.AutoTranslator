@@ -7,7 +7,7 @@ using XUnity.Common.Logging;
 using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Support
+namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {
    internal static class FontHelper
    {

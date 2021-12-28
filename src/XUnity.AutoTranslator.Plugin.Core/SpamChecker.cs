@@ -6,7 +6,6 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
-using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
 using XUnity.Common.Support;

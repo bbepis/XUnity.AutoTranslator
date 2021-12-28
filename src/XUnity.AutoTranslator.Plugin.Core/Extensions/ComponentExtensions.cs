@@ -8,7 +8,6 @@ using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Text;
 using XUnity.AutoTranslator.Plugin.Core.Textures;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
@@ -205,8 +204,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          else
          {
-            return UnityTypes.TextMeshProUGUI.IsAssignableFrom( type )
-               || UnityTypes.TextMeshPro.IsAssignableFrom( type );
+            return UnityTypes.TextMeshProUGUI?.IsAssignableFrom( type ) == true
+               || UnityTypes.TextMeshPro?.IsAssignableFrom( type ) == true;
          }
       }
 
@@ -237,8 +236,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
          else
          {
-            return ( UnityTypes.TextMeshPro.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
-               || ( UnityTypes.TextMeshProUGUI.IsAssignableFrom( unityType ) && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
+            return ( UnityTypes.TextMeshPro?.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) )
+               || ( UnityTypes.TextMeshProUGUI?.IsAssignableFrom( unityType ) == true && Equals( clrType.CachedProperty( RichTextPropertyName )?.Get( ui ), true ) );
          }
       }
 
@@ -403,7 +402,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static object CreateDerivedProxyIfRequiredAndPossible( this Component ui )
       {
-         if( IsKnownTextType( ui ) )
+         if( ui.IsKnownTextType() )
          {
 #if MANAGED
             return ui;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using XUnity.AutoTranslator.Plugin.Core.Support;
+using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Shims

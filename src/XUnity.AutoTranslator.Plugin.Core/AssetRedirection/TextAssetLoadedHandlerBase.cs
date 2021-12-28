@@ -2,7 +2,6 @@
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Hooks;
-using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
 

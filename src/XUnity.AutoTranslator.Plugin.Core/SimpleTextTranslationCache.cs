@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
-using XUnity.AutoTranslator.Plugin.Core.Support;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Logging;
 
