@@ -67,7 +67,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             foreach( var comp in go.GetAllTextComponentsInChildren() )
             {
-               var info = comp.GetOrCreateTextTranslationInfo();
+               var derivedComp = comp.CreateDerivedProxyIfRequiredAndPossible();
+               var info = derivedComp.GetOrCreateTextTranslationInfo();
                info.TextCache = cache;
             }
 

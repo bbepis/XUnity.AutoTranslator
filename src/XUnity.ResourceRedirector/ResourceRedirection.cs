@@ -376,7 +376,6 @@ namespace XUnity.ResourceRedirector
          }
       }
 
-#if MANAGED
       /// <summary>
       /// Enables CAB randomization of loaded asset bundles if a conflict is detected.
       /// </summary>
@@ -492,7 +491,6 @@ namespace XUnity.ResourceRedirector
             }
          }
       }
-#endif
 
       /// <summary>
       /// Disables CAB randomization if it was previously enabled.

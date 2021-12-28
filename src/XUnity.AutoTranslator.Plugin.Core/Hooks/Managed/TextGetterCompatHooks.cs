@@ -9,7 +9,7 @@ using XUnity.Common.Constants;
 using XUnity.Common.Harmony;
 using XUnity.Common.MonoMod;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
+namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
    internal static class TextGetterCompatHooks
    {

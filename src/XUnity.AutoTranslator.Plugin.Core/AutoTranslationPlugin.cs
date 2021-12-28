@@ -864,7 +864,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
 
                // NGUI only behaves if you set the text after the resize behaviour
-               ui.SetText( text );
+               ui.SetText( text, info );
 
                info?.ResetScrollIn( ui );
 
@@ -1325,7 +1325,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( info != null && info.IsCurrentlySettingText )
             return null;
 
-         text = text ?? ui.GetText();
+         text = text ?? ui.GetText( info );
 
          // Get the trimmed text
          string originalText = text;
@@ -1916,7 +1916,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   var fixedText = text.FixRedirected();
                   info.RedirectedTranslations.Add( fixedText );
 
-                  ui.SetText( fixedText );
+                  ui.SetText( fixedText, info );
 
                   return true;
                }
@@ -1949,7 +1949,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( info != null && info.IsCurrentlySettingText )
             return null;
 
-         text = text ?? ui.GetText();
+         text = text ?? ui.GetText( info );
 
          // this only happens if the game sets the text of a component to our translation
          if( info?.IsTranslated == true && text == info.TranslatedText )
@@ -2304,6 +2304,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   CoroutineHelper.Start(
                      WaitForTextStablization(
                         ui: ui,
+                        info: info,
                         delay: delay, // 0.9 second to prevent '1 second tickers' from getting translated
                         maxTries: retries, // 60 tries, about 1 minute
                         currentTries: 0,
@@ -2446,14 +2447,14 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// the text has stopped changing. This is important for 'story'
       /// mode text, which 'scrolls' into place slowly.
       /// </summary>
-      private IEnumerator WaitForTextStablization( object ui, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
+      private IEnumerator WaitForTextStablization( object ui, TextTranslationInfo info, float delay, int maxTries, int currentTries, Action<string> onTextStabilized, Action onMaxTriesExceeded )
       {
          yield return null; // wait a single frame to allow any external plugins to complete their hooking logic
 
          bool succeeded = false;
          while( currentTries < maxTries ) // shortcircuit
          {
-            var beforeText = ui.GetText();
+            var beforeText = ui.GetText( info );
 
             var instruction = CoroutineHelper.CreateWaitForSecondsRealtime( delay );
             if( instruction != null )
@@ -2470,7 +2471,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                }
             }
 
-            var afterText = ui.GetText();
+            var afterText = ui.GetText( info );
 
             if( beforeText == afterText )
             {
@@ -3016,10 +3017,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             // update the original text, but only if it has not been chaanged already for some reason (could be other translator plugin or game itself)
             try
             {
-               var text = component.GetText();
+               var info = component.GetOrCreateTextTranslationInfo();
+               var text = component.GetText( info );
                if( text == key.Original_Text )
                {
-                  var info = component.GetOrCreateTextTranslationInfo();
                   if( !string.IsNullOrEmpty( job.TranslatedText ) )
                   {
                      SetTranslatedText( component, key.Untemplate( job.TranslatedText ), key.Original_Text, info );
@@ -3043,7 +3044,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                try
                {
-                  var text = context.Component.GetText();
+                  var info = context.Component.GetOrCreateTextTranslationInfo();
+                  var text = context.Component.GetText( info );
                   var result = context.Result;
 
                   string translatedText;
@@ -3069,7 +3071,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( text == result.OriginalText )
                      {
-                        var info = context.Component.GetOrCreateTextTranslationInfo();
                         SetTranslatedText( context.Component, translatedText, context.Result.OriginalText, info );
                      }
 
@@ -3440,7 +3441,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                {
                   output = type.Name;
 
-                  var text = x.GetText();
+                  var info = x.GetOrCreateTextTranslationInfo();
+                  var text = x.GetText( info );
                   if( !string.IsNullOrEmpty( text ) )
                   {
                      output += " (" + text + ")";

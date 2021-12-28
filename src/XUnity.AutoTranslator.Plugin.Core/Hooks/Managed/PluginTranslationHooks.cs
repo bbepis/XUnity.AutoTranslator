@@ -14,7 +14,7 @@ using XUnity.Common.Logging;
 using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat
+namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
    internal static class PluginTranslationHooks
    {

@@ -1,6 +1,4 @@
-﻿#if MANAGED
-
-using System.Reflection;
+﻿using System.Reflection;
 using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
@@ -46,5 +44,3 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
       }
    }
 }
-
-#endif

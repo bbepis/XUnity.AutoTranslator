@@ -35,17 +35,16 @@ namespace XUnity.AutoTranslator.Plugin.Core.Text
          var type = _type;
 
 #if MANAGED
+         // Using ClrType here is fine because cast should already have happend in IL2CPP
          if( UnityTypes.AdvUguiMessageWindow != null && UnityTypes.UguiNovelText?.ClrType.IsAssignableFrom( type ) == true )
          {
-            var uguiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUguiMessageWindow.ClrType );
+            var uguiMessageWindow = GameObject.FindObjectOfType( UnityTypes.AdvUguiMessageWindow.UnityType );
             if( uguiMessageWindow != null )
             {
-
                var uguiNovelText = UnityTypes.AdvUguiMessageWindow_Properties.Text?.Get( uguiMessageWindow )
                   ?? UnityTypes.AdvUguiMessageWindow_Fields.text?.GetValue( uguiMessageWindow );
 
-
-               if( Equals( uguiNovelText, ui ) )
+               if( UnityObjectReferenceComparer.Default.Equals( uguiNovelText, ui ) )
                {
                   string previousNameText = null;
                   var nameText = UnityTypes.AdvUguiMessageWindow_Fields.nameText.GetValue( uguiMessageWindow ) as UnityEngine.Object;

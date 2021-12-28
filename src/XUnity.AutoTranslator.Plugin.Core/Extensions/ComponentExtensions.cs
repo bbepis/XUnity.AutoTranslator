@@ -58,8 +58,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly string RichTextPropertyName = "richText";
       private static GameObject[] _objects = new GameObject[ 128 ];
       private static readonly string XuaIgnore = "XUAIGNORE";
-      private static readonly Dictionary<Type, ITextComponentManipulator> Manipulators = new Dictionary<Type, ITextComponentManipulator>();
       private static List<IPropertyMover> TexturePropertyMovers;
+#if MANAGED
+      private static readonly Dictionary<Type, ITextComponentManipulator> Manipulators = new Dictionary<Type, ITextComponentManipulator>();
+#else
+      private static readonly Dictionary<Il2CppSystem.Type, ITextComponentManipulator> Manipulators = new Dictionary<Il2CppSystem.Type, ITextComponentManipulator>();
+#endif
 
       static ComponentExtensions()
       {
@@ -80,35 +84,79 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      private static ITextComponentManipulator GetTextManipulator( object ui )
+      public static ITextComponentManipulator GetTextManipulator( this object ui )
       {
          if( ui == null )
          {
             return null;
          }
 
-         var type = ui.GetType();
+         var unityType = ui.GetUnityType();
 
-         if( !Manipulators.TryGetValue( type, out var manipulator ) )
+         if( !Manipulators.TryGetValue( unityType, out var manipulator ) )
          {
-#if MANAGED
-            if( type == UnityTypes.TextField?.ClrType )
+            if( UnityTypes.TextField != null && UnityTypes.TextField.IsAssignableFrom( unityType ) )
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
-            else if( type == UnityTypes.TextArea2D?.ClrType )
+            else if( UnityTypes.TextArea2D != null && UnityTypes.TextArea2D.IsAssignableFrom( unityType ) )
             {
                manipulator = new TextArea2DComponentManipulator();
             }
             else
-#endif
             {
-               manipulator = new DefaultTextComponentManipulator( type );
+               manipulator = new DefaultTextComponentManipulator( ui.GetType() );
             }
-            Manipulators[ type ] = manipulator;
+            Manipulators[ unityType ] = manipulator;
          }
 
          return manipulator;
+      }
+
+      public static bool ShouldIgnoreTextComponent( this object ui )
+      {
+         if( ui is Component component )
+         {
+            var go = component.gameObject;
+            var ignore = go.HasIgnoredName();
+            if( ignore )
+            {
+               return true;
+            }
+
+            Component inputField = null;
+            if( UnityTypes.InputField != null )
+            {
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
+               if( inputField != null )
+               {
+                  if( UnityTypes.InputField_Properties.Placeholder != null )
+                  {
+                     var placeholder = (Component)UnityTypes.InputField_Properties.Placeholder.Get( inputField );
+                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
+                  }
+               }
+            }
+
+            if( UnityTypes.TMP_InputField != null )
+            {
+               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField?.UnityType );
+               if( inputField != null )
+               {
+                  if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
+                  {
+                     var placeholder = (Component)UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
+                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
+                  }
+               }
+            }
+
+            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
+
+            return inputField != null;
+         }
+
+         return false;
       }
 
       public static bool IsComponentActive( this object ui )
@@ -283,16 +331,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return false;
       }
 
-      public static string GetText( this object ui )
+      public static string GetText( this object ui, TextTranslationInfo info )
       {
          if( ui == null ) return null;
 
          TextGetterCompatModeHelper.IsGettingText = true;
          try
          {
-            if( _guiContentCheckFailed || !TryGetTextFromGUIContentSafe( ui, out var text ) )
+            string text = null;
+            if( ( _guiContentCheckFailed || !TryGetTextFromGUIContentSafe( ui, out text ) ) && info != null )
             {
-               return GetTextManipulator( ui )?.GetText( ui );
+               return info.TextManipulator.GetText( ui );
             }
             return text;
          }
@@ -302,13 +351,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
       }
 
-      public static void SetText( this object ui, string text )
+      public static void SetText( this object ui, string text, TextTranslationInfo info )
       {
          if( ui == null ) return;
 
-         if( _guiContentCheckFailed || !SetTextOnGUIContentSafe( ui, text ) )
+         if( ( _guiContentCheckFailed || !SetTextOnGUIContentSafe( ui, text ) ) && info != null )
          {
-            GetTextManipulator( ui )?.SetText( ui, text );
+            info.TextManipulator.SetText( ui, text );
          }
       }
 
@@ -342,29 +391,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 #if MANAGED
             return ui;
 #else
-            var il2cppType = ui.GetIl2CppTypeSafe();
-            if( il2cppType != null )
+            var unityType = ui.GetUnityType();
+            if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( unityType ) )
             {
-               if( Settings.EnableUGUI && UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( il2cppType ) )
-               {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.Text.ClrType );
-               }
-               else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( il2cppType ) )
-               {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMesh.ClrType );
-               }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( il2cppType ) )
-               {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
-               }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( il2cppType ) )
-               {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
-               }
-               else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.IsAssignableFrom( il2cppType ) )
-               {
-                  return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
-               }
+               return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.Text.ClrType );
+            }
+            else if( Settings.EnableTextMesh && UnityTypes.TextMesh != null && UnityTypes.TextMesh.IsAssignableFrom( unityType ) )
+            {
+               return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMesh.ClrType );
+            }
+            else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshProUGUI != null && UnityTypes.TextMeshProUGUI.IsAssignableFrom( unityType ) )
+            {
+               return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshProUGUI.ClrType );
+            }
+            else if( Settings.EnableTextMeshPro && UnityTypes.TextMeshPro != null && UnityTypes.TextMeshPro.IsAssignableFrom( unityType ) )
+            {
+               return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TextMeshPro.ClrType );
+            }
+            else if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null && UnityTypes.TMP_Text.IsAssignableFrom( unityType ) )
+            {
+               return Il2CppUtilities.CreateProxyComponentWithDerivedType( ui.Pointer, UnityTypes.TMP_Text.ClrType );
             }
 #endif
          }
@@ -432,43 +478,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          return null;
       }
 
-      public static IEnumerable<object> GetAllTextComponentsInChildren( this object go )
+      public static IEnumerable<Component> GetAllTextComponentsInChildren( this GameObject go )
       {
          // Only used for plugin specific hooks
-#if MANAGED
-         var gameObject = (GameObject)go;
-
          if( Settings.EnableTextMeshPro && UnityTypes.TMP_Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TMP_Text.UnityType, true ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.TMP_Text.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableUGUI && UnityTypes.Text != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.Text.UnityType, true ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.Text.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableTextMesh && UnityTypes.TextMesh != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.TextMesh.UnityType, true ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.TextMesh.UnityType, true ) )
             {
                yield return comp;
             }
          }
          if( Settings.EnableNGUI && UnityTypes.UILabel != null )
          {
-            foreach( var comp in gameObject.GetComponentsInChildren( UnityTypes.UILabel.UnityType, true ) )
+            foreach( var comp in go.GetComponentsInChildren( UnityTypes.UILabel.UnityType, true ) )
             {
                yield return comp;
             }
          }
-#else
-         yield break;
-#endif
       }
 
       private static GameObject GetAssociatedGameObject( object obj )

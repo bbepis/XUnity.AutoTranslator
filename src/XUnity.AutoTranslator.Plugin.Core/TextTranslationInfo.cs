@@ -30,6 +30,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       private bool _initialized = false;
       private HashSet<string> _redirectedTranslations;
 
+      public ITextComponentManipulator TextManipulator { get; set; }
       public string OriginalText { get; set; }
       public string TranslatedText { get; set; }
       public bool IsTranslated { get; set; }
@@ -52,7 +53,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             IsKnownTextComponent = ui.IsKnownTextType();
             SupportsStabilization = ui.SupportsStabilization();
-            ShouldIgnore = ShouldIgnoreTextComponent( ui );
+            ShouldIgnore = ui.ShouldIgnoreTextComponent();
+            TextManipulator = ui.GetTextManipulator();
          }
       }
 
@@ -67,52 +69,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          IsTranslated = true;
          TranslatedText = translatedText;
-      }
-
-      public bool ShouldIgnoreTextComponent( object ui )
-      {
-         if( ui is Component component )
-         {
-            var go = component.gameObject;
-            var ignore = go.HasIgnoredName();
-            if( ignore )
-            {
-               return true;
-            }
-
-            Component inputField = null;
-            if( UnityTypes.InputField != null )
-            {
-               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.InputField?.UnityType );
-               if( inputField != null )
-               {
-                  if( UnityTypes.InputField_Properties.Placeholder != null )
-                  {
-                     var placeholder = (Component)UnityTypes.InputField_Properties.Placeholder.Get( inputField );
-                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
-                  }
-               }
-            }
-
-            if( UnityTypes.TMP_InputField != null )
-            {
-               inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.TMP_InputField?.UnityType );
-               if( inputField != null )
-               {
-                  if( UnityTypes.TMP_InputField_Properties.Placeholder != null )
-                  {
-                     var placeholder = (Component)UnityTypes.TMP_InputField_Properties.Placeholder.Get( inputField );
-                     return !UnityObjectReferenceComparer.Default.Equals( placeholder, component );
-                  }
-               }
-            }
-
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
-
-            return inputField != null;
-         }
-
-         return false;
       }
 
       public void ResetScrollIn( object ui )

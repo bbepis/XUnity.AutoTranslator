@@ -14,12 +14,6 @@ using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
-#if MANAGED
-using XUnity.AutoTranslator.Plugin.Core.Hooks.FairyGUI;
-using XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI;
-using XUnity.AutoTranslator.Plugin.Core.Hooks.TextGetterCompat;
-#endif
-
 namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
    internal static class HooksSetup
@@ -181,11 +175,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             if( Settings.EnableFairyGUI )
             {
-#if MANAGED
                HookingHelper.PatchAll( FairyGUIHooks.All, Settings.ForceMonoModHooks );
-#else
-               throw new NotImplementedException("EnableFairyGUI is not supported in IL2CPP.");
-#endif
             }
          }
          catch( Exception e )

@@ -15,7 +15,7 @@ using XUnity.Common.MonoMod;
 using XUnity.Common.Utilities;
 using static UnityEngine.GUI;
 
-namespace XUnity.AutoTranslator.Plugin.Core.Hooks.IMGUI
+namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 {
    internal static class IMGUIHooks
    {

@@ -95,7 +95,11 @@ namespace UnityEngine
 
       private static void CheckNullArgument( object arg, string message ) => throw new NotImplementedException();
 
+#if IL2CPP
+      public static Object FindObjectOfType( Il2CppSystem.Type type ) => throw new NotImplementedException();
+#else
       public static Object FindObjectOfType( Type type ) => throw new NotImplementedException();
+#endif
 
       public static bool operator ==( Object x, Object y ) => throw new NotImplementedException();
 
