@@ -383,6 +383,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
          return null;
       }
+      public static ImageTranslationInfo GetOrCreateImageTranslationInfo( this object obj, Texture2D originalTexture )
+      {
+         if( obj == null ) return null;
+
+         var iti = obj.GetOrCreateExtensionData<ImageTranslationInfo>();
+         if( iti.Original == null ) iti.Initialize( originalTexture );
+
+         return iti;
+      }
+
+      public static TextureTranslationInfo GetOrCreateTextureTranslationInfo( this Texture2D texture )
+      {
+         var tti = texture.GetOrCreateExtensionData<TextureTranslationInfo>();
+         tti.Initialize( texture );
+
+         return tti;
+      }
 
       public static object CreateDerivedProxyIfRequiredAndPossible( this Component ui )
       {
@@ -475,6 +492,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             return ui;
 #endif
          }
+         return null;
+      }
+
+#if IL2CPP
+      public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Il2CppSystem.Type type )
+#else
+      public static Component GetFirstComponentInSelfOrAncestor( this GameObject go, Type type )
+#endif
+      {
+         if( type == null ) return null;
+
+         var current = go;
+
+         while( current != null )
+         {
+            var foundComponent = current.GetComponent( type );
+            if( foundComponent != null )
+            {
+               return foundComponent;
+            }
+
+            current = current.transform?.parent?.gameObject;
+         }
+
          return null;
       }
 
