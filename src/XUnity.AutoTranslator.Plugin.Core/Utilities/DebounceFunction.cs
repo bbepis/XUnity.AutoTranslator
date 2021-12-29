@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
@@ -7,7 +8,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    {
       private readonly float _delaySeconds;
       private readonly Action _callback;
-      private object _current;
+      private Coroutine _current;
 
       public DebounceFunction( float delaySeconds, Action callback )
       {

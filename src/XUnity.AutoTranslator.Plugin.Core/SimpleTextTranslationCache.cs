@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.Common.Logging;
@@ -28,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static object _writeToFileSync = new object(); // static on purpose so we do not start 100 IO operations at the same time
       private Dictionary<string, string> _newTranslations = new Dictionary<string, string>();
-      private object _currentScheduledTask;
+      private Coroutine _currentScheduledTask;
       private bool _shouldOverrideEntireFile;
 
       /// <summary>

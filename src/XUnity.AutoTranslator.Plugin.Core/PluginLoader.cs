@@ -16,7 +16,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public static class PluginLoader
    {
-      private static AutoTranslationPlugin Plugin;
+      internal static AutoTranslationPlugin Plugin;
+      internal static MonoBehaviour MonoBehaviour;
 
       private static bool _loaded;
       private static bool _bootstrapped;
@@ -36,13 +37,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var obj = new GameObject( "___XUnityAutoTranslator" );
             obj.hideFlags = HideFlags.HideAndDontSave;
             Plugin = obj.AddComponent<AutoTranslationPlugin>();
-            Plugin.hideFlags = HideFlags.HideAndDontSave;
+            MonoBehaviour = Plugin;
             GameObject.DontDestroyOnLoad( obj );
 #else
             Plugin = new AutoTranslationPlugin();
             var obj = new GameObject( "___XUnityAutoTranslator" );
             obj.hideFlags = HideFlags.HideAndDontSave;
-            obj.AddComponent<AutoTranslatorProxyBehaviour>();
+            MonoBehaviour = obj.AddComponent<AutoTranslatorProxyBehaviour>();
             GameObject.DontDestroyOnLoad( obj );
 #endif
          }

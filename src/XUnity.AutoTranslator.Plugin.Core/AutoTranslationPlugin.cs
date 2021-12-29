@@ -2795,10 +2795,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred in Update callback. " );
          }
-
-#if IL2CPP
-         Il2CppCoroutines.ProcessPostUpdate();
-#endif
       }
 
       private void PrintSceneInformation()

@@ -38,28 +38,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return UnityFeatures.SupportsCustomYieldInstruction;
       }
 
+      public static Coroutine Start( IEnumerator coroutine )
+      {
 #if IL2CPP
-      public static object Start( IEnumerator coroutine )
-      {
-         return Il2CppCoroutines.Start( coroutine );
-      }
-
-      public static void Stop( object coroutine )
-      {
-         Il2CppCoroutines.Stop( (IEnumerator)coroutine );
-      }
+         var wrapper = new Il2CppSystem.Collections.IEnumerator( new Il2CppManagedEnumerator( coroutine ).Pointer );
+         return PluginLoader.MonoBehaviour.StartCoroutine( wrapper );
+#else
+         return PluginLoader.MonoBehaviour.StartCoroutine( coroutine );
 #endif
 
-#if MANAGED
-      public static object Start( IEnumerator coroutine )
-      {
-         return AutoTranslationPlugin.Current.StartCoroutine( coroutine );
       }
 
-      public static void Stop( object coroutine )
+      public static void Stop( Coroutine coroutine )
       {
-         AutoTranslationPlugin.Current.StopCoroutine( (Coroutine)coroutine );
+         PluginLoader.MonoBehaviour.StopCoroutine( coroutine );
       }
-#endif
    }
 }

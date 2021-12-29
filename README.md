@@ -8,6 +8,7 @@
  * [Translators](#translators)
  * [Text Frameworks](#text-frameworks)
  * [Configuration](#configuration)
+ * [IL2CPP Support](#il2cpp-support)
  * [Frequently Asked Questions](#frequently-asked-questions)
  * [Translating Mods](#translating-mods)
  * [Manual Translations](#manual-translations)
@@ -510,8 +511,7 @@ While this plugin offers some level of IL2CPP support, it is by no means complet
  * TextGetterCompatibilityMode is not supported
  * Plugin-specific translations are not supported (yet)
  * IMGUI translations are not supported (yet)
- * 
-
+ * Many other features are completely unproven
 
 ## Frequently Asked Questions
 > **Q: Why doesn't this plugin work in game X?**  
