@@ -211,7 +211,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          foreach( var text in texts )
          {
-            GUILayout.Label( text, GUIUtil.LabelTranslation );
+            GUILayout.Label( text, GUIUtil.LabelTranslation, null );
          }
 
          GUILayout.EndScrollView();

@@ -2,6 +2,7 @@
  * FEATURE - Basic IL2CPP support through BepInEx 6 and MelonLoader
  * FEATURE - MelonLoader support
  * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
+ * BUG FIX - Fixed text escapting error related to GoogleTranslateV2
 
 ### 4.21.0
  * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators

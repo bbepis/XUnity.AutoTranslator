@@ -218,7 +218,11 @@ namespace UnityEngine
          DoLabel( GUIContent.Temp( image ), style, options );
       }
 
+#if IL2CPP
+      public static void Label( string text, GUIStyle style, UnhollowerBaseLib.Il2CppReferenceArray<GUILayoutOption> options )
+#else
       public static void Label( string text, GUIStyle style, params GUILayoutOption[] options )
+#endif
       {
          DoLabel( GUIContent.Temp( text ), style, options );
       }

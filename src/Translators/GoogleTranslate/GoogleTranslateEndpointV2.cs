@@ -104,7 +104,7 @@ namespace GoogleTranslate
 
             _httpsServicePointTranslateTemplateUrl = _selectedUserBackend + HttpsServicePointTranslateTemplateUrl;
          }
-         
+
          _translateRpcId = context.GetOrCreateSetting( "GoogleV2", "RPCID", "MkEWBc" );
          _version = context.GetOrCreateSetting( "GoogleV2", "VERSION", "boq_translate-webserver_20210323.10_p0" );
          _useSimplestSuggestion = context.GetOrCreateSetting( "GoogleV2", "UseSimplest", false );
@@ -140,14 +140,11 @@ namespace GoogleTranslate
          _translationCount++;
 
          var allUntranslatedText =
-            string.Join( "\\\\n", context.UntranslatedTexts )
-            .Replace( "\"", "\\\\\\\"" )
-            .Replace( "\n", "\\\\n" )
-            .Replace("\r", "");
+            JsonHelper.Escape( JsonHelper.Escape( string.Join( "\n", context.UntranslatedTexts ) ) );
 
          var query = string.Join( "&", new[]
          {
-            "rpcids=MkEWBc",
+            "rpcids=" + _translateRpcId,
             "f.sid=" + _FSID.ToString(CultureInfo.InvariantCulture),
             "bl=" + Uri.EscapeDataString(_version),
             "hl=en-US",
