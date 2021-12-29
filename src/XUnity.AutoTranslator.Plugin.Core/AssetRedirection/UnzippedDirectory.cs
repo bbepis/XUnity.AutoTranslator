@@ -7,7 +7,7 @@ using System.Reflection;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.AssetRedirection
 {

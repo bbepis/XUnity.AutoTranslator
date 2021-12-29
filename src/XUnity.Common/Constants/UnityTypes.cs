@@ -228,8 +228,13 @@ namespace XUnity.Common.Constants
 
       public static class AssetBundle_Methods
       {
+#if MANAGED
          public static CachedMethod LoadAll = UnityTypes.AssetBundle?.ClrType.CachedMethod( "LoadAll", typeof( Type ) );
          public static CachedMethod LoadAllAssets = UnityTypes.AssetBundle?.ClrType.CachedMethod( "LoadAllAssets", typeof( Type ) );
+#else
+         public static CachedMethod LoadAll = UnityTypes.AssetBundle?.ClrType.CachedMethod( "LoadAll", typeof( Il2CppSystem.Type ) );
+         public static CachedMethod LoadAllAssets = UnityTypes.AssetBundle?.ClrType.CachedMethod( "LoadAllAssets", typeof( Il2CppSystem.Type ) );
+#endif
 
          public static CachedMethod LoadFromFile = UnityTypes.AssetBundle?.ClrType.CachedMethod( "LoadFromFile", typeof( string ) );
          public static CachedMethod CreateFromFile = UnityTypes.AssetBundle?.ClrType.CachedMethod( "CreateFromFile", typeof( string ) );

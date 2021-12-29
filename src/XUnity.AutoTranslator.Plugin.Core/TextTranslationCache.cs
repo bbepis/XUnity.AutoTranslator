@@ -15,7 +15,6 @@ using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core

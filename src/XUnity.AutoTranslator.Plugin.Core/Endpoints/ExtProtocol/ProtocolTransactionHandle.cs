@@ -1,6 +1,5 @@
 ﻿using XUnity.AutoTranslator.Plugin.Core.Shims;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
-using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {

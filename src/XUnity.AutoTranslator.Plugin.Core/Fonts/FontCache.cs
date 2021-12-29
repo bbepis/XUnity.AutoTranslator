@@ -7,7 +7,6 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {

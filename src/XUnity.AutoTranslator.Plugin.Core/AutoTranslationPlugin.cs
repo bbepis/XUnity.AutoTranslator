@@ -32,7 +32,6 @@ using XUnity.Common.Constants;
 using XUnity.ResourceRedirector;
 using XUnity.Common.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.UIResize;
-using XUnity.Common.Support;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
 

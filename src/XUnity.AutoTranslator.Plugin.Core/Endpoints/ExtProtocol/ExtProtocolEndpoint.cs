@@ -12,7 +12,7 @@ using XUnity.AutoTranslator.Plugin.Core.Web;
 using XUnity.AutoTranslator.Plugin.ExtProtocol;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.ExtProtocol
 {

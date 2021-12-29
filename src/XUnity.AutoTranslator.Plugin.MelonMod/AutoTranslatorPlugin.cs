@@ -13,7 +13,6 @@ using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.MelonMod;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 
 [assembly: MelonInfo( typeof( AutoTranslatorPlugin ), PluginData.Name, PluginData.Version, PluginData.Author )]
 [assembly: MelonGame( null, null )]

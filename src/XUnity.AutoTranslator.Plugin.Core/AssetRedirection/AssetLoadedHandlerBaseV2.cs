@@ -4,7 +4,6 @@ using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 using XUnity.ResourceRedirector;
 

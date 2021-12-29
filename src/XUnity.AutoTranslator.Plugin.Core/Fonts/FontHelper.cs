@@ -1,24 +1,19 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.Common.Constants;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {
    internal static class FontHelper
    {
-#if IL2CPP
-      public static UnhollowerBaseLib.Il2CppObjectBase GetTextMeshProFont()
-#else
-      public static object GetTextMeshProFont()
-#endif
+      public static UnityEngine.Object GetTextMeshProFont()
       {
-#if MANAGED
-         object font = null;
+         UnityEngine.Object font = null;
 
          var overrideFontPath = Path.Combine( Paths.GameRoot, Settings.OverrideFontTextMeshPro );
          if( File.Exists( overrideFontPath ) )
@@ -46,15 +41,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
                return null;
             }
 
-            if( UnityTypes.AssetBundle_Methods.LoadAllAssets != null )
+            if( UnityTypes.FontAsset != null )
             {
-               var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.FontAsset } );
-               font = assets?.FirstOrDefault();
-            }
-            else if( UnityTypes.AssetBundle_Methods.LoadAll != null )
-            {
-               var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.FontAsset } );
-               font = assets?.FirstOrDefault();
+               if( UnityTypes.AssetBundle_Methods.LoadAllAssets != null )
+               {
+#if MANAGED
+                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+#else
+                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+#endif
+                  font = assets?.FirstOrDefault();
+               }
+               else if( UnityTypes.AssetBundle_Methods.LoadAll != null )
+               {
+#if MANAGED
+                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+#else
+                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+#endif
+                  font = assets?.FirstOrDefault();
+               }
             }
          }
          else
@@ -66,7 +72,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 
          if( font != null )
          {
-            GameObject.DontDestroyOnLoad( (UnityEngine.Object)font );
+            GameObject.DontDestroyOnLoad( font );
          }
          else
          {
@@ -74,10 +80,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          }
 
          return font;
-
-#else
-         return null;
-#endif
       }
 
       public static Font GetTextFont( int size )

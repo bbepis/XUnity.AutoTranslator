@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using XUnity.Common.Utilities;
 
-namespace XUnity.Common.Support
+namespace XUnity.Common.Utilities
 {
    /// <summary>
    /// WARNING: Pubternal API (internal). Do not use. May change during any update.

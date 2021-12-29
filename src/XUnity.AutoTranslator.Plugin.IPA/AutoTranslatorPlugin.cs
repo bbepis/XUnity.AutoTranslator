@@ -9,7 +9,7 @@ using IllusionPlugin;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
-using XUnity.Common.Support;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.IPA
 {

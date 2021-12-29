@@ -8,7 +8,6 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.Common.Extensions;
 using XUnity.Common.Logging;
-using XUnity.Common.Support;
 
 namespace XUnity.AutoTranslator.Plugin.Core
 {
