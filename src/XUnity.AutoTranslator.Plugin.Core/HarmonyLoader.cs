@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public static void Load()
       {
-         //var flags = Harmony.AccessTools.all;
+         var flags = Harmony.AccessTools.all;
       }
    }
 }
