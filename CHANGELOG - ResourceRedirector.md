@@ -3,6 +3,7 @@
  * MISC - Prioritize HarmonyX hooks over MonoMod hooks
  * MISC - Changed BepInEx setting names
  * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
+ * BUG FIX - Fixed bug that caused some rarely used methods to be short-circuited incorrectly
 
 ### 1.2.1
  * MISC - Improved logging statements for redirection subscriptions allowing for less spam
