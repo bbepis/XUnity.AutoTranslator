@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
+using XUnity.Common.Constants;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Shims
 {
@@ -99,7 +100,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Shims
       /// <returns></returns>
       public IEnumerator GetSupportedEnumerator()
       {
-         if( CoroutineHelper.SupportsCustomYieldInstruction() ) // requires Unity 5.3 or later
+         if( UnityFeatures.SupportsCustomYieldInstruction ) // requires Unity 5.3 or later
          {
             yield return this;
          }

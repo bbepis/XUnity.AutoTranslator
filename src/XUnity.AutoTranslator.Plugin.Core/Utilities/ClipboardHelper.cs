@@ -14,16 +14,8 @@ using UnhollowerRuntimeLib;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
-   /// <summary>
-   /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-   /// </summary>
    internal static class ClipboardHelper
    {
-      /// <summary>
-      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
-      /// </summary>
-      /// <param name="lines"></param>
-      /// <param name="maxCharacters"></param>
       public static void CopyToClipboard( IEnumerable<string> lines, int maxCharacters )
       {
          var texts = lines.ToList();

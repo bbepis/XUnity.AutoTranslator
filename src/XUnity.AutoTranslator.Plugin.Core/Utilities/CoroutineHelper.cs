@@ -13,11 +13,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
    /// </summary>
    public static class CoroutineHelper
    {
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="seconds"></param>
+      /// <returns></returns>
       public static WaitForSeconds CreateWaitForSeconds( float seconds )
       {
          return new WaitForSeconds( seconds );
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="delay"></param>
+      /// <returns></returns>
       public static IEnumerator CreateWaitForSecondsRealtime( float delay )
       {
          // Could be bad... WaitForSecondsRealtime could be shimmed away, even if IEnumerator is supported
@@ -33,11 +43,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return new WaitForSecondsRealtime( delay );
       }
 
-      public static bool SupportsCustomYieldInstruction()
-      {
-         return UnityFeatures.SupportsCustomYieldInstruction;
-      }
-
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="coroutine"></param>
+      /// <returns></returns>
       public static Coroutine Start( IEnumerator coroutine )
       {
 #if IL2CPP
@@ -49,6 +59,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
       }
 
+      /// <summary>
+      /// WARNING: Pubternal API (internal). Do not use. May change during any update.
+      /// </summary>
+      /// <param name="coroutine"></param>
       public static void Stop( Coroutine coroutine )
       {
          PluginLoader.MonoBehaviour.StopCoroutine( coroutine );
