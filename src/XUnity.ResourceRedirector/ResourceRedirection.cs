@@ -548,13 +548,23 @@ namespace XUnity.ResourceRedirector
          return result != null;
       }
 
+      internal static bool ShouldBlockAsyncOperationMethods( AssetBundleRequest operation )
+      {
+         return TryGetAssetBundleLoadInfo( operation, out var result ) && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets;
+      }
+
+      internal static bool ShouldBlockAsyncOperationMethods( AssetBundleCreateRequest operation )
+      {
+         return TryGetAssetBundle( operation, out var result ) && result.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle;
+      }
+
       internal static bool ShouldBlockAsyncOperationMethods( AsyncOperation operation )
       {
          return SyncOverAsyncEnabled
             && (
-               ( operation.TryCastTo<AssetBundleRequest>( out var r1 ) && TryGetAssetBundleLoadInfo( r1, out var result ) && result.ResolveType == AsyncAssetLoadingResolve.ThroughAssets )
+               ( operation.TryCastTo<AssetBundleRequest>( out var r1 ) && ShouldBlockAsyncOperationMethods( r1 ) )
                ||
-               ( operation.TryCastTo<AssetBundleCreateRequest>( out var r2 ) && TryGetAssetBundle( r2, out var result2 ) && result2.ResolveType == AsyncAssetBundleLoadingResolve.ThroughBundle )
+               ( operation.TryCastTo<AssetBundleCreateRequest>( out var r2 ) && ShouldBlockAsyncOperationMethods( r2 ) )
             );
       }
 

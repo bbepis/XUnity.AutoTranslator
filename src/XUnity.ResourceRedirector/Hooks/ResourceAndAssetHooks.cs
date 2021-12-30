@@ -155,7 +155,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static bool Prefix( AssetBundleCreateRequest __instance )
       {
-         return !ResourceRedirection.TryGetAssetBundle( __instance, out _ );
+         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
 #if MANAGED
@@ -193,7 +193,7 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static bool Prefix( AssetBundleCreateRequest __instance, bool set )
       {
-         return !ResourceRedirection.TryGetAssetBundle( __instance, out var result );
+         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
       }
 
 #if MANAGED
