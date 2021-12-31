@@ -30,7 +30,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly string EnglishLanguage = "en";
       public static readonly string Romaji = "romaji";
       public static readonly int MaxErrors = 5;
-      public static readonly float ClipboardDebounceTime = 1.250f;
       public static readonly int MaxTranslationsBeforeShutdown = 8000;
       public static readonly int MaxUnstartedJobs = 4000;
       public static readonly float IncreaseBatchOperationsEvery = 30;
@@ -165,6 +164,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
       public static bool CopyToClipboard;
       public static int MaxClipboardCopyCharacters;
+      public static float ClipboardDebounceTime;
 
       public static void Configure()
       {
@@ -240,6 +240,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             ForceSplitTextAfterCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceSplitTextAfterCharacters", 0 );
             CopyToClipboard = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CopyToClipboard", false );
             MaxClipboardCopyCharacters = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxClipboardCopyCharacters", 2500 );
+            ClipboardDebounceTime = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ClipboardDebounceTime", 1.25f );
             EnableUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableUIResizing", true );
             EnableBatching = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "EnableBatching", true );
             UseStaticTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "UseStaticTranslations", true );
@@ -308,6 +309,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             LogAllLoadedResources = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "LogAllLoadedResources", false );
             EnableDumping = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "EnableDumping", false );
             CacheMetadataForAllFiles = PluginEnvironment.Current.Preferences.GetOrDefault( "ResourceRedirector", "CacheMetadataForAllFiles", true );
+
+            if( ClipboardDebounceTime < 0.1f )
+            {
+               XuaLogger.AutoTranslator.Warn( "'ClipboardDebounceTime' must not be lower than 0.1. Setting it to that..." );
+
+               ClipboardDebounceTime = 0.1f;
+
+            }
 
             if( CacheMetadataForAllFiles && EnableDumping )
             {

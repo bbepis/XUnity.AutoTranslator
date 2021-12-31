@@ -310,11 +310,12 @@ MinDialogueChars=20              ;The length of the text for it to be considered
 ForceSplitTextAfterCharacters=0  ;Split text into multiple lines once the translated text exceeds this number of characters
 CopyToClipboard=False            ;Whether or not to copy hooked texts to clipboard
 MaxClipboardCopyCharacters=450   ;Max number of characters to hook to clipboard at a time
+ClipboardDebounceTime=1.25       ;The number of seconds it takes for hooked text to reach the clipboard. Minimum is 0.1
 EnableUIResizing=True            ;Whether or not the plugin should provide a "best attempt" at resizing UI components upon translation
 EnableBatching=True              ;Indicates whether batching of translations should be enabled for supported endpoints
 UseStaticTranslations=True       ;Indicates whether or not to use translations from the included static translation cache
 OverrideFont=                    ;Overrides the fonts used for texts when updating text components. NOTE: Only works for UGUI
-OverrideFontTextMeshPro=         ;Overrides the fonts used for texts when updating text components. NOTE: Only works for TextMeshPro
+OverrideFontTextMeshPro=         ;Consider using FallbackFontTextMeshPro instead. Overrides the fonts used for texts when updating text components. NOTE: Only works for TextMeshPro
 FallbackFontTextMeshPro=         ;Adds a fallback font for TextMeshPro in case a specific character is not supported. This is recommended over OverrideFontTextMeshPro
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
@@ -450,7 +451,7 @@ By default, the plugin will attempt some basic auto-resizing behaviour, which ar
  * `ForceUIResizing`: Resizes all components at all times, period.
  * `ResizeUILineSpacingScale`: Changes the line spacing of resized components. UGUI only.
  * `OverrideFont`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. UGUI only.
- * `OverrideFontTextMeshPro`: Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only. This option is able to load a font in two different ways. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle (requires Unity 2018 or greater (or alternatively a custom asset bundle built specifically for the targeted game)). If not, it will be attempted to be loaded through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
+ * `OverrideFontTextMeshPro`: Consider using `FallbackFontTextMeshPro` instead. Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only. This option is able to load a font in two different ways. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle (requires Unity 2018 or greater (or alternatively a custom asset bundle built specifically for the targeted game)). If not, it will be attempted to be loaded through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
  * `FallbackFontTextMeshPro`: Adds a fallback font that TextMesh Pro can use in case a specific character is not supported.
 
 An additional note on changing the font of TextMeshPro: You can download some pre-built asset bundles for Unity 2018 and 2019 in the release tab, but for now, they are not particularly well tested. If you want to try them out, simply download the .zip folder and put one of the font assets into the game folder. Then configure it up by writing the name of the file in the configuration file in `OverrideFontTextMeshPro`.
@@ -500,6 +501,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `TextGetterCompatibilityMode`: This mode fools the game into thinking that the text displayed is not translated. This is required if the game uses text displayed to the user to determine what logic to execute. You can easily determine if this is required if you can see the functionality works fine if you toggle the translation off (hotkey: ALT+T).
  * `IgnoreTextStartingWith`: Disable translation for any texts starting with values in this ';-separated' setting. The [default value](https://www.charbase.com/180e-unicode-mongolian-vowel-separator) is an invisible character that takes up no space.
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
+ * `ClipboardDebounceTime`: The delay between hooking a text and it being copied to clipboard. This is to avoid spamming the clipboard. If multiple texts appear in this period they will be concatenated.
  * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations.
  * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
  * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. Enabling this may also output a lot of garbage to the `OutputFile` that should be deleted before potential redistribution. **Never redistribute the mod with this enabled.**
