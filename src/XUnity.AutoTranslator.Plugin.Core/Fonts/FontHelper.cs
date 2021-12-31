@@ -11,11 +11,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
 {
    internal static class FontHelper
    {
-      public static UnityEngine.Object GetTextMeshProFont()
+      public static UnityEngine.Object GetTextMeshProFont( string assetBundle )
       {
          UnityEngine.Object font = null;
 
-         var overrideFontPath = Path.Combine( Paths.GameRoot, Settings.OverrideFontTextMeshPro );
+         var overrideFontPath = Path.Combine( Paths.GameRoot, assetBundle );
          if( File.Exists( overrideFontPath ) )
          {
             XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from asset bundle." );
@@ -41,23 +41,23 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
                return null;
             }
 
-            if( UnityTypes.FontAsset != null )
+            if( UnityTypes.TMP_FontAsset != null )
             {
                if( UnityTypes.AssetBundle_Methods.LoadAllAssets != null )
                {
 #if MANAGED
-                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.TMP_FontAsset.UnityType } );
 #else
-                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAllAssets.Invoke( bundle, new object[] { UnityTypes.TMP_FontAsset.UnityType } );
 #endif
                   font = assets?.FirstOrDefault();
                }
                else if( UnityTypes.AssetBundle_Methods.LoadAll != null )
                {
 #if MANAGED
-                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+                  var assets = (UnityEngine.Object[])UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.TMP_FontAsset.UnityType } );
 #else
-                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.FontAsset.UnityType } );
+                  var assets = (UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object>)UnityTypes.AssetBundle_Methods.LoadAll.Invoke( bundle, new object[] { UnityTypes.TMP_FontAsset.UnityType } );
 #endif
                   font = assets?.FirstOrDefault();
                }
@@ -67,16 +67,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          {
             XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from internal Resources API." );
 
-            font = Resources.Load( Settings.OverrideFontTextMeshPro );
+            font = Resources.Load( assetBundle );
          }
 
          if( font != null )
          {
+            var versionProperty = UnityTypes.TMP_FontAsset_Properties.Version;
+            var version = (string)versionProperty?.Get( font ) ?? "Unknown";
+            XuaLogger.AutoTranslator.Info( $"Loaded TextMesh Pro font uses version: {version}" );
+
+            if( versionProperty != null && Settings.TextMeshProVersion != null && version != Settings.TextMeshProVersion )
+            {
+               XuaLogger.AutoTranslator.Warn( $"TextMesh Pro version mismatch. Font asset version: {version}, TextMesh Pro version: {Settings.TextMeshProVersion}" );
+            }
+
             GameObject.DontDestroyOnLoad( font );
          }
          else
          {
-            XuaLogger.AutoTranslator.Error( "Could not find the TextMeshPro font asset: " + Settings.OverrideFontTextMeshPro );
+            XuaLogger.AutoTranslator.Error( "Could not find the TextMeshPro font asset: " + assetBundle );
          }
 
          return font;

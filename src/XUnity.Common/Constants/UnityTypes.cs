@@ -90,7 +90,8 @@ namespace XUnity.Common.Constants
       public static readonly TypeContainer TMP_Text = FindType( "TMPro.TMP_Text" );
       public static readonly TypeContainer TextMeshProUGUI = FindType( "TMPro.TextMeshProUGUI" );
       public static readonly TypeContainer TextMeshPro = FindType( "TMPro.TextMeshPro" );
-      public static readonly TypeContainer FontAsset = FindType( "TMPro.TMP_FontAsset" );
+      public static readonly TypeContainer TMP_FontAsset = FindType( "TMPro.TMP_FontAsset" );
+      public static readonly TypeContainer TMP_Settings = FindType( "TMPro.TMP_Settings" );
 
       // Unity
       public static readonly TypeContainer GameObject = FindType( "UnityEngine.GameObject" );
@@ -158,6 +159,17 @@ namespace XUnity.Common.Constants
 
       // Assets.System (what engine is this?)
       public static readonly TypeContainer TextWindow = FindType( "Assets.System.Text.TextWindow" );
+
+      public static class TMP_Settings_Properties
+      {
+         public static CachedProperty Version = UnityTypes.TMP_Settings?.ClrType.CachedProperty( "version" );
+         public static CachedProperty FallbackFontAssets = UnityTypes.TMP_Settings?.ClrType.CachedProperty( "fallbackFontAssets" );
+      }
+
+      public static class TMP_FontAsset_Properties
+      {
+         public static CachedProperty Version = UnityTypes.TMP_FontAsset?.ClrType.CachedProperty( "version" );
+      }
 
       public static class AdvUguiMessageWindow_Properties
       {

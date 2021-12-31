@@ -13,8 +13,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
    internal static class FontCache
    {
       private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
-      private static bool _hasReadTextMeshProFont = false;
-      private static object TextMeshProOverrideFont;
+      private static bool _hasReadOverrideFontTextMeshPro = false;
+      private static object OverrideFontTextMeshPro;
+      private static bool _hasReadFallbackFontTextMeshPro = false;
+      private static object FallbackFontTextMeshPro;
 
       public static Font GetOrCreate( int size )
       {
@@ -26,14 +28,14 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          return font;
       }
 
-      public static object GetOrCreateTextMeshProFont()
+      public static object GetOrCreateOverrideFontTextMeshPro()
       {
-         if( !_hasReadTextMeshProFont )
+         if( !_hasReadOverrideFontTextMeshPro )
          {
             try
             {
-               _hasReadTextMeshProFont = true;
-               TextMeshProOverrideFont = FontHelper.GetTextMeshProFont();
+               _hasReadOverrideFontTextMeshPro = true;
+               OverrideFontTextMeshPro = FontHelper.GetTextMeshProFont( Settings.OverrideFontTextMeshPro );
             }
             catch( Exception e )
             {
@@ -41,7 +43,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
             }
          }
 
-         return TextMeshProOverrideFont;
+         return OverrideFontTextMeshPro;
+      }
+
+      public static object GetOrCreateFallbackFontTextMeshPro()
+      {
+         if( !_hasReadFallbackFontTextMeshPro )
+         {
+            try
+            {
+               _hasReadFallbackFontTextMeshPro = true;
+               FallbackFontTextMeshPro = FontHelper.GetTextMeshProFont( Settings.FallbackFontTextMeshPro );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while loading text mesh pro fasllback font: " + Settings.FallbackFontTextMeshPro );
+            }
+         }
+
+         return FallbackFontTextMeshPro;
       }
    }
 }

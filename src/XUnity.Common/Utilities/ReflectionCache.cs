@@ -280,12 +280,12 @@ namespace XUnity.Common.Utilities
       {
          if( propertyInfo.CanRead )
          {
-            _get = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetGetMethod() );
+            _get = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetGetMethod( true ) );
          }
 
          if( propertyInfo.CanWrite )
          {
-            _set = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetSetMethod() );
+            _set = CustomFastReflectionHelper.CreateFastDelegate( propertyInfo.GetSetMethod( true ) );
          }
 
          PropertyType = propertyInfo.PropertyType;

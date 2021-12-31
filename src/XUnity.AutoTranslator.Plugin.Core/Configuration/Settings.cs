@@ -21,6 +21,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
    internal static class Settings
    {
       // cannot be changed
+      public static string TextMeshProVersion = null;
       public static readonly int MaxFailuresForSameTextPerEndpoint = 3;
       public static readonly string TranslatorsFolder = "Translators";
       public static readonly int MaxMaxCharactersPerTranslation = 2500;
@@ -103,6 +104,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string OverrideFont;
       public static int? OverrideFontSize;
       public static string OverrideFontTextMeshPro;
+      public static string FallbackFontTextMeshPro;
       public static string UserAgent;
       public static bool DisableCertificateValidation;
       public static float? ResizeUILineSpacingScale;
@@ -199,6 +201,20 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
                XuaLogger.AutoTranslator.Warn( e, "An error occurred while trying to determine the game resolution." );
             }
 
+            try
+            {
+               var versionProperty = UnityTypes.TMP_Settings_Properties.Version;
+               if( versionProperty != null )
+               {
+                  TextMeshProVersion = (string)versionProperty.Get( null );
+                  XuaLogger.AutoTranslator.Info( $"Version of TextMesh Pro: {TextMeshProVersion}." );
+               }
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Warn( e, "An error occurred while trying to determine TextMesh Pro version." );
+            }
+
             ServiceEndpoint = PluginEnvironment.Current.Preferences.GetOrDefault( "Service", "Endpoint", KnownTranslateEndpointNames.GoogleTranslateV2 );
             FallbackServiceEndpoint = PluginEnvironment.Current.Preferences.GetOrDefault( "Service", "FallbackEndpoint", string.Empty );
 
@@ -230,6 +246,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             OverrideFont = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFont", string.Empty );
             OverrideFontSize = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontSize", (int?)null );
             OverrideFontTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OverrideFontTextMeshPro", string.Empty );
+            FallbackFontTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "FallbackFontTextMeshPro", string.Empty );
             ResizeUILineSpacingScale = PluginEnvironment.Current.Preferences.GetOrDefault<float?>( "Behaviour", "ResizeUILineSpacingScale", null );
             ForceUIResizing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ForceUIResizing", false );
             IgnoreTextStartingWith = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreTextStartingWith", "\\u180e;" )

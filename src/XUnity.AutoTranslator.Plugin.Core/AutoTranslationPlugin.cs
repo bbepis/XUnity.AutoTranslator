@@ -154,10 +154,31 @@ namespace XUnity.AutoTranslator.Plugin.Core
          // enable scene scan
          EnableSceneLoadScan();
 
+         // load fallback fonts
+         LoadFallbackFont();
+
          // load all translations from files
          LoadTranslations( false );
 
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
+      }
+
+      private static void LoadFallbackFont()
+      {
+         if( !string.IsNullOrEmpty( Settings.FallbackFontTextMeshPro ) )
+         {
+            var font = FontCache.GetOrCreateFallbackFontTextMeshPro();
+            if( UnityTypes.TMP_Settings_Properties.FallbackFontAssets == null )
+            {
+               XuaLogger.AutoTranslator.Info( $"Cannot use fallback font because it is not supported in this version." );
+               return;
+            }
+
+            var fallbacks = (IList)UnityTypes.TMP_Settings_Properties.FallbackFontAssets.Get( null );
+            fallbacks.Add( font );
+
+            XuaLogger.AutoTranslator.Info( $"Loaded fallback font for TextMesh Pro: " + Settings.FallbackFontTextMeshPro );
+         }
       }
 
       private static void InitializeHarmonyDetourBridge()

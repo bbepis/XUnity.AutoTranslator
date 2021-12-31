@@ -1,6 +1,7 @@
 ﻿### 5.0.0
  * FEATURE - Basic IL2CPP support through BepInEx 6 and MelonLoader
  * FEATURE - MelonLoader support
+ * FEATURE - Added FallbackFontTextMeshPro as an alternative to OverrideFontTextMeshPro. If game supports, it is recommended to use that instead
  * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
  * BUG FIX - Fixed text escapting error related to GoogleTranslateV2
 
