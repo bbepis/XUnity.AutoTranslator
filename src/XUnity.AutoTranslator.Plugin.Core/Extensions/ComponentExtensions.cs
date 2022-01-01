@@ -102,6 +102,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                manipulator = new TextArea2DComponentManipulator();
             }
+            else if( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.IsAssignableFrom( unityType ) )
+            {
+               manipulator = new UguiNovelTextComponentManipulator( ui.GetType() );
+            }
             else
             {
                manipulator = new DefaultTextComponentManipulator( ui.GetType() );

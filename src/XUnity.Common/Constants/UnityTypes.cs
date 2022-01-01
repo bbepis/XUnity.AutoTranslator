@@ -142,6 +142,7 @@ namespace XUnity.Common.Constants
 
       // Utage
       public static readonly TypeContainer UguiNovelText = FindType( "Utage.UguiNovelText" );
+      public static readonly TypeContainer UguiNovelTextGenerator = FindType( "Utage.UguiNovelTextGenerator" );
       public static readonly TypeContainer AdvEngine = FindType( "Utage.AdvEngine" );
       public static readonly TypeContainer AdvPage = FindType( "Utage.AdvPage" );
       public static readonly TypeContainer TextData = FindType( "Utage.TextData" );
@@ -169,6 +170,21 @@ namespace XUnity.Common.Constants
       public static class TMP_FontAsset_Properties
       {
          public static CachedProperty Version = UnityTypes.TMP_FontAsset?.ClrType.CachedProperty( "version" );
+      }
+
+      public static class UguiNovelText_Properties
+      {
+         public static CachedProperty TextGenerator = UnityTypes.UguiNovelText?.ClrType.CachedProperty( "TextGenerator" );
+      }
+
+      public static class UguiNovelText_Methods
+      {
+         public static CachedMethod SetAllDirty = UnityTypes.UguiNovelText?.ClrType.CachedMethod( "SetAllDirty" );
+      }
+
+      public static class UguiNovelTextGenerator_Methods
+      {
+         public static CachedMethod Refresh = UnityTypes.UguiNovelTextGenerator?.ClrType.CachedMethod( "Refresh" );
       }
 
       public static class AdvUguiMessageWindow_Properties

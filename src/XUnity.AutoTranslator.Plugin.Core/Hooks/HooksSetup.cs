@@ -148,7 +148,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for IMGUI." );
          }
 
-#if MANAGED
          try
          {
             HookingHelper.PatchAll( UtageHooks.All, Settings.ForceMonoModHooks );
@@ -157,7 +156,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for Utage." );
          }
-#endif
 
          try
          {

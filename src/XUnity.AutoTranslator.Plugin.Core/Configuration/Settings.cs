@@ -284,7 +284,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             OutputTooLongText = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "OutputTooLongText", false );
             TemplateAllNumberAway = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TemplateAllNumberAway", false );
             ReloadTranslationsOnFileChange = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ReloadTranslationsOnFileChange", false );
-            DisableTextMeshProScrollInEffects = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "DisableTextMeshProScrollInEffects", ApplicationName.Equals( "SamuraiVandalism", StringComparison.OrdinalIgnoreCase ) );
+            DisableTextMeshProScrollInEffects = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "DisableTextMeshProScrollInEffects", ApplicationName.Equals( "SamuraiVandalism", StringComparison.OrdinalIgnoreCase ) || UnityTypes.UguiNovelText != null );
             CacheParsedTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheParsedTranslations", false );
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );

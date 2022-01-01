@@ -4,7 +4,9 @@
  * FEATURE - Added FallbackFontTextMeshPro as an alternative to OverrideFontTextMeshPro. If game supports, it is recommended to use that instead
  * FEATURE - Added ClipboardDebounceTime that can control how long time between a text is shown until it reaches the clipboard
  * MISC - Renamed BepInEx plugin package from BepIn-5x to BepInEx
+ * MISC - UTAGE support re-implemented from scratch to better support IL2CPP
  * BUG FIX - Fixed text escapting error related to GoogleTranslateV2
+ * BUG FIX - Fixed issue that could cause texts not to be hooked in certain situations during component initialization
 
 ### 4.21.0
  * FEATURE - Added support for additional control over spam handling/translation delays to improve support for offline translators

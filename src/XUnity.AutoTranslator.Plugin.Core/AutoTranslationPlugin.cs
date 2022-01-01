@@ -786,7 +786,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          try
          {
-            if( ( _hasValidOverrideFont || Settings.ForceUIResizing ) && ui.IsComponentActive() )
+            var isComponentActive = ui.IsComponentActive();
+            if( ( _hasValidOverrideFont || Settings.ForceUIResizing ) && isComponentActive )
             {
                if( _hasValidOverrideFont )
                {
@@ -808,6 +809,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                return true;
             }
+            return isComponentActive;
          }
          catch( Exception e )
          {

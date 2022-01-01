@@ -22,114 +22,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
       public static readonly Type[] All = new[] {
          typeof( Text_text_Hook ),
          typeof( Text_OnEnable_Hook ),
-#if MANAGED
-         typeof( TextArea2D_text_Hook ),
-         typeof( TextArea2D_TextData_Hook ),
-         typeof( TextData_ctor_Hook ),
-#endif
       };
    }
-
-#if MANAGED
-   [HookingHelperPriority( HookPriority.Last )]
-   internal static class TextArea2D_text_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return UnityTypes.TextArea2D != null;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Property( UnityTypes.TextArea2D.ClrType, "text" )?.GetSetMethod();
-      }
-
-      static void Postfix( object __instance )
-      {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-      }
-
-      static Action<object, string> _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<Action<object, string>>();
-      }
-
-      static void MM_Detour( object __instance, string value )
-      {
-         _original( __instance, value );
-
-         Postfix( __instance );
-      }
-   }
-
-   [HookingHelperPriority( HookPriority.Last )]
-   internal static class TextArea2D_TextData_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return UnityTypes.TextArea2D != null;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return AccessToolsShim.Property( UnityTypes.TextArea2D.ClrType, "TextData" )?.GetSetMethod();
-      }
-
-      static void Postfix( object __instance )
-      {
-         AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
-      }
-
-      static Action<object, object> _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<Action<object, object>>();
-      }
-
-      static void MM_Detour( object __instance, object value )
-      {
-         _original( __instance, value );
-
-         Postfix( __instance );
-      }
-   }
-
-   [HookingHelperPriority( HookPriority.Last )]
-   internal static class TextData_ctor_Hook
-   {
-      static bool Prepare( object instance )
-      {
-         return UnityTypes.TextData != null;
-      }
-
-      static MethodBase TargetMethod( object instance )
-      {
-         return UnityTypes.TextData.ClrType.GetConstructor( new[] { typeof( string ) } );
-      }
-
-      static void Postfix( object __instance, string text )
-      {
-         __instance.SetExtensionData( text );
-      }
-
-      static Action<object, string> _original;
-
-      static void MM_Init( object detour )
-      {
-         _original = detour.GenerateTrampolineEx<Action<object, string>>();
-      }
-
-      static void MM_Detour( object __instance, string text )
-      {
-         _original( __instance, text );
-
-         Postfix( __instance, text );
-      }
-   }
-#endif
 
    [HookingHelperPriority( HookPriority.Last )]
    internal static class Text_text_Hook
@@ -210,11 +104,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI
 
       static void Postfix( Component __instance )
       {
-         if( __instance.GetUnityType().IsAssignableFrom( UnityTypes.Text.UnityType ) )
+         if( UnityTypes.Text.IsAssignableFrom( __instance.GetUnityType() ) )
          {
 #if IL2CPP
             __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.Text.ClrType );
 #endif
+
             _Postfix( __instance );
          }
       }
