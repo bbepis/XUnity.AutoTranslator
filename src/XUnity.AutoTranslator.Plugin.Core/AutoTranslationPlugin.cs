@@ -726,6 +726,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   info.TextCache = CallOrigin.TextCache;
                }
 
+               //XuaLogger.AutoTranslator.Warn( ui.GetText( info ) );
+
                TranslateOrQueueWebJob( ui, null, isComponentActive, info );
             }
             catch( Exception e )

@@ -22,16 +22,19 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          typeof( TeshMeshProUGUI_OnEnable_Hook ),
          typeof( TeshMeshPro_OnEnable_Hook ),
          typeof( TMP_Text_text_Hook ),
+
+         typeof( TMP_Text_SetText_Hook1 ),
+         typeof( TMP_Text_SetText_Hook2 ),
+         typeof( TMP_Text_SetText_Hook3 ),
+
+         typeof( TMP_Text_SetCharArray_Hook1 ),
+         typeof( TMP_Text_SetCharArray_Hook2 ),
+         typeof( TMP_Text_SetCharArray_Hook3 ),
+
 #if MANAGED
          typeof( TextWindow_SetText_Hook ),
          typeof( TeshMeshProUGUI_text_Hook ),
          typeof( TeshMeshPro_text_Hook ),
-         typeof( TMP_Text_SetText_Hook1 ),
-         typeof( TMP_Text_SetText_Hook2 ),
-         typeof( TMP_Text_SetText_Hook3 ),
-         typeof( TMP_Text_SetCharArray_Hook1 ),
-         typeof( TMP_Text_SetCharArray_Hook2 ),
-         typeof( TMP_Text_SetCharArray_Hook3 ),
 #endif
       };
 
@@ -41,7 +44,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
    }
 
 #if MANAGED
-
    [HookingHelperPriority( HookPriority.Last )]
    internal static class TextWindow_SetText_Hook
    {
@@ -140,7 +142,8 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          Postfix( __instance );
       }
    }
-   
+#endif
+
    [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook1
    {
@@ -151,27 +154,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( StringBuilder ) } );
+#if MANAGED
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetText", new[] { typeof( StringBuilder ) } );
+#else
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetText", new[] { typeof( Il2CppSystem.Text.StringBuilder ) } );
+#endif
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
+#if IL2CPP
+         __instance = (Component)Il2CppUtilities.CreateProxyComponentWithDerivedType( __instance.Pointer, UnityTypes.TMP_Text.ClrType );
+#endif
+
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static Action<object, StringBuilder> _original;
+#if MANAGED
+      static Action<Component, StringBuilder> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, StringBuilder>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, StringBuilder>>();
       }
 
-      static void MM_Detour( object __instance, StringBuilder value )
+      static void MM_Detour( Component __instance, StringBuilder value )
       {
          _original( __instance, value );
 
          Postfix( __instance );
       }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
@@ -184,34 +197,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( string ), typeof( bool ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetText", new[] { typeof( string ), typeof( bool ) } );
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static Action<object, string, bool> _original;
+#if MANAGED
+      static Action<Component, string, bool> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, string, bool>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, string, bool>>();
       }
 
-      static void MM_Detour( object __instance, string value, bool arg2 )
+      static void MM_Detour( Component __instance, string value, bool arg2 )
       {
          _original( __instance, value, arg2 );
 
          Postfix( __instance );
       }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
    internal static class TMP_Text_SetText_Hook3
    {
-      delegate void OriginalMethod( object arg1, string arg2, float arg3, float arg4, float arg5 );
-
       static bool Prepare( object instance )
       {
          return UnityTypes.TMP_Text != null;
@@ -222,10 +235,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetText", new[] { typeof( string ), typeof( float ), typeof( float ), typeof( float ) } );
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
+
+#if MANAGED
+      delegate void OriginalMethod( Component arg1, string arg2, float arg3, float arg4, float arg5 );
 
       static OriginalMethod _original;
 
@@ -234,12 +250,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
          _original = detour.GenerateTrampolineEx<OriginalMethod>();
       }
 
-      static void MM_Detour( object __instance, string value, float arg2, float arg3, float arg4 )
+      static void MM_Detour( Component __instance, string value, float arg2, float arg3, float arg4 )
       {
          _original( __instance, value, arg2, arg3, arg4 );
 
          Postfix( __instance );
       }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
@@ -252,27 +269,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( char[] ) } );
+#if MANAGED
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( char[] ) } );
+#else
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<char> ) } );
+#endif
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static Action<object, char[]> _original;
+#if MANAGED
+      static Action<Component, char[]> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, char[]>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, char[]>>();
       }
 
-      static void MM_Detour( object __instance, char[] value )
+      static void MM_Detour( Component __instance, char[] value )
       {
          _original( __instance, value );
 
          Postfix( __instance );
       }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
@@ -285,27 +308,33 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
+#if MANAGED
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
+#else
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<char> ), typeof( int ), typeof( int ) } );
+#endif
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static Action<object, char[], int, int> _original;
+#if MANAGED
+      static Action<Component, char[], int, int> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, char[], int, int>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, char[], int, int>>();
       }
 
-      static void MM_Detour( object __instance, char[] value, int arg2, int arg3 )
+      static void MM_Detour( Component __instance, char[] value, int arg2, int arg3 )
       {
          _original( __instance, value, arg2, arg3 );
 
          Postfix( __instance );
       }
+#endif
    }
 
    [HookingHelperPriority( HookPriority.Last )]
@@ -318,29 +347,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 
       static MethodBase TargetMethod( object instance )
       {
-         return AccessToolsShim.Method( UnityTypes.TMP_Text.ClrType, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
+#if MANAGED
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
+#else
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<int> ), typeof( int ), typeof( int ) } );
+#endif
       }
 
-      static void Postfix( object __instance )
+      static void Postfix( Component __instance )
       {
          AutoTranslationPlugin.Current.Hook_TextChanged( __instance, false );
       }
 
-      static Action<object, int[], int, int> _original;
+#if MANAGED
+      static Action<Component, int[], int, int> _original;
 
       static void MM_Init( object detour )
       {
-         _original = detour.GenerateTrampolineEx<Action<object, int[], int, int>>();
+         _original = detour.GenerateTrampolineEx<Action<Component, int[], int, int>>();
       }
 
-      static void MM_Detour( object __instance, int[] value, int arg2, int arg3 )
+      static void MM_Detour( Component __instance, int[] value, int arg2, int arg3 )
       {
          _original( __instance, value, arg2, arg3 );
 
          Postfix( __instance );
       }
-   }
 #endif
+   }
 
    [HookingHelperPriority( HookPriority.Last )]
    internal static class TeshMeshProUGUI_OnEnable_Hook
