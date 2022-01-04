@@ -172,6 +172,11 @@ namespace XUnity.Common.Constants
          public static CachedProperty Version = UnityTypes.TMP_FontAsset?.ClrType.CachedProperty( "version" );
       }
 
+      public static class AdvScenarioData_Properties
+      {
+         public static CachedProperty ScenarioLabels = UnityTypes.AdvScenarioData?.ClrType.CachedProperty( "ScenarioLabels" );
+      }
+
       public static class UguiNovelText_Properties
       {
          public static CachedProperty TextGenerator = UnityTypes.UguiNovelText?.ClrType.CachedProperty( "TextGenerator" );

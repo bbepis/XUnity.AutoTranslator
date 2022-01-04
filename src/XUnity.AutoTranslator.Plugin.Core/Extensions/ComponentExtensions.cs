@@ -98,10 +98,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
             {
                manipulator = new FairyGUITextComponentManipulator();
             }
+#if MANAGED
             else if( UnityTypes.TextArea2D != null && UnityTypes.TextArea2D.IsAssignableFrom( unityType ) )
             {
                manipulator = new TextArea2DComponentManipulator();
             }
+#endif
             else if( UnityTypes.UguiNovelText != null && UnityTypes.UguiNovelText.IsAssignableFrom( unityType ) )
             {
                manipulator = new UguiNovelTextComponentManipulator( ui.GetType() );

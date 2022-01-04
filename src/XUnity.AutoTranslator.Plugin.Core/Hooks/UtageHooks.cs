@@ -21,9 +21,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          typeof( AdvEngine_JumpScenario_Hook ),
          typeof( UguiNovelTextGenerator_LengthOfView_Hook ),
 
+#if MANAGED
          typeof( TextArea2D_text_Hook ),
          typeof( TextArea2D_TextData_Hook ),
          typeof( TextData_ctor_Hook ),
+#endif
       };
    }
    

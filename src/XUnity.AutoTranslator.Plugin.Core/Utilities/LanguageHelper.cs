@@ -38,11 +38,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          "ja", "zh", "zh-CN", "zh-TW", "zh-Hans", "zh-Hant"
       };
 
-      internal static bool IsFromLanguageSupported( string code )
-      {
-         return LanguageSymbolChecks.ContainsKey( code );
-      }
-
       internal static bool RequiresWhitespaceUponLineMerging( string code )
       {
          return !LanguagesNotUsingWhitespaceBetweenWords.Contains( code );

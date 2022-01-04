@@ -382,14 +382,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void ValidateConfiguration()
       {
-         // check if language is supported
-         if( !LanguageHelper.IsFromLanguageSupported( Settings.FromLanguage ) )
-         {
-            XuaLogger.AutoTranslator.Error( $"The plugin has been configured to use the 'FromLanguage={Settings.FromLanguage}'. This language is not supported. Shutting plugin down." );
-
-            Settings.IsShutdown = true;
-         }
-
          // check if font is supported
          try
          {
