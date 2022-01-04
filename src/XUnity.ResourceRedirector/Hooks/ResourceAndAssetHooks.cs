@@ -1594,9 +1594,16 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Property( UnityTypes.AsyncOperation?.ClrType, "isDone" )?.GetGetMethod();
       }
 
-      static bool Prefix( AsyncOperation __instance )
+      static bool Prefix( AsyncOperation __instance, ref bool __result )
       {
-         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance ) )
+         {
+            __result = true;
+
+            return false;
+         }
+
+         return true;
       }
 
 #if MANAGED
@@ -1611,11 +1618,12 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static bool MM_Detour( AsyncOperation __instance )
       {
-         if( Prefix( __instance ) )
+         bool __result = default;
+         if( Prefix( __instance, ref __result ) )
          {
-            return _original( __instance );
+            __result = _original( __instance );
          }
-         return true;
+         return __result;
       }
 #endif
    }
@@ -1632,9 +1640,16 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Property( UnityTypes.AsyncOperation?.ClrType, "progress" )?.GetGetMethod();
       }
 
-      static bool Prefix( AsyncOperation __instance )
+      static bool Prefix( AsyncOperation __instance, ref float __result )
       {
-         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance ) )
+         {
+            __result = 100f;
+
+            return false;
+         }
+
+         return true;
       }
 
 #if MANAGED
@@ -1649,12 +1664,13 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static float MM_Detour( AsyncOperation __instance )
       {
-         if( Prefix( __instance ) )
+         float __result = default;
+         if( Prefix( __instance, ref __result ) )
          {
-            return _original( __instance );
+            __result = _original( __instance );
          }
 
-         return 100.0f;
+         return __result;
       }
 #endif
    }
@@ -1671,9 +1687,16 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Property( UnityTypes.AsyncOperation?.ClrType, "priority" )?.GetGetMethod();
       }
 
-      static bool Prefix( AsyncOperation __instance )
+      static bool Prefix( AsyncOperation __instance, ref int __result )
       {
-         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance ) )
+         {
+            __result = 0;
+
+            return false;
+         }
+
+         return true;
       }
 
 #if MANAGED
@@ -1688,12 +1711,13 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static int MM_Detour( AsyncOperation __instance )
       {
-         if( Prefix( __instance ) )
+         int __result = default;
+         if( Prefix( __instance, ref __result ) )
          {
-            return _original( __instance );
+            __result = _original( __instance );
          }
 
-         return 0;
+         return __result;
       }
 #endif
    }
@@ -1747,9 +1771,16 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Property( UnityTypes.AsyncOperation?.ClrType, "allowSceneActivation" )?.GetGetMethod();
       }
 
-      static bool Prefix( AsyncOperation __instance )
+      static bool Prefix( AsyncOperation __instance, ref bool __result )
       {
-         return !ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance );
+         if( ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance ) )
+         {
+            __result = true;
+
+            return false;
+         }
+
+         return true;
       }
 
 #if MANAGED
@@ -1764,11 +1795,12 @@ namespace XUnity.ResourceRedirector.Hooks
 
       static bool MM_Detour( AsyncOperation __instance )
       {
-         if( Prefix( __instance ) )
+         bool __result = default;
+         if( Prefix( __instance, ref __result ) )
          {
-            return _original( __instance );
+            __result = _original( __instance );
          }
-         return true; // do not believe this has an impact
+         return __result; // do not believe this has an impact
       }
 #endif
    }
