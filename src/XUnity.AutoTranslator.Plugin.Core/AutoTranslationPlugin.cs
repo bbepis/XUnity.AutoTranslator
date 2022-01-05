@@ -165,19 +165,31 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static void LoadFallbackFont()
       {
-         if( !string.IsNullOrEmpty( Settings.FallbackFontTextMeshPro ) )
+         try
          {
-            var font = FontCache.GetOrCreateFallbackFontTextMeshPro();
-            if( UnityTypes.TMP_Settings_Properties.FallbackFontAssets == null )
+            if( !string.IsNullOrEmpty( Settings.FallbackFontTextMeshPro ) )
             {
-               XuaLogger.AutoTranslator.Info( $"Cannot use fallback font because it is not supported in this version." );
-               return;
+               var font = FontCache.GetOrCreateFallbackFontTextMeshPro();
+               if( UnityTypes.TMP_Settings_Properties.FallbackFontAssets == null )
+               {
+                  XuaLogger.AutoTranslator.Info( $"Cannot use fallback font because it is not supported in this version." );
+                  return;
+               }
+
+#if MANAGED
+               var fallbacks = (IList)UnityTypes.TMP_Settings_Properties.FallbackFontAssets.Get( null );
+#else
+               var fallbacksObj = (Il2CppSystem.Object)UnityTypes.TMP_Settings_Properties.FallbackFontAssets.Get( null );
+               fallbacksObj.TryCastTo<Il2CppSystem.Collections.IList>( out var fallbacks );
+#endif
+               fallbacks.Add( font );
+
+               XuaLogger.AutoTranslator.Info( $"Loaded fallback font for TextMesh Pro: " + Settings.FallbackFontTextMeshPro );
             }
-
-            var fallbacks = (IList)UnityTypes.TMP_Settings_Properties.FallbackFontAssets.Get( null );
-            fallbacks.Add( font );
-
-            XuaLogger.AutoTranslator.Info( $"Loaded fallback font for TextMesh Pro: " + Settings.FallbackFontTextMeshPro );
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while trying to load fallback font for TextMesh Pro." );
          }
       }
 
@@ -1412,7 +1424,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-      #region IInternalTranslator
+#region IInternalTranslator
 
       private ComponentTranslationContext InvokeOnTranslatingCallback( object textComponent, string untranslatedText, TextTranslationInfo info )
       {
@@ -1542,7 +1554,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return false;
       }
 
-      #endregion
+#endregion
 
       private InternalTranslationResult Translate(
          string text,

@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public sealed class AssetBundle : Object
    {
+      public AssetBundle( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public Object mainAsset
       {
          get;

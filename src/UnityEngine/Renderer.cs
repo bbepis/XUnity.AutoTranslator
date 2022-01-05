@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public class Renderer : Component
    {
+      public Renderer() : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       internal Transform staticBatchRootTransform
       {
          get;

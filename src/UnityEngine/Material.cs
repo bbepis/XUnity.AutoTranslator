@@ -12,6 +12,7 @@ namespace UnityEngine
 {
    public class Material : Object
    {
+      public Material( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
       public Shader shader
       {
          get;
@@ -102,20 +103,11 @@ namespace UnityEngine
       }
 
       [Obsolete( "Creating materials from shader source string is no longer supported. Use Shader assets instead." )]
-      public Material( string contents )
-      {
-         Internal_CreateWithString( this, contents );
-      }
+      public Material( string contents ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public Material( Shader shader )
-      {
-         Internal_CreateWithShader( this, shader );
-      }
+      public Material( Shader shader ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public Material( Material source )
-      {
-         Internal_CreateWithMaterial( this, source );
-      }
+      public Material( Material source ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
       private extern void SetFloatImpl( int nameID, float value );
 

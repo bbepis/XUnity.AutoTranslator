@@ -21,18 +21,14 @@ namespace UnityEngine
       public int lineHeight => throw new NotImplementedException();
 
       public int fontSize => throw new NotImplementedException();
+      public Font( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public Font()
-      {
-      }
 
-      public Font( string name )
-      {
-      }
+      public Font() : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      private Font( string[] names, int size )
-      {
-      }
+      public Font( string name ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
+      private Font( string[] names, int size ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
       public static extern string[] GetOSInstalledFontNames();
 

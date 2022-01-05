@@ -216,9 +216,7 @@ namespace UnityEngine
          get;
       }
 
-      protected Transform()
-      {
-      }
+      protected Transform() : base( IntPtr.Zero ) => throw new NotImplementedException();
 
       private extern void INTERNAL_get_position( out Vector3 value );
 

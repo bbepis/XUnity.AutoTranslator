@@ -96,29 +96,13 @@ namespace UnityEngine
 
       public GameObject gameObject => this;
 
-      public GameObject(IntPtr pointer)
-      {
+      public GameObject( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      }
+      public GameObject( string name ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public GameObject( string name )
-      {
-         Internal_CreateGameObject( this, name );
-      }
+      public GameObject() : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public GameObject()
-      {
-         Internal_CreateGameObject( this, null );
-      }
-
-      public GameObject( string name, params Type[] components )
-      {
-         Internal_CreateGameObject( this, name );
-         foreach( Type componentType in components )
-         {
-            AddComponent( componentType );
-         }
-      }
+      public GameObject( string name, params Type[] components ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
 
 

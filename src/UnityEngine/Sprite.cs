@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public sealed class Sprite : Object
    {
+      public Sprite( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public Bounds bounds
       {
          get

@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public class Behaviour : Component
    {
+      public Behaviour() : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public bool enabled
       {
          get => throw new NotImplementedException();

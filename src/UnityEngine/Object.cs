@@ -19,6 +19,11 @@ namespace UnityEngine
       : Il2CppSystem.Object
 #endif
    {
+      public Object(IntPtr pointer)
+      {
+
+      }
+
       public string name
       {
          get => throw new NotImplementedException();

@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public class Component : Object
    {
+      public Component( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public Transform transform => throw new NotImplementedException();
 
       public GameObject gameObject => throw new NotImplementedException();

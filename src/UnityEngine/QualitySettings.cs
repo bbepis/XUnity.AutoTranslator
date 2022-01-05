@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public sealed class QualitySettings : Object
    {
+      public QualitySettings( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public static string[] names
       {
    

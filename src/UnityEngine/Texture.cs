@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public class Texture : Object
    {
+      public Texture( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public static int masterTextureLimit
       {
          get;

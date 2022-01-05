@@ -196,41 +196,13 @@ namespace UnityEngine
          set;
       }
 
-      public RenderTexture( int width, int height, int depth, RenderTextureFormat format, RenderTextureReadWrite readWrite )
-      {
-         Internal_CreateRenderTexture( this );
-         this.width = width;
-         this.height = height;
-         this.depth = depth;
-         this.format = format;
-         bool sRGB = readWrite == RenderTextureReadWrite.sRGB;
-         if( readWrite == RenderTextureReadWrite.Default )
-         {
-            sRGB = ( QualitySettings.activeColorSpace == ColorSpace.Linear );
-         }
+      public RenderTexture( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-         Internal_SetSRGBReadWrite( this, sRGB );
-      }
+      public RenderTexture( int width, int height, int depth, RenderTextureFormat format, RenderTextureReadWrite readWrite ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public RenderTexture( int width, int height, int depth, RenderTextureFormat format )
-      {
-         Internal_CreateRenderTexture( this );
-         this.width = width;
-         this.height = height;
-         this.depth = depth;
-         this.format = format;
-         Internal_SetSRGBReadWrite( this, QualitySettings.activeColorSpace == ColorSpace.Linear );
-      }
+      public RenderTexture( int width, int height, int depth, RenderTextureFormat format ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
-      public RenderTexture( int width, int height, int depth )
-      {
-         Internal_CreateRenderTexture( this );
-         this.width = width;
-         this.height = height;
-         this.depth = depth;
-         format = RenderTextureFormat.Default;
-         Internal_SetSRGBReadWrite( this, QualitySettings.activeColorSpace == ColorSpace.Linear );
-      }
+      public RenderTexture( int width, int height, int depth ) : base( IntPtr.Zero ) => throw new NotImplementedException();
 
 
 

@@ -14,9 +14,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
    {
       private static readonly Dictionary<int, Font> CachedFonts = new Dictionary<int, Font>();
       private static bool _hasReadOverrideFontTextMeshPro = false;
-      private static object OverrideFontTextMeshPro;
+      private static UnityEngine.Object OverrideFontTextMeshPro;
       private static bool _hasReadFallbackFontTextMeshPro = false;
-      private static object FallbackFontTextMeshPro;
+      private static UnityEngine.Object FallbackFontTextMeshPro;
 
       public static Font GetOrCreate( int size )
       {
@@ -37,6 +37,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
                _hasReadOverrideFontTextMeshPro = true;
                OverrideFontTextMeshPro = FontHelper.GetTextMeshProFont( Settings.OverrideFontTextMeshPro );
             }
+#if IL2CPP
+            catch( Exception e ) when( e.Message.ToLowerInvariant().Contains( "missing" ) || e.Message.ToLowerInvariant().Contains( "not found" ) )
+            {
+               XuaLogger.AutoTranslator.Warn( e, "An error occurred while loading text mesh pro override font. Retrying load with custom proxies..." );
+
+               try
+               {
+                  OverrideFontTextMeshPro = FontHelper.GetTextMeshProFontByCustomProxies( Settings.OverrideFontTextMeshPro );
+               }
+               catch( Exception ex )
+               {
+                  XuaLogger.AutoTranslator.Error( ex, "An error occurred while loading text mesh pro override font: " + Settings.OverrideFontTextMeshPro );
+               }
+            }
+#endif
             catch( Exception e )
             {
                XuaLogger.AutoTranslator.Error( e, "An error occurred while loading text mesh pro override font: " + Settings.OverrideFontTextMeshPro );
@@ -46,7 +61,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          return OverrideFontTextMeshPro;
       }
 
-      public static object GetOrCreateFallbackFontTextMeshPro()
+      public static UnityEngine.Object GetOrCreateFallbackFontTextMeshPro()
       {
          if( !_hasReadFallbackFontTextMeshPro )
          {
@@ -55,9 +70,24 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
                _hasReadFallbackFontTextMeshPro = true;
                FallbackFontTextMeshPro = FontHelper.GetTextMeshProFont( Settings.FallbackFontTextMeshPro );
             }
+#if IL2CPP
+            catch( Exception e ) when( e.Message.ToLowerInvariant().Contains( "missing" ) || e.Message.ToLowerInvariant().Contains( "not found" ) )
+            {
+               XuaLogger.AutoTranslator.Warn( e, "An error occurred while loading text mesh pro fallback font. Retrying load with custom proxies..." );
+
+               try
+               {
+                  FallbackFontTextMeshPro = FontHelper.GetTextMeshProFontByCustomProxies( Settings.FallbackFontTextMeshPro );
+               }
+               catch( Exception ex )
+               {
+                  XuaLogger.AutoTranslator.Error( ex, "An error occurred while loading text mesh pro fallback font: " + Settings.FallbackFontTextMeshPro );
+               }
+            }
+#endif
             catch( Exception e )
             {
-               XuaLogger.AutoTranslator.Error( e, "An error occurred while loading text mesh pro fasllback font: " + Settings.FallbackFontTextMeshPro );
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while loading text mesh pro fallback font: " + Settings.FallbackFontTextMeshPro );
             }
          }
 

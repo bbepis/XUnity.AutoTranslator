@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public sealed class Shader : Object
    {
+      public Shader( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public bool isSupported
       {
          get;

@@ -12,6 +12,8 @@ namespace UnityEngine
 {
    public class TextAsset : Object
    {
+      public TextAsset( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
       public string text => throw new NotImplementedException();
 
 #if IL2CPP

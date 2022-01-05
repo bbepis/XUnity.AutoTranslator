@@ -13,10 +13,9 @@ namespace UnityEngine
    [StructLayout( LayoutKind.Sequential )]
    public class ScriptableObject : Object
    {
-      public ScriptableObject()
-      {
-         Internal_CreateScriptableObject( this );
-      }
+      public ScriptableObject( IntPtr pointer ) : base( IntPtr.Zero ) => throw new NotImplementedException();
+
+      public ScriptableObject() : base( IntPtr.Zero ) => throw new NotImplementedException();
 
       private static extern void Internal_CreateScriptableObject( ScriptableObject self );
 
