@@ -1644,7 +1644,7 @@ namespace XUnity.ResourceRedirector.Hooks
       {
          if( ResourceRedirection.ShouldBlockAsyncOperationMethods( __instance ) )
          {
-            __result = 100f;
+            __result = 1.0f;
 
             return false;
          }

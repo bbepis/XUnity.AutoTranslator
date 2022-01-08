@@ -25,10 +25,6 @@ It does (obviously) go to the internet, in order to provide the automated transl
 
 If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution) and the section regarding [manual translations](#manual-translations) so you understand how the plugin operates.
 
-From version 3.0.0 it is possible to implement custom translators. See [this section](#implementing-a-translator) for more info.
-
-From version 4.0.0 it comes with a resource redirector (version 1.0.0) that enables redirecting resources for any purpose. See more information [here](#resource-redirection).
-
 ## Plugin Frameworks
 The mod can be installed without any external dependencies or as a plugin to the following Plugin Managers/Mod Loaders:
  * [BepInEx](https://github.com/bbepis/BepInEx) (recommended)

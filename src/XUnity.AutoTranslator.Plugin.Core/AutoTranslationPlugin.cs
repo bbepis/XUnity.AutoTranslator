@@ -176,6 +176,12 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   return;
                }
 
+               if( font == null )
+               {
+                  XuaLogger.AutoTranslator.Warn( $"Could not load fallback font for TextMesh Pro: " + Settings.FallbackFontTextMeshPro );
+                  return;
+               }
+
 #if MANAGED
                var fallbacks = (IList)UnityTypes.TMP_Settings_Properties.FallbackFontAssets.Get( null );
 #else
@@ -1424,7 +1430,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return null;
       }
 
-#region IInternalTranslator
+      #region IInternalTranslator
 
       private ComponentTranslationContext InvokeOnTranslatingCallback( object textComponent, string untranslatedText, TextTranslationInfo info )
       {
@@ -1554,7 +1560,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return false;
       }
 
-#endregion
+      #endregion
 
       private InternalTranslationResult Translate(
          string text,
