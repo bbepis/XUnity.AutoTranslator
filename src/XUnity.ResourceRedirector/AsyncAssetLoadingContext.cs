@@ -130,6 +130,7 @@ namespace XUnity.ResourceRedirector
             }
 
             _backingField.Array = value;
+            ResolveType = AsyncAssetLoadingResolve.ThroughAssets;
          }
       }
 
@@ -137,7 +138,23 @@ namespace XUnity.ResourceRedirector
       /// Gets or sets the loaded assets. This is simply equal to the first index of the Assets property, with some
       /// additional null guards to prevent NullReferenceExceptions when using it.
       /// </summary>
-      public UnityEngine.Object Asset { get => _backingField.Field; set => _backingField.Field = value; }
+      public UnityEngine.Object Asset
+      {
+         get
+         {
+            return _backingField.Field;
+         }
+         set
+         {
+            if( !ResourceRedirection.SyncOverAsyncEnabled )
+            {
+               throw new InvalidOperationException( "Trying to set the Assets/Asset property in async load operation while 'SyncOverAsyncAssetLoads' is disabled is not allowed. Consider settting the Request property instead if possible or enabling 'SyncOverAsyncAssetLoads' through the method 'ResourceRedirection.EnableSyncOverAsyncAssetLoads()'." );
+            }
+
+            _backingField.Field = value;
+            ResolveType = AsyncAssetLoadingResolve.ThroughAssets;
+         }
+      }
 
       /// <summary>
       /// Gets or sets how this load operation should be resolved.
