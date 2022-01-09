@@ -27,7 +27,7 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          var modFi = new FileInfo( Location );
          var gameDir = modFi.Directory.Parent;
          var unhollowedPath = Path.Combine( gameDir.FullName, @"MelonLoader\Managed" );
-         Il2CppProxyAssemblies.Location = Path.Combine( unhollowedPath );
+         Il2CppProxyAssemblies.Location = unhollowedPath;
 #endif
 
          PluginLoader.Load( false );

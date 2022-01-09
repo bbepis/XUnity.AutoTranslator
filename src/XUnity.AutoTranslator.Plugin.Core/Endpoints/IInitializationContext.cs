@@ -8,12 +8,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
    public interface IInitializationContext
    {
       /// <summary>
-      /// Gets the directory where the configuration file and translations are stored.
-      /// </summary>
-      [Obsolete( "This property is not reliable.", true )]
-      string PluginDirectory { get; }
-
-      /// <summary>
       /// Gets the directory where the translators are placed in.
       /// </summary>
       string TranslatorDirectory { get; }

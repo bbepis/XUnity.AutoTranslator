@@ -35,9 +35,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints
       /// </summary>
       public string DestinationLanguage { get; }
 
-      [Obsolete( "This property is not reliable.", true )]
-      public string PluginDirectory => Settings.TranslatorsPath;
-
       public string TranslatorDirectory => Settings.TranslatorsPath;
 
       public bool SpamChecksEnabled { get; private set; }
