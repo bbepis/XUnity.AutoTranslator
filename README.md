@@ -514,9 +514,6 @@ While this plugin offers some level of IL2CPP support, it is by no means complet
  * Many other features are completely unproven
 
 ## Frequently Asked Questions
-> **Q: Why doesn't this plugin work in game X?**  
-A: There can be a host of reasons. If the game is AOT compiled with IL2CPP it will not work (check _Data directory). If you see translations being queued (ALT+0) but never completing, a potential solution is to select a compatibility endpoint from the dropdown.
-
 > **Q: How do I disable auto translations?**  
 A: Select the empty endpoint when you press ALT+0 or set the configuration parameter `Endpoint=` to empty.
 
