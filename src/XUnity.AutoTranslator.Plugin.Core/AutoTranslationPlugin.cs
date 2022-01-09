@@ -2469,7 +2469,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
          catch( Exception e )
          {
-            XuaLogger.AutoTranslator.Error( e, "An error occurred while attempting to cache a composed translation." );
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while attempting to cache a parsed translation." );
          }
 
          return translation;

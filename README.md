@@ -732,7 +732,7 @@ The translation files support the following directives:
  * `#set required-resolution height > 1280 && width > 720` tells the plugin that translations following this line in this file should only be applied if the resolution is greater than specified. Current implementation only handles the resolution used by the game at startup.
  * `#unset required-resolution` tells the plugin to ignore previously specified `#set required-resolution` directive.
 
-For this to work, the following configuration option must be changed, as it defaults to `False`:
+For this to work, the following configuration option must be `True`:
 
 ```
 [Behaviour]
