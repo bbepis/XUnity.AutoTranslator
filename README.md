@@ -28,6 +28,7 @@ If you intend on redistributing this plugin as part of a translation suite for a
 ## Plugin Frameworks
 The mod can be installed without any external dependencies or as a plugin to the following Plugin Managers/Mod Loaders:
  * [BepInEx](https://github.com/bbepis/BepInEx) (recommended)
+ * [Melon Loader](https://melonwiki.xyz)
  * [IPA](https://github.com/Eusth/IPA)
  * UnityInjector
 
