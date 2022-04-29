@@ -103,12 +103,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( string.IsNullOrEmpty( Settings.OverrideFont ) ) return;
 
             var Text_fontProperty = UnityTypes.Text_Properties.Font;
-            var Text_fontSizeProperty = UnityTypes.Text_Properties.FontSize;
-
             var previousFont = (Font)Text_fontProperty.Get( ui );
             var Font_fontSizeProperty = UnityTypes.Font_Properties.FontSize;
 
-            var newFont = FontCache.GetOrCreate( (int?)Font_fontSizeProperty?.Get( previousFont ) ?? (int)Text_fontSizeProperty.Get( ui ) );
+            var newFont = FontCache.GetOrCreate( (int)Font_fontSizeProperty?.Get( previousFont ) );
             if( newFont == null || previousFont == null ) return;
 
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )

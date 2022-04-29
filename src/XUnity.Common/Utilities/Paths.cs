@@ -13,15 +13,25 @@ namespace XUnity.Common.Utilities
    /// </summary>
    public static class Paths
    {
+      private static string _gameRoot;
+
       /// <summary>
       /// WARNING: Pubternal API (internal). Do not use. May change during any update.
       /// </summary>
-      public static string GameRoot => new DirectoryInfo( Application.dataPath ).Parent.FullName;
+      public static string GameRoot
+      {
+         get => _gameRoot ?? GetAndSetGameRoot();
+         set => _gameRoot = value;
+      }
 
       public static void Initialize()
       {
-         // simply sets the GameRoot variable, ensuring it is initialized from the
-         // thread that calls this method
+         GetAndSetGameRoot();
+      }
+
+      private static string GetAndSetGameRoot()
+      {
+         return _gameRoot = new DirectoryInfo( Application.dataPath ).Parent.FullName;
       }
    }
 }

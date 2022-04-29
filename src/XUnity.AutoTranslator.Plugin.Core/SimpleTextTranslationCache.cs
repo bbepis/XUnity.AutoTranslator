@@ -18,8 +18,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
    /// </summary>
    public class SimpleTextTranslationCache
    {
-      private static readonly char[] TranslationSplitters = new char[] { '=' };
-
       /// <summary>
       /// Internal translation dictionary used to store translations.
       /// </summary>
@@ -164,32 +162,39 @@ namespace XUnity.AutoTranslator.Plugin.Core
                string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
                foreach( string translatioOrDirective in translations )
                {
-                  string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
-                  if( kvp.Length == 2 )
+                  try
                   {
-                     string key = TextHelper.Decode( kvp[ 0 ] );
-                     string value = TextHelper.Decode( kvp[ 1 ] );
-
-                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && key != value )
+                     var kvp = TextHelper.ReadTranslationLineAndDecode( translatioOrDirective );
+                     if( kvp != null )
                      {
-                        if( key.StartsWith( "r:" ) )
-                        {
-                           try
-                           {
-                              var regex = new RegexTranslation( key, value );
+                        string key = kvp[ 0 ];
+                        string value = kvp[ 1 ];
 
-                              AddTranslationRegex( regex );
-                           }
-                           catch( Exception e )
-                           {
-                              XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
-                           }
-                        }
-                        else
+                        if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) && key != value )
                         {
-                           AddTranslationInternal( key, value.MakeRedirected(), allowOverride );
+                           if( key.StartsWith( "r:" ) )
+                           {
+                              try
+                              {
+                                 var regex = new RegexTranslation( key, value );
+
+                                 AddTranslationRegex( regex );
+                              }
+                              catch( Exception e )
+                              {
+                                 XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
+                              }
+                           }
+                           else
+                           {
+                              AddTranslationInternal( key, value.MakeRedirected(), allowOverride );
+                           }
                         }
                      }
+                  }
+                  catch( Exception e )
+                  {
+                     XuaLogger.AutoTranslator.Warn( e, $"An error occurred while reading translation: '{translatioOrDirective}'." );
                   }
                }
             }

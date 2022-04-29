@@ -1,4 +1,15 @@
-﻿### 5.0.0
+﻿### 5.1.0
+ * BREAKING CHANGE - Fixed escaping for '='-sign in translation files. Now uses '\=' instead of '%3D', though '%3D' is still recognized as newline when reading translations
+ * FEATURE - Added automatic translation pruning for translations replaced by regexes in the standard output file. Does not work for splitter regexes
+ * BUG FIX - Fixed an issue related to TextMesh Pro font fallback in MelonLoader
+ * BUG FIX - Fixed a bug related to splitter regex construction
+ * BUG FIX - Fixed issue related reloading translations
+ * BUG FIX - Added warnings for badly formed regexes
+ * MISC - Reduced Translation Aggregator window delay from 2 seconds to 1 second
+ * MISC - Improved error logging associated with translation reading
+ * MISC - ezTransXP and LEC now not affected by anti spam measures as though it was an online endpoint
+
+### 5.0.0
  * FEATURE - Basic IL2CPP support through BepInEx 6 and MelonLoader
  * FEATURE - MelonLoader support
  * FEATURE - Added FallbackFontTextMeshPro as an alternative to OverrideFontTextMeshPro. If game supports, it is recommended to use that instead

@@ -8,73 +8,118 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 {
    internal static class TextHelper
    {
-      public static string Decode( string text )
-      {
-         var commentIndex = text.IndexOf( "//" );
-         if( commentIndex > -1 )
-         {
-            text = text.Substring( 0, commentIndex );
-         }
-
-         return UnescapeNewlines( text )
-            .Replace( "%3D", "=" )
-            .Replace( "%2F%2F", "//" );
-      }
-
       public static string Encode( string text )
       {
-         return EscapeNewlines( text )
-            .Replace( "=", "%3D" )
-            .Replace( "//", "%2F%2F" );
+         return EscapeNewlines( text );
       }
 
-      internal static string UnescapeNewlines( string str )
+      public static string[] ReadTranslationLineAndDecode( string str )
       {
-         if( str == null ) return null;
+         if( string.IsNullOrEmpty( str ) ) return null;
 
-         var builder = new StringBuilder( str );
-
+         var lines = new string[ 2 ];
+         var lidx = 0;
          bool escapeNext = false;
-         for( int i = 0; i < builder.Length; i++ )
+         var len = str.Length;
+         var builder = new StringBuilder( (int)( len / 1.3 ) );
+         for( int i = 0; i < len; i++ )
          {
-            var c = builder[ i ];
+            var c = str[ i ];
             if( escapeNext )
             {
-               bool found = true;
-               char escapeWith = default( char );
                switch( c )
                {
+                  case '=':
+                  case '\\':
+                     builder.Append( c );
+                     break;
                   case 'n':
-                     escapeWith = '\n';
+                     builder.Append( '\n' );
                      break;
                   case 'r':
-                     escapeWith = '\r';
+                     builder.Append( '\r' );
                      break;
-                  case '\\':
-                     escapeWith = '\\';
+                  case 'u':
+                     var i4 = i + 4;
+                     if( i4 < len )
+                     {
+                        int code = int.Parse( new string( new char[] { str[ i + 1 ], str[ i + 2 ], str[ i + 3 ], str[ i + 4 ] } ), NumberStyles.HexNumber );
+                        builder.Append( (char)code );
+                        i += 4;
+                     }
+                     else
+                     {
+                        throw new Exception( "Found invalid unicode in line: " + str );
+                     }
                      break;
                   default:
-                     found = false;
+                     builder.Append( '\\' );
+                     builder.Append( c );
                      break;
-               }
-
-               // remove previous char and go one back
-               if( found )
-               {
-                  // found proper escaping
-                  builder.Remove( --i, 2 );
-                  builder.Insert( i, escapeWith );
                }
 
                escapeNext = false;
+            }
+            else if( c == '=' )
+            {
+               if( lidx > 1 )
+               {
+                  return null;
+               }
+
+               lines[ lidx++ ] = builder.ToString();
+               builder.Length = 0;
+            }
+            else if( c == '%' )
+            {
+               // backwards compatibility for old newline encoding
+               var i2 = i + 2;
+               if( i2 < len && str[ i + 1 ] == '3' && str[ i + 2 ] == 'D' )
+               {
+                  builder.Append( '=' );
+                  i += 2;
+               }
             }
             else if( c == '\\' )
             {
                escapeNext = true;
             }
+            else if( c == '/' )
+            {
+               // Maybe this is an inline comment
+               var n = i + 1;
+               if( n < len && str[ n ] == '/' )
+               {
+                  lines[ lidx++ ] = builder.ToString();
+
+                  if( lidx == 2 )
+                  {
+                     return lines;
+                  }
+                  else
+                  {
+                     return null;
+                  }
+               }
+               else
+               {
+                  builder.Append( c );
+               }
+            }
+            else
+            {
+               builder.Append( c );
+            }
          }
 
-         return builder.ToString();
+         if( lidx != 1 )
+         {
+            return null;
+         }
+
+         lines[ lidx++ ] = builder.ToString();
+
+         return lines;
       }
 
       internal static string EscapeNewlines( string str )
@@ -92,7 +137,26 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             c = str[ i ];
             switch( c )
             {
+               case '/':
+                  var i1 = i + 1;
+                  if( i1 < len && str[ i1 ] == '/' )
+                  {
+                     sb.Append( '\\' );
+                     sb.Append( c );
+                     sb.Append( '\\' );
+                     sb.Append( c );
+                     i++;
+                  }
+                  else
+                  {
+                     sb.Append( c );
+                  }
+                  break;
                case '\\':
+                  sb.Append( '\\' );
+                  sb.Append( c );
+                  break;
+               case '=':
                   sb.Append( '\\' );
                   sb.Append( c );
                   break;

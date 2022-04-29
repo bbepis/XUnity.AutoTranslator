@@ -21,8 +21,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    sealed class TextTranslationCache : IReadOnlyTextTranslationCache, IDisposable
    {
-      private static readonly char[] TranslationSplitters = new char[] { '=' };
-
       public event Action TextTranslationFileChanged;
 
       private Dictionary<IReadOnlyTextTranslationCache, CompositeTextTranslationCache> _compositeCaches = new Dictionary<IReadOnlyTextTranslationCache, CompositeTextTranslationCache>();
@@ -139,6 +137,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
          return compo;
       }
 
+      public void PruneMainTranslationFile()
+      {
+         XuaLogger.AutoTranslator.Debug( $"Pruning text translations in main translation file..." );
+
+         bool anyChanges;
+         var input = new FileInfo( Settings.AutoTranslationsFilePath );
+
+         using var outputStream = new MemoryStream();
+
+         using( var inputFile = input.OpenRead() )
+         {
+            anyChanges = PruneTranslationFile( inputFile, outputStream );
+         }
+
+         if( anyChanges )
+         {
+            var backupFileName = input.FullName + "." + DateTime.Now.ToString( "yyyyMMddHHmmssfff.bak" );
+            File.Move( input.FullName, backupFileName );
+
+            using( var outputFile = new FileStream( input.FullName, FileMode.Create ) )
+            {
+               outputStream.Seek( 0, SeekOrigin.Begin );
+               outputStream.WriteTo( outputFile );
+               outputFile.Flush();
+               outputFile.Close();
+            }
+
+            XuaLogger.AutoTranslator.Warn( "Generated backup translation file: " + backupFileName );
+         }
+      }
+
       internal void LoadTranslationFiles()
       {
          try
@@ -180,6 +209,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                _registeredSplitterRegexes.Clear();
                _splitterRegexes.Clear();
                _scopedTranslations.Clear();
+               _failedRegexLookups.Clear();
 
                var mainTranslationFile = new FileInfo( Settings.AutoTranslationsFilePath ).FullName;
                var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
@@ -188,7 +218,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                if( _pluginDirectory == null )
                {
-                  LoadTranslationsInFile( mainTranslationFile, true );
+                  LoadTranslationsInFile( mainTranslationFile, true, true, AddTranslationSplitterRegex, AddTranslationRegex, AddTranslation );
                }
                foreach( var fullFileName in GetTranslationFiles().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile, postprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
                {
@@ -199,7 +229,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         continue;
                      }
 
-                     LoadTranslationsInFile( fullFileName, false );
+                     LoadTranslationsInFile( fullFileName, false, true, AddTranslationSplitterRegex, AddTranslationRegex, AddTranslation );
                   }
                   catch( Exception e )
                   {
@@ -218,7 +248,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      stream.Seek( 0, SeekOrigin.Begin );
                   }
 
-                  LoadTranslationsInStream( stream, streamPackages.Name, false );
+                  LoadTranslationsInStream( stream, streamPackages.Name, false, true, AddTranslationSplitterRegex, AddTranslationRegex, AddTranslation );
                }
                catch( Exception e )
                {
@@ -466,109 +496,199 @@ namespace XUnity.AutoTranslator.Plugin.Core
          public bool IsVariable { get; set; }
       }
 
-      private void LoadTranslationsInStream( Stream stream, string fullFileName, bool isOutputFile )
+      private bool PruneTranslationFile( Stream inputStream, Stream outputStream )
       {
-         if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
+         var registerdRegexes = new HashSet<string>();
+         var regexes = new List<RegexTranslation>();
+
+         Action<RegexTranslation, int> addTranslationRegex = ( regex, level ) =>
+         {
+            if( level == TranslationScopes.None && !registerdRegexes.Contains( regex.Original ) )
+            {
+               registerdRegexes.Add( regex.Original );
+               regexes.Add( regex );
+            }
+         };
+
+         var pluginsDir = Path.Combine( Settings.TranslationsPath, "plugins" );
+         var mainTranslationFile = new FileInfo( Settings.AutoTranslationsFilePath ).FullName;
+         var substitutionFile = new FileInfo( Settings.SubstitutionFilePath ).FullName;
+         var preprocessorsFile = new FileInfo( Settings.PreprocessorsFilePath ).FullName;
+         var postprocessorsFile = new FileInfo( Settings.PostprocessorsFilePath ).FullName;
+         foreach( var fullFileName in GetTranslationFiles().Except( new[] { mainTranslationFile, substitutionFile, preprocessorsFile, postprocessorsFile }, StringComparer.OrdinalIgnoreCase ) )
+         {
+            try
+            {
+               if( _pluginDirectory == null && fullFileName.StartsWith( pluginsDir, StringComparison.OrdinalIgnoreCase ) )
+               {
+                  continue;
+               }
+
+               LoadTranslationsInFile( fullFileName, false, false, null, addTranslationRegex, null );
+            }
+            catch( Exception e )
+            {
+               XuaLogger.AutoTranslator.Error( e, "An error occurred while loading translations in file: " + fullFileName );
+            }
+         }
+
+
+         bool anyChanges = false;
+         var reader = new StreamReader( inputStream, Encoding.UTF8 );
+         var writer = new StreamWriter( outputStream, Encoding.UTF8 );
+         {
+            string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
+            foreach( string translatioOrDirective in translations )
+            {
+               var kvp = TextHelper.ReadTranslationLineAndDecode( translatioOrDirective );
+               if( kvp != null )
+               {
+                  string key = kvp[ 0 ];
+                  string value = kvp[ 1 ];
+
+                  if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                  {
+                     if( !key.StartsWith( "sr:" ) && !key.StartsWith( "r:" ) )
+                     {
+                        if( !regexes.Any( x => x.CompiledRegex.IsMatch( key ) ) )
+                        {
+                           writer.WriteLine( TextHelper.Encode( key ) + '=' + TextHelper.Encode( value ) );
+                        }
+                        else
+                        {
+                           XuaLogger.AutoTranslator.Warn( "Pruned translation: " + translatioOrDirective );
+                           anyChanges = true;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
+         writer.Flush();
+
+         return anyChanges;
+      }
+
+      private void LoadTranslationsInStream(
+         Stream stream,
+         string fullFileName,
+         bool isOutputFile,
+         bool isLoad,
+         Action<RegexTranslationSplitter, int> addTranslationSplitterRegex,
+         Action<RegexTranslation, int> addTranslationRegex,
+         Action<string, string, int> addTranslation )
+      {
+         if( !Settings.EnableSilentMode && isLoad ) XuaLogger.AutoTranslator.Debug( $"Loading texts: {fullFileName}." );
 
          var reader = new StreamReader( stream, Encoding.UTF8 );
          {
             var context = new TranslationFileLoadingContext();
-            var set = new HashSet<string>();
 
             string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translatioOrDirective in translations )
             {
-               if( !isOutputFile )
+               try
                {
-                  var directive = TranslationFileDirective.Create( translatioOrDirective );
-                  if( directive != null )
+                  if( !isOutputFile )
                   {
-                     context.Apply( directive );
-
-                     if( !Settings.EnableSilentMode ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
-                     continue;
-                  }
-               }
-
-               if( context.IsApplicable() )
-               {
-                  string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
-                  if( kvp.Length == 2 )
-                  {
-                     string key = TextHelper.Decode( kvp[ 0 ] );
-                     string value = TextHelper.Decode( kvp[ 1 ] );
-
-                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                     var directive = TranslationFileDirective.Create( translatioOrDirective );
+                     if( directive != null )
                      {
-                        if( key.StartsWith( "sr:" ) )
-                        {
-                           try
-                           {
-                              var regex = new RegexTranslationSplitter( key, value );
+                        context.Apply( directive );
 
-                              var levels = context.GetLevels();
-                              if( levels.Count == 0 )
+                        if( !Settings.EnableSilentMode && isLoad ) XuaLogger.AutoTranslator.Debug( "Directive in file: " + fullFileName + ": " + directive.ToString() );
+                        continue;
+                     }
+                  }
+
+                  if( context.IsApplicable() )
+                  {
+                     var kvp = TextHelper.ReadTranslationLineAndDecode( translatioOrDirective );
+                     if( kvp != null )
+                     {
+                        string key = kvp[ 0 ];
+                        string value = kvp[ 1 ];
+
+                        if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                        {
+                           if( key.StartsWith( "sr:" ) )
+                           {
+                              try
                               {
-                                 AddTranslationSplitterRegex( regex, TranslationScopes.None );
-                              }
-                              else
-                              {
-                                 foreach( var level in levels )
+                                 var regex = new RegexTranslationSplitter( key, value );
+
+                                 var levels = context.GetLevels();
+                                 if( levels.Count == 0 )
                                  {
-                                    AddTranslationSplitterRegex( regex, level );
+                                    addTranslationSplitterRegex?.Invoke( regex, TranslationScopes.None );
+                                 }
+                                 else
+                                 {
+                                    foreach( var level in levels )
+                                    {
+                                       addTranslationSplitterRegex?.Invoke( regex, level );
+                                    }
                                  }
                               }
-                           }
-                           catch( Exception e )
-                           {
-                              XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation splitter: '{translatioOrDirective}'." );
-                           }
-                        }
-                        else if( key.StartsWith( "r:" ) )
-                        {
-                           try
-                           {
-                              var regex = new RegexTranslation( key, value );
-
-                              var levels = context.GetLevels();
-                              if( levels.Count == 0 )
+                              catch( Exception e )
                               {
-                                 AddTranslationRegex( regex, TranslationScopes.None );
+                                 XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation splitter: '{translatioOrDirective}'." );
                               }
-                              else
+                           }
+                           else if( key.StartsWith( "r:" ) )
+                           {
+                              try
                               {
-                                 foreach( var level in levels )
+                                 var regex = new RegexTranslation( key, value );
+
+                                 var levels = context.GetLevels();
+                                 if( levels.Count == 0 )
                                  {
-                                    AddTranslationRegex( regex, level );
+                                    addTranslationRegex?.Invoke( regex, TranslationScopes.None );
+                                 }
+                                 else
+                                 {
+                                    foreach( var level in levels )
+                                    {
+                                       addTranslationRegex?.Invoke( regex, level );
+                                    }
                                  }
                               }
-                           }
-                           catch( Exception e )
-                           {
-                              XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
-                           }
-                        }
-                        else
-                        {
-                           var levels = context.GetLevels();
-                           if( levels.Count == 0 )
-                           {
-                              AddTranslation( key, value, TranslationScopes.None );
+                              catch( Exception e )
+                              {
+                                 XuaLogger.AutoTranslator.Warn( e, $"An error occurred while constructing regex translation: '{translatioOrDirective}'." );
+                              }
                            }
                            else
                            {
-                              foreach( var level in levels )
+                              var levels = context.GetLevels();
+                              if( levels.Count == 0 )
                               {
-                                 AddTranslation( key, value, level );
+                                 addTranslation?.Invoke( key, value, TranslationScopes.None );
+                              }
+                              else
+                              {
+                                 foreach( var level in levels )
+                                 {
+                                    addTranslation?.Invoke( key, value, level );
+                                 }
                               }
                            }
                         }
                      }
                   }
                }
+               catch( Exception e )
+               {
+                  XuaLogger.AutoTranslator.Warn( e, $"An error occurred while reading translation: '{translatioOrDirective}'." );
+               }
             }
 
-            AllowFallback = AllowFallback || context.IsEnabled( "fallback" );
+            if( isLoad )
+            {
+               AllowFallback = AllowFallback || context.IsEnabled( "fallback" );
+            }
          }
       }
 
@@ -617,7 +737,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private void LoadTranslationsInFile( string fullFileName, bool isOutputFile )
+      private void LoadTranslationsInFile(
+         string fullFileName,
+         bool isOutputFile,
+         bool isLoad,
+         Action<RegexTranslationSplitter, int> addTranslationSplitterRegex,
+         Action<RegexTranslation, int> addTranslationRegex,
+         Action<string, string, int> addTranslation )
       {
          var fileExists = File.Exists( fullFileName );
          if( fileExists )
@@ -637,27 +763,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                         if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
                         {
                            var zipInputStream = zf.GetInputStream( entry );
-                           LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile );
+                           LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile, isLoad, addTranslationSplitterRegex, addTranslationRegex, addTranslation );
                         }
                      }
-
-                     //using( var zipInputStream = new ZipInputStream( stream ) )
-                     //{
-                     //   while( zipInputStream.GetNextEntry() is ZipEntry entry )
-                     //   {
-                     //      if( entry.IsFile && entry.Name.EndsWith( ".txt", StringComparison.OrdinalIgnoreCase ) && !entry.Name.EndsWith( "resizer.txt", StringComparison.OrdinalIgnoreCase ) )
-                     //      {
-                     //         LoadTranslationsInStream( zipInputStream, fullFileName + Path.DirectorySeparatorChar + entry.Name, isOutputFile );
-                     //      }
-                     //   }
-                     //}
-
 
                      zf.Close();
                   }
                   else
                   {
-                     LoadTranslationsInStream( stream, fullFileName, isOutputFile );
+                     LoadTranslationsInStream( stream, fullFileName, isOutputFile, isLoad, addTranslationSplitterRegex, addTranslationRegex, addTranslation );
                   }
                }
             }
@@ -672,11 +786,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             string[] translations = Properties.Resources.StaticTranslations.Split( new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translation in translations )
             {
-               string[] kvp = translation.Split( TranslationSplitters, StringSplitOptions.None );
-               if( kvp.Length >= 2 )
+               var kvp = TextHelper.ReadTranslationLineAndDecode( translation );
+               if( kvp != null )
                {
-                  string key = TextHelper.Decode( kvp[ 0 ] );
-                  string value = TextHelper.Decode( kvp[ 1 ] );
+                  string key = kvp[ 0 ];
+                  string value = kvp[ 1 ];
 
                   if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
                   {

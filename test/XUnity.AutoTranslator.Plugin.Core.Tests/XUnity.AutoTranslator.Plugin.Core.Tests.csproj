@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Translators\BingTranslateLegitimate\BingTranslateLegitimate.csproj" />
+    <ProjectReference Include="..\..\src\Translators\BingTranslate\BingTranslate.csproj" />
     <ProjectReference Include="..\..\src\Translators\Common.ExtProtocol.Executor\Common.ExtProtocol.Executor.csproj" />
     <ProjectReference Include="..\..\src\Translators\DeepLTranslate.ExtProtocol\DeepLTranslate.ExtProtocol.csproj" />
     <ProjectReference Include="..\..\src\Translators\DeepLTranslate\DeepLTranslate.csproj" />

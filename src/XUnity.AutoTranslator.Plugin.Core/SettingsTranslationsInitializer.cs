@@ -11,8 +11,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
 {
    internal static class SettingsTranslationsInitializer
    {
-      private static readonly char[] TranslationSplitters = new char[] { '=' };
-
       public static void LoadTranslations()
       {
          Settings.Replacements.Clear();
@@ -58,37 +56,43 @@ namespace XUnity.AutoTranslator.Plugin.Core
          var reader = new StreamReader( stream, Encoding.UTF8 );
          {
             var context = new TranslationFileLoadingContext();
-            var set = new HashSet<string>();
 
             string[] translations = reader.ReadToEnd().Split( new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries );
             foreach( string translatioOrDirective in translations )
             {
                if( context.IsApplicable() )
                {
-                  string[] kvp = translatioOrDirective.Split( TranslationSplitters, StringSplitOptions.None );
-                  if( kvp.Length == 2 )
+                  try
                   {
-                     string key = TextHelper.Decode( kvp[ 0 ] );
-                     string value = TextHelper.Decode( kvp[ 1 ] );
-
-                     if( !string.IsNullOrEmpty( key ) )
+                     var kvp = TextHelper.ReadTranslationLineAndDecode( translatioOrDirective );
+                     if( kvp != null )
                      {
-                        if( isSubstitutionFile )
+                        string key = kvp[ 0 ];
+                        string value = kvp[ 1 ];
+
+                        if( !string.IsNullOrEmpty( key ) )
                         {
-                           if( !string.IsNullOrEmpty( value ) )
+                           if( isSubstitutionFile )
                            {
-                              Settings.Replacements[ key ] = value;
+                              if( !string.IsNullOrEmpty( value ) )
+                              {
+                                 Settings.Replacements[ key ] = value;
+                              }
+                           }
+                           else if( isPreprocessorFile )
+                           {
+                              Settings.Preprocessors[ key ] = value;
+                           }
+                           else if( isPostProcessorFile )
+                           {
+                              Settings.Postprocessors[ key ] = value;
                            }
                         }
-                        else if( isPreprocessorFile )
-                        {
-                           Settings.Preprocessors[ key ] = value;
-                        }
-                        else if( isPostProcessorFile )
-                        {
-                           Settings.Postprocessors[ key ] = value;
-                        }
                      }
+                  }
+                  catch( Exception e )
+                  {
+                     XuaLogger.AutoTranslator.Warn( e, $"An error occurred while reading translation: '{translatioOrDirective}'." );
                   }
                }
             }

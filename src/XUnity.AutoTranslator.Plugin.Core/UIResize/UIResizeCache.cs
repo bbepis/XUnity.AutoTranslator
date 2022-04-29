@@ -15,8 +15,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 {
    class UIResizeCache
    {
-      private static readonly char[] Splitters = new char[] { '=' };
-
       private UIResizeAttachment _root = new UIResizeAttachment();
 
       public bool HasAnyResizeCommands { get; private set; } = false;
@@ -74,27 +72,34 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
 
                if( context.IsApplicable() )
                {
-                  string[] kvp = translatioOrDirective.Split( Splitters, StringSplitOptions.None );
-                  if( kvp.Length == 2 )
+                  try
                   {
-                     string key = TextHelper.Decode( kvp[ 0 ] );
-                     string value = TextHelper.Decode( kvp[ 1 ] );
-
-                     if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
+                     var kvp = TextHelper.ReadTranslationLineAndDecode( translatioOrDirective );
+                     if( kvp != null )
                      {
-                        var levels = context.GetLevels();
-                        if( levels.Count == 0 )
+                        string key = kvp[ 0 ];
+                        string value = kvp[ 1 ];
+
+                        if( !string.IsNullOrEmpty( key ) && !string.IsNullOrEmpty( value ) )
                         {
-                           AddTranslation( key, value, TranslationScopes.None );
-                        }
-                        else
-                        {
-                           foreach( var level in levels )
+                           var levels = context.GetLevels();
+                           if( levels.Count == 0 )
                            {
-                              AddTranslation( key, value, level );
+                              AddTranslation( key, value, TranslationScopes.None );
+                           }
+                           else
+                           {
+                              foreach( var level in levels )
+                              {
+                                 AddTranslation( key, value, level );
+                              }
                            }
                         }
                      }
+                  }
+                  catch( Exception e )
+                  {
+                     XuaLogger.AutoTranslator.Warn( e, $"An error occurred while reading UI resize directive: '{translatioOrDirective}'." );
                   }
                }
             }

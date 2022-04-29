@@ -33,6 +33,8 @@ namespace ezTransXP
             path = defaultPath;
          }
 
+         context.DisableSpamChecks();
+
          //subprocess path
          var exePath = Path.Combine( context.TranslatorDirectory, @"FullNET\ezTransXP.ExtProtocol.exe" );
 

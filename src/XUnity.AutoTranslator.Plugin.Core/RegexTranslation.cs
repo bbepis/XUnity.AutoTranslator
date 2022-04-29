@@ -29,6 +29,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                key = key.Substring( startIdx, endIdx - startIdx );
             }
+            else
+            {
+               throw new Exception( $"Splitter regex with key: '{Key}' starts with a \" but does not end with a \"." );
+            }
          }
 
          // remove r:
@@ -49,6 +53,10 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( endIdx != startIdx - 1)
             {
                value = value.Substring( startIdx, endIdx - startIdx );
+            }
+            else
+            {
+               throw new Exception( $"Splitter regex with value: '{Value}' starts with a \" but does not end with a \"." );
             }
          }
 

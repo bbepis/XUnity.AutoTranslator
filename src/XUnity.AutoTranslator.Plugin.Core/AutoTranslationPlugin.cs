@@ -406,7 +406,11 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !string.IsNullOrEmpty( Settings.OverrideFont ) )
             {
                var available = GetSupportedFonts();
-               if( !available.Contains( Settings.OverrideFont ) )
+               if( available == null )
+               {
+                  XuaLogger.AutoTranslator.Warn( $"Unable to validate OverrideFont validity due to shimmed APIs." );
+               }
+               else if( !available.Contains( Settings.OverrideFont ) )
                {
                   XuaLogger.AutoTranslator.Error( $"The specified override font is not available. Available fonts: " + string.Join( ", ", available ) );
                   Settings.OverrideFont = null;
@@ -434,7 +438,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       internal static string[] GetSupportedFonts()
       {
-         return FontHelper.GetOSInstalledFontNames();
+         try
+         {
+            return FontHelper.GetOSInstalledFontNames();
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "Unable to retrieve OS installed fonts." );
+            return null;
+         }
       }
 
       private void OnEndpointSelected( TranslationEndpointManager endpoint )
@@ -1387,7 +1399,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          {
             //var textKey = new TranslationKey( ui, text, !ui.SupportsStabilization(), false );
             var isSpammer = ui.IsSpammingComponent();
-            var textKey = GetCacheKey( ui, text, isSpammer );
+            var textKey = GetCacheKey( text, isSpammer );
 
             // potentially shortcircuit if fully templated
             if( ( textKey.IsTemplated && !tc.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
@@ -1528,7 +1540,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) )
          {
-            var textKey = GetCacheKey( null, text, false );
+            var textKey = GetCacheKey( text, false );
 
             // potentially shortcircuit if fully templated
             if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
@@ -1583,7 +1595,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !text.IsNullOrWhiteSpace() && TextCache.IsTranslatable( text, false, scope ) )
             {
-               var textKey = GetCacheKey( null, text, false );
+               var textKey = GetCacheKey( text, false );
 
                // potentially shortcircuit if fully templated
                if( ( textKey.IsTemplated && !TextCache.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
@@ -1693,7 +1705,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
             else if( !text.IsNullOrWhiteSpace() && endpoint.IsTranslatable( text ) )
             {
-               var textKey = GetCacheKey( null, text, false );
+               var textKey = GetCacheKey( text, false );
                if( textKey.IsTemplated && !endpoint.IsTranslatable( textKey.TemplatedOriginal_Text ) )
                {
                   result.SetErrorWithMessage( "This text is already considered a translation for something else." );
@@ -2044,7 +2056,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( isSpammer && !IsBelowMaxLength( text ) ) return null; // avoid templating long strings every frame for IMGUI, important!
 
             // potentially shortcircuit if templated is a translation
-            var textKey = GetCacheKey( ui, text, isSpammer );
+            var textKey = GetCacheKey( text, isSpammer );
 
             // potentially shortcircuit if fully templated
             if( ( textKey.IsTemplated && !tc.IsTranslatable( textKey.TemplatedOriginal_Text, false, scope ) ) || textKey.IsOnlyTemplate )
@@ -2235,7 +2247,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   if( tc.IsTranslatable( stabilizedText, false, scope ) )
                   {
                      // potentially shortcircuit if templated is a translation
-                     var stabilizedTextKey = GetCacheKey( ui, stabilizedText, false );
+                     var stabilizedTextKey = GetCacheKey( stabilizedText, false );
 
                      // potentially shortcircuit if fully templated
                      if( ( stabilizedTextKey.IsTemplated && !tc.IsTranslatable( stabilizedTextKey.TemplatedOriginal_Text, false, scope ) ) || stabilizedTextKey.IsOnlyTemplate )
@@ -2419,6 +2431,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var textKey = new UntranslatedText( untranslatedTextPart, false, false, Settings.FromLanguageUsesWhitespaceBetweenWords, true, Settings.TemplateAllNumberAway );
                if( tc.IsTranslatable( textKey.TemplatedOriginal_Text, true, scope ) )
                {
+#warning Why is using a regex here not allowed?
                   string partTranslation;
                   if( tc.TryGetTranslation( textKey, false, true, scope, out partTranslation ) )
                   {
@@ -3135,7 +3148,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      private UntranslatedText GetCacheKey( object ui, string originalText, bool isFromSpammingComponent )
+      private UntranslatedText GetCacheKey( string originalText, bool isFromSpammingComponent )
       {
          if( isFromSpammingComponent && CachedKeys.Count < Settings.MaxImguiKeyCacheCount )
          {
@@ -3155,6 +3168,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          try
          {
+            TextCache.PruneMainTranslationFile();
+
             LoadTranslations( true );
 
             var context = new TextureReloadContext();
@@ -3171,57 +3186,73 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                      if( tti != null && !tti.OriginalText.IsNullOrWhiteSpace() )
                      {
+                        bool updated = false;
                         var originalText = tti.OriginalText;
-                        var key = GetCacheKey( kvp.Key, originalText, false );
-                        if( TextCache.TryGetTranslation( key, true, false, scope, out string translatedText ) )
+                        try
                         {
-                           tti.UnresizeUI( ui );
-                           SetTranslatedText( kvp.Key, key.Untemplate( translatedText ), null, tti ); // no need to untemplatize the translated text
-                           continue;
+                           var key = GetCacheKey( originalText, false );
+                           if( TextCache.TryGetTranslation( key, true, false, scope, out string translatedText ) )
+                           {
+                              tti.UnresizeUI( ui );
+                              SetTranslatedText( kvp.Key, key.Untemplate( translatedText ), null, tti ); // no need to untemplatize the translated text
+                              updated = true;
+                              continue;
+                           }
+                           else
+                           {
+                              if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
+                              {
+                                 var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope, TextCache );
+                                 if( result != null )
+                                 {
+                                    var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
+                                    if( translation != null )
+                                    {
+                                       tti.UnresizeUI( ui );
+                                       SetTranslatedText( ui, translation, null, tti );
+                                       updated = true;
+                                       continue;
+                                    }
+                                 }
+                              }
+                              if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) )
+                              {
+                                 var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope, TextCache );
+                                 if( result != null )
+                                 {
+                                    var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
+                                    if( translation != null )
+                                    {
+                                       tti.UnresizeUI( ui );
+                                       SetTranslatedText( ui, translation, null, tti );
+                                       updated = true;
+                                       continue;
+                                    }
+                                 }
+                              }
+                              if( UnityTextParsers.RichTextParser.CanApply( ui ) )
+                              {
+                                 var result = UnityTextParsers.RichTextParser.Parse( originalText, scope );
+                                 if( result != null )
+                                 {
+                                    var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
+                                    if( translation != null )
+                                    {
+                                       tti.UnresizeUI( ui );
+                                       SetTranslatedText( ui, translation, null, tti );
+                                       updated = true;
+                                       continue;
+                                    }
+                                 }
+                              }
+                           }
                         }
-                        else
+                        finally
                         {
-                           if( UnityTextParsers.GameLogTextParser.CanApply( ui ) )
+                           if( !updated )
                            {
-                              var result = UnityTextParsers.GameLogTextParser.Parse( originalText, scope, TextCache );
-                              if( result != null )
-                              {
-                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
-                                 if( translation != null )
-                                 {
-                                    tti.UnresizeUI( ui );
-                                    SetTranslatedText( ui, translation, null, tti );
-                                    continue;
-                                 }
-                              }
-                           }
-                           if( UnityTextParsers.RegexSplittingTextParser.CanApply( ui ) )
-                           {
-                              var result = UnityTextParsers.RegexSplittingTextParser.Parse( originalText, scope, TextCache );
-                              if( result != null )
-                              {
-                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
-                                 if( translation != null )
-                                 {
-                                    tti.UnresizeUI( ui );
-                                    SetTranslatedText( ui, translation, null, tti );
-                                    continue;
-                                 }
-                              }
-                           }
-                           if( UnityTextParsers.RichTextParser.CanApply( ui ) )
-                           {
-                              var result = UnityTextParsers.RichTextParser.Parse( originalText, scope );
-                              if( result != null )
-                              {
-                                 var translation = TranslateOrQueueWebJobImmediateByParserResult( ui, result, scope, false, false, false, TextCache, null );
-                                 if( translation != null )
-                                 {
-                                    tti.UnresizeUI( ui );
-                                    SetTranslatedText( ui, translation, null, tti );
-                                    continue;
-                                 }
-                              }
+                              SetText( ui, tti.OriginalText, false, null, tti );
+                              Hook_TextChanged( ui, false );
                            }
                         }
                      }

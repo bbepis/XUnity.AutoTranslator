@@ -20,7 +20,7 @@ using XUnity.Common.Logging;
 
 namespace BingTranslate
 {
-   internal class BingTranslateEndpoint : HttpEndpoint
+   public class BingTranslateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
       {

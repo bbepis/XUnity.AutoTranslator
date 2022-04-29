@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.Parsing
@@ -25,9 +26,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          {
             startIdx++;
             var endIdx = key.LastIndexOf( '"' );
-            if( endIdx != startIdx )
+            if( endIdx != startIdx - 1 )
             {
                key = key.Substring( startIdx, endIdx - startIdx );
+            }
+            else
+            {
+               throw new Exception( $"Regex with key: '{Key}' starts with a \" but does not end with a \"." );
             }
          }
 
@@ -46,9 +51,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          {
             startIdx++;
             var endIdx = value.LastIndexOf( '"' );
-            if( endIdx != startIdx )
+            if( endIdx != startIdx - 1 )
             {
                value = value.Substring( startIdx, endIdx - startIdx );
+            }
+            else
+            {
+               throw new Exception( $"Regex with value: '{Value}' starts with a \" but does not end with a \"." );
             }
          }
 

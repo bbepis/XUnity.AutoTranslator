@@ -8,6 +8,18 @@ namespace UnityEngine
 {
    internal class AssetBundleProxy
    {
+      private delegate IntPtr CreateDynamicFontFromOSFont_InternalDelegate( IntPtr fontname, int size );
+      private static readonly CreateDynamicFontFromOSFont_InternalDelegate CreateDynamicFontFromOSFont_InternalDelegateField;
+
+      public static Font CreateDynamicFontFromOSFont( string fontname, int size )
+      {
+         if( string.IsNullOrEmpty( fontname ) )
+            throw new System.ArgumentNullException( nameof( fontname ), "The path cannot be null or empty." );
+
+         IntPtr ptr = CreateDynamicFontFromOSFont_InternalDelegateField( IL2CPP.ManagedStringToIl2Cpp( fontname ), size );
+         return ptr != IntPtr.Zero ? new Font( ptr ) : null;
+      }
+
       private delegate IntPtr LoadFromFile_InternalDelegate( IntPtr path, uint crc, ulong offset );
       private static readonly LoadFromFile_InternalDelegate LoadFromFile_InternalDelegateField;
       private delegate IntPtr LoadAssetWithSubAssets_InternalDelegate( IntPtr _this, IntPtr name, IntPtr type );
@@ -34,6 +46,7 @@ namespace UnityEngine
       {
          LoadFromFile_InternalDelegateField = IL2CPP.ResolveICall<LoadFromFile_InternalDelegate>( "UnityEngine.AssetBundle::LoadFromFile_Internal(System.String,System.UInt32,System.UInt64)" );
          LoadAssetWithSubAssets_InternalDelegateField = IL2CPP.ResolveICall<LoadAssetWithSubAssets_InternalDelegate>( "UnityEngine.AssetBundle::LoadAssetWithSubAssets_Internal" );
+         CreateDynamicFontFromOSFont_InternalDelegateField = IL2CPP.ResolveICall<CreateDynamicFontFromOSFont_InternalDelegate>( "UnityEngine.Font::CreateDynamicFontFromOSFont(System.String,System.Int32)" );
       }
 
       public Il2CppReferenceArray<Object> LoadAll() => LoadAllAssets();
