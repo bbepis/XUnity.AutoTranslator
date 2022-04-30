@@ -60,6 +60,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
 
                escapeNext = false;
             }
+            else if( c == '\\' )
+            {
+               escapeNext = true;
+            }
             else if( c == '=' )
             {
                if( lidx > 1 )
@@ -79,10 +83,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                   builder.Append( '=' );
                   i += 2;
                }
-            }
-            else if( c == '\\' )
-            {
-               escapeNext = true;
+               else
+               {
+                  builder.Append( c );
+               }
             }
             else if( c == '/' )
             {
