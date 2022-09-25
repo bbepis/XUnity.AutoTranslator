@@ -229,4 +229,7 @@
   <data name="ezTransXP_ExtProtocol" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\..\XUnity.AutoTranslator.Setup.Build-x86\bin\net35\ezTransXP.ExtProtocol.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="LingoCloudTranslate" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\LingoCloudTranslate.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

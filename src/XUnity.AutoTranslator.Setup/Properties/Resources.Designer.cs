@@ -349,11 +349,21 @@ namespace XUnity.AutoTranslator.Setup.Properties {
                 return ((byte[])(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] ReiPatcher {
+        internal static byte[] LingoCloudTranslate{
+            get{
+                object obj = ResourceManager.GetObject("LingoCloudTranslate", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+
+      /// <summary>
+      ///   Looks up a localized resource of type System.Byte[].
+      /// </summary>
+      internal static byte[] ReiPatcher {
             get {
                 object obj = ResourceManager.GetObject("ReiPatcher", resourceCulture);
                 return ((byte[])(obj));

@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Translators\GoogleTranslateLegitimate\GoogleTranslateLegitimate.csproj" />
     <ProjectReference Include="..\Translators\GoogleTranslate\GoogleTranslate.csproj" />
     <ProjectReference Include="..\Translators\LecPowerTranslator15\LecPowerTranslator15.csproj" />
+    <ProjectReference Include="..\Translators\LingoCloudTranslate\LingoCloudTranslate.csproj" />
     <ProjectReference Include="..\Translators\PapagoTranslate\PapagoTranslate.csproj" />
     <ProjectReference Include="..\Translators\ReverseTranslator\ReverseTranslator.csproj" />
     <ProjectReference Include="..\Translators\WatsonTranslate\WatsonTranslate.csproj" />

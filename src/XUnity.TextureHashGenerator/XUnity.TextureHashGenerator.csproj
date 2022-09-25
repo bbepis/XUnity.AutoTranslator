@@ -9,4 +9,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\XUnity.RuntimeHooker\XUnity.RuntimeHooker.csproj" />
+  </ItemGroup>
+
 </Project>

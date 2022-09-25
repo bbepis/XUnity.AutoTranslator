@@ -70,6 +70,7 @@ namespace XUnity.AutoTranslator.Setup
             AddFile( Path.Combine( translatorsPath, "WatsonTranslate.dll" ), Resources.WatsonTranslate, true );
             AddFile( Path.Combine( translatorsPath, "YandexTranslate.dll" ), Resources.YandexTranslate, true );
             AddFile( Path.Combine( translatorsPath, "PapagoTranslate.dll" ), Resources.PapagoTranslate, true );
+            AddFile( Path.Combine( translatorsPath, "LingoCloudTranslate.dll" ), Resources.LingoCloudTranslate, true );
             AddFile( Path.Combine( fullNetPath, "XUnity.AutoTranslator.Plugin.ExtProtocol.dll" ), Resources.XUnity_AutoTranslator_Plugin_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "Lec.ExtProtocol.exe" ), Resources.Lec_ExtProtocol, true );
             AddFile( Path.Combine( fullNetPath, "ezTransXP.ExtProtocol.exe" ), Resources.ezTransXP_ExtProtocol, true );
