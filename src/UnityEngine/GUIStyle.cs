@@ -14,8 +14,7 @@ namespace UnityEngine
    [StructLayout( LayoutKind.Sequential )]
    public sealed class GUIStyle
    {
-      [NonSerialized]
-      internal IntPtr m_Ptr;
+      public IntPtr m_Ptr { get; set; }
 
       [NonSerialized]
       private GUIStyleState m_Normal;
@@ -742,5 +741,7 @@ namespace UnityEngine
 
 
       private static extern void Internal_CalcMinMaxWidth( IntPtr target, GUIContent content, out float minWidth, out float maxWidth );
+
+      public static System.IntPtr Internal_Copy( GUIStyle self, GUIStyle other ) => throw new Exception();
    }
 }

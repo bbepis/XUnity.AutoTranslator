@@ -18,49 +18,52 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
       public static GUIContent none = new GUIContent( "" );
 
-      public static readonly RectOffset Empty = new RectOffset( 0, 0, 0, 0 );
+      public static readonly RectOffset Empty = new RectOffset { left = 0, right = 0, top = 0, bottom = 0 };
 
-      public static readonly GUIStyle LabelTranslation = new GUIStyle( GUI.skin.label )
+      public static readonly GUIStyle LabelTranslation = CopyStyle( GUI.skin.label, style =>
       {
-         richText = false,
-         margin = new RectOffset( GUI.skin.label.margin.left, GUI.skin.label.margin.right, 0, 0 ),
-         padding = new RectOffset( GUI.skin.label.padding.left, GUI.skin.label.padding.right, 2, 3 )
-      };
+         style.richText = false;
+         style.margin = new RectOffset { left = GUI.skin.label.margin.left, right = GUI.skin.label.margin.right, top = 0, bottom = 0 };
+         style.padding = new RectOffset { left = GUI.skin.label.padding.left, right = GUI.skin.label.padding.right, top = 2, bottom = 3 };
+      } );
 
-      public static readonly GUIStyle LabelCenter = new GUIStyle( GUI.skin.label )
+      public static readonly GUIStyle LabelCenter = CopyStyle( GUI.skin.label, style =>
       {
-         alignment = TextAnchor.UpperCenter,
-         richText = true
-      };
+         style.alignment = TextAnchor.UpperCenter;
+         style.richText = true;
+      } );
 
-      public static readonly GUIStyle LabelRight = new GUIStyle( GUI.skin.label )
+      public static readonly GUIStyle LabelRight = CopyStyle( GUI.skin.label, style =>
       {
-         alignment = TextAnchor.UpperRight
-      };
+         style.alignment = TextAnchor.UpperRight;
+      } );
 
-      public static readonly GUIStyle LabelRich = new GUIStyle( GUI.skin.label )
+      public static readonly GUIStyle LabelRich = CopyStyle( GUI.skin.label, style =>
       {
-         richText = true
-      };
+         style.richText = true;
+      } );
 
-      public static readonly GUIStyle NoMarginButtonStyle = new GUIStyle( GUI.skin.button ) { margin = Empty };
-
-      public static readonly GUIStyle NoMarginButtonPressedStyle = new GUIStyle( GUI.skin.button )
+      public static readonly GUIStyle NoMarginButtonStyle = CopyStyle( GUI.skin.button, style =>
       {
-         margin = Empty,
-         onNormal = GUI.skin.button.onActive,
-         onFocused = GUI.skin.button.onActive,
-         onHover = GUI.skin.button.onActive,
-         normal = GUI.skin.button.onActive,
-         focused = GUI.skin.button.onActive,
-         hover = GUI.skin.button.onActive,
-      };
+         style.margin = Empty;
+      } );
 
-      public static readonly GUIStyle NoSpacingBoxStyle = new GUIStyle( GUI.skin.box )
+      public static readonly GUIStyle NoMarginButtonPressedStyle = CopyStyle( GUI.skin.button, style =>
       {
-         margin = Empty,
-         padding = Empty
-      };
+         style.margin = Empty;
+         style.onNormal = GUI.skin.button.onActive;
+         style.onFocused = GUI.skin.button.onActive;
+         style.onHover = GUI.skin.button.onActive;
+         style.normal = GUI.skin.button.onActive;
+         style.focused = GUI.skin.button.onActive;
+         style.hover = GUI.skin.button.onActive;
+      } );
+
+      public static readonly GUIStyle NoSpacingBoxStyle = CopyStyle( GUI.skin.box, style =>
+      {
+         style.margin = Empty;
+         style.padding = Empty;
+      } );
 
       public static GUIStyle WindowBackgroundStyle = new GUIStyle
       {
@@ -69,6 +72,52 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             background = CreateBackgroundTexture()
          }
       };
+
+      public static GUIStyle CopyStyle( GUIStyle other, Action<GUIStyle> setProperties )
+      {
+#if IL2CPP
+         return CopyWithPropertiesSafe( other, setProperties );
+#else
+         var style = new GUIStyle( other );
+         setProperties( style );
+         return style;
+#endif
+      }
+
+#if IL2CPP
+      private static bool _hasCtor = true;
+      
+      public static GUIStyle CopyWithPropertiesSafe( GUIStyle other, Action<GUIStyle> setProperties )
+      {
+         if( _hasCtor )
+         {
+            try
+            {
+               return CopyWithPropertiesUnsafe( other, setProperties );
+            }
+            catch
+            {
+               _hasCtor = false;
+            }
+         }
+         return CopyWithPropertiesSpecial( other, setProperties );
+      }
+
+      public static GUIStyle CopyWithPropertiesSpecial( GUIStyle other, Action<GUIStyle> setProperties )
+      {
+         var style = new GUIStyle();
+         style.m_Ptr = GUIStyle.Internal_Copy( style, other );
+         setProperties( style );
+         return style;
+      }
+
+      public static GUIStyle CopyWithPropertiesUnsafe( GUIStyle other, Action<GUIStyle> setProperties )
+      {
+         var style = new GUIStyle( other );
+         setProperties( style );
+         return style;
+      }
+#endif
 
       public static GUIContent CreateContent( string text )
       {

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using XUnity.Common.Logging;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -32,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          _viewModel = viewModel;
       }
 
-      public bool OnGUI(bool enabled)
+      public bool OnGUI( bool enabled )
       {
          var previouslyEnabled = GUI.enabled;
 
@@ -69,12 +71,25 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
       }
 
+      private bool _supportsScrollView = true;
+
       private void ShowDropdown( float x, float y, float width, GUIStyle buttonStyle )
       {
-         var rect = GUIUtil.R( x, y, width, _viewModel.Options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _viewModel.Options.Count * GUIUtil.RowHeight );
+         var rect = GUIUtil.R( x, y, width, _supportsScrollView && _viewModel.Options.Count * GUIUtil.RowHeight > MaxHeight ? MaxHeight : _viewModel.Options.Count * GUIUtil.RowHeight );
 
          GUILayout.BeginArea( rect, GUIUtil.NoSpacingBoxStyle );
-         _scrollPosition = GUILayout.BeginScrollView( _scrollPosition, GUIStyle.none );
+         try
+         {
+            if( _supportsScrollView )
+            {
+               _scrollPosition = GUILayout.BeginScrollView( _scrollPosition, GUIStyle.none );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Warn( e, "GUILayout.BeginScrollView not supported. Proceeding without..." );
+            _supportsScrollView = false;
+         }
 
          var style = _viewModel.CurrentSelection == null ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
          if( GUILayout.Button( _unselect, style, null ) )
@@ -95,7 +110,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
             GUI.enabled = true;
          }
 
-         GUILayout.EndScrollView();
+         if( _supportsScrollView )
+         {
+            GUILayout.EndScrollView();
+         }
          GUILayout.EndArea();
       }
    }
