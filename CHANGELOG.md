@@ -1,4 +1,8 @@
-﻿### 5.1.0
+﻿### 5.2.0
+ * FEATURE - Added support for Lingo Cloud - thanks to Kiles Duli
+ * BUG FIX - Fixed IL2CPP issue where plugin did not always use correct unhollowed paths for BepInEx
+
+### 5.1.0
  * BREAKING CHANGE - Fixed escaping for '='-sign in translation files. Now uses '\=' instead of '%3D', though '%3D' is still recognized as newline when reading translations
  * FEATURE - Added automatic translation pruning for translations replaced by regexes in the standard output file. Does not work for splitter regexes
  * BUG FIX - Fixed an issue related to TextMesh Pro font fallback in MelonLoader
