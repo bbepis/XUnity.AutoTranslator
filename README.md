@@ -211,7 +211,7 @@ The supported translators are:
  * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
    * No limitations, but unstable.
  * [BaiduTranslate](https://anonym.to/?https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
-   * Not sure on quotas on this one.
+   * After registration, the first 50,000 characters per month are free (QPS=1), and 49 yuan/million characters are charged after that. If you have passed the free identity authentication, then the first 1 million characters per month are free (QPS=10), and the excess is charged at 49 yuan/million characters. The longest single request is 6000 characters;
  * [YandexTranslate](https://anonym.to/?https://tech.yandex.com/translate/), based on the Yandex translation service. Requires an API key.
    * Free up to 1 million characters per day, but max 10 million characters per month.
  * [WatsonTranslate](https://anonym.to/?https://cloud.ibm.com/apidocs/language-translator), based on IBM's Watson. Requires a URL and an API key.

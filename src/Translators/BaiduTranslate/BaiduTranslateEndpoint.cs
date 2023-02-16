@@ -9,7 +9,7 @@ using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Endpoints;
-using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
+using XUnity.AutoTranslator.Plugin.Core.Endpoints;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
@@ -79,7 +79,7 @@ namespace BaiduTranslate
          { "hu", "hu" },
       };
 
-      private static readonly string HttpServicePointTemplateUrl = "http://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
+      private static readonly string HttpServicePointTemplateUrl = "https://api.fanyi.baidu.com/api/trans/vip/translate?q={0}&from={1}&to={2}&appid={3}&salt={4}&sign={5}";
       private static readonly MD5 HashMD5 = MD5.Create();
 
       private string _appId;
