@@ -223,7 +223,7 @@ The supported translators are:
  * [Sugoi Translator](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), currently requires external translator plugin.
    * No limitations. Remarkable quality.
  * [LingoCloudTranslate](https://anonym.to/?https://fanyi.caiyunapp.com/), based on the online LingoCloud translation service. Translation is only supported in Chinese and two other languages: Japanese and English.
-   * Not sure on quotas on this one.
+   * After registration and free certification, the first 1 million characters per month are free, and the excess will be charged at 20 yuan/million characters.The official test token is `3975l6lr5pcbvidl6jl2`, you can try it before registering.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:
