@@ -49,7 +49,7 @@ namespace LingoCloudTranslate
          _token = context.GetOrCreateSetting( "LingoCloud", "LingoCloudToken", "" );
          if( string.IsNullOrEmpty( _token ) ) throw new EndpointInitializationException( "The LingoCloudTranslate endpoint requires an App Id which has not been provided." );
 
-         context.DisableCertificateChecksFor( "https://api.interpreter.caiyunai.com/v1/translator" );
+         context.DisableCertificateChecksFor( "api.interpreter.caiyunai.com" );
 
          if( !SupportedLanguages.ContainsKey( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.ContainsKey( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
@@ -70,7 +70,6 @@ namespace LingoCloudTranslate
 
          var request = new XUnityWebRequest( "POST", HttpServicePointTemplateUrl, data );
          request.Headers[ HttpRequestHeader.ContentType ] = "application/json";
-         request.Headers[ HttpRequestHeader.Accept ] = "application/json";
          request.Headers[ "X-Authorization" ] = $"token {this._token}";
 
          context.Complete( request );
