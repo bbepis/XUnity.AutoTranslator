@@ -36,7 +36,7 @@ namespace LingoCloudTranslate
          return lang;
       }
 
-      private static readonly string HttpServicePointTemplateUrl = "http://api.interpreter.caiyunai.com/v1/translator";
+      private static readonly string HttpServicePointTemplateUrl = "https://api.interpreter.caiyunai.com/v1/translator";
 
       public override string Id => "LingoCloudTranslate";
 
@@ -47,9 +47,9 @@ namespace LingoCloudTranslate
       public override void Initialize( IInitializationContext context )
       {
          _token = context.GetOrCreateSetting( "LingoCloud", "LingoCloudToken", "" );
-         if( string.IsNullOrEmpty( _token ) ) throw new EndpointInitializationException( "The BaiduTranslate endpoint requires an App Id which has not been provided." );
+         if( string.IsNullOrEmpty( _token ) ) throw new EndpointInitializationException( "The LingoCloudTranslate endpoint requires an App Id which has not been provided." );
 
-         context.DisableCertificateChecksFor( "http://api.interpreter.caiyunai.com/v1/translator" );
+         context.DisableCertificateChecksFor( "https://api.interpreter.caiyunai.com/v1/translator" );
 
          if( !SupportedLanguages.ContainsKey( context.SourceLanguage ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
          if( !SupportedLanguages.ContainsKey( context.DestinationLanguage ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
