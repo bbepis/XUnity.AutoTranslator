@@ -36,7 +36,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
       static void Postfix( TextAsset __instance, ref byte[] __result )
 #else
-      static void Postfix( TextAsset __instance, ref UnhollowerBaseLib.Il2CppStructArray<byte> __result )
+      static void Postfix( TextAsset __instance, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> __result )
 #endif
       {
          if( __result == null ) return;

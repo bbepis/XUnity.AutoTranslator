@@ -20,7 +20,7 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
          {
             try
             {
-               if( ui is Component component )
+               if( ui is Component component && component )
                {
                   return GetScopeFromComponent( component );
                }

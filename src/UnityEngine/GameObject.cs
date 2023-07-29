@@ -9,7 +9,8 @@ using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 #if IL2CPP
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #endif
 
 namespace UnityEngine

@@ -34,7 +34,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
       static void Postfix( object __instance )
 #else
-      static void Postfix( UnhollowerBaseLib.Il2CppObjectBase __instance )
+      static void Postfix(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase __instance )
 #endif
       {
 #if IL2CPP
@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
       static void Postfix( object __instance )
 #else
-      static void Postfix( UnhollowerBaseLib.Il2CppObjectBase __instance )
+      static void Postfix(Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase __instance )
 #endif
       {
 #if IL2CPP

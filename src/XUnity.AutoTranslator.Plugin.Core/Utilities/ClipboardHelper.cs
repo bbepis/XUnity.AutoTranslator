@@ -9,7 +9,7 @@ using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 #if IL2CPP
-using UnhollowerRuntimeLib;
+using Il2CppInterop.Runtime;
 #endif
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities

@@ -12,8 +12,8 @@ using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 #if IL2CPP
-using UnhollowerBaseLib;
-using UnhollowerRuntimeLib;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 #endif
 
 namespace XUnity.Common.Constants

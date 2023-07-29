@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 
 #if IL2CPP
-using UnhollowerBaseLib;
-using UnhollowerBaseLib.Attributes;
-using UnhollowerRuntimeLib;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Common.Attributes;
 #endif
 
 namespace UnityEngine.Events

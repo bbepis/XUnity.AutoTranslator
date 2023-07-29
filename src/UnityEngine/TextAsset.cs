@@ -17,7 +17,7 @@ namespace UnityEngine
       public string text => throw new NotImplementedException();
 
 #if IL2CPP
-      public UnhollowerBaseLib.Il2CppStructArray<byte> bytes => throw new NotImplementedException();
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> bytes => throw new NotImplementedException();
 #else
       public byte[] bytes => throw new NotImplementedException();
 #endif

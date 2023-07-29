@@ -118,7 +118,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public UnityEngine.Object[] Assets
 #else
-      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> Assets
 #endif
       {
          get => _backingField.Array;

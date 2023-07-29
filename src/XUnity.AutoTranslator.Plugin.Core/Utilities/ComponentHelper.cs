@@ -6,7 +6,7 @@ using UnityEngine;
 using XUnity.Common.Extensions;
 
 #if IL2CPP
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
 #endif
 
 namespace XUnity.AutoTranslator.Plugin.Core.Utilities

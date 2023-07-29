@@ -272,7 +272,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 #if MANAGED
          return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( char[] ) } );
 #else
-         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<char> ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<char> ) } );
 #endif
       }
 
@@ -311,7 +311,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 #if MANAGED
          return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( char[] ), typeof( int ), typeof( int ) } );
 #else
-         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<char> ), typeof( int ), typeof( int ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<char> ), typeof( int ), typeof( int ) } );
 #endif
       }
 
@@ -350,7 +350,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro
 #if MANAGED
          return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( int[] ), typeof( int ), typeof( int ) } );
 #else
-         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( UnhollowerBaseLib.Il2CppStructArray<int> ), typeof( int ), typeof( int ) } );
+         return AccessToolsShim.Method( UnityTypes.TMP_Text?.ClrType, "SetCharArray", new[] { typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int> ), typeof( int ), typeof( int ) } );
 #endif
       }
 

@@ -9,6 +9,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
 		<ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
+		<ProjectReference Include="..\XUnity.ResourceRedirector.BepInEx\XUnity.ResourceRedirector.BepInEx.csproj" />
 		<ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" />
 	</ItemGroup>
 
@@ -16,15 +17,27 @@
 		<Reference Include="BepInEx.Core">
 			<HintPath>..\..\libs\BepInEx IL2CPP 6.0.0.291\BepInEx.Core.dll</HintPath>
 		</Reference>
-		<Reference Include="BepInEx.IL2CPP">
-			<HintPath>..\..\libs\BepInEx IL2CPP 6.0.0.291\BepInEx.IL2CPP.dll</HintPath>
+		<Reference Include="BepInEx.Unity.Common">
+			<HintPath>..\..\libs\BepInEx IL2CPP 6.0.0.291\BepInEx.Unity.Common.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Unity.IL2CPP">
+			<HintPath>..\..\libs\BepInEx IL2CPP 6.0.0.291\BepInEx.Unity.IL2CPP.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
-		<Reference Include="UnhollowerBaseLib">
-			<HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Runtime.dll</HintPath>
 		</Reference>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+		<!--<Reference Include="Il2CppInterop.Generator">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Generator.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.HarmonySupport">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.HarmonySupport.dll</HintPath>
+		</Reference>-->
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

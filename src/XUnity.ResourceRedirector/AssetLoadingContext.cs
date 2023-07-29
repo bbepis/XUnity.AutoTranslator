@@ -99,7 +99,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public UnityEngine.Object[] Assets { get => _backingField.Array; set => _backingField.Array = value; }
 #else
-      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
 #endif
 
       /// <summary>

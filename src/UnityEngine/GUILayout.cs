@@ -219,7 +219,7 @@ namespace UnityEngine
       }
 
 #if IL2CPP
-      public static void Label( string text, GUIStyle style, UnhollowerBaseLib.Il2CppReferenceArray<GUILayoutOption> options )
+      public static void Label( string text, GUIStyle style, Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GUILayoutOption> options )
 #else
       public static void Label( string text, GUIStyle style, params GUILayoutOption[] options )
 #endif
@@ -292,7 +292,7 @@ namespace UnityEngine
       }
 
 #if IL2CPP
-      public static bool Button( GUIContent content, GUIStyle style, UnhollowerBaseLib.Il2CppReferenceArray<GUILayoutOption> options ) => throw new NotImplementedException();
+      public static bool Button( GUIContent content, GUIStyle style, Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GUILayoutOption> options ) => throw new NotImplementedException();
 #else
       public static bool Button( GUIContent content, GUIStyle style, params GUILayoutOption[] options ) => throw new NotImplementedException();
 #endif

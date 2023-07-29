@@ -26,7 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             {
                AdvManager = GameObject.FindObjectOfType( UnityTypes.AdvDataManager.UnityType );
 #if IL2CPP
-               AdvManager = Il2CppUtilities.CreateProxyComponentWithDerivedType( ( (UnhollowerBaseLib.Il2CppObjectBase)AdvManager ).Pointer, UnityTypes.AdvDataManager.ClrType );
+               AdvManager = Il2CppUtilities.CreateProxyComponentWithDerivedType( ( (Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase)AdvManager ).Pointer, UnityTypes.AdvDataManager.ClrType );
 #endif
 
                var ScenarioDataTblProperty = UnityTypes.AdvDataManager.ClrType.GetProperty( "ScenarioDataTbl" );

@@ -55,7 +55,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       UnityEngine.Object[] Assets { get; set; }
 #else
-      UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get; set; }
+      Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> Assets { get; set; }
 #endif
 
       /// <summary>

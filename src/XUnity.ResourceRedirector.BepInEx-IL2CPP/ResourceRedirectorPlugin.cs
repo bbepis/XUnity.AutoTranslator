@@ -1,6 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.IL2CPP;
+using BepInEx.Unity.IL2CPP;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

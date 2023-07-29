@@ -81,7 +81,7 @@ namespace XUnity.Common.Extensions
             initialLength = 32768;
          }
 
-         var buffer = new UnhollowerBaseLib.Il2CppStructArray<byte>( initialLength );
+         var buffer = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte>( initialLength );
          int read = 0;
 
          int chunk;

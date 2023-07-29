@@ -33,15 +33,21 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
-		<Reference Include="UnhollowerBaseLib">
-			<HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
-		</Reference>
-		<Reference Include="UnhollowerRuntimeLib">
-			<HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
-		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+		<!--<Reference Include="Il2CppInterop.Generator">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Generator.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.HarmonySupport">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.HarmonySupport.dll</HintPath>
+		</Reference>-->
 	</ItemGroup>
 
 	<ItemGroup>

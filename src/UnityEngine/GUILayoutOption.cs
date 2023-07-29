@@ -8,10 +8,14 @@ using System.Text;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
+#if IL2CPP
+using Il2CppInterop.Runtime.InteropTypes;
+#endif
+
 namespace UnityEngine
 {
 #if IL2CPP
-   public sealed class GUILayoutOption : UnhollowerBaseLib.Il2CppObjectBase
+   public sealed class GUILayoutOption : Il2CppObjectBase
 #else
    public sealed class GUILayoutOption
 #endif

@@ -120,7 +120,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool ShouldIgnoreTextComponent( this object ui )
       {
-         if( ui is Component component )
+         if( ui is Component component && component )
          {
             var go = component.gameObject;
             var ignore = go.HasIgnoredName();
@@ -166,7 +166,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
 
       public static bool IsComponentActive( this object ui )
       {
-         if( ui is Component component )
+         if( ui is Component component && component )
          {
             var go = component.gameObject;
             if( go )

@@ -8,8 +8,9 @@ using XUnity.Common.Constants;
 using XUnity.Common.Utilities;
 
 #if IL2CPP
-using UnhollowerBaseLib;
-using UnhollowerRuntimeLib;
+using Il2CppInterop.Runtime.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime;
 #endif
 
 
@@ -22,11 +23,11 @@ namespace XUnity.Common.Extensions
 
       static ObjectExtensions()
       {
-         GetIl2CppType = UnhollowerBaseLib.IL2CPP.GetIl2CppMethod(
+         GetIl2CppType = IL2CPP.GetIl2CppMethod(
                Il2CppClassPointerStore<Il2CppSystem.Object>.NativeClassPtr,
                false,
                "GetType",
-               UnhollowerBaseLib.IL2CPP.RenderTypeName<Type>() );
+               IL2CPP.RenderTypeName<Type>() );
 
       }
 
@@ -34,15 +35,15 @@ namespace XUnity.Common.Extensions
       {
          if( that is Il2CppObjectBase obj )
          {
-            UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj );
+            IL2CPP.Il2CppObjectBaseToPtrNotNull( obj );
             System.IntPtr* param = null;
             System.IntPtr exc = IntPtr.Zero;
-            System.IntPtr intPtr = UnhollowerBaseLib.IL2CPP.il2cpp_runtime_invoke(
+            System.IntPtr intPtr = IL2CPP.il2cpp_runtime_invoke(
                GetIl2CppType,
-               UnhollowerBaseLib.IL2CPP.Il2CppObjectBaseToPtrNotNull( obj ),
+               IL2CPP.Il2CppObjectBaseToPtrNotNull( obj ),
                (void**)param,
                ref exc );
-            Il2CppException.RaiseExceptionIfNecessary( exc );
+            Il2CppInterop.Runtime.Il2CppException.RaiseExceptionIfNecessary( exc );
             return intPtr != IntPtr.Zero ? new Il2CppSystem.Type( intPtr ) : null;
          }
          return null;
@@ -98,7 +99,7 @@ namespace XUnity.Common.Extensions
             }
             if( RuntimeSpecificsStore.IsInjected( intPtr ) )
             {
-               castedObject = (TObject)UnhollowerBaseLib.Runtime.ClassInjectorBase.GetMonoObjectFromIl2CppPointer( instancePointer );
+               castedObject = (TObject)ClassInjectorBase.GetMonoObjectFromIl2CppPointer( instancePointer );
                return castedObject != null;
             }
 

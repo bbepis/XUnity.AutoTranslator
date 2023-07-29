@@ -8,7 +8,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       private UnityEngine.Object[] _array;
 #else
-      private UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> _array;
+      private Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> _array;
 #endif
       private BackingSource _source;
 
@@ -22,7 +22,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public BackingFieldOrArray( UnityEngine.Object[] array )
 #else
-      public BackingFieldOrArray( UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> array )
+      public BackingFieldOrArray( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> array )
 #endif
       {
          _field = null;
@@ -58,7 +58,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public UnityEngine.Object[] Array
 #else
-      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Array
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> Array
 #endif
       {
          get

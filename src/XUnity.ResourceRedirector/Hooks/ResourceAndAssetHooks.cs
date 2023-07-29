@@ -364,15 +364,15 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync_Internal", typeof( byte[] ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync", typeof( byte[] ), typeof( uint ) );
 #else
-         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync_Internal", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) )
-            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) );
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync_Internal", typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemoryAsync", typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> ), typeof( uint ) );
 #endif
       }
 
 #if MANAGED
       static bool Prefix( ref byte[] binary, ref uint crc, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
 #else
-      static bool Prefix( ref UnhollowerBaseLib.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
+      static bool Prefix( ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundleCreateRequest __result, ref AsyncAssetBundleLoadingContext __state )
 #endif
       {
          var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
@@ -429,15 +429,15 @@ namespace XUnity.ResourceRedirector.Hooks
          return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory_Internal", typeof( byte[] ), typeof( uint ) )
             ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory", typeof( byte[] ), typeof( uint ) );
 #else
-         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory_Internal", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) )
-            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory", typeof( UnhollowerBaseLib.Il2CppStructArray<byte> ), typeof( uint ) );
+         return AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory_Internal", typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> ), typeof( uint ) )
+            ?? AccessToolsShim.Method( UnityTypes.AssetBundle?.ClrType, "LoadFromMemory", typeof( Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> ), typeof( uint ) );
 #endif
       }
 
 #if MANAGED
       static bool Prefix( ref byte[] binary, ref uint crc, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
 #else
-      static bool Prefix( ref UnhollowerBaseLib.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
+      static bool Prefix( ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> binary, ref uint crc, ref AssetBundle __result, ref AssetBundleLoadingContext __state )
 #endif
       {
          var parameters = new AssetBundleLoadingParameters( binary, null, crc, 0, null, 0, AssetBundleLoadType.LoadFromMemory );
@@ -916,7 +916,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static bool Prefix( AssetBundle __instance, ref Type type, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
 #else
-      static bool Prefix( AssetBundle __instance, ref Il2CppSystem.Type type, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+      static bool Prefix( AssetBundle __instance, ref Il2CppSystem.Type type, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
 #endif
       {
          var parameters = new AssetLoadingParameters( null, type, AssetLoadType.LoadByType );
@@ -931,7 +931,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static void Postfix( AssetBundle __instance, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
 #else
-      static void Postfix( AssetBundle __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+      static void Postfix( AssetBundle __instance, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
 #endif
       {
          if( !__state.SkipAllPostfixes )
@@ -1114,7 +1114,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static bool Prefix( AssetBundle __instance, ref string name, ref Type type, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
 #else
-      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+      static bool Prefix( AssetBundle __instance, ref string name, ref Il2CppSystem.Type type, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
 #endif
       {
          if( name == string.Empty )
@@ -1138,7 +1138,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static void Postfix( AssetBundle __instance, ref UnityEngine.Object[] __result, ref AssetLoadingContext __state )
 #else
-      static void Postfix( AssetBundle __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
+      static void Postfix( AssetBundle __instance, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AssetLoadingContext __state )
 #endif
       {
          if( !__state.SkipAllPostfixes )
@@ -1330,7 +1330,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static bool Prefix( AssetBundleRequest __instance, ref UnityEngine.Object[] __result, ref AsyncAssetLoadInfo __state )
 #else
-      static bool Prefix( AssetBundleRequest __instance, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
+      static bool Prefix( AssetBundleRequest __instance, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
 #endif
       {
          if( ResourceRedirection.TryGetAssetBundleLoadInfo( __instance, out __state ) )
@@ -1355,7 +1355,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static void Postfix( ref UnityEngine.Object[] __result, ref AsyncAssetLoadInfo __state )
 #else
-      static void Postfix( ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
+      static void Postfix( ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result, ref AsyncAssetLoadInfo __state )
 #endif
       {
          if( __state != null && !__state.SkipAllPostfixes )
@@ -1455,7 +1455,7 @@ namespace XUnity.ResourceRedirector.Hooks
 #if MANAGED
       static void Postfix( string __0, Type __1, ref UnityEngine.Object[] __result )
 #else
-      static void Postfix( string __0, Il2CppSystem.Type __1, ref UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> __result )
+      static void Postfix( string __0, Il2CppSystem.Type __1, ref Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> __result )
 #endif
       {
          var parameters = new ResourceLoadedParameters( __0, __1, ResourceLoadType.LoadByType );

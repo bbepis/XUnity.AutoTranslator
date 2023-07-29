@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 #if IL2CPP
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
 #endif
 
 namespace UnityEngine
@@ -89,7 +89,7 @@ namespace UnityEngine
       private static extern void INTERNAL_CALL_GetPixelBilinear( Texture2D self, float u, float v, out Color value );
 
 #if IL2CPP
-      public void SetPixels( Il2CppStructArray<Color> colors ) => throw new NotImplementedException();
+      public void SetPixels(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<Color> colors ) => throw new NotImplementedException();
 #else
       public void SetPixels( Color[] colors ) => throw new NotImplementedException();
 #endif
@@ -124,7 +124,7 @@ namespace UnityEngine
       private extern void SetBlockOfPixels32( int x, int y, int blockWidth, int blockHeight, Color32[] colors, int miplevel );
 
 #if IL2CPP
-      public void SetPixels32( Il2CppStructArray<Color32> colors ) => throw new NotImplementedException();
+      public void SetPixels32(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<Color32> colors ) => throw new NotImplementedException();
 #else
       public void SetPixels32( Color32[] colors ) => throw new NotImplementedException();
 #endif

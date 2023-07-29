@@ -10,7 +10,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       internal AssetBundleLoadingParameters( byte[] data, string path, uint crc, ulong offset, Stream stream, uint managedReadBufferSize, AssetBundleLoadType loadType )
 #else
-      internal AssetBundleLoadingParameters( UnhollowerBaseLib.Il2CppStructArray<byte> data, string path, uint crc, ulong offset, Il2CppSystem.IO.Stream stream, uint managedReadBufferSize, AssetBundleLoadType loadType )
+      internal AssetBundleLoadingParameters(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> data, string path, uint crc, ulong offset, Il2CppSystem.IO.Stream stream, uint managedReadBufferSize, AssetBundleLoadType loadType )
 #endif
       {
          Binary = data;
@@ -57,7 +57,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public byte[] Binary { get; set; }
 #else
-      public UnhollowerBaseLib.Il2CppStructArray<byte> Binary { get; set; }
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<byte> Binary { get; set; }
 #endif
 
       /// <summary>

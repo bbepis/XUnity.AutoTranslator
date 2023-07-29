@@ -4,7 +4,8 @@ using System.Linq;
 using XUnity.Common.Extensions;
 
 #if IL2CPP
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
+using Il2CppInterop.Runtime.InteropTypes;
 #endif
 
 namespace XUnity.Common.Utilities

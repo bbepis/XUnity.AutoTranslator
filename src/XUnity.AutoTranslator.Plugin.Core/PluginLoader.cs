@@ -105,7 +105,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       {
          static AutoTranslatorProxyBehaviour()
          {
-            UnhollowerRuntimeLib.ClassInjector.RegisterTypeInIl2Cpp<AutoTranslatorProxyBehaviour>();
+            Il2CppInterop.Runtime.Injection.ClassInjector.RegisterTypeInIl2Cpp<AutoTranslatorProxyBehaviour>();
          }
 
          public AutoTranslatorProxyBehaviour( IntPtr value ) : base( value )

@@ -16,7 +16,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnityEngine.Object[] assets )
 #else
-      internal ResourceLoadedContext( ResourceLoadedParameters parameters, UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> assets )
+      internal ResourceLoadedContext( ResourceLoadedParameters parameters, Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> assets )
 #endif
       {
          Parameters = parameters;
@@ -123,7 +123,7 @@ namespace XUnity.ResourceRedirector
 #if MANAGED
       public UnityEngine.Object[] Assets { get => _backingField.Array; set => _backingField.Array = value; }
 #else
-      public UnhollowerBaseLib.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
+      public Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<UnityEngine.Object> Assets { get => _backingField.Array; set => _backingField.Array = value; }
 #endif
 
       /// <summary>

@@ -1,59 +1,65 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <Title>XUnity Common</Title>
-    <Description>Common dependencies shared between XUnity Auto Translator and Resource Redirector.</Description>
-    <Authors>gravydevsupreme</Authors>
-    <PackageTags>unity;xunity</PackageTags>
-    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <DevelopmentDependency>True</DevelopmentDependency>
-    <TargetFrameworks>net35;net472</TargetFrameworks>
-    <Version>1.0.3</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Title>XUnity Common</Title>
+		<Description>Common dependencies shared between XUnity Auto Translator and Resource Redirector.</Description>
+		<Authors>gravydevsupreme</Authors>
+		<PackageTags>unity;xunity</PackageTags>
+		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<DevelopmentDependency>True</DevelopmentDependency>
+		<TargetFrameworks>net35;net472</TargetFrameworks>
+		<Version>1.0.3</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>bin\Release\net35\XUnity.Common.xml</DocumentationFile>
+	</PropertyGroup>
 
-   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
-      <DefineConstants>MANAGED</DefineConstants>
-   </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net35'">
+		<DefineConstants>MANAGED</DefineConstants>
+	</PropertyGroup>
 
-   <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
-      <DefineConstants>IL2CPP</DefineConstants>
-   </PropertyGroup>
-   
-   <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-      <Reference Include="UnhollowerBaseLib">
-         <HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
-      </Reference>
-      <Reference Include="UnhollowerRuntimeLib">
-         <HintPath>..\..\libs\Unhollower\UnhollowerRuntimeLib.dll</HintPath>
-      </Reference>
-      <Reference Include="Il2Cppmscorlib">
-         <HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
-      </Reference>
-   </ItemGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+		<DefineConstants>IL2CPP</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\..\libs\MonoMod\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod.Utils">
-      <HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+		<!--<Reference Include="Il2CppInterop.Generator">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Generator.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.HarmonySupport">
+			<HintPath>..\..\libs\Unhollower\Il2CppInterop.HarmonySupport.dll</HintPath>
+		</Reference>-->
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Mono.Cecil">
+			<HintPath>..\..\libs\MonoMod\Mono.Cecil.dll</HintPath>
+		</Reference>
+		<Reference Include="MonoMod.Utils">
+			<HintPath>..\..\libs\MonoMod\MonoMod.Utils.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
