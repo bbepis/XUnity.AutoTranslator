@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net35;net472</TargetFrameworks>
+		<TargetFrameworks>net35;net6.0</TargetFrameworks>
 		<Version>5.2.0</Version>
 	</PropertyGroup>
 
@@ -9,7 +9,7 @@
 		<DefineConstants>MANAGED</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<DefineConstants>IL2CPP</DefineConstants>
 	</PropertyGroup>
 
@@ -28,12 +28,9 @@
 		</Reference>
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
-		</Reference>
-		<Reference Include="UnhollowerBaseLib">
-			<HintPath>..\..\libs\Unhollower\UnhollowerBaseLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -49,7 +46,7 @@
 	</Target>
 
 	<!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
-	<Target Name="PostBuildNET472" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net472'">
+	<Target Name="PostBuildNET472" AfterTargets="PostBuildEvent" Condition="'$(TargetFramework)'=='net6.0'">
 		<GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
 			<Output TaskParameter="Assemblies" ItemName="Targets" />
 		</GetAssemblyIdentity>

@@ -35,8 +35,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private static void TestReflectionEmit()
       {
-         MethodToken t1 = default( MethodToken );
-         MethodToken t2 = default( MethodToken );
+         Label t1 = default( Label );
+         Label t2 = default( Label );
          var ok = t1 == t2;
       }
    }

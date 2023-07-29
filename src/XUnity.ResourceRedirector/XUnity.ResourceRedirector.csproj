@@ -10,7 +10,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<DevelopmentDependency>True</DevelopmentDependency>
-		<TargetFrameworks>net35;net472</TargetFrameworks>
+		<TargetFrameworks>net35;net6.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<Version>2.0.0</Version>
 	</PropertyGroup>
@@ -27,11 +27,11 @@
 		<DefineConstants>MANAGED</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+	<PropertyGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<DefineConstants>IL2CPP</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)'=='net472'">
+	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
@@ -41,12 +41,6 @@
 		<Reference Include="Il2CppInterop.Common">
 			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
 		</Reference>
-		<!--<Reference Include="Il2CppInterop.Generator">
-			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Generator.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2CppInterop.HarmonySupport">
-			<HintPath>..\..\libs\Unhollower\Il2CppInterop.HarmonySupport.dll</HintPath>
-		</Reference>-->
 	</ItemGroup>
 
 	<ItemGroup>

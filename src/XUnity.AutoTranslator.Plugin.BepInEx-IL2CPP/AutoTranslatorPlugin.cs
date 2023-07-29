@@ -7,8 +7,8 @@ using System.Text;
 using BepInEx;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
+using BepInEx.Unity.IL2CPP;
 using ExIni;
-using UnhollowerRuntimeLib;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
@@ -31,7 +31,7 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
 
          _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
 
-         Il2CppProxyAssemblies.Location = Preloader.IL2CPPUnhollowedPath; // Path.Combine( Paths.BepInExRootPath, "unhollowed" );
+         Il2CppProxyAssemblies.Location = Path.Combine( Paths.BepInExRootPath, "interop" ); // Il2CppInteropManager.IL2CPPInteropAssemblyPath is internal...
       }
 
       public override void Load()
