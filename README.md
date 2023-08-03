@@ -341,6 +341,7 @@ IgnoreVirtualTextSetterCallingRules=False; Indicates that rules for virtual meth
 MaxTextParserRecursion=1         ;Indicates how many levels of recursion are allowed when text is parsed so it can be translated in different parts. This can be used with splitter-regexes in advanced scenarios. The default value of one essentially means that recursion is disabled.
 HtmlEntityPreprocessing=True     ;Will preprocess and decode html entities before they are send for translation. Some translators will fail when html entities are sent.
 HandleRichText=True              ;Will enable automated handling of rich text (text with markup)
+PersistRichTextMode=Final        ;Indicates how parsed rich text should be persisted. Either 'Fragment' to store the the text piecemeal or 'Final' to store the entire translated string (does not support substitutions!)
 EnableTranslationHelper=False    ;Indicates if translator-related helpful log messages should be enabled. May be useful when tranlating based on redirected resources
 ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
 InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)

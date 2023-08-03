@@ -1,9 +1,9 @@
 ﻿### 5.3.0
- * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono)
+ * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono), also dropped support for earlier versions!
  * FEATURE - Added 'PersistRichTextMode' to allow control over how text that is parsed as rich text during translation is persisted
  * REGRESSION - Dropped support for pre-2017 Unity Engine versions for IL2CPP versions due to problems with new IL2CPP interop (may be re-added later)
  * BUG FIX - Fixed some potential NullReferenceException occurrences
- * BUG FIX - Fixed potential bug during substitution replacements - thanks to @Tokc
+ * BUG FIX - Fixed potential bug during substitution replacements - thanks to @TokcDK
 
 ### 5.2.0
  * FEATURE - Added support for Lingo Cloud - thanks to Kiles Duli
