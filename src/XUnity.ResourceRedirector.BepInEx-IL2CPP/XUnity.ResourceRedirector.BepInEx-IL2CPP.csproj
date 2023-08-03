@@ -7,7 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
 		<ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
 		<ProjectReference Include="..\XUnity.ResourceRedirector.BepInEx\XUnity.ResourceRedirector.BepInEx.csproj" />
 		<ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" />
@@ -31,6 +30,10 @@
 		</Reference>
 		<Reference Include="Il2CppInterop.Common">
 			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

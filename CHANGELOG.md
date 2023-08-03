@@ -1,4 +1,9 @@
-﻿### 5.2.0
+﻿### 5.3.0
+ * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono)
+ * REGRESSION - Dropped support for pre-2017 Unity Engine versions for IL2CPP versions due to problems with new IL2CPP interop (may be re-added later)
+ * BUG FIX - Fixed some potential NullReferenceException occurrences
+
+### 5.2.0
  * FEATURE - Added support for Lingo Cloud - thanks to Kiles Duli
  * BUG FIX - Fixed IL2CPP issue where plugin did not always use correct unhollowed paths for BepInEx
 

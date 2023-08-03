@@ -78,7 +78,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Endpoints.Www
       /// <returns></returns>
       protected WWW CreateWww( string address, byte[] data, Dictionary<string, string> headers )
       {
+#if MANAGED
          return new WWW( address, data, headers );
+#else
+         throw new NotSupportedException( "WWW API generally not supported in unstripped unity proxy API." );
+#endif
       }
 
       /// <summary>

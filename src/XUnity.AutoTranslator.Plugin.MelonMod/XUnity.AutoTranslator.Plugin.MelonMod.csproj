@@ -13,8 +13,21 @@
 		<DefineConstants>IL2CPP</DefineConstants>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net35'">
 		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\XUnity.AutoTranslator.Plugin.Core\XUnity.AutoTranslator.Plugin.Core.csproj" />
 		<ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" />
 	</ItemGroup>
@@ -25,12 +38,6 @@
 		</Reference>
 		<Reference Include="MelonLoader">
 			<HintPath>..\..\libs\MelonMod052\MelonLoader.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 

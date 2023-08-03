@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using XUnity.Common.Logging;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -92,7 +93,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          }
 
          var style = _viewModel.CurrentSelection == null ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
-         if( GUILayout.Button( _unselect, style, null ) )
+         if( GUILayout.Button( _unselect, style, ArrayHelper.Null<GUILayoutOption>() ) )
          {
             _viewModel.Select( null );
             _isShown = false;
@@ -102,7 +103,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          {
             style = option.IsSelected() ? GUIUtil.NoMarginButtonPressedStyle : GUIUtil.NoMarginButtonStyle;
             GUI.enabled = option?.IsEnabled() ?? true;
-            if( GUILayout.Button( option.Text, style, null ) )
+            if( GUILayout.Button( option.Text, style, ArrayHelper.Null<GUILayoutOption>() ) )
             {
                _viewModel.Select( option );
                _isShown = false;

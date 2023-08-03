@@ -32,6 +32,10 @@
 		<DefineConstants>IL2CPP</DefineConstants>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)'=='net35'">
+		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+	</ItemGroup>
+
 	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>
@@ -41,6 +45,22 @@
 		</Reference>
 		<Reference Include="Il2CppInterop.Common">
 			<HintPath>..\..\libs\Unhollower\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+		
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TextRenderingModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.TextRenderingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.AssetBundleModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.IMGUIModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.IMGUIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestWWWModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -70,7 +90,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
 		<ProjectReference Include="..\XUnity.AutoTranslator.Plugin.ExtProtocol\XUnity.AutoTranslator.Plugin.ExtProtocol.csproj" PrivateAssets="All" />
 		<ProjectReference Include="..\XUnity.Common\XUnity.Common.csproj" PrivateAssets="All" />
 		<ProjectReference Include="..\XUnity.ResourceRedirector\XUnity.ResourceRedirector.csproj" PrivateAssets="All" />

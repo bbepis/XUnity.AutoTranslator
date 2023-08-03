@@ -28,7 +28,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
       /// </summary>
       /// <param name="delay"></param>
       /// <returns></returns>
-      public static IEnumerator CreateWaitForSecondsRealtime( float delay )
+      public static object CreateWaitForSecondsRealtime( float delay )
       {
          // Could be bad... WaitForSecondsRealtime could be shimmed away, even if IEnumerator is supported
          if( UnityFeatures.SupportsWaitForSecondsRealtime )
@@ -38,7 +38,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          return null;
       }
 
-      private static IEnumerator GetWaitForSecondsRealtimeInternal( float delay )
+      private static object GetWaitForSecondsRealtimeInternal( float delay )
       {
          return new WaitForSecondsRealtime( delay );
       }

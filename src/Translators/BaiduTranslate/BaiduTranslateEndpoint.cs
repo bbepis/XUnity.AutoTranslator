@@ -13,6 +13,7 @@ using XUnity.AutoTranslator.Plugin.Core.Endpoints.Http;
 using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Utilities;
 using XUnity.AutoTranslator.Plugin.Core.Web;
+using XUnity.Common.Utilities;
 
 namespace BaiduTranslate
 {
@@ -116,7 +117,9 @@ namespace BaiduTranslate
 
       public override IEnumerator OnBeforeTranslate( IHttpTranslationContext context )
       {
-         var timeSinceLast = Time.realtimeSinceStartup - _lastRequestTimestamp;
+         var realtimeSinceStartup = TimeHelper.realtimeSinceStartup;
+
+         var timeSinceLast = realtimeSinceStartup - _lastRequestTimestamp;
          if( timeSinceLast < _delay )
          {
             var delay = _delay - timeSinceLast;
@@ -128,16 +131,16 @@ namespace BaiduTranslate
             }
             else
             {
-               float start = Time.realtimeSinceStartup;
+               float start = realtimeSinceStartup;
                var end = start + delay;
-               while( Time.realtimeSinceStartup < end )
+               while( realtimeSinceStartup < end )
                {
                   yield return null;
                }
             }
          }
 
-         _lastRequestTimestamp = Time.realtimeSinceStartup;
+         _lastRequestTimestamp = TimeHelper.realtimeSinceStartup;
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
