@@ -1,4 +1,7 @@
-﻿### 2.0.0
+﻿### 2.1.0
+ * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono), also dropped support for earlier versions!
+
+### 2.0.0
  * FEATURE - IL2CPP support through BepInEx 6 and MelonLoader
  * MISC - Prioritize HarmonyX hooks over MonoMod hooks
  * MISC - Changed BepInEx setting names
