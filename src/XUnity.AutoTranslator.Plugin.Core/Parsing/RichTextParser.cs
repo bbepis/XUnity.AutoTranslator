@@ -144,7 +144,15 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          var success = arg != 'A' && templateString.Length > 5;
          if( !success ) return null;
 
-         return new ParserResult( ParserResultOrigin.RichTextParser, input, templateString, false, true, true, false, allMatches );
+         return new ParserResult(
+            ParserResultOrigin.RichTextParser,
+            input,
+            templateString,
+            false,
+            true,
+            Settings.PersistRichTextMode == PersistRichTextMode.Final,
+            Settings.PersistRichTextMode == PersistRichTextMode.Fragment,
+            allMatches );
       }
    }
 }

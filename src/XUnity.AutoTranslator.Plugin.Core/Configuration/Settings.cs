@@ -129,6 +129,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int MaxTextParserRecursion;
       public static bool HtmlEntityPreprocessing;
       public static bool HandleRichText;
+      public static PersistRichTextMode PersistRichTextMode;
       public static bool EnableTranslationHelper;
       public static RedirectedResourceDetection RedirectedResourceDetectionStrategy;
       public static bool OutputTooLongText;
@@ -260,6 +261,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             TranslationPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "TranslationPostProcessing", TextPostProcessing.ReplaceMacronWithCircumflex | TextPostProcessing.ReplaceHtmlEntities );
             RegexPostProcessing = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "RegexPostProcessing", TextPostProcessing.None );
             CacheRegexPatternResults = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexPatternResults", false );
+            PersistRichTextMode = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "PersistRichTextMode", PersistRichTextMode.Final );
             CacheRegexLookups = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheRegexLookups", false );
             CacheWhitespaceDifferences = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheWhitespaceDifferences", false );
             GenerateStaticSubstitutionTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "GenerateStaticSubstitutionTranslations", false );
