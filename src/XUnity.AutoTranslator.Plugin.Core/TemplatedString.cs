@@ -55,46 +55,33 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       public static string ReplaceApproximateMatches( string translatedText, string translatorFriendlyKey, string key )
       {
-         var cidx = 0;
-         var startIdx = 0;
+            var tfKeyMaxIndex = translatorFriendlyKey.Length - 1;
+            var cidx = tfKeyMaxIndex;
+            var endIndex = tfKeyMaxIndex;
 
-         for( int i = 0; i < translatedText.Length; i++ )
-         {
-            var c = translatedText[ i ];
-            if( c == ' ' || c == '　' ) continue;
-            
-            if( char.ToUpperInvariant( c ) == char.ToUpperInvariant( translatorFriendlyKey[ cidx ] ) )
+            var maxIndex = translatedText.Length - 1;
+            for (int i = maxIndex; i >= 0; i--)
             {
-               if( cidx == 0 )
-               {
-                  startIdx = i;
-               }
+                var c = translatedText[i];
+                if (c == ' ' || c == '　') continue;
 
-               cidx++;
+                if ((c = char.ToUpperInvariant(c)) == char.ToUpperInvariant(translatorFriendlyKey[cidx])
+                    || c == char.ToUpperInvariant(translatorFriendlyKey[cidx = tfKeyMaxIndex]))
+                {
+                    if (cidx == tfKeyMaxIndex) endIndex = i;
+
+                    cidx--;
+                }
+
+                if (cidx >= 0) continue;
+
+                var lengthOfFriendlyKeyPlusSpaces = (endIndex + 1) - i;
+                translatedText = translatedText.Remove(i, lengthOfFriendlyKeyPlusSpaces).Insert(i, key);
+
+                cidx = tfKeyMaxIndex;
             }
-            else
-            {
-               cidx = 0;
-               startIdx = 0;
-            }
 
-            if( cidx == translatorFriendlyKey.Length )
-            {
-               int endIdx = i + 1;
-
-               var lengthOfKey = endIdx - startIdx;
-               var diff = lengthOfKey - key.Length;
-
-               translatedText = translatedText.Remove( startIdx, lengthOfKey ).Insert( startIdx, key );
-
-               i -= diff;
-
-               cidx = 0;
-               startIdx = 0;
-            }
-         }
-
-         return translatedText;
+            return translatedText;
       }
    }
 }
