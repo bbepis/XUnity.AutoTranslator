@@ -211,7 +211,7 @@ The supported translators are:
  * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
    * No limitations, but unstable.
  * [BaiduTranslate](https://anonym.to/?https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
-   * Not sure on quotas on this one.
+   * After registration, the first 50,000 characters per month are free (QPS=1), and 49 yuan/million characters are charged after that. If you have passed the free identity authentication, then the first 1 million characters per month are free (QPS=10), and the excess is charged at 49 yuan/million characters. The longest single request is 6000 characters.
  * [YandexTranslate](https://anonym.to/?https://tech.yandex.com/translate/), based on the Yandex translation service. Requires an API key.
    * Free up to 1 million characters per day, but max 10 million characters per month.
  * [WatsonTranslate](https://anonym.to/?https://cloud.ibm.com/apidocs/language-translator), based on IBM's Watson. Requires a URL and an API key.
@@ -223,7 +223,7 @@ The supported translators are:
  * [Sugoi Translator](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), currently requires external translator plugin.
    * No limitations. Remarkable quality.
  * [LingoCloudTranslate](https://anonym.to/?https://fanyi.caiyunapp.com/), based on the online LingoCloud translation service. Translation is only supported in Chinese and two other languages: Japanese and English.
-   * Not sure on quotas on this one.
+   * After registration and free certification, the first 1 million characters per month are free, and the excess will be charged at 20 yuan/million characters.The official test token is `3975l6lr5pcbvidl6jl2`, you can try it before registering.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:
