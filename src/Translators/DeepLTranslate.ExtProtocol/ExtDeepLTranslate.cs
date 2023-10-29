@@ -67,7 +67,7 @@ namespace DeepLTranslate.ExtProtocol
 
       private static readonly string HttpsServicePointTemplateUrl = "https://www2.deepl.com/jsonrpc";
       private static readonly string HttpsTranslateUserSite = "https://www.deepl.com/translator";
-      private static readonly string HttpsTranslateStateSetup = "https://www.deepl.com/PHP/backend/clientState.php?request_type=jsonrpc&il=EN";
+      private static readonly string HttpsTranslateStateSetup = "https://w.deepl.com/web?request_type=jsonrpc&il=en&method=getClientState";
       private static readonly Random RandomNumbers = new Random();
 
       private static readonly string[] Accepts = new string[] { "*/*" };
@@ -400,10 +400,10 @@ namespace DeepLTranslate.ExtProtocol
 
          var stringContent = new StringContent( content );
 
-         using var request = new HttpRequestMessage( HttpMethod.Get, HttpsTranslateStateSetup );
-         AddHeaders( request, stringContent, false );
+         using var request = new HttpRequestMessage( HttpMethod.Post, HttpsTranslateStateSetup );
+         AddHeaders( request, stringContent, true );
 
-         using var response = await _client.SendAsync( request );
+         using var response = await _client.PostAsync( HttpsTranslateStateSetup, stringContent );
          response.ThrowIfBlocked();
          response.EnsureSuccessStatusCode();
 
