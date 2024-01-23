@@ -32,7 +32,7 @@ namespace DeepLTranslate.ExtProtocol
       {
          if( msg.StatusCode == (HttpStatusCode)429 )
          {
-            throw new Exception( "Too many requests!" );
+            throw new BlockedException( "Too many requests!" );
          }
       }
    }
@@ -318,11 +318,10 @@ namespace DeepLTranslate.ExtProtocol
 
             ExtractTranslation( str, untranslatedTextInfos, context );
          }
-         catch( BlockedException )
+         catch( BlockedException e)
          {
             Reset();
-
-            throw;
+            throw new Exception( "Request was blocked, and reset used", e );
          }
          finally
          {
