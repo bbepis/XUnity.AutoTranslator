@@ -50,6 +50,10 @@
 		<Reference Include="UnityEngine.CoreModule">
 			<HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>..\..\libs\Proxies\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
+
 		<Reference Include="UnityEngine.TextRenderingModule">
 			<HintPath>..\..\libs\Proxies\UnityEngine.TextRenderingModule.dll</HintPath>
 		</Reference>

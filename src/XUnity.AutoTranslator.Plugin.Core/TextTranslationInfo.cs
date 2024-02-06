@@ -12,6 +12,7 @@ using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -132,13 +133,81 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
+               var outlineColorProperty = clrType.CachedProperty( "outlineColor" );
+               var outlineColor = outlineColorProperty.Get( ui );
+               var outlineWidthProperty = clrType.CachedProperty( "outlineWidth" );
+               var outlineWidth = outlineWidthProperty.Get( ui );
+               var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
+               var oldMaterial = fontMaterialProperty.Get( ui );
+               
                fontProperty.Set( ui, newFont );
+
+               var newMaterial = fontMaterialProperty.Get( ui );
+
+               if (oldMaterial != null && newMaterial != null) {
+                  Material _material;
+            
+                  if(!materialOutlines.TryGetValue((oldMaterial as Material).name, out _material) || _material.GetCachedPtr() == IntPtr.Zero) {
+                     _material = createOutlineMaterial(oldMaterial as Material, newMaterial as Material);
+                     materialOutlines[(oldMaterial as Material).name] = _material;
+                  }
+                  fontMaterialProperty.Set( ui, _material );
+               }
+               if (outlineColor != null)
+               {
+                  outlineColorProperty.Set( ui, outlineColor );
+               }
+               if (outlineWidth != null)
+               {
+                  outlineWidthProperty.Set( ui, outlineWidth );
+               }
+               
                _unfont = obj =>
                {
                   fontProperty.Set( obj, previousFont );
+                  if (oldMaterial != null && (oldMaterial as Material).GetCachedPtr() != IntPtr.Zero) {
+                     fontMaterialProperty.Set( obj, oldMaterial );
+                  }
+                  if (outlineColor != null)
+                  {
+                     outlineColorProperty.Set( obj, outlineColor );
+                  }
+                  if (outlineWidth != null)
+                  {
+                     outlineWidthProperty.Set( obj, outlineWidth );
+                  }
                };
             }
          }
+      }
+
+      static Dictionary<string, Material> materialOutlines = new Dictionary<string, Material>();
+      static List<String> skipProperties = new List<String>{"_GradientScale", "_TextureHeight", "_TextureWidth"};
+      static Material createOutlineMaterial(Material src, Material material)
+      {
+         XuaLogger.AutoTranslator.Info($"Wrap Material: {src.name}");
+         var mat = GameObject.Instantiate(src);
+         mat.CopyPropertiesFromMaterial(material);
+         mat.shaderKeywords = src.shaderKeywords;
+         
+         var propCount = src.shader.GetPropertyCount();
+         for(var i = 0; i < propCount; ++i) {
+               string propertyName = src.shader.GetPropertyName(i);
+               if(skipProperties.Contains(propertyName)) continue;
+               switch(src.shader.GetPropertyType(i)) {
+                  case UnityEngine.Rendering.ShaderPropertyType.Range:
+                  case UnityEngine.Rendering.ShaderPropertyType.Float:
+                     mat.SetFloat(propertyName, src.GetFloat(propertyName));
+                     break;
+                  case UnityEngine.Rendering.ShaderPropertyType.Vector:
+                     mat.SetVector(propertyName, src.GetVector(propertyName));
+                     break;
+                  case UnityEngine.Rendering.ShaderPropertyType.Color:
+                     mat.SetColor(propertyName, src.GetColor(propertyName));
+                     break;
+               }
+         }
+         return mat;
       }
 
       public void UnchangeFont( object ui )

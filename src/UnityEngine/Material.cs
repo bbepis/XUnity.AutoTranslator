@@ -646,5 +646,7 @@ namespace UnityEngine
          Vector4 textureScaleAndOffsetImpl = GetTextureScaleAndOffsetImpl( nameID );
          return new Vector2( textureScaleAndOffsetImpl.x, textureScaleAndOffsetImpl.y );
       }
+
+      public extern IntPtr GetCachedPtr();
    }
 }

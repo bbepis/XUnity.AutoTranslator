@@ -47,6 +47,16 @@ namespace UnityEngine
          get;
       }
 
+      public extern int GetPropertyCount();
+      public string GetPropertyName(int propertyIndex)
+      {
+         throw null;
+      }
+      public ShaderPropertyType GetPropertyType(int propertyIndex)
+      {
+         throw null;
+      }
+
       [Obsolete( "Use Graphics.activeTier instead (UnityUpgradable) -> UnityEngine.Graphics.activeTier", false )]
       public static ShaderHardwareTier globalShaderHardwareTier => throw new NotImplementedException();
 
