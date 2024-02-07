@@ -139,19 +139,24 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var outlineWidth = outlineWidthProperty.Get( ui );
                var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
                var oldMaterial = fontMaterialProperty.Get( ui );
-               
+
                fontProperty.Set( ui, newFont );
 
                var newMaterial = fontMaterialProperty.Get( ui );
 
+               MaterialToggle _material = new MaterialToggle();
+
                if (oldMaterial != null && newMaterial != null) {
-                  Material _material;
-            
-                  if(!materialOutlines.TryGetValue((oldMaterial as Material).name, out _material) || _material.GetCachedPtr() == IntPtr.Zero) {
+                  if(!materialOutlines.TryGetValue((oldMaterial as Material).name, out _material) || _material.newMaterial?.GetCachedPtr() == IntPtr.Zero) {
+                     var uiCopy = GameObject.Instantiate( ui as UnityEngine.Object );
+                     fontProperty.Set( uiCopy, previousFont );
+                     fontMaterialProperty.Set( uiCopy, oldMaterial );
+
                      _material = createOutlineMaterial(oldMaterial as Material, newMaterial as Material);
+                     _material.oldfont = previousFont;
                      materialOutlines[(oldMaterial as Material).name] = _material;
                   }
-                  fontMaterialProperty.Set( ui, _material );
+                  fontMaterialProperty.Set( ui, _material.newMaterial );
                }
                if (outlineColor != null)
                {
@@ -164,9 +169,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
                
                _unfont = obj =>
                {
-                  fontProperty.Set( obj, previousFont );
-                  if (oldMaterial != null && (oldMaterial as Material).GetCachedPtr() != IntPtr.Zero) {
-                     fontMaterialProperty.Set( obj, oldMaterial );
+                  fontProperty.Set( obj, _material.oldfont ?? previousFont );
+                  if ( _material.oldMaterial != null && ( _material.oldMaterial as Material).GetCachedPtr() != IntPtr.Zero) {
+                     fontMaterialProperty.Set( obj, _material.oldMaterial );
                   }
                   if (outlineColor != null)
                   {
@@ -181,9 +186,16 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
-      static Dictionary<string, Material> materialOutlines = new Dictionary<string, Material>();
+      struct MaterialToggle
+      {
+         public Material oldMaterial;
+         public Material newMaterial;
+         public object oldfont;
+      }
+
+      static Dictionary<string, MaterialToggle> materialOutlines = new Dictionary<string, MaterialToggle>();
       static List<String> skipProperties = new List<String>{"_GradientScale", "_TextureHeight", "_TextureWidth"};
-      static Material createOutlineMaterial(Material src, Material material)
+      static MaterialToggle createOutlineMaterial(Material src, Material material)
       {
          XuaLogger.AutoTranslator.Info($"Wrap Material: {src.name}");
          var mat = GameObject.Instantiate(src);
@@ -207,7 +219,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                      break;
                }
          }
-         return mat;
+         return new MaterialToggle() { newMaterial = mat, oldMaterial = src};
       }
 
       public void UnchangeFont( object ui )
