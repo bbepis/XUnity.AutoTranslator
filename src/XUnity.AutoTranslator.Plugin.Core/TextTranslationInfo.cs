@@ -146,38 +146,41 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
                MaterialToggle _material = new MaterialToggle();
 
-               if (oldMaterial != null && newMaterial != null) {
-                  if(!materialOutlines.TryGetValue((oldMaterial as Material).name, out _material) || _material.newMaterial?.GetCachedPtr() == IntPtr.Zero) {
+               if( oldMaterial != null && newMaterial != null )
+               {
+                  if( !materialOutlines.TryGetValue( ( oldMaterial as Material ).name, out _material ) || _material.newMaterial?.GetCachedPtr() == IntPtr.Zero )
+                  {
                      var uiCopy = GameObject.Instantiate( ui as UnityEngine.Object );
                      fontProperty.Set( uiCopy, previousFont );
                      fontMaterialProperty.Set( uiCopy, oldMaterial );
 
-                     _material = createOutlineMaterial(oldMaterial as Material, newMaterial as Material);
+                     _material = createOutlineMaterial( oldMaterial as Material, newMaterial as Material );
                      _material.oldfont = previousFont;
-                     materialOutlines[(oldMaterial as Material).name] = _material;
+                     materialOutlines[ ( oldMaterial as Material ).name ] = _material;
                   }
                   fontMaterialProperty.Set( ui, _material.newMaterial );
                }
-               if (outlineColor != null)
+               if( outlineColor != null )
                {
                   outlineColorProperty.Set( ui, outlineColor );
                }
-               if (outlineWidth != null)
+               if( outlineWidth != null )
                {
                   outlineWidthProperty.Set( ui, outlineWidth );
                }
-               
+
                _unfont = obj =>
                {
                   fontProperty.Set( obj, _material.oldfont ?? previousFont );
-                  if ( _material.oldMaterial != null && ( _material.oldMaterial as Material).GetCachedPtr() != IntPtr.Zero) {
+                  if( _material.oldMaterial != null && ( _material.oldMaterial as Material ).GetCachedPtr() != IntPtr.Zero )
+                  {
                      fontMaterialProperty.Set( obj, _material.oldMaterial );
                   }
-                  if (outlineColor != null)
+                  if( outlineColor != null )
                   {
                      outlineColorProperty.Set( obj, outlineColor );
                   }
-                  if (outlineWidth != null)
+                  if( outlineWidth != null )
                   {
                      outlineWidthProperty.Set( obj, outlineWidth );
                   }
@@ -194,32 +197,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
       }
 
       static Dictionary<string, MaterialToggle> materialOutlines = new Dictionary<string, MaterialToggle>();
-      static List<String> skipProperties = new List<String>{"_GradientScale", "_TextureHeight", "_TextureWidth"};
-      static MaterialToggle createOutlineMaterial(Material src, Material material)
+      static MaterialToggle createOutlineMaterial( Material src, Material material )
       {
-         XuaLogger.AutoTranslator.Info($"Wrap Material: {src.name}");
-         var mat = GameObject.Instantiate(src);
-         mat.CopyPropertiesFromMaterial(material);
-         mat.shaderKeywords = src.shaderKeywords;
-         
-         var propCount = src.shader.GetPropertyCount();
-         for(var i = 0; i < propCount; ++i) {
-               string propertyName = src.shader.GetPropertyName(i);
-               if(skipProperties.Contains(propertyName)) continue;
-               switch(src.shader.GetPropertyType(i)) {
-                  case UnityEngine.Rendering.ShaderPropertyType.Range:
-                  case UnityEngine.Rendering.ShaderPropertyType.Float:
-                     mat.SetFloat(propertyName, src.GetFloat(propertyName));
-                     break;
-                  case UnityEngine.Rendering.ShaderPropertyType.Vector:
-                     mat.SetVector(propertyName, src.GetVector(propertyName));
-                     break;
-                  case UnityEngine.Rendering.ShaderPropertyType.Color:
-                     mat.SetColor(propertyName, src.GetColor(propertyName));
-                     break;
-               }
-         }
-         return new MaterialToggle() { newMaterial = mat, oldMaterial = src};
+         XuaLogger.AutoTranslator.Info( $"Wrap Material: {src.name}" );
+         var mat = GameObject.Instantiate( src );
+         mat.SetTexture( "_MainTex", material.GetTexture( "_MainTex" ) );
+         mat.SetFloat( "_TextureHeight", material.GetFloat( "_TextureHeight" ) );
+         mat.SetFloat( "_TextureWidth", material.GetFloat( "_TextureWidth" ) );
+         mat.SetFloat( "_GradientScale", material.GetFloat( "_GradientScale" ) );
+         return new MaterialToggle() { newMaterial = mat, oldMaterial = src };
       }
 
       public void UnchangeFont( object ui )
