@@ -12,6 +12,7 @@ using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
+using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -132,13 +133,47 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
+               var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
+               var oldMaterial = fontMaterialProperty.Get( ui );
+
                fontProperty.Set( ui, newFont );
+
+               var newMaterial = fontMaterialProperty.Get( ui );
+
+               if( oldMaterial != null && newMaterial != null )
+               {
+                  object copyMaterial = null;
+                  if( CreateCopy( oldMaterial, out copyMaterial ) )
+                  {
+                     copyMaterialProperties( copyMaterial as Material, newMaterial as Material );
+                  }
+                  fontMaterialProperty.Set( ui, copyMaterial );
+               }
+
                _unfont = obj =>
                {
                   fontProperty.Set( obj, previousFont );
+                  fontMaterialProperty.Set( obj, oldMaterial );
                };
             }
          }
+      }
+      static WeakDictionary<object, object> objectInstantiate = new WeakDictionary<object, object>();
+      static bool CreateCopy(object obj, out object copy)
+      {
+         if(! objectInstantiate.TryGetValue(obj, out copy ) )
+         {
+            copy = objectInstantiate[ obj ] = GameObject.Instantiate( obj as UnityEngine.Object );
+            return true;
+         }
+         return false;
+      }
+      static void copyMaterialProperties( Material dst, Material src )
+      {
+         dst.SetTexture( "_MainTex", src.GetTexture( "_MainTex" ) );
+         dst.SetFloat( "_TextureHeight", src.GetFloat( "_TextureHeight" ) );
+         dst.SetFloat( "_TextureWidth", src.GetFloat( "_TextureWidth" ) );
+         dst.SetFloat( "_GradientScale", src.GetFloat( "_GradientScale" ) );
       }
 
       public void UnchangeFont( object ui )
