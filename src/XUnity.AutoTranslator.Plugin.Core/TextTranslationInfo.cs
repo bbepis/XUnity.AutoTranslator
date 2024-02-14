@@ -135,7 +135,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
                var oldMaterial = fontMaterialProperty.Get( ui );
-
+               
                fontProperty.Set( ui, newFont );
 
                var newMaterial = fontMaterialProperty.Get( ui );
@@ -143,8 +143,15 @@ namespace XUnity.AutoTranslator.Plugin.Core
                if( oldMaterial != null && newMaterial != null )
                {
                   object copyMaterial = null;
-                  if( CreateCopy( oldMaterial, out copyMaterial ) )
+                  if( !_matCopies.TryGetValue( oldMaterial, out copyMaterial ) )
                   {
+                     copyMaterial = _matCopies[ oldMaterial ] = UnityEngine.Object.Instantiate( oldMaterial as Material );
+
+                     // keep original font
+                     var uiCopy = UnityEngine.Object.Instantiate( ui as UnityEngine.Object );
+                     fontProperty.Set( uiCopy, previousFont );
+                     fontMaterialProperty.Set( uiCopy, oldMaterial );
+
                      copyMaterialProperties( copyMaterial as Material, newMaterial as Material );
                   }
                   fontMaterialProperty.Set( ui, copyMaterial );
@@ -158,16 +165,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
       }
-      static WeakDictionary<object, object> objectInstantiate = new WeakDictionary<object, object>();
-      static bool CreateCopy(object obj, out object copy)
-      {
-         if(! objectInstantiate.TryGetValue(obj, out copy ) )
-         {
-            copy = objectInstantiate[ obj ] = GameObject.Instantiate( obj as UnityEngine.Object );
-            return true;
-         }
-         return false;
-      }
+      static WeakDictionary<object, object> _matCopies = new WeakDictionary<object, object>();
+
       static void copyMaterialProperties( Material dst, Material src )
       {
          dst.SetTexture( "_MainTex", src.GetTexture( "_MainTex" ) );
