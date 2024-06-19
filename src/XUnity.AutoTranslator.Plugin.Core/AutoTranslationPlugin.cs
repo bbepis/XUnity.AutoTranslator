@@ -2721,7 +2721,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             {
                HandleInput();
             }
-            catch( TypeLoadException e )
+            catch( Exception e )
             {
                _inputSupported = false;
                XuaLogger.AutoTranslator.Warn( e, "Input API is not available!" );
