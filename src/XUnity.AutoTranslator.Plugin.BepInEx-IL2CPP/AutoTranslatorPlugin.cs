@@ -40,8 +40,7 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
          try
          {
             var Il2CppInteropManagerType = Type.GetType( "BepInEx.Unity.IL2CPP.Il2CppInteropManager, BepInEx.Unity.IL2CPP" );
-            Log.LogInfo( Il2CppInteropManagerType );
-            return (string)Il2CppInteropManagerType.GetProperty( "IL2CPPInteropAssemblyPath", BindingFlags.Static | BindingFlags.NonPublic ).GetValue( null );
+            return (string)Il2CppInteropManagerType.GetProperty( "IL2CPPInteropAssemblyPath", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public ).GetValue( null );
          }
          catch( Exception e )
          {
