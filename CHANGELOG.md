@@ -1,4 +1,7 @@
-﻿### 5.3.0
+﻿### 5.3.1
+* Various bugfixes and minor improvemnents to the IL2CPP build and to the DeepL endpoint
+
+### 5.3.0
  * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono), also dropped support for earlier versions!
  * FEATURE - Added 'PersistRichTextMode' to allow control over how text that is parsed as rich text during translation is persisted
  * REGRESSION - Dropped support for pre-2017 Unity Engine versions for IL2CPP versions due to problems with new IL2CPP interop (may be re-added later)
