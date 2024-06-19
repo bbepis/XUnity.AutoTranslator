@@ -1,4 +1,4 @@
-#if IL2CPP
+﻿#if IL2CPP
 
 using System;
 using System.Reflection;
@@ -6,6 +6,17 @@ using UnityEngine;
 
 namespace XUnity.AutoTranslator.Plugin.Core;
 
+/// <summary>
+/// UnityEngine.Input is usually in UnityEngine or UnityEngine.CoreModule (in which case there is a TypeForwardedTo attribute for it in UnityEngine),
+/// but in newer games it can be in UnityEngine.InputLegacyModule with no type forwarding. In this case it's necessary to load from the legacy assembly manually.
+///
+/// Currently slow relection is used to resolve UnityEngine.Input in both UnityEngine.CoreModule and UnityEngine.InputLegacyModule.
+///
+/// This is a pretty dirty solution, but it is very simple and self-contained so it will suffice for now.
+/// Ideally there would be a full abstraction class that also handles Unity.InputSystem like BepInEx.UnityInput.
+///
+/// TODO: Change all input handling to a local copy of BepInEx.UnityInput whenever it's ported to the master branch
+/// </summary>
 public static class Input
 {
   static Type type = null;
