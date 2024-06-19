@@ -31,7 +31,22 @@ namespace XUnity.AutoTranslator.Plugin.BepInEx
 
          _configPath = Path.Combine( ConfigPath, "AutoTranslatorConfig.ini" );
 
-         Il2CppProxyAssemblies.Location = Path.Combine( Paths.BepInExRootPath, "interop" ); // Il2CppInteropManager.IL2CPPInteropAssemblyPath is internal...
+         Il2CppProxyAssemblies.Location = GetIL2CPPInteropAssemblyPath();
+      }
+
+      private string GetIL2CPPInteropAssemblyPath()
+      {
+         // Il2CppInteropManager.IL2CPPInteropAssemblyPath is internal...
+         try
+         {
+            var Il2CppInteropManagerType = Type.GetType( "BepInEx.Unity.IL2CPP.Il2CppInteropManager, BepInEx.Unity.IL2CPP" );
+            return (string)Il2CppInteropManagerType.GetProperty( "IL2CPPInteropAssemblyPath", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public ).GetValue( null );
+         }
+         catch( Exception e )
+         {
+            Log.LogError( e );
+            return Path.Combine( Paths.BepInExRootPath, "interop" );
+         }
       }
 
       public override void Load()
