@@ -19,60 +19,69 @@ namespace XUnity.AutoTranslator.Plugin.Core;
 /// </summary>
 public static class Input
 {
-  static Type type = null;
-  static Type GetInputType()
-  {
-    type ??= Type.GetType("UnityEngine.Input, UnityEngine.CoreModule");
-    type ??= Type.GetType("UnityEngine.Input, UnityEngine.InputLegacyModule");
-    return type ?? throw new InvalidOperationException("Failed to find the UnityEngine.Input type");
-  }
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-  static MethodInfo _getKey = null;
-  public static bool GetKey(KeyCode key)
-  {
-    _getKey ??= GetInputType().GetMethod("GetKey", new Type[] { typeof(KeyCode) });
-    return (bool)_getKey.Invoke(null, new object[] { key });
-  }
-  static MethodInfo _getKeyDown = null;
-  public static bool GetKeyDown(KeyCode key)
-  {
-    _getKeyDown ??= GetInputType().GetMethod("GetKeyDown", new Type[] { typeof(KeyCode) });
-    return (bool)_getKeyDown.Invoke(null, new object[] { key });
-  }
+   private static Type _inputType;
+   private static Type GetInputType()
+   {
+      _inputType ??= Type.GetType( "UnityEngine.Input, UnityEngine.CoreModule" );
+      _inputType ??= Type.GetType( "UnityEngine.Input, UnityEngine.InputLegacyModule" );
+      return _inputType ?? throw new InvalidOperationException( "Failed to find the UnityEngine.Input type" );
+   }
 
-  static MethodInfo _getMouseButton = null;
-  public static bool GetMouseButton(int button){
-    _getMouseButton ??= GetInputType().GetMethod("GetMouseButton", new Type[] { typeof(int) });
-    return (bool)_getMouseButton.Invoke(null, new object[] { button });
-  }
+   private static MethodInfo _getKey;
+   public static bool GetKey( KeyCode key )
+   {
+      _getKey ??= GetInputType().GetMethod( "GetKey", [ typeof( KeyCode ) ] )!;
+      return (bool)_getKey.Invoke( null, [ key ] )!;
+   }
 
-  static MethodInfo _getMouseButtonDown = null;
-  public static bool GetMouseButtonDown(int button){
-    _getMouseButtonDown ??= GetInputType().GetMethod("GetMouseButtonDown", new Type[] { typeof(int) });
-    return (bool)_getMouseButtonDown.Invoke(null, new object[] { button });
-  }
+   private static MethodInfo _getKeyDown;
+   public static bool GetKeyDown( KeyCode key )
+   {
+      _getKeyDown ??= GetInputType().GetMethod( "GetKeyDown", [ typeof( KeyCode ) ] )!;
+      return (bool)_getKeyDown.Invoke( null, [ key ] )!;
+   }
 
-  static MethodInfo resetInputAxes = null;
-  public static void ResetInputAxes(){
-    resetInputAxes ??= GetInputType().GetMethod("ResetInputAxes", new Type[] {});
-    resetInputAxes.Invoke(null, new object[] {});
-  }
-  
-  static PropertyInfo _mouseScrollDelta = null;
-  public static Vector2 mouseScrollDelta {
-    get {
-      // UnityEngine.Input.GetMouseButtonDown
-      _mouseScrollDelta ??= GetInputType().GetProperty("mouseScrollDelta");
-      return (Vector2)_mouseScrollDelta.GetValue(null, null);
-    }
-  }
+   private static MethodInfo _getMouseButton;
+   public static bool GetMouseButton( int button )
+   {
+      _getMouseButton ??= GetInputType().GetMethod( "GetMouseButton", [ typeof( int ) ] )!;
+      return (bool)_getMouseButton.Invoke( null, [ button ] )!;
+   }
 
-  static PropertyInfo _mousePosition = null;
-  public static Vector3 mousePosition {
-    get {
-      _mousePosition ??= GetInputType().GetProperty("mousePosition");
-      return (Vector3)_mousePosition.GetValue(null, null);
-    }
-  }
+   private static MethodInfo _getMouseButtonDown;
+   public static bool GetMouseButtonDown( int button )
+   {
+      _getMouseButtonDown ??= GetInputType().GetMethod( "GetMouseButtonDown", [ typeof( int ) ] )!;
+      return (bool)_getMouseButtonDown.Invoke( null, [ button ] )!;
+   }
+
+   private static MethodInfo _resetInputAxes;
+   public static void ResetInputAxes()
+   {
+      _resetInputAxes ??= GetInputType().GetMethod( "ResetInputAxes", [ ] )!;
+      _resetInputAxes.Invoke( null, [ ] );
+   }
+
+   private static PropertyInfo _mouseScrollDelta;
+   public static Vector2 mouseScrollDelta
+   {
+      get
+      {
+         _mouseScrollDelta ??= GetInputType().GetProperty( "mouseScrollDelta" )!;
+         return (Vector2)_mouseScrollDelta.GetValue( null, null )!;
+      }
+   }
+
+   private static PropertyInfo _mousePosition;
+   public static Vector3 mousePosition
+   {
+      get
+      {
+         _mousePosition ??= GetInputType().GetProperty( "mousePosition" )!;
+         return (Vector3)_mousePosition.GetValue( null, null )!;
+      }
+   }
 }
 #endif
