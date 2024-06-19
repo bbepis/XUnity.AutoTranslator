@@ -13,7 +13,7 @@ public static class Input
   {
     type ??= Type.GetType("UnityEngine.Input, UnityEngine.CoreModule");
     type ??= Type.GetType("UnityEngine.Input, UnityEngine.InputLegacyModule");
-    return type;
+    return type ?? throw new InvalidOperationException("Failed to find the UnityEngine.Input type");
   }
 
   static MethodInfo _getKey = null;
