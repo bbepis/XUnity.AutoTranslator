@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.Unity.IL2CPP</name>
+    </assembly>
+    <members>
+        <member name="M:BepInEx.Unity.IL2CPP.BasePlugin.AddComponent``1">
+            <summary>
+                Add a Component (e.g. MonoBehaviour) into Unity scene.
+                Automatically registers the type with Il2Cpp Type system if it isn't already.
+            </summary>
+            <typeparam name="T">Type of the component to add.</typeparam>
+        </member>
+        <member name="M:BepInEx.Unity.IL2CPP.IL2CPPChainloader.AddUnityComponent``1">
+            <summary>
+                Register and add a Unity Component (for example MonoBehaviour) into BepInEx global manager.
+                Automatically registers the type with Il2Cpp type system if it isn't initialised already.
+            </summary>
+            <typeparam name="T">Type of the component to add.</typeparam>
+        </member>
+        <member name="M:BepInEx.Unity.IL2CPP.IL2CPPChainloader.AddUnityComponent(System.Type)">
+            <summary>
+                Register and add a Unity Component (for example MonoBehaviour) into BepInEx global manager.
+                Automatically registers the type with Il2Cpp type system if it isn't initialised already.
+            </summary>
+            <param name="t">Type of the component to add</param>
+        </member>
+        <member name="E:BepInEx.Unity.IL2CPP.IL2CPPChainloader.PluginLoad">
+            <summary>
+                Occurs after a plugin is instantiated and just before <see cref="M:BepInEx.Unity.IL2CPP.BasePlugin.Load"/> is called.
+            </summary>
+        </member>
+        <member name="M:Doorstop.Entrypoint.Start">
+            <summary>
+                The main entrypoint of BepInEx, called from Doorstop.
+            </summary>
+        </member>
+    </members>
+</doc>

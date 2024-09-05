@@ -14,13 +14,13 @@
 
 	<ItemGroup>
 		<Reference Include="BepInEx.Core">
-			<HintPath>..\..\libs\BepInEx 6.0 BE-672\BepInEx.Core.dll</HintPath>
+			<HintPath>..\..\libs\BepInEx 6.0 BE-704\BepInEx.Core.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Unity.Common">
-			<HintPath>..\..\libs\BepInEx 6.0 BE-672\BepInEx.Unity.Common.dll</HintPath>
+			<HintPath>..\..\libs\BepInEx 6.0 BE-704\BepInEx.Unity.Common.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Unity.IL2CPP">
-			<HintPath>..\..\libs\BepInEx 6.0 BE-672\BepInEx.Unity.IL2CPP.dll</HintPath>
+			<HintPath>..\..\libs\BepInEx 6.0 BE-704\BepInEx.Unity.IL2CPP.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\Proxies\Il2Cppmscorlib.dll</HintPath>

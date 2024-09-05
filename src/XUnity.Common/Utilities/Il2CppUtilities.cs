@@ -42,8 +42,8 @@ namespace XUnity.Common.Utilities
          return factoryFunction( ptr );
       }
 
-      public static Func<object, uint> GetGarbageCollectionHandle =
-         CustomFastReflectionHelper.CreateFastFieldGetter<object, uint>(
+      public static Func<object, IntPtr> GetGarbageCollectionHandle =
+         CustomFastReflectionHelper.CreateFastFieldGetter<object, IntPtr>(
             typeof( Il2CppObjectBase ).GetField(
                "myGcHandle",
                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance ) );
@@ -68,7 +68,7 @@ namespace XUnity.Common.Utilities
          return intPtr;
       }
 
-      public static IntPtr GetIl2CppInstancePointer( uint gcHandle )
+      public static IntPtr GetIl2CppInstancePointer( IntPtr gcHandle )
       {
          var intPtr = IL2CPP.il2cpp_gchandle_get_target( gcHandle );
          if( intPtr == IntPtr.Zero )

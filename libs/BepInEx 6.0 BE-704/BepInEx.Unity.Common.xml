@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BepInEx.Unity.Common</name>
+    </assembly>
+    <members>
+        <member name="T:BepInEx.Unity.Common.UnityInfo">
+            <summary>
+                Various information about the currently executing Unity player.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Common.UnityInfo.PlayerPath">
+            <summary>
+                Path to the player executable.
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Common.UnityInfo.GameDataPath">
+            <summary>
+                Path to the game data directory (directory that contains the game assets).
+            </summary>
+        </member>
+        <member name="P:BepInEx.Unity.Common.UnityInfo.Version">
+            <summary>
+                Version of the Unity player
+            </summary>
+            <remarks>
+                Because BepInEx can execute very early, the exact Unity version might not be available in early
+                bootstrapping phases. The version should be treated as an estimation of the actual version of the Unity player.
+            </remarks>
+        </member>
+    </members>
+</doc>
