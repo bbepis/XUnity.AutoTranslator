@@ -92,6 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private static readonly WeakDictionary<Material, Material> _FontMaterialCopies = new WeakDictionary<Material, Material>();
       public void ChangeFont( object ui )
       {
          if( ui == null ) return;
@@ -132,10 +133,37 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
+               var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
+               var oldMaterial = fontMaterialProperty.Get( ui ) as Material;
+
                fontProperty.Set( ui, newFont );
+
+               var newMaterial = fontMaterialProperty.Get( ui ) as Material;
+
+               if( oldMaterial != null && newMaterial != null )
+               {
+                  if( !_FontMaterialCopies.TryGetValue( oldMaterial, out var copyMaterial ) )
+                  {
+                     copyMaterial = _FontMaterialCopies[ oldMaterial ] = UnityEngine.Object.Instantiate( oldMaterial );
+
+                     // Keep original font
+                     var uiCopy = UnityEngine.Object.Instantiate( ui as UnityEngine.Object );
+                     fontProperty.Set( uiCopy, previousFont );
+                     fontMaterialProperty.Set( uiCopy, oldMaterial );
+
+                     // Copy required material properties
+                     copyMaterial.SetTexture( "_MainTex", newMaterial.GetTexture( "_MainTex" ) );
+                     copyMaterial.SetFloat( "_TextureHeight", newMaterial.GetFloat( "_TextureHeight" ) );
+                     copyMaterial.SetFloat( "_TextureWidth", newMaterial.GetFloat( "_TextureWidth" ) );
+                     copyMaterial.SetFloat( "_GradientScale", newMaterial.GetFloat( "_GradientScale" ) );
+                  }
+                  fontMaterialProperty.Set( ui, copyMaterial );
+               }
+
                _unfont = obj =>
                {
                   fontProperty.Set( obj, previousFont );
+                  fontMaterialProperty.Set( obj, oldMaterial );
                };
             }
          }
