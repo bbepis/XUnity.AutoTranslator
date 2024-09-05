@@ -24,7 +24,8 @@ namespace XUnity.Common.Constants
       private static bool _initialized;
       private static readonly HashSet<string> Blacklist = new HashSet<string>( StringComparer.OrdinalIgnoreCase )
       {
-         "netstandard.dll"
+         "netstandard.dll",
+         "Il2Cppnetstandard.dll"
       };
 
       private static void Initialize()
