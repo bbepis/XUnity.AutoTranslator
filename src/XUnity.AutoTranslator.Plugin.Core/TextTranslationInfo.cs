@@ -12,7 +12,6 @@ using XUnity.AutoTranslator.Plugin.Utilities;
 using XUnity.Common.Constants;
 using XUnity.Common.Extensions;
 using XUnity.Common.Harmony;
-using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core
@@ -93,6 +92,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          }
       }
 
+      private static readonly WeakDictionary<Material, Material> _FontMaterialCopies = new WeakDictionary<Material, Material>();
       public void ChangeFont( object ui )
       {
          if( ui == null ) return;
@@ -134,25 +134,28 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
                var fontMaterialProperty = clrType.CachedProperty( "fontSharedMaterial" );
-               var oldMaterial = fontMaterialProperty.Get( ui );
-               
+               var oldMaterial = fontMaterialProperty.Get( ui ) as Material;
+
                fontProperty.Set( ui, newFont );
 
-               var newMaterial = fontMaterialProperty.Get( ui );
+               var newMaterial = fontMaterialProperty.Get( ui ) as Material;
 
                if( oldMaterial != null && newMaterial != null )
                {
-                  object copyMaterial = null;
-                  if( !_matCopies.TryGetValue( oldMaterial, out copyMaterial ) )
+                  if( !_FontMaterialCopies.TryGetValue( oldMaterial, out var copyMaterial ) )
                   {
-                     copyMaterial = _matCopies[ oldMaterial ] = UnityEngine.Object.Instantiate( oldMaterial as Material );
+                     copyMaterial = _FontMaterialCopies[ oldMaterial ] = UnityEngine.Object.Instantiate( oldMaterial );
 
-                     // keep original font
+                     // Keep original font
                      var uiCopy = UnityEngine.Object.Instantiate( ui as UnityEngine.Object );
                      fontProperty.Set( uiCopy, previousFont );
                      fontMaterialProperty.Set( uiCopy, oldMaterial );
 
-                     copyMaterialProperties( copyMaterial as Material, newMaterial as Material );
+                     // Copy required material properties
+                     copyMaterial.SetTexture( "_MainTex", newMaterial.GetTexture( "_MainTex" ) );
+                     copyMaterial.SetFloat( "_TextureHeight", newMaterial.GetFloat( "_TextureHeight" ) );
+                     copyMaterial.SetFloat( "_TextureWidth", newMaterial.GetFloat( "_TextureWidth" ) );
+                     copyMaterial.SetFloat( "_GradientScale", newMaterial.GetFloat( "_GradientScale" ) );
                   }
                   fontMaterialProperty.Set( ui, copyMaterial );
                }
@@ -164,15 +167,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
                };
             }
          }
-      }
-      static WeakDictionary<object, object> _matCopies = new WeakDictionary<object, object>();
-
-      static void copyMaterialProperties( Material dst, Material src )
-      {
-         dst.SetTexture( "_MainTex", src.GetTexture( "_MainTex" ) );
-         dst.SetFloat( "_TextureHeight", src.GetFloat( "_TextureHeight" ) );
-         dst.SetFloat( "_TextureWidth", src.GetFloat( "_TextureWidth" ) );
-         dst.SetFloat( "_GradientScale", src.GetFloat( "_GradientScale" ) );
       }
 
       public void UnchangeFont( object ui )
