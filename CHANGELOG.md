@@ -1,5 +1,12 @@
-﻿### 5.3.1
-* Various bugfixes and minor improvemnents to the IL2CPP build and to the DeepL endpoint
+﻿### 5.4.0
+ * FEATURE - Keep the outline style when overriding TextMeshPro Font
+ * BUG FIX - Update to BepInEx 6.0 BE-704 to fix some IL2CPP crashes
+ * BUG FIX - Fix failing to get some Il2CppTypes silently and crashing later
+ * BUG FIX - Update DeepL supported languages
+
+### 5.3.1
+ * BUG FIX - Various bugfixes and minor improvemnents to the IL2CPP build
+ * BUG FIX - Various bugfixes to the DeepL endpoint
 
 ### 5.3.0
  * FEATURE - Added support for latest MelonLoader and BepInEx bleeding edge builds (only for IL2CPP, use stable release for Mono), also dropped support for earlier versions!

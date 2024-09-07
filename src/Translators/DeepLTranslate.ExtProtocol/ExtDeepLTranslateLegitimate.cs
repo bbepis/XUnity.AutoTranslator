@@ -93,7 +93,7 @@ namespace DeepLTranslate.ExtProtocol
          _handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
          _client = new HttpClient( _handler, true );
-         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "XUnity", "5.3.1" ) );
+         _client.DefaultRequestHeaders.UserAgent.Add( new ProductInfoHeaderValue( "XUnity", "5.4.0" ) );
          _client.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( "*/*" ) );
       }
 

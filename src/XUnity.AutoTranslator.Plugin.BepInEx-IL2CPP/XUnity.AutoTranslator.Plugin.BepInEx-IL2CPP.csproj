@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>XUnity.AutoTranslator.Plugin.BepInEx_IL2CPP</RootNamespace>
 		<TargetFramework>net6.0</TargetFramework>
-		<Version>5.3.1</Version>
+		<Version>5.4.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
