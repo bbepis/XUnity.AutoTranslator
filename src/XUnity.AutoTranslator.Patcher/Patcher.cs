@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Patcher
       {
          get
          {
-            return GeneratedInfo.PLUGIN_VERSION;
+            return GeneratedInfo.PROJECT_VERSION;
          }
       }
 

@@ -16,7 +16,7 @@
 
 	<Target Name="AddGeneratedFile" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)GeneratedFile.cs">
 		<PropertyGroup>
-			<GeneratedText><![CDATA[namespace $(RootNamespace) { internal static class GeneratedInfo { public const string PLUGIN_VERSION = "$(Version)"%3B } }]]></GeneratedText>
+			<GeneratedText><![CDATA[namespace $(RootNamespace) { internal static class GeneratedInfo { public const string PROJECT_VERSION = "$(Version)"%3B } }]]></GeneratedText>
 			<GeneratedFilePath>$(IntermediateOutputPath)GeneratedInfo.cs</GeneratedFilePath>
 		</PropertyGroup>
 		<ItemGroup>
