@@ -5,13 +5,9 @@
 		<Description>Main development dependency for XUnity Auto Translator.</Description>
 		<Authors>gravydevsupreme</Authors>
 		<PackageTags>unity;xunity;machine translation</PackageTags>
-		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<DevelopmentDependency>True</DevelopmentDependency>
 		<TargetFrameworks>net35;net6.0</TargetFrameworks>
-		<Version>5.4.0</Version>
 		<LangVersion>latest</LangVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>

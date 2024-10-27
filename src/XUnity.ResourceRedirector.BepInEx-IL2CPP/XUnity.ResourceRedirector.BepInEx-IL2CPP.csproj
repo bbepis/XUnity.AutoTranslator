@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<RootNamespace>XUnity.ResourceRedirector.BepInEx_IL2CPP</RootNamespace>
-		<Version>2.1.0</Version>
+		<Version>$(VersionRedirector)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

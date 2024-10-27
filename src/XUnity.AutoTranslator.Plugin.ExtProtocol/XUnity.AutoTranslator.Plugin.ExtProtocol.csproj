@@ -5,13 +5,10 @@
     <Description>Package that contains a simple inter-process protocol format used in XUnity.</Description>
     <Authors>gravydevsupreme</Authors>
     <PackageTags>unity;xunity</PackageTags>
-    <PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DevelopmentDependency>True</DevelopmentDependency>
     <TargetFramework>net35</TargetFramework>
-    <Version>1.0.1</Version>
+    <Version>$(VersionExtProtocol)</Version>
   </PropertyGroup>
 
   <ItemGroup>
