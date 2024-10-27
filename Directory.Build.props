@@ -1,13 +1,19 @@
 ﻿<Project>
+	<!-- Use these properties to change version numbers globally -->
 	<PropertyGroup>
+		<!-- Plugin version -->
 		<Version>5.4.0</Version>
+		<!-- XUnity.Common version -->
 		<VersionCommon>1.0.3</VersionCommon>
+		<!-- XUnity.AutoTranslator.Plugin.ExtProtocol version -->
 		<VersionExtProtocol>1.0.1</VersionExtProtocol>
+		<!-- XUnity.ResourceRedirector version -->
 		<VersionRedirector>2.1.0</VersionRedirector>
+	</PropertyGroup>
 
-		<Authors>Bepis, gravydevsupreme, others at https://github.com/bbepis/XUnity.AutoTranslator</Authors>
+	<PropertyGroup>
+		<Authors>gravydevsupreme, Bepis, others at https://github.com/bbepis/XUnity.AutoTranslator</Authors>
 		<Copyright>Copyright © 2018 / MIT License</Copyright>
-
 		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
