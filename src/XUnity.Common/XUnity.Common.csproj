@@ -5,13 +5,10 @@
 		<Description>Common dependencies shared between XUnity Auto Translator and Resource Redirector.</Description>
 		<Authors>gravydevsupreme</Authors>
 		<PackageTags>unity;xunity</PackageTags>
-		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<DevelopmentDependency>True</DevelopmentDependency>
 		<TargetFrameworks>net35;net6.0</TargetFrameworks>
-		<Version>1.0.3</Version>
+		<Version>$(VersionCommon)</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 

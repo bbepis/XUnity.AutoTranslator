@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net35;net6.0</TargetFrameworks>
-		<Version>5.4.0</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)'=='net35'">

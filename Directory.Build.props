@@ -1,0 +1,34 @@
+﻿<Project>
+	<!-- Use these properties to change version numbers globally -->
+	<PropertyGroup>
+		<!-- Plugin version -->
+		<Version>5.4.0</Version>
+		<!-- XUnity.Common version -->
+		<VersionCommon>1.0.3</VersionCommon>
+		<!-- XUnity.AutoTranslator.Plugin.ExtProtocol version -->
+		<VersionExtProtocol>1.0.1</VersionExtProtocol>
+		<!-- XUnity.ResourceRedirector version -->
+		<VersionRedirector>2.1.0</VersionRedirector>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>gravydevsupreme, Bepis, others at https://github.com/bbepis/XUnity.AutoTranslator</Authors>
+		<Copyright>Copyright © 2018 / MIT License</Copyright>
+		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageTags>unity;xunity</PackageTags>
+	</PropertyGroup>
+
+	<Target Name="AddGeneratedFile" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)GeneratedFile.cs">
+		<PropertyGroup>
+			<GeneratedText><![CDATA[namespace $(RootNamespace) { internal static class GeneratedInfo { public const string PROJECT_VERSION = "$(Version)"%3B } }]]></GeneratedText>
+			<GeneratedFilePath>$(IntermediateOutputPath)GeneratedInfo.cs</GeneratedFilePath>
+		</PropertyGroup>
+		<ItemGroup>
+			<Compile Include="$(GeneratedFilePath)" />
+			<FileWrites Include="$(GeneratedFilePath)" />
+		</ItemGroup>
+		<WriteLinesToFile Lines="$(GeneratedText)" File="$(GeneratedFilePath)" Overwrite="true" />
+	</Target>
+</Project>

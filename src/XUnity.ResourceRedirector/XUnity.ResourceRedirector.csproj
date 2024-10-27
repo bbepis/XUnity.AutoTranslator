@@ -5,14 +5,11 @@
 		<Description>Main development dependency for XUnity Resource Redirector.</Description>
 		<Authors>gravydevsupreme</Authors>
 		<PackageTags>unity;xunity;resource redirection</PackageTags>
-		<PackageReleaseNotes>https://github.com/bbepis/XUnity.AutoTranslator/blob/master/CHANGELOG.md</PackageReleaseNotes>
-		<PackageProjectUrl>https://github.com/bbepis/XUnity.AutoTranslator</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<DevelopmentDependency>True</DevelopmentDependency>
 		<TargetFrameworks>net35;net6.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
-		<Version>2.1.0</Version>
+		<Version>$(VersionRedirector)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

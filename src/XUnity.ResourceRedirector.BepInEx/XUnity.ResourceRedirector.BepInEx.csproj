@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net35</TargetFramework>
 		<RootNamespace>XUnity.ResourceRedirector.BepInEx</RootNamespace>
-		<Version>2.1.0</Version>
+		<Version>$(VersionRedirector)</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
