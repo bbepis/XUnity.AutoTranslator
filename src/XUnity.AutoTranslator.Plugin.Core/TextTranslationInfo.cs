@@ -129,8 +129,9 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var fontProperty = clrType.CachedProperty( "font" );
 
             var previousFont = fontProperty.Get( ui );
+            if( previousFont == null ) return;
             var newFont = FontCache.GetOrCreateOverrideFontTextMeshPro();
-            if( newFont == null || previousFont == null ) return;
+            if( newFont == null ) return;
 
             if( !UnityObjectReferenceComparer.Default.Equals( newFont, previousFont ) )
             {
