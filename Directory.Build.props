@@ -1,6 +1,6 @@
 ﻿<Project>
 	<PropertyGroup>
-		<Version>5.4.0.1</Version>
+		<Version>5.4.0</Version>
 		<VersionCommon>1.0.3</VersionCommon>
 		<VersionExtProtocol>1.0.1</VersionExtProtocol>
 		<VersionRedirector>2.1.0</VersionRedirector>
