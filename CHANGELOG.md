@@ -1,4 +1,7 @@
-﻿### 5.4.0
+﻿### 5.4.1
+ * BUG FIX - Fix change font crash when previous font is null
+
+### 5.4.0
  * FEATURE - Keep the outline style when overriding TextMeshPro Font
  * BUG FIX - Update to BepInEx 6.0 BE-704 to fix some IL2CPP crashes
  * BUG FIX - Fix failing to get some Il2CppTypes silently and crashing later
