@@ -31,10 +31,10 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          var gameDir = modFi.Directory.Parent;
          var unhollowedPath = Path.Combine( gameDir.FullName, "MelonLoader", "Il2CppAssemblies" );
          Il2CppProxyAssemblies.Location = unhollowedPath;
+#endif
          _dataFolder = Path.Combine( gameDir.FullName, "AutoTranslator" );
          _configPath = Path.Combine( _dataFolder, "Config.ini" );
          TranslationPath =_dataFolder;
-#endif
 
          PluginLoader.LoadWithConfig( this );
       }
