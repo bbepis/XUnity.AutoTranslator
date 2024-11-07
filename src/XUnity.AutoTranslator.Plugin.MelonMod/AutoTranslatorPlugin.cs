@@ -32,9 +32,11 @@ namespace XUnity.AutoTranslator.Plugin.MelonMod
          var unhollowedPath = Path.Combine( gameDir.FullName, "MelonLoader", "Il2CppAssemblies" );
          Il2CppProxyAssemblies.Location = unhollowedPath;
 #endif
-         _dataFolder = Path.Combine( gameDir.FullName, "AutoTranslator" );
+         var gameDirectory = MelonUtils.GameDirectory;
+         LoggerInstance.Msg( "Mod Directory : "+ gameDirectory );
+         _dataFolder = Path.Combine( gameDirectory, "AutoTranslator" );
          _configPath = Path.Combine( _dataFolder, "Config.ini" );
-         TranslationPath =_dataFolder;
+         TranslationPath = _dataFolder;
 
          PluginLoader.LoadWithConfig( this );
       }
