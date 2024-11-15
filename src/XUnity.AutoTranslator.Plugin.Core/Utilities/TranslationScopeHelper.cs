@@ -20,10 +20,15 @@ namespace XUnity.AutoTranslator.Plugin.Utilities
          {
             try
             {
+               var GetScopeReturn = -1;
                if( ui is Component component && component )
                {
-                  return GetScopeFromComponent( component );
+                  GetScopeReturn = GetScopeFromComponent( component );
                }
+               if( GetScopeReturn != -1 )
+			      {
+				      return GetScopeReturn; 
+			      }
                else if( ui is GUIContent guic ) // not same as spamming component because we allow nulls
                {
                   return TranslationScopes.None;
