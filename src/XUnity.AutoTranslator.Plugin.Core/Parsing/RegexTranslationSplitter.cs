@@ -64,7 +64,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Parsing
          if( !key.StartsWith( "^" ) ) key = "^" + key;
          if( !key.EndsWith( "$" ) ) key = key + "$";
 
-         CompiledRegex = new Regex( key );
+         CompiledRegex = new Regex( key, RegexOptions.Compiled );
          Original = key;
          Translation = value;
       }
