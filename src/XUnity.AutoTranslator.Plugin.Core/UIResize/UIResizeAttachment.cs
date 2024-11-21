@@ -12,7 +12,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UIResize
       private static readonly char[] CommandSplitters = new char[] { ';' };
       private static readonly char[] PathSplitters = new char[] { '/' };
       private static readonly char[] ArgSplitters = new char[] { ',', ' ' };
-      private static Regex CommandRegex = new Regex( @"^\s*(.+)\s*\(([\s\S]*)\)\s*$" );
+      private static Regex CommandRegex = new Regex( @"^\s*(.+)\s*\(([\s\S]*)\)\s*$", RegexOptions.Compiled );
       private static Dictionary<string, Type> CommandTypes;
 
       static UIResizeAttachment()
