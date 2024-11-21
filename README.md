@@ -327,10 +327,10 @@ TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Gett
 GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
 RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex;ReplaceHtmlEntities ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
-RegexPostProcessing=None         ;Indicates what type of post processing to perform on the capture groups of regexes. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
-CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
+PostProcessing=None         ;Indicates what type of post processing to perform on the capture groups of es. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
+CacheLookups=False          ;Indicates whether or not results of  lookups should be output to the specified OutputFile
 CacheWhitespaceDifferences=False ;Indicates whether or not whitespace differences should be output to the specified OutputFile
-CacheRegexPatternResults=False   ;Indicates whether or not the complete result of regex-splitted translations should be output to the specified OutputFile
+CachePatternResults=False   ;Indicates whether or not the complete result of -splitted translations should be output to the specified OutputFile
 GenerateStaticSubstitutionTranslations=False ;Indicates that the plugin should generate translations without variables when using substitutions
 GeneratePartialTranslations=False ;Indicates that the plugin should generate partial translations to support text translations as it is "scrolling in"
 EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' directives and scope translations based on these
@@ -338,7 +338,7 @@ EnableSilentMode=False           ;Indicates the plugin should not print out succ
 BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
 OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
 IgnoreVirtualTextSetterCallingRules=False; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
-MaxTextParserRecursion=1         ;Indicates how many levels of recursion are allowed when text is parsed so it can be translated in different parts. This can be used with splitter-regexes in advanced scenarios. The default value of one essentially means that recursion is disabled.
+MaxTextParserRecursion=1         ;Indicates how many levels of recursion are allowed when text is parsed so it can be translated in different parts. This can be used with splitter-es in advanced scenarios. The default value of one essentially means that recursion is disabled.
 HtmlEntityPreprocessing=True     ;Will preprocess and decode html entities before they are send for translation. Some translators will fail when html entities are sent.
 HandleRichText=True              ;Will enable automated handling of rich text (text with markup)
 PersistRichTextMode=Final        ;Indicates how parsed rich text should be persisted. Either 'Fragment' to store the the text piecemeal or 'Final' to store the entire translated string (does not support substitutions!)
@@ -614,7 +614,7 @@ public interface ITranslationRegistry
 ```
 
 ### Substitutions
-It is also possible to add substitutions that are applied to found texts before translations are created. This is controlled through the `SubstitutionFile`, which uses the same format as normal translation text files, although things like regexes are not supported.
+It is also possible to add substitutions that are applied to found texts before translations are created. This is controlled through the `SubstitutionFile`, which uses the same format as normal translation text files, although things like es are not supported.
 
 This is useful for replacing names that are often translated incorrectly, etc.
 
@@ -631,7 +631,7 @@ When creating manual translations, use this file as sparingly as you would use r
 *NOTE: If the text to be translated includes rich text, it cannot currently be parameterized.*
 
 ### Regex Usage
-Text translation files support regexes as well. Always remember to use regexes sparingly and scope to avoid performance issues.
+Text translation files support regexes as well. Always remember to use regexes sparingly and scope them to avoid performance issues.
 
 Regexes can be applied to translations in two different ways. The following two sections describes these two ways:
 
