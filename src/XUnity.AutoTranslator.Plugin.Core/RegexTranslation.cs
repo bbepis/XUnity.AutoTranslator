@@ -60,7 +60,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
 
-         CompiledRegex = new Regex( key );
+         CompiledRegex = new Regex( key, RegexOptions.Compiled );
          Original = key;
          Translation = value;
       }

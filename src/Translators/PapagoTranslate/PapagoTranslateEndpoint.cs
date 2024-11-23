@@ -28,8 +28,8 @@ namespace PapagoTranslate
       private static readonly string FormUrlEncodedTemplate = "deviceId={0}&locale=en&dict=false&honorific=false&instant=true&source={1}&target={2}&text={3}";
       private static readonly Random RandomNumbers = new Random();
       private static readonly Guid UUID = Guid.NewGuid();
-      private static readonly Regex PatternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Singleline );
-      private static readonly Regex PatternVersion = new Regex( @"v\d\.\d\.\d_[^""]+", RegexOptions.Singleline );
+      private static readonly Regex PatternSource = new Regex( @"/vendors~main[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
+      private static readonly Regex PatternVersion = new Regex( @"v\d\.\d\.\d_[^""]+", RegexOptions.Compiled | RegexOptions.Singleline );
 
       private string _version; // for hmac key
       private bool _isSMT;

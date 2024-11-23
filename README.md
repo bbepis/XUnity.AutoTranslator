@@ -631,7 +631,7 @@ When creating manual translations, use this file as sparingly as you would use r
 *NOTE: If the text to be translated includes rich text, it cannot currently be parameterized.*
 
 ### Regex Usage
-Text translation files support regexes as well. Always remember to use regexes as sparing as possible and scope them as much as possible to avoid performance issues.
+Text translation files support regexes as well. Always remember to use regexes sparingly and scope them to avoid performance issues.
 
 Regexes can be applied to translations in two different ways. The following two sections describes these two ways:
 
