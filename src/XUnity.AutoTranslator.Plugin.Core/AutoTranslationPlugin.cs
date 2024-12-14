@@ -34,6 +34,10 @@ using XUnity.Common.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.UIResize;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
+using Harmony;
+using System.Security.Policy;
+
+
 
 #if MANAGED
 using MonoMod.RuntimeDetour;
@@ -84,6 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
+      private static RegexOptions _regexCompiledSupportedFlag = RegexOptions.None;
       private bool _isInTranslatedMode = true;
       private bool _textHooksEnabled = true;
 
@@ -124,6 +129,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          InitializeHarmonyDetourBridge();
 
+         CheckRegexCompiledSupport();
+
          InitializeTextTranslationCaches();
 
          // Setup hooks
@@ -163,6 +170,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
+
+      private void CheckRegexCompiledSupport()
+      {
+         try
+         {
+            string testSubject = "She believed";
+            string testPattern = ".he ..lie..d";
+            Regex testRegex = new Regex( testPattern, RegexOptions.Compiled );
+            var testResult = testRegex.Match( testSubject );
+            if( testResult.Success )
+            {
+               _regexCompiledSupportedFlag = RegexOptions.Compiled;
+            }
+            else
+            {
+               XuaLogger.AutoTranslator.Info( "Unknown Error at CheckRegexCompiledSupport" );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Info( "The current version of the game doesn't support compiled Regex" );
+         }
+      }
       private static void LoadFallbackFont()
       {
          try
@@ -3625,5 +3655,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
       }
+      public static RegexOptions RegexCompiledSupportedFlag => _regexCompiledSupportedFlag; 
    }
 }

@@ -62,7 +62,7 @@ namespace DeepLTranslate.ExtProtocol
             | SecurityProtocolType.Tls12;
       }
 
-      private static readonly Regex NewlineSplitter = new Regex( @"([\s]*[\r\n]+[\s]*)", RegexOptions.Compiled );
+      private static readonly Regex NewlineSplitter = new Regex( @"([\s]*[\r\n]+[\s]*)");
       private static readonly DateTime Epoch = new DateTime( 1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc );
 
       private static readonly string HttpsServicePointTemplateUrl = "https://www2.deepl.com/jsonrpc";
