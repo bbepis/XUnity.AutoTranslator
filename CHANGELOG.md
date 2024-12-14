@@ -1,4 +1,11 @@
-﻿### 5.4.1
+﻿### 5.4.2
+ * FEATURE - Translation scoping - if GetScopeFromComponent fails, use GetActiveSceneId instead of -1                
+ * BUG FIX - Make config accessible on Android
+ * BUG FIX - Make paths OS-independent in the MelonMod version
+ * MISC - Minor regex performance improvement
+ * MISC - Move XZipper from DotNetZip to SharpCompress
+
+### 5.4.1
  * BUG FIX - Fix change font crash when previous font is null
 
 ### 5.4.0
