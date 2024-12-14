@@ -68,6 +68,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TextureTranslationCache TextureCache;
       internal UIResizeCache ResizeCache;
       internal SpamChecker SpamChecker;
+      internal static RegexOptions RegexCompiledSupportedFlag = RegexOptions.None;
       private Dictionary<string, UntranslatedText> CachedKeys = new Dictionary<string, UntranslatedText>( StringComparer.Ordinal );
 
       private List<Action<ComponentTranslationContext>> _shouldIgnore = new List<Action<ComponentTranslationContext>>();
@@ -84,7 +85,6 @@ namespace XUnity.AutoTranslator.Plugin.Core
       /// </summary>
       private HashSet<string> _immediatelyTranslating = new HashSet<string>();
 
-      private static RegexOptions _regexCompiledSupportedFlag = RegexOptions.None;
       private bool _isInTranslatedMode = true;
       private bool _textHooksEnabled = true;
 
@@ -177,7 +177,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             var testResult = testRegex.Match( testSubject );
             if( testResult.Success )
             {
-               _regexCompiledSupportedFlag = RegexOptions.Compiled;
+               RegexCompiledSupportedFlag = RegexOptions.Compiled;
             }
             else
             {
@@ -3651,6 +3651,5 @@ namespace XUnity.AutoTranslator.Plugin.Core
             }
          }
       }
-      public static RegexOptions RegexCompiledSupportedFlag => _regexCompiledSupportedFlag; 
    }
 }
