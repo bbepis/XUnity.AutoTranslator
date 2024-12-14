@@ -68,6 +68,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
       internal TextureTranslationCache TextureCache;
       internal UIResizeCache ResizeCache;
       internal SpamChecker SpamChecker;
+      internal static RegexOptions RegexCompiledSupportedFlag = RegexOptions.None;
       private Dictionary<string, UntranslatedText> CachedKeys = new Dictionary<string, UntranslatedText>( StringComparer.Ordinal );
 
       private List<Action<ComponentTranslationContext>> _shouldIgnore = new List<Action<ComponentTranslationContext>>();
@@ -124,6 +125,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          InitializeHarmonyDetourBridge();
 
+         CheckRegexCompiledSupport();
+
          InitializeTextTranslationCaches();
 
          // Setup hooks
@@ -163,6 +166,29 @@ namespace XUnity.AutoTranslator.Plugin.Core
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
       }
 
+
+      private void CheckRegexCompiledSupport()
+      {
+         try
+         {
+            string testSubject = "She believed";
+            string testPattern = ".he ..lie..d";
+            Regex testRegex = new Regex( testPattern, RegexOptions.Compiled );
+            var testResult = testRegex.Match( testSubject );
+            if( testResult.Success )
+            {
+               RegexCompiledSupportedFlag = RegexOptions.Compiled;
+            }
+            else
+            {
+               XuaLogger.AutoTranslator.Info( "Unknown Error at CheckRegexCompiledSupport" );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Info( "The current version of the game doesn't support compiled Regex" );
+         }
+      }
       private static void LoadFallbackFont()
       {
          try
