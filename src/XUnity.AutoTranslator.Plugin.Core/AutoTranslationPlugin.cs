@@ -34,10 +34,6 @@ using XUnity.Common.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.UIResize;
 using XUnity.AutoTranslator.Plugin.Core.UI;
 using XUnity.AutoTranslator.Plugin.Core.Fonts;
-using Harmony;
-using System.Security.Policy;
-
-
 
 #if MANAGED
 using MonoMod.RuntimeDetour;
