@@ -15,6 +15,8 @@ namespace CustomTranslate
       private static readonly string ServicePointTemplateUrl = "{0}?from={1}&to={2}&text={3}";
       private string _endpoint;
       private string _friendlyName;
+      private bool _enableShortDelay;
+      private bool _disableSpamChecks;
 
       public CustomTranslateEndpoint()
       {
@@ -28,12 +30,18 @@ namespace CustomTranslate
       public override void Initialize( IInitializationContext context )
       {
          _endpoint = context.GetOrCreateSetting( "Custom", "Url", "" );
+         _enableShortDelay = context.GetOrCreateSetting( "Custom", "EnableShortDelay", false );
+         _disableSpamChecks = context.GetOrCreateSetting( "Custom", "DisableSpamChecks", false );
+
          if( string.IsNullOrEmpty( _endpoint ) ) throw new EndpointInitializationException( "The custom endpoint requires a url which has not been provided." );
 
          var uri = new Uri( _endpoint );
          context.DisableCertificateChecksFor( uri.Host );
 
          _friendlyName += " (" + uri.Host + ")";
+
+         if( _enableShortDelay ) context.SetTranslationDelay( 0.1f );
+         if( _disableSpamChecks ) context.DisableSpamChecks();
       }
 
       public override void OnCreateRequest( IHttpRequestCreationContext context )
