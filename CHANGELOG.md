@@ -1,4 +1,8 @@
-﻿### 5.4.2
+﻿### 5.4.3
+* FEATURE - CustomTranslateEndpoint - Add EnableShortDelay and DisableSpamChecks settings
+* BUG FIX - Fix `minor regex performance improvement` breaking in some games
+
+### 5.4.2
  * FEATURE - Translation scoping - if GetScopeFromComponent fails, use GetActiveSceneId instead of -1                
  * BUG FIX - Make config accessible on Android
  * BUG FIX - Make paths OS-independent in the MelonMod version
