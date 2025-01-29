@@ -250,7 +250,7 @@ If you decide to use an authenticated service *do not ever share your key or sec
 
 If you want to use a paid option, remember to check if that plugin supports the language you want to translate from and to before paying. Also, while the plugin does attempt to keep the amount of requests sent to the translation endpoint to a minimum, there are no guarantees about how much it will ask the endpoint to translate, and the author/owner of this repository takes no responsibility for any charges you may receive from your selected translation provider as a result of using this plugin.
 
-How the plugin attempts to minmize the number of requests it sends out is outlined [here](#spam-prevention).
+How the plugin attempts to minimize the number of requests it sends out is outlined [here](#spam-prevention).
 
 ### Spam Prevention
 The plugin employs the following spam prevention mechanisms:
