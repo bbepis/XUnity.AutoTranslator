@@ -22,20 +22,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          var tti = instance.GetTextTranslationInfo();
          if( tti?.IsTranslated == true )
          {
-            // 0. This method
-            // 1. Postfix
-            // 2. _Postfix
-            // 3. Harmony-related trampoline method/MM_Detour
-            // 4. Original method
-            var callingMethod = new StackFrame( 4 ).GetMethod();
-
-            var callingAssembly = callingMethod.DeclaringType.Assembly;
-
             var originalAssembly = instance.GetType().Assembly;
-            if( callingAssembly != originalAssembly )
+            var insideAssemblyCsharp = originalAssembly.GetName().Name.Equals( "Assembly-CSharp" );
+            if( insideAssemblyCsharp )
             {
-               // if the assembly is not the same, it may be call from the game or another mod, so replace
+               // If the UI element is inside Assembly-CSharp it's not possible to tell if it's called by game code or UI code
+               // This happens in NGUI where always replacing doesn't seem to cause any issues
                __result = tti.OriginalText;
+            }
+            else
+            {
+               // 0. This method
+               // 1. Postfix
+               // 2. _Postfix
+               // 3. Harmony-related trampoline method/MM_Detour
+               // 4. Original method
+               var callingMethod = new StackFrame( 4 ).GetMethod();
+
+               var callingAssembly = callingMethod.DeclaringType.Assembly;
+
+               if( callingAssembly != originalAssembly )
+               {
+                  // if the assembly is not the same, it may be call from the game or another mod, so replace
+                  __result = tti.OriginalText;
+               }
             }
          }
       }
