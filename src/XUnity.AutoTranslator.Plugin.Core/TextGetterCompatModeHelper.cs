@@ -32,6 +32,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             }
             else
             {
+               // BUG: This seems to not be right, at least in the latest BepInEx5 there seems to be one less stack frame
                // 0. This method
                // 1. Postfix
                // 2. _Postfix
