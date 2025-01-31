@@ -1,4 +1,9 @@
-﻿### 5.4.3
+﻿### 5.4.4
+* BUG FIX - Add NGUI support to TextGetterCompatibilityMode
+* BUG FIX - Fix potential assembly comparison issue in TextGetterCompatModeHelper
+* BUG FIX - Fix broken Assembly-CSharp-firstpass detection in CallOrigin
+
+### 5.4.3
 * FEATURE - CustomTranslateEndpoint - Add EnableShortDelay and DisableSpamChecks settings
 * BUG FIX - Fix `minor regex performance improvement` breaking in some games
 
