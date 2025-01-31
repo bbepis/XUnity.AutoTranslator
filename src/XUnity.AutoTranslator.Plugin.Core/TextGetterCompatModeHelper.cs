@@ -23,11 +23,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          if( tti?.IsTranslated == true )
          {
             var originalAssembly = instance.GetType().Assembly;
-            var insideAssemblyCsharp = originalAssembly.IsAssemblyCsharp();
-            if( insideAssemblyCsharp )
+            var withinGameCode = originalAssembly.IsAssemblyCsharp();
+            if( withinGameCode )
             {
                // If the UI element is inside Assembly-CSharp it's not possible to tell if it's called by game code or UI code
-               // This happens in NGUI where always replacing doesn't seem to cause any issues
+               // This happens in NGUI, in which always replacing doesn't seem to cause any issues
                __result = tti.OriginalText;
             }
             else
