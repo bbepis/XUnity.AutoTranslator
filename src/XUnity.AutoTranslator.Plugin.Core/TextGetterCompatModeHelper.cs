@@ -40,9 +40,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
                // 4. Original method
                var callingMethod = new StackFrame( 4 ).GetMethod();
 
-               var callingAssembly = callingMethod.DeclaringType.Assembly;
+               var callingAssembly = callingMethod.DeclaringType?.Assembly;
 
-               if( callingAssembly != originalAssembly )
+               if( !originalAssembly.Equals( callingAssembly ) )
                {
                   // if the assembly is not the same, it may be call from the game or another mod, so replace
                   __result = tti.OriginalText;
