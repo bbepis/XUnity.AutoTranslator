@@ -29,7 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             BreakingAssemblies.AddRange(
                AppDomain.CurrentDomain
                   .GetAssemblies()
-                  .Where( x => x.GetName().Name.Equals( "Assembly-CSharp" ) || x.GetName().Equals( "Assembly-CSharp-firstpass" ) )
+                  .Where( x => x.IsAssemblyCsharp() || x.IsAssemblyCsharpFirstpass() )
                );
          }
          catch( Exception e )

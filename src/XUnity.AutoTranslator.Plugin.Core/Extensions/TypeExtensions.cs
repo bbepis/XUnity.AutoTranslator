@@ -14,5 +14,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          return originalAssembly.GetName().Name.Equals( "Assembly-CSharp" );
       }
+
+      public static bool IsAssemblyCsharpFirstpass( this Assembly originalAssembly )
+      {
+         return originalAssembly.GetName().Name.Equals( "Assembly-CSharp-firstpass" );
+      }
    }
 }
