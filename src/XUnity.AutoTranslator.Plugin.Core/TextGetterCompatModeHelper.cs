@@ -23,7 +23,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
          if( tti?.IsTranslated == true )
          {
             var originalAssembly = instance.GetType().Assembly;
-            var insideAssemblyCsharp = originalAssembly.GetName().Name.Equals( "Assembly-CSharp" );
+            var insideAssemblyCsharp = originalAssembly.IsAssemblyCsharp();
             if( insideAssemblyCsharp )
             {
                // If the UI element is inside Assembly-CSharp it's not possible to tell if it's called by game code or UI code
