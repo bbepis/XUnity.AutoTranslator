@@ -441,6 +441,39 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   UnityTypes.UILabel_Properties.OverflowMethod?.Set( g, overflowMethodPropertyValue );
                };
             }
+
+            if( cache.HasAnyResizeCommands )
+            {
+               var text = (Component)ui;
+               var clrType = ui.GetType();
+
+               var segments = text.gameObject.GetPathSegments();
+               var scope = TranslationScopeHelper.GetScope( ui );
+               if( cache.TryGetUIResize( segments, scope, out var result ) )
+               {
+                  // TODO: Support other resizer commands for NGUI
+                  if( result.ResizeCommand != null )
+                  {
+                     var fontSizeProperty = clrType.CachedProperty( "fontSize" );
+                     var currentFontSize = (int)fontSizeProperty.Get( ui );
+
+                     if( !Equals( _alteredFontSize, currentFontSize ) )
+                     {
+                        var newFontSize = result.ResizeCommand.GetSize( currentFontSize );
+                        if( newFontSize.HasValue )
+                        {
+                           fontSizeProperty.Set( ui, newFontSize.Value );
+                           _alteredFontSize = newFontSize.Value;
+
+                           _unresize += g =>
+                           {
+                              fontSizeProperty.Set( g, currentFontSize );
+                           };
+                        }
+                     }
+                  }
+               }
+            }
          }
          else if( type == UnityTypes.TextMeshPro?.UnityType || type == UnityTypes.TextMeshProUGUI?.UnityType )
          {
