@@ -1,4 +1,7 @@
-﻿### 5.4.4
+﻿### 5.4.5
+* FEATURE - Add basic resizer support for NGUI
+
+### 5.4.4
 * BUG FIX - Add NGUI support to TextGetterCompatibilityMode
 * BUG FIX - Fix potential assembly comparison issue in TextGetterCompatModeHelper
 * BUG FIX - Fix broken Assembly-CSharp-firstpass detection in CallOrigin
