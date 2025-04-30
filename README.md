@@ -194,31 +194,31 @@ The following key inputs are mapped:
 
 ## Translators
 The supported translators are:
- * [GoogleTranslate](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
+ * [GoogleTranslate](https://untrack.link/https://translate.google.com/), based on the online Google translation service. Does not require authentication.
    * No limitations, but unstable.
- * [GoogleTranslateV2](https://anonym.to/?https://translate.google.com/), based on the online Google translation service. Does not require authentication.
+ * [GoogleTranslateV2](https://untrack.link/https://translate.google.com/), based on the online Google translation service. Does not require authentication.
    * No limitations, but unstable. Currently being tested. May replace original version in future since that API is no longer used on their official translator web.
- * [GoogleTranslateCompat](https://anonym.to/?https://translate.google.com/), same as the above, except requests are served out-of-process which is needed in some versions of Unity/Mono.
+ * [GoogleTranslateCompat](https://untrack.link/https://translate.google.com/), same as the above, except requests are served out-of-process which is needed in some versions of Unity/Mono.
    * No limitations, but unstable.
- * [GoogleTranslateLegitimate](https://anonym.to/?https://cloud.google.com/translate/), based on the Google cloud translation API. Requires an API key.
+ * [GoogleTranslateLegitimate](https://untrack.link/https://cloud.google.com/translate/), based on the Google cloud translation API. Requires an API key.
    * Provides trial period of 1 year with $300 credits. Enough for 15 million characters translations.
- * [BingTranslate](https://anonym.to/?https://www.bing.com/translator), based on the online Bing translation service. Does not require authentication.
+ * [BingTranslate](https://untrack.link/https://www.bing.com/translator), based on the online Bing translation service. Does not require authentication.
    * No limitations, but unstable.
- * [BingTranslateLegitimate](https://anonym.to/?https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview), based on the Azure text translation. Requires an API key.
+ * [BingTranslateLegitimate](https://untrack.link/https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview), based on the Azure text translation. Requires an API key.
    * Free up to 2 million characters per month.
- * [DeepLTranslate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Does not require authentication.
+ * [DeepLTranslate](https://untrack.link/https://www.deepl.com/translator), based on the online DeepL translation service. Does not require authentication.
    * No limitations, but unstable. Remarkable quality.
- * [DeepLTranslateLegitimate](https://anonym.to/?https://www.deepl.com/translator), based on the online DeepL translation service. Requires an  API Key.
+ * [DeepLTranslateLegitimate](https://untrack.link/https://www.deepl.com/translator), based on the online DeepL translation service. Requires an  API Key.
    * $4.99 per month and $20 per million characters translated that month. 
    * Free up to 0.5 million characters per month.
    * For now, you must subscribe to DeepL API (for Developers). - DOES NOT WORK WITH DeepL Pro (Starter, Advanced and Ultimate)
- * [PapagoTranslate](https://anonym.to/?https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
+ * [PapagoTranslate](https://untrack.link/https://papago.naver.com/), based on the online Papago translation service. Does not require authentication.
    * No limitations, but unstable.
- * [BaiduTranslate](https://anonym.to/?https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
+ * [BaiduTranslate](https://untrack.link/https://fanyi.baidu.com/), based on Baidu translation service. Requires AppId and AppSecret.
    * After registration, the first 50,000 characters per month are free (QPS=1), and 49 yuan/million characters are charged after that. If you have passed the free identity authentication, then the first 1 million characters per month are free (QPS=10), and the excess is charged at 49 yuan/million characters. The longest single request is 6000 characters.
- * [YandexTranslate](https://anonym.to/?https://tech.yandex.com/translate/), based on the Yandex translation service. Requires an API key.
+ * [YandexTranslate](https://untrack.link/https://tech.yandex.com/translate/), based on the Yandex translation service. Requires an API key.
    * Free up to 1 million characters per day, but max 10 million characters per month.
- * [WatsonTranslate](https://anonym.to/?https://cloud.ibm.com/apidocs/language-translator), based on IBM's Watson. Requires a URL and an API key.
+ * [WatsonTranslate](https://untrack.link/https://cloud.ibm.com/apidocs/language-translator), based on IBM's Watson. Requires a URL and an API key.
    * Free up to 1 million characters per month.
  * LecPowerTranslator15, based on LEC's Power Translator. Does not require authentication, but does require the software installed.
    * No limitations.
@@ -228,7 +228,7 @@ The supported translators are:
    * No limitations. Remarkable quality.
  * [ChatGPT](https://github.com/joshfreitas1984/XUnity.AutoChatGptTranslator), currently requires external translator plugin.
    * Requires an APIKey, paid per tokens used.
- * [LingoCloudTranslate](https://anonym.to/?https://fanyi.caiyunapp.com/), based on the online LingoCloud translation service. Translation is only supported in Chinese and two other languages: Japanese and English.
+ * [LingoCloudTranslate](https://untrack.link/https://fanyi.caiyunapp.com/), based on the online LingoCloud translation service. Translation is only supported in Chinese and two other languages: Japanese and English.
    * After registration and free certification, the first 1 million characters per month are free, and the excess will be charged at 20 yuan/million characters.The official test token is `3975l6lr5pcbvidl6jl2`, you can try it before registering.
  * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
