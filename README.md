@@ -193,7 +193,10 @@ The following key inputs are mapped:
   * CTRL + ALT + NP6: Print out entire GameObject hierarchy to file `hierarchy.txt`
 
 ## Translators
-The supported translators are:
+Translations are obtained through translation endpoints, which are basically plugins for AutoTranslator. The endpoint plugins are stored in the `Translators` subfolder.
+
+### Built-in
+Here's a list of translators supported out of the box:
  * [GoogleTranslate](https://untrack.link/https://translate.google.com/), based on the online Google translation service. Does not require authentication.
    * No limitations, but unstable.
  * [GoogleTranslateV2](https://untrack.link/https://translate.google.com/), based on the online Google translation service. Does not require authentication.
@@ -224,13 +227,9 @@ The supported translators are:
    * No limitations.
  * ezTrans XP, based on Changsinsoft's japanese-korean translator ezTrans XP. Does not require authentication, but does require the software and [Ehnd](https://github.com/sokcuri/ehnd) installed.
    * No limitations.
- * [Sugoi Translator](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), currently requires external translator plugin.
-   * No limitations. Remarkable quality.
- * [ChatGPT](https://github.com/joshfreitas1984/XUnity.AutoChatGptTranslator), currently requires external translator plugin.
-   * Requires an APIKey, paid per tokens used.
  * [LingoCloudTranslate](https://untrack.link/https://fanyi.caiyunapp.com/), based on the online LingoCloud translation service. Translation is only supported in Chinese and two other languages: Japanese and English.
    * After registration and free certification, the first 1 million characters per month are free, and the excess will be charged at 20 yuan/million characters.The official test token is `3975l6lr5pcbvidl6jl2`, you can try it before registering.
- * CustomTranslate. Alternatively you can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
+ * CustomTranslate. You can also specify any custom HTTP url that can be used as a translation endpoint (GET request). This must use the query parameters "from", "to" and "text" and return only a string with the result (try HTTP without SSL first, as unity-mono often has issues with SSL).
    * *NOTE: This is a developer-centric option. You cannot simply specify "CustomTranslate" and expect it to work with any arbitrary translation service you find online. See [FAQ](#frequently-asked-questions)*
    * Example Configuration:
      * Endpoint=CustomTranslate
@@ -240,11 +239,23 @@ The supported translators are:
    * Example Response (only body): Hello
    * Known implementations that can be used with CustomTranslate:
      * ezTrans: https://github.com/HelloKS/ezTransWeb
- 
+
 *NOTE: If you use any of the online translators that does not require some form of authentication, that this plugin may break at any time.*
 
+### Third-party
 Since 3.0.0, you can also implement your own translators. To do so, follow the instruction [here](#implementing-a-translator).
+Here are some third-party translation plugins that you can use with AutoTranslator:
+ * [SugoiOfflineTranslatorEndpoint](https://github.com/Vin-meido/XUnity-AutoTranslator-SugoiOfflineTranslatorEndpoint), for use with a Sugoi Translator server.
+   * No limitations. Remarkable quality.
+ * [LlmTranslators](https://github.com/joshfreitas1984/XUnity.AutoTranslate.LlmTranslators), for use with OpenAI's LLM, and Ollama Models.
+   * OpenAI requires an APIKey, paid per tokens used. Locally hosted Ollama Models are free.
+ * [AutoChatGptTranslator](https://github.com/joshfreitas1984/XUnity.AutoChatGptTranslator), for ChatGPT. Obsolete, use LlmTranslators instead.
+   * Requires an APIKey, paid per tokens used.
+ * [AutoLLMTranslator](https://github.com/NothingNullNull/XUnity.AutoLLMTranslator), a generic endpoint that supports many different LLM's, including Ollama models.
+   * Very flexible but requires advanced manual configuration. Recommended only for advanced users.
 
+*NOTE: You use third-party plugins at your own risk - they were checked at the time of being added to the list, but may change over time. Third-party plugins might cause issues or have security issues.*
+ 
 ### About Authenticated Translators
 If you decide to use an authenticated service *do not ever share your key or secret*. If you do so by accident, you should revoke it immediately. Most, if not all services provides an option for this.
 
