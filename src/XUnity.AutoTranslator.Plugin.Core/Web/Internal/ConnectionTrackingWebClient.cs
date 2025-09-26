@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -1794,7 +1795,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web.Internal
       {
          byte[] buffer3;
          string strA = this.Headers[ "Content-Type" ];
-         if( ( strA != null ) && ( string.Compare( strA, urlEncodedCType, true ) != 0 ) )
+         if( ( strA != null ) && ( string.Compare( strA, urlEncodedCType, true, CultureInfo.InvariantCulture ) != 0 ) )
          {
             throw new WebException( "Content-Type header cannot be changed from its default value for this request." );
          }

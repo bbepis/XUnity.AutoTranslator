@@ -210,8 +210,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          try
          {
             var fileName = Path.GetFileNameWithoutExtension( fullFileName );
-            var startHash = fileName.LastIndexOf( "[" );
-            var endHash = fileName.LastIndexOf( "]" );
+            var startHash = fileName.LastIndexOf( '[' );
+            var endHash = fileName.LastIndexOf( ']' );
 
             if( endHash > -1 && startHash > -1 && endHash > startHash )
             {

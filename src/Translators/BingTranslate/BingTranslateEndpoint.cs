@@ -262,11 +262,11 @@ namespace BingTranslate
 
       private string Lookup( string lookFor, string html )
       {
-         var index = html.IndexOf( lookFor );
+         var index = html.IndexOf( lookFor, StringComparison.Ordinal );
          if( index > -1 ) // simple string approach
          {
             var startIndex = index + lookFor.Length;
-            var endIndex = html.IndexOf( "\"", startIndex );
+            var endIndex = html.IndexOf( '\"', startIndex );
 
             if( startIndex > -1 && endIndex > -1 )
             {

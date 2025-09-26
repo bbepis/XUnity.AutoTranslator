@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -111,7 +112,7 @@ namespace PapagoTranslate
          request.Headers[ HttpRequestHeader.UserAgent ] = string.IsNullOrEmpty( AutoTranslatorSettings.UserAgent ) ? UserAgents.Chrome_Win10_Latest : AutoTranslatorSettings.UserAgent;
          request.Headers[ "Authorization" ] = $"PPG {UUID}:{token}";
          request.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded; charset=UTF-8";
-         request.Headers[ "Timestamp" ] = timestamp.ToString();
+         request.Headers[ "Timestamp" ] = timestamp.ToString(CultureInfo.InvariantCulture);
 
          context.Complete( request );
 

@@ -228,7 +228,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public static TranslationFileDirective Create( string directive )
       {
-         var commentIndex = directive.IndexOf( "//" );
+         var commentIndex = directive.IndexOf( '/' );
          if( commentIndex > -1 )
          {
             directive = directive.Substring( 0, commentIndex );
@@ -245,7 +245,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
                var command = parts[ 0 ].ToLowerInvariant();
 
                var setType = parts[ 1 ];
-               var argument = directive.Substring( directive.IndexOf( setType ) + setType.Length ).Trim();
+               var argument = directive.Substring( directive.IndexOf( setType, StringComparison.Ordinal ) + setType.Length ).Trim();
                setType = setType.ToLowerInvariant();
                switch( command )
                {

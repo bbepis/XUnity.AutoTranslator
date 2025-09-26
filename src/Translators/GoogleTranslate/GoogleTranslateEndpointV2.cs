@@ -175,7 +175,7 @@ namespace GoogleTranslate
 
          // output is some odd form of chunked-encoding. We just look at the first chunk
          data = data.Substring( 6 );
-         var chars = data.Substring( 0, data.IndexOf( "\n" ) );
+         var chars = data.Substring( 0, data.IndexOf( '\n' ) );
          var num = int.Parse( chars, CultureInfo.InvariantCulture );
          data = data.Substring( chars.Length, num );
 
@@ -355,11 +355,11 @@ namespace GoogleTranslate
             string[] lookups = new[] { "FdrFJe\":\"" };
             foreach( var lookup in lookups )
             {
-               var index = html.IndexOf( lookup );
+               var index = html.IndexOf( lookup, StringComparison.Ordinal );
                if( index > -1 ) // simple string approach
                {
                   var startIndex = index + lookup.Length;
-                  var endIndex = html.IndexOf( "\"", startIndex );
+                  var endIndex = html.IndexOf( '\"', startIndex );
                   var result = html.Substring( startIndex, endIndex - startIndex );
 
                   _FSID = long.Parse( result, CultureInfo.InvariantCulture );

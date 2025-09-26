@@ -522,7 +522,7 @@ namespace XUnity.Common.Constants
             string @namespace = string.Empty;
             string typeName = null;
 
-            var lastDot = name.LastIndexOf( "." );
+            var lastDot = name.LastIndexOf( '.' );
             if( lastDot == -1 )
             {
                typeName = name;
