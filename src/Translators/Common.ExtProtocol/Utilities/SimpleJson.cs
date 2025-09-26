@@ -245,7 +245,7 @@ namespace SimpleJSON
          get
          {
             double v = 0.0;
-            if( double.TryParse( Value, NumberStyles.None, CultureInfo.InvariantCulture, out v ) )
+            if( double.TryParse( Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out v ) )
                return v;
             return 0.0;
          }
@@ -940,7 +940,7 @@ namespace SimpleJSON
          set
          {
             double v;
-            if( double.TryParse( value, NumberStyles.None, CultureInfo.InvariantCulture, out v ) )
+            if( double.TryParse( value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out v ) )
                m_Data = v;
          }
       }

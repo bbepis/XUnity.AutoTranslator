@@ -228,7 +228,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
    {
       public static TranslationFileDirective Create( string directive )
       {
-         var commentIndex = directive.IndexOf( '/' );
+         var commentIndex = directive.IndexOf( "//", StringComparison.Ordinal );
          if( commentIndex > -1 )
          {
             directive = directive.Substring( 0, commentIndex );
