@@ -78,7 +78,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             if( string.IsNullOrEmpty( replacement ) )
             {
                int idx = -1;
-               while( ( idx = str.IndexOf( original ) ) != -1 )
+               while( ( idx = str.IndexOf( original, StringComparison.InvariantCulture ) ) != -1 )
                {
                   succeeded = true;
                   str = str.Remove( idx, original.Length );
@@ -88,7 +88,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             {
                string key = null;
                int idx = -1;
-               while( ( idx = str.IndexOf( original ) ) != -1 )
+               while( ( idx = str.IndexOf( original, StringComparison.InvariantCulture ) ) != -1 )
                {
                   if( key == null )
                   {

@@ -265,7 +265,7 @@ namespace UnityEngine
                continue;
             }
 
-            int num2 = text.IndexOf( ": " );
+            int num2 = text.IndexOf( ": ", StringComparison.Ordinal );
             if( num2 != -1 )
             {
                string key = text.Substring( 0, num2 ).ToUpper();

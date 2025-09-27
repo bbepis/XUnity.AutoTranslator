@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -244,13 +245,13 @@ namespace SimpleJSON
          get
          {
             double v = 0.0;
-            if( double.TryParse( Value, out v ) )
+            if( double.TryParse( Value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out v ) )
                return v;
             return 0.0;
          }
          set
          {
-            Value = value.ToString();
+            Value = value.ToString(CultureInfo.InvariantCulture);
          }
       }
 
@@ -935,11 +936,11 @@ namespace SimpleJSON
 
       public override string Value
       {
-         get { return m_Data.ToString(); }
+         get { return m_Data.ToString(CultureInfo.InvariantCulture); }
          set
          {
             double v;
-            if( double.TryParse( value, out v ) )
+            if( double.TryParse( value, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out v ) )
                m_Data = v;
          }
       }

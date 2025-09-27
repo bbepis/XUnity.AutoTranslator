@@ -211,11 +211,11 @@ namespace XUnity.Common.Extensions
       {
          const int kNotFound = -1;
 
-         var startIdx = strSource.IndexOf( strStart );
+         var startIdx = strSource.IndexOf( strStart, StringComparison.InvariantCulture );
          if( startIdx != kNotFound )
          {
             startIdx += strStart.Length;
-            var endIdx = strSource.IndexOf( strEnd, startIdx );
+            var endIdx = strSource.IndexOf( strEnd, startIdx, StringComparison.InvariantCulture );
             if( endIdx > startIdx )
             {
                return strSource.Substring( startIdx, endIdx - startIdx );

@@ -337,11 +337,11 @@ namespace GoogleTranslate
             string[] lookups = new[] { "tkk:'", "TKK='" };
             foreach( var lookup in lookups )
             {
-               var index = html.IndexOf( lookup );
+               var index = html.IndexOf( lookup, StringComparison.Ordinal );
                if( index > -1 ) // simple string approach
                {
                   var startIndex = index + lookup.Length;
-                  var endIndex = html.IndexOf( "'", startIndex );
+                  var endIndex = html.IndexOf( '\'', startIndex );
                   var result = html.Substring( startIndex, endIndex - startIndex );
 
                   var parts = result.Split( '.' );
