@@ -199,6 +199,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
          if( UnityTypes.Text != null && UnityTypes.Text.IsAssignableFrom( type ) )
          {
             var text = (Component)ui;
+            if( !text || !text.gameObject ) return;
 
             // text is likely to be longer than there is space for, simply expand out anyway then
 
@@ -445,6 +446,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( cache.HasAnyResizeCommands )
             {
                var text = (Component)ui;
+               if( !text || !text.gameObject ) return;
                var clrType = ui.GetType();
 
                var segments = text.gameObject.GetPathSegments();
@@ -486,6 +488,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
             if( cache.HasAnyResizeCommands )
             {
                var text = (Component)ui;
+               if( !text || !text.gameObject ) return;
 
                var segments = text.gameObject.GetPathSegments();
                var scope = TranslationScopeHelper.GetScope( ui );
