@@ -2,9 +2,9 @@
 	<!-- Use these properties to change version numbers globally -->
 	<PropertyGroup>
 		<!-- Plugin version -->
-		<Version>5.4.5</Version>
+		<Version>5.4.6</Version>
 		<!-- XUnity.Common version -->
-		<VersionCommon>1.0.3</VersionCommon>
+		<VersionCommon>1.0.4</VersionCommon>
 		<!-- XUnity.AutoTranslator.Plugin.ExtProtocol version -->
 		<VersionExtProtocol>1.0.1</VersionExtProtocol>
 		<!-- XUnity.ResourceRedirector version -->

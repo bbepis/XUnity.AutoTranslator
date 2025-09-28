@@ -1,4 +1,8 @@
-﻿### 5.4.5
+﻿### 5.4.6
+* BUG FIX - Fix ResizeUI nullref crash if component is destroyed
+* BUG FIX - Replace culture sensitive string operations with invariant or ordinal to fix issues on Turkish and some other system locales
+
+### 5.4.5
 * FEATURE - Add basic resizer support for NGUI
 
 ### 5.4.4
