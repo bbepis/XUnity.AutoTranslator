@@ -977,7 +977,7 @@ This requires version 3.7.0 or later!
 
 ### Implementing a component that the Auto Translator should not interfere with
 As a mod author, you might not want the Auto Translator to interfere with your mods UI. If this is the case there's two ways to tell Auto Translator not to perform any translation:
- * If your UI is based on GameObjects, you can simply name your GameObjects containing the text element (for example Text class) to something that contains the string "XUAIGNORE". The Auto Translator will check for this and ignore components that contains the string.
+ * If your UI is based on GameObjects, you can simply name your GameObjects containing the text element (for example Text class) to something that contains the string "XUAIGNORE". The Auto Translator will check for this and ignore components that contains the string. If you name the GameObject with "XUAIGNORETREE" instead, Auto Translator will also ignore components on all child GameObjects. Warning: This is checked on component creation. If you rename the GameObject after the component has been instantiated, it will not be ignored.
  * If your UI is based on IMGUI, the above approach is not possible, because there are no GameObject. In that case you can do the following instead:
 
 ```C#

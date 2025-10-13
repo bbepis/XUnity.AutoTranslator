@@ -57,6 +57,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       private static readonly string RichTextPropertyName = "richText";
       private static GameObject[] _objects = new GameObject[ 128 ];
       private static readonly string XuaIgnore = "XUAIGNORE";
+      private static readonly string XuaIgnoreTree = "XUAIGNORETREE";
       private static List<IPropertyMover> TexturePropertyMovers;
 #if MANAGED
       private static readonly Dictionary<Type, ITextComponentManipulator> Manipulators = new Dictionary<Type, ITextComponentManipulator>();
@@ -122,11 +123,21 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui is Component component && component )
          {
-            var go = component.gameObject;
-            var ignore = go.HasIgnoredName();
-            if( ignore )
+            var tr = component.transform.parent;
+
+            if( tr.name.Contains( XuaIgnore ) ) // Also includes XuaIgnoreTree
             {
                return true;
+            }
+
+            while( tr.parent )
+            {
+               tr = tr.parent;
+
+               if( tr.name.Contains( XuaIgnoreTree ) )
+               {
+                  return true;
+               }
             }
 
             Component inputField = null;
@@ -156,7 +167,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                }
             }
 
-            inputField = go.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
+            inputField = component.gameObject.GetFirstComponentInSelfOrAncestor( UnityTypes.UIInput?.UnityType );
 
             return inputField != null;
          }
@@ -609,12 +620,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
          }
 
          return path.ToString();
-      }
-
-      public static bool HasIgnoredName( this object ui )
-      {
-         var go = GetAssociatedGameObject( ui );
-         return go.name.Contains( XuaIgnore );
       }
 
       public static Texture2D GetTexture( this object ui )
