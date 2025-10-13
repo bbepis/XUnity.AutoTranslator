@@ -123,7 +123,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
       {
          if( ui is Component component && component )
          {
-            var tr = component.transform.parent;
+            var tr = component.transform;
 
             if( tr.name.Contains( XuaIgnore ) ) // Also includes XuaIgnoreTree
             {
