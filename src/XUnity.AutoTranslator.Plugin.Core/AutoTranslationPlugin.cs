@@ -164,6 +164,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
          LoadTranslations( false );
 
          XuaLogger.AutoTranslator.Info( $"Loaded XUnity.AutoTranslator into Unity [{Application.unityVersion}] game." );
+
+         AutoTranslatorState.OnPluginInitializationCompleted();
       }
 
 
