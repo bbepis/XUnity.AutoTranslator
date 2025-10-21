@@ -18,7 +18,7 @@ namespace YandexTranslate
    internal class YandexTranslateEndpoint : HttpEndpoint
    {
       private static readonly HashSet<string> SupportedLanguages = new HashSet<string> { "az", "sq", "am", "en", "ar", "hy", "af", "eu", "ba", "be", "bn", "my", "bg", "bs", "cy", "hu", "vi", "ht", "gl", "nl", "mrj", "el", "ka", "gu", "da", "he", "yi", "id", "ga", "it", "is", "es", "kk", "kn", "ca", "ky", "zh", "ko", "xh", "km", "lo", "la", "lv", "lt", "lb", "mg", "ms", "ml", "mt", "mk", "mi", "mr", "mhr", "mn", "de", "ne", "no", "pa", "pap", "fa", "pl", "pt", "ro", "ru", "ceb", "sr", "si", "sk", "sl", "sw", "su", "tg", "th", "tl", "ta", "tt", "te", "tr", "udm", "uz", "uk", "ur", "fi", "fr", "hi", "hr", "cs", "sv", "gd", "et", "eo", "jv", "ja" };
-      private static readonly string HttpsServicePointTemplateUrl = "https://translate.api.cloud.yandex.net/translate/v2/translate";
+      private static readonly string HttpsServiceUrl = "https://translate.api.cloud.yandex.net/translate/v2/translate";
 
       private string _key;
 
@@ -59,10 +59,10 @@ namespace YandexTranslate
 
          string body = $"{{\"sourceLanguageCode\":\"{sourceLang}\",\"targetLanguageCode\":\"{targetLang}\",\"texts\":[\"{escapedText}\"]}}";
 
-         var request = new XUnityWebRequest("POST", HttpsServicePointTemplateUrl, body);
+         var request = new XUnityWebRequest("POST", HttpsServiceUrl, body);
 
          request.Headers["Authorization"] = $"Api-Key {_key}";
-         request.Headers["Content-Type"] = "application/json";
+         request.Headers["Content-Type"] = "application/json; charset=utf-8";
          request.Headers["Accept"] = "application/json";
 
          context.Complete( request );
