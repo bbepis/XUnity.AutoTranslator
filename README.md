@@ -531,7 +531,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
 
 ## IL2CPP Support
 While this plugin offers some level of IL2CPP support, it is by no means complete. The following differences can be observed/features are missing:
- * Subpar text hooking capabilities
+ * Subpar text hooking capabilities - Some changes to text components are not detected, requiring a manual refresh to get translated. Currently this can be worked around by using the [AutoTranslator.IL2CPP.BruteForceFix](https://github.com/ManlyMarco/RandomPlugins) helper plugin.
  * TextGetterCompatibilityMode is not supported
  * Plugin-specific translations are not supported (yet)
  * IMGUI translations are not supported (yet)
