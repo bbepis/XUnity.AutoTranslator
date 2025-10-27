@@ -1,4 +1,9 @@
-﻿### 5.4.6
+﻿### 5.5.0
+ * FEATURE - Yandex Translate API v2 support
+ * FEATURE - Added support for `XUAIGNORETREE` tag in GameObject names to prevent translation of entire trees of GameObjects (previously added `XUAIGNORE` only ignores the named GameObject)
+ * FEATURE - Added `AutoTranslatorState.PluginInitialized` property and `PluginInitializationCompleted` event
+
+### 5.4.6
 * BUG FIX - Fix ResizeUI nullref crash if component is destroyed
 * BUG FIX - Replace culture sensitive string operations with invariant or ordinal to fix issues on Turkish and some other system locales
 
