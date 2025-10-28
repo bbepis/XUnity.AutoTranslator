@@ -29,6 +29,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Utilities
             {
                switch( c )
                {
+                  case '/':
                   case '=':
                   case '\\':
                      builder.Append( c );
