@@ -30,6 +30,9 @@
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net35'">
 		<ProjectReference Include="..\UnityEngine\UnityEngine.csproj" />
+		<Reference Include="Unity.InputSystem">
+			<HintPath>..\..\libs\Unity.InputSystem.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
@@ -45,6 +48,9 @@
 
 		<Reference Include="UnityEngine.CoreModule">
 			<HintPath>..\..\libs\Proxies\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.InputSystem">
+			<HintPath>..\..\libs\Proxies\Unity.InputSystem.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.TextRenderingModule">
 			<HintPath>..\..\libs\Proxies\UnityEngine.TextRenderingModule.dll</HintPath>

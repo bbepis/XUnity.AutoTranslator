@@ -48,7 +48,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
 
          if( GUIUtil.IsAnyMouseButtonOrScrollWheelDownSafe )
          {
-            var point = new Vector2( Input.mousePosition.x, Screen.height - Input.mousePosition.y );
+            var point = new Vector2( UnityInput.Current.mousePosition.x, Screen.height - UnityInput.Current.mousePosition.y );
             _isMouseDownOnWindow = _windowRect.Contains( point );
          }
 
@@ -58,11 +58,11 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
          // make sure window is focused if scroll wheel is used to indicate we consumed that event
          GUI.FocusWindow( WindowId );
 
-         var point1 = new Vector2( Input.mousePosition.x, Screen.height - Input.mousePosition.y );
+         var point1 = new Vector2( UnityInput.Current.mousePosition.x, Screen.height - UnityInput.Current.mousePosition.y );
          if( !_windowRect.Contains( point1 ) )
             return;
 
-         Input.ResetInputAxes();
+         UnityInput.Current.ResetInputAxes();
       }
 
       public void Update()

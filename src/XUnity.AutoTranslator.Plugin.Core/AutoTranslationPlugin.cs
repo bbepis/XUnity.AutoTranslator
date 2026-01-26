@@ -2759,61 +2759,61 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private void HandleInput()
       {
-         var isAltPressed = Input.GetKey( KeyCode.LeftAlt ) || Input.GetKey( KeyCode.RightAlt );
+         var isAltPressed = UnityInput.Current.GetKey( KeyCode.LeftAlt ) || UnityInput.Current.GetKey( KeyCode.RightAlt );
          if( isAltPressed )
          {
-            var isCtrlPressed = Input.GetKey( KeyCode.LeftControl );
+            var isCtrlPressed = UnityInput.Current.GetKey( KeyCode.LeftControl );
 
-            if( Input.GetKeyDown( KeyCode.T ) )
+            if( UnityInput.Current.GetKeyDown( KeyCode.T ) )
             {
                ToggleTranslation();
             }
-            else if( Input.GetKeyDown( KeyCode.F ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.F ) )
             {
                ToggleFont();
             }
-            else if( Input.GetKeyDown( KeyCode.R ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.R ) )
             {
                ReloadTranslations();
             }
-            else if( Input.GetKeyDown( KeyCode.U ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.U ) )
             {
                ManualHook();
             }
-            else if( Input.GetKeyDown( KeyCode.Q ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.Q ) )
             {
                RebootPlugin();
             }
-            //else if( Input.GetKeyDown( KeyCode.B ) )
+            //else if( UnityInput.Current.GetKeyDown( KeyCode.B ) )
             //{
             //   ConnectionTrackingWebClient.CloseServicePoints();
             //}
-            else if( Input.GetKeyDown( KeyCode.Alpha0 ) || Input.GetKeyDown( KeyCode.Keypad0 ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.Alpha0 ) || UnityInput.Current.GetKeyDown( KeyCode.Keypad0 ) )
             {
                if( MainWindow != null )
                {
                   MainWindow.IsShown = !MainWindow.IsShown;
                }
             }
-            else if( Input.GetKeyDown( KeyCode.Alpha1 ) || Input.GetKeyDown( KeyCode.Keypad1 ) )
+            else if( UnityInput.Current.GetKeyDown( KeyCode.Alpha1 ) || UnityInput.Current.GetKeyDown( KeyCode.Keypad1 ) )
             {
                ToggleTranslationAggregator();
             }
             else if( isCtrlPressed )
             {
-               if( Input.GetKeyDown( KeyCode.Keypad9 ) )
+               if( UnityInput.Current.GetKeyDown( KeyCode.Keypad9 ) )
                {
                   Settings.SimulateError = !Settings.SimulateError;
                }
-               else if( Input.GetKeyDown( KeyCode.Keypad8 ) )
+               else if( UnityInput.Current.GetKeyDown( KeyCode.Keypad8 ) )
                {
                   Settings.SimulateDelayedError = !Settings.SimulateDelayedError;
                }
-               else if( Input.GetKeyDown( KeyCode.Keypad7 ) )
+               else if( UnityInput.Current.GetKeyDown( KeyCode.Keypad7 ) )
                {
                   PrintSceneInformation();
                }
-               else if( Input.GetKeyDown( KeyCode.Keypad6 ) )
+               else if( UnityInput.Current.GetKeyDown( KeyCode.Keypad6 ) )
                {
                   PrintObjects();
                }
