@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using XUnity.Common.Constants;
+using XUnity.Common.Utilities;
 
 namespace XUnity.AutoTranslator.Plugin.Core.UI
 {
@@ -174,9 +175,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          get
          {
-            return Input.GetMouseButtonDown( 0 )
-               || Input.GetMouseButtonDown( 1 )
-               || Input.GetMouseButtonDown( 2 );
+            return UnityInput.Current.GetMouseButtonDown( 0 )
+               || UnityInput.Current.GetMouseButtonDown( 1 )
+               || UnityInput.Current.GetMouseButtonDown( 2 );
          }
       }
 
@@ -184,10 +185,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          get
          {
-            return Input.mouseScrollDelta.y != 0f
-               || Input.GetMouseButtonDown( 0 )
-               || Input.GetMouseButtonDown( 1 )
-               || Input.GetMouseButtonDown( 2 );
+            return UnityInput.Current.mouseScrollDelta.y != 0f
+               || UnityInput.Current.GetMouseButtonDown( 0 )
+               || UnityInput.Current.GetMouseButtonDown( 1 )
+               || UnityInput.Current.GetMouseButtonDown( 2 );
          }
       }
 
@@ -205,9 +206,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          get
          {
-            return Input.GetMouseButton( 0 )
-               || Input.GetMouseButton( 1 )
-               || Input.GetMouseButton( 2 );
+            return UnityInput.Current.GetMouseButton( 0 )
+               || UnityInput.Current.GetMouseButton( 1 )
+               || UnityInput.Current.GetMouseButton( 2 );
          }
       }
 
@@ -215,10 +216,10 @@ namespace XUnity.AutoTranslator.Plugin.Core.UI
       {
          get
          {
-            return Input.mouseScrollDelta.y != 0f
-               || Input.GetMouseButton( 0 )
-               || Input.GetMouseButton( 1 )
-               || Input.GetMouseButton( 2 );
+            return UnityInput.Current.mouseScrollDelta.y != 0f
+               || UnityInput.Current.GetMouseButton( 0 )
+               || UnityInput.Current.GetMouseButton( 1 )
+               || UnityInput.Current.GetMouseButton( 2 );
          }
       }
    }
