@@ -1,4 +1,7 @@
-﻿### 5.5.0
+﻿### 5.5.1
+ * Use UnityInput to support both legacy and new input systems
+
+### 5.5.0
  * FEATURE - Yandex Translate API v2 support
  * FEATURE - Added support for `XUAIGNORETREE` tag in GameObject names to prevent translation of entire trees of GameObjects (previously added `XUAIGNORE` only ignores the named GameObject)
  * FEATURE - Added `AutoTranslatorState.PluginInitialized` property and `PluginInitializationCompleted` event
