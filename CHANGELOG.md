@@ -1,4 +1,8 @@
-﻿### 5.5.1
+﻿### 5.5.2
+ * BUG FIX - Use Authorization header instead of legacy query/body params for DeepL API auth
+ * BUG FIX - Fix override font stopping working after a while in IL2CPP
+
+### 5.5.1
  * Use UnityInput to support both legacy and new input systems
 
 ### 5.5.0
