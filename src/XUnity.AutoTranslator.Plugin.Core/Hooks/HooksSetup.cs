@@ -11,6 +11,7 @@ using XUnity.AutoTranslator.Plugin.Core.Extensions;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.NGUI;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.TextMeshPro;
 using XUnity.AutoTranslator.Plugin.Core.Hooks.UGUI;
+using XUnity.AutoTranslator.Plugin.Core.Hooks.UIElements;
 using XUnity.Common.Logging;
 using XUnity.Common.Utilities;
 
@@ -101,6 +102,17 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
          catch( Exception e )
          {
             XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for UGUI." );
+         }
+         try
+         {
+            if( Settings.EnableUIElements )
+            {
+               HookingHelper.PatchAll( UIElementsHooks.All, Settings.ForceMonoModHooks );
+            }
+         }
+         catch( Exception e )
+         {
+            XuaLogger.AutoTranslator.Error( e, "An error occurred while setting up hooks for UIElements." );
          }
 
          try
