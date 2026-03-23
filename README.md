@@ -313,7 +313,7 @@ PostprocessorsFile=Translation\{Lang}\Text\_Postprocessors.txt      ;File that c
 
 [TextFrameworks]
 EnableUGUI=True                  ;Enable or disable UGUI translation
-EnableUIElements=True                  ;Enable or disable UIElements translation
+EnableUIElements=True            ;Enable or disable UIElements translation
 EnableNGUI=True                  ;Enable or disable NGUI translation
 EnableTextMeshPro=True           ;Enable or disable TextMeshPro translation
 EnableTextMesh=False             ;Enable or disable TextMesh translation
