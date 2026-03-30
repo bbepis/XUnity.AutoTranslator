@@ -254,7 +254,7 @@ Here are some third-party translation plugins that you can use with AutoTranslat
  * [AutoLLMTranslator](https://github.com/NothingNullNull/XUnity.AutoLLMTranslator), a generic endpoint that supports many different LLM's, including Ollama models.
    * Very flexible but requires advanced manual configuration. Recommended only for advanced users.
 * [AutoPollinationTranslator](https://github.com/kikyo2006/XUnity.AutoPollinationTranslator), a high-quality translator utilizing the Pollinations.ai API.
-   * Completely free to use. Powered by state-of-the-art models like Llama 3.3, Grok, and Mistral. High-speed and reliable.
+   * Requires a Pollinations API Key. Powered by top-tier models like Grok, Gemini, DeepSeek, and Mistral.
 
 *NOTE: You use third-party plugins at your own risk - they were checked at the time of being added to the list, but may change over time. Third-party plugins might cause issues or have security issues.*
  
