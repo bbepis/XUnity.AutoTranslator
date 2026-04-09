@@ -557,13 +557,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Extensions
                yield return comp;
             }
          }
-         if( Settings.EnableUIElements && UnityTypes.TextElement != null )
-         {
-            foreach( var comp in go.GetComponentsInChildren( UnityTypes.TextElement.UnityType, true ) )
-            {
-               yield return comp;
-            }
-         }
          if( Settings.EnableTextMesh && UnityTypes.TextMesh != null )
          {
             foreach( var comp in go.GetComponentsInChildren( UnityTypes.TextMesh.UnityType, true ) )
