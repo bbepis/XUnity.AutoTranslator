@@ -99,6 +99,7 @@ namespace XUnity.Common.Constants
       public static readonly TypeContainer Transform = FindType( "UnityEngine.Transform" );
       public static readonly TypeContainer TextMesh = FindType( "UnityEngine.TextMesh" );
       public static readonly TypeContainer Text = FindType( "UnityEngine.UI.Text" );
+      public static readonly TypeContainer TextElement = FindType( "UnityEngine.UIElements.TextElement" );
       public static readonly TypeContainer Image = FindType( "UnityEngine.UI.Image" );
       public static readonly TypeContainer RawImage = FindType( "UnityEngine.UI.RawImage" );
       public static readonly TypeContainer MaskableGraphic = FindType( "UnityEngine.UI.MaskableGraphic" );
@@ -310,6 +311,17 @@ namespace XUnity.Common.Constants
             public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_text", typeof( string ) );
             public static readonly IntPtr get_supportRichText = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "get_supportRichText", typeof( bool ) );
             public static readonly IntPtr OnEnable = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Text?.ClassPointer, "OnEnable", typeof( void ) );
+         }
+#endif
+      }
+
+      public static class TextElement_Methods
+      {
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr set_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextElement?.ClassPointer, "set_text", typeof( void ), typeof( string ) );
+            public static readonly IntPtr get_text = Il2CppUtilities.GetIl2CppMethod( UnityTypes.TextElement?.ClassPointer, "get_text", typeof( string ) );
          }
 #endif
       }

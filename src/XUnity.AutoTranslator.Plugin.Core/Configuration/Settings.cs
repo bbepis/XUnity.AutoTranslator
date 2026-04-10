@@ -87,6 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static string TranslatorsPath;
       public static bool EnableIMGUI;
       public static bool EnableUGUI;
+      public static bool EnableUIElements;
       public static bool EnableNGUI;
       public static bool EnableTextMeshPro;
       public static bool EnableTextMesh;
@@ -230,6 +231,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
 
             EnableIMGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableIMGUI", false );
             EnableUGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableUGUI", true );
+            EnableUIElements = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableUIElements", true );
             EnableNGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableNGUI", true );
             EnableTextMeshPro = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMeshPro", true );
             EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
