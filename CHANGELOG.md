@@ -1,4 +1,9 @@
-﻿### 5.5.2
+﻿### 5.6.0
+ * FEATURE - Added UIElements support (#818)
+ * BUG FIX - Fix Papago translator JS chunk pattern to match current website structure (#820)
+ * MISC - README: Add AutoPollinationTranslator to third-party translator list (#823)
+
+### 5.5.2
  * BUG FIX - Use Authorization header instead of legacy query/body params for DeepL API auth
  * BUG FIX - Fix override font stopping working after a while in IL2CPP
 
