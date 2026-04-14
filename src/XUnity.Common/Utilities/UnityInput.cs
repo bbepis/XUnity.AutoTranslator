@@ -21,6 +21,57 @@ namespace XUnity.Common.Utilities
         /// <summary>
         /// Best currently supported input system.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateLegacy()
+        {
+            try {
+                return TryCreateLegacyInternal();
+            } catch (Exception ex) {
+                XuaLogger.AutoTranslator.Warn("[UnityInput] LegacyInputSystem check failed: " + ex);
+                return null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateLegacyInternal()
+        {
+            return new LegacyInputSystem();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateNew()
+        {
+            try {
+                return TryCreateNewInternal();
+            } catch (Exception ex) {
+                XuaLogger.AutoTranslator.Warn("[UnityInput] NewInputSystem check failed: " + ex);
+                return null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateNewInternal()
+        {
+            return new NewInputSystem();
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateReflectionLegacy()
+        {
+            try {
+                return TryCreateReflectionLegacyInternal();
+            } catch (Exception ex) {
+                XuaLogger.AutoTranslator.Warn("[UnityInput] ReflectionLegacyInputSystem check failed: " + ex);
+                return null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem TryCreateReflectionLegacyInternal()
+        {
+            return new ReflectionLegacyInputSystem();
+        }
+
         public static IInputSystem Current
         {
             get
@@ -29,16 +80,34 @@ namespace XUnity.Common.Utilities
                 {
                     try
                     {
-                        try
+                        var legacy = TryCreateLegacy();
+                        if (legacy != null)
                         {
-                            _current = new LegacyInputSystem();
+                            _current = legacy;
                             XuaLogger.AutoTranslator.Debug( "[UnityInput] Using LegacyInputSystem" );
                         }
-                        catch
+                        else
                         {
-                            var newInputSystem = new NewInputSystem();
-                            _current = newInputSystem;
-                            XuaLogger.AutoTranslator.Debug( "[UnityInput] Using NewInputSystem");
+                            var reflectionLegacy = TryCreateReflectionLegacy();
+                            if (reflectionLegacy != null)
+                            {
+                                _current = reflectionLegacy;
+                                XuaLogger.AutoTranslator.Debug( "[UnityInput] Using ReflectionLegacyInputSystem" );
+                            }
+                            else
+                            {
+                                var newSys = TryCreateNew();
+                                if (newSys != null)
+                                {
+                                    _current = newSys;
+                                    XuaLogger.AutoTranslator.Debug( "[UnityInput] Using NewInputSystem" );
+                                }
+                                else
+                                {
+                                    _current = new NullInputSystem();
+                                    XuaLogger.AutoTranslator.Warn( "[UnityInput] Both Legacy and New input systems failed to initialize." );
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -54,7 +123,7 @@ namespace XUnity.Common.Utilities
         /// <summary>
         /// True if the Input class is not disabled.
         /// </summary>
-        public bool LegacyInputSystemAvailable => Current is LegacyInputSystem;
+        public bool LegacyInputSystemAvailable => Current is LegacyInputSystem || Current is ReflectionLegacyInputSystem;
     }
 
     /// <summary>
@@ -148,8 +217,14 @@ namespace XUnity.Common.Utilities
     internal class NewInputSystem : IInputSystem
     {
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public NewInputSystem() => GetKeyDown(KeyCode.A);
-        
+        public NewInputSystem() => Ping();
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Ping()
+        {
+            var key = GetControl(KeyCode.A);
+        }
+
         public bool GetKey(string name) => GetControl(name)?.isPressed ?? false;
 
         public bool GetKey(KeyCode key) => GetControl(key)?.isPressed ?? false;
@@ -170,17 +245,21 @@ namespace XUnity.Common.Utilities
 
         public void ResetInputAxes() { /*Not supported*/ }
 
-        public Vector3 mousePosition => Mouse.current.position.ReadValue();
-        public Vector2 mouseScrollDelta => Mouse.current.scroll.ReadValue();
-        public bool mousePresent => Mouse.current.enabled;
+        public Vector3 mousePosition => Mouse.current?.position.ReadValue() ?? Vector2.zero;
+        public Vector2 mouseScrollDelta => Mouse.current?.scroll.ReadValue() ?? Vector2.zero;
+        public bool mousePresent => Mouse.current?.enabled ?? false;
 
         public bool anyKey
         {
             get
             {
-                if (Keyboard.current.anyKey.isPressed)
+                var keyboard = Keyboard.current;
+                if (keyboard != null && keyboard.anyKey.isPressed)
                     return true;
+
                 var current = Mouse.current;
+                if (current == null) return false;
+
                 return current.leftButton.isPressed ||
                        current.rightButton.isPressed ||
                        current.forwardButton.isPressed ||
@@ -193,9 +272,13 @@ namespace XUnity.Common.Utilities
         {
             get
             {
-                if (Keyboard.current.anyKey.wasPressedThisFrame)
+                var keyboard = Keyboard.current;
+                if (keyboard != null && keyboard.anyKey.wasPressedThisFrame)
                     return true;
+
                 var current = Mouse.current;
+                if (current == null) return false;
+
                 return current.leftButton.wasPressedThisFrame ||
                        current.rightButton.wasPressedThisFrame ||
                        current.forwardButton.wasPressedThisFrame ||
@@ -204,7 +287,16 @@ namespace XUnity.Common.Utilities
             }
         }
 
-        public IEnumerable<KeyCode> SupportedKeyCodes { get; } = Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(x => GetControl(x, true) != null).ToList();
+        private List<KeyCode> _supportedKeyCodes;
+        public IEnumerable<KeyCode> SupportedKeyCodes 
+        {
+            get
+            {
+                if (_supportedKeyCodes == null)
+                    _supportedKeyCodes = Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>().Where(x => GetControl(x, true) != null).ToList();
+                return _supportedKeyCodes;
+            }
+        }
 
         private static ButtonControl GetControl(string name) => GetControl((KeyCode)Enum.Parse(typeof(KeyCode), name, true));
 
@@ -215,97 +307,97 @@ namespace XUnity.Common.Utilities
                 case KeyCode.None:
                     break;
                 case KeyCode.Backspace:
-                    return Keyboard.current.backspaceKey;
+                    return Keyboard.current?.backspaceKey;
                 case KeyCode.Delete:
-                    return Keyboard.current.deleteKey;
+                    return Keyboard.current?.deleteKey;
                 case KeyCode.Tab:
-                    return Keyboard.current.tabKey;
+                    return Keyboard.current?.tabKey;
                 case KeyCode.Clear:
                     break;
                 case KeyCode.Return:
-                    return Keyboard.current.enterKey;
+                    return Keyboard.current?.enterKey;
                 case KeyCode.Pause:
-                    return Keyboard.current.pauseKey;
+                    return Keyboard.current?.pauseKey;
                 case KeyCode.Escape:
-                    return Keyboard.current.escapeKey;
+                    return Keyboard.current?.escapeKey;
                 case KeyCode.Space:
-                    return Keyboard.current.spaceKey;
+                    return Keyboard.current?.spaceKey;
                 case KeyCode.Keypad0:
-                    return Keyboard.current.numpad0Key;
+                    return Keyboard.current?.numpad0Key;
                 case KeyCode.Keypad1:
-                    return Keyboard.current.numpad1Key;
+                    return Keyboard.current?.numpad1Key;
                 case KeyCode.Keypad2:
-                    return Keyboard.current.numpad2Key;
+                    return Keyboard.current?.numpad2Key;
                 case KeyCode.Keypad3:
-                    return Keyboard.current.numpad3Key;
+                    return Keyboard.current?.numpad3Key;
                 case KeyCode.Keypad4:
-                    return Keyboard.current.numpad4Key;
+                    return Keyboard.current?.numpad4Key;
                 case KeyCode.Keypad5:
-                    return Keyboard.current.numpad5Key;
+                    return Keyboard.current?.numpad5Key;
                 case KeyCode.Keypad6:
-                    return Keyboard.current.numpad6Key;
+                    return Keyboard.current?.numpad6Key;
                 case KeyCode.Keypad7:
-                    return Keyboard.current.numpad7Key;
+                    return Keyboard.current?.numpad7Key;
                 case KeyCode.Keypad8:
-                    return Keyboard.current.numpad8Key;
+                    return Keyboard.current?.numpad8Key;
                 case KeyCode.Keypad9:
-                    return Keyboard.current.numpad9Key;
+                    return Keyboard.current?.numpad9Key;
                 case KeyCode.KeypadPeriod:
-                    return Keyboard.current.numpadPeriodKey;
+                    return Keyboard.current?.numpadPeriodKey;
                 case KeyCode.KeypadDivide:
-                    return Keyboard.current.numpadDivideKey;
+                    return Keyboard.current?.numpadDivideKey;
                 case KeyCode.KeypadMultiply:
-                    return Keyboard.current.numpadMultiplyKey;
+                    return Keyboard.current?.numpadMultiplyKey;
                 case KeyCode.KeypadMinus:
-                    return Keyboard.current.numpadMinusKey;
+                    return Keyboard.current?.numpadMinusKey;
                 case KeyCode.KeypadPlus:
-                    return Keyboard.current.numpadPlusKey;
+                    return Keyboard.current?.numpadPlusKey;
                 case KeyCode.KeypadEnter:
-                    return Keyboard.current.numpadEnterKey;
+                    return Keyboard.current?.numpadEnterKey;
                 case KeyCode.KeypadEquals:
-                    return Keyboard.current.numpadEqualsKey;
+                    return Keyboard.current?.numpadEqualsKey;
                 case KeyCode.UpArrow:
-                    return Keyboard.current.upArrowKey;
+                    return Keyboard.current?.upArrowKey;
                 case KeyCode.DownArrow:
-                    return Keyboard.current.downArrowKey;
+                    return Keyboard.current?.downArrowKey;
                 case KeyCode.RightArrow:
-                    return Keyboard.current.rightArrowKey;
+                    return Keyboard.current?.rightArrowKey;
                 case KeyCode.LeftArrow:
-                    return Keyboard.current.leftArrowKey;
+                    return Keyboard.current?.leftArrowKey;
                 case KeyCode.Insert:
-                    return Keyboard.current.insertKey;
+                    return Keyboard.current?.insertKey;
                 case KeyCode.Home:
-                    return Keyboard.current.homeKey;
+                    return Keyboard.current?.homeKey;
                 case KeyCode.End:
-                    return Keyboard.current.endKey;
+                    return Keyboard.current?.endKey;
                 case KeyCode.PageUp:
-                    return Keyboard.current.pageUpKey;
+                    return Keyboard.current?.pageUpKey;
                 case KeyCode.PageDown:
-                    return Keyboard.current.pageDownKey;
+                    return Keyboard.current?.pageDownKey;
                 case KeyCode.F1:
-                    return Keyboard.current.f1Key;
+                    return Keyboard.current?.f1Key;
                 case KeyCode.F2:
-                    return Keyboard.current.f2Key;
+                    return Keyboard.current?.f2Key;
                 case KeyCode.F3:
-                    return Keyboard.current.f3Key;
+                    return Keyboard.current?.f3Key;
                 case KeyCode.F4:
-                    return Keyboard.current.f4Key;
+                    return Keyboard.current?.f4Key;
                 case KeyCode.F5:
-                    return Keyboard.current.f5Key;
+                    return Keyboard.current?.f5Key;
                 case KeyCode.F6:
-                    return Keyboard.current.f6Key;
+                    return Keyboard.current?.f6Key;
                 case KeyCode.F7:
-                    return Keyboard.current.f7Key;
+                    return Keyboard.current?.f7Key;
                 case KeyCode.F8:
-                    return Keyboard.current.f8Key;
+                    return Keyboard.current?.f8Key;
                 case KeyCode.F9:
-                    return Keyboard.current.f9Key;
+                    return Keyboard.current?.f9Key;
                 case KeyCode.F10:
-                    return Keyboard.current.f10Key;
+                    return Keyboard.current?.f10Key;
                 case KeyCode.F11:
-                    return Keyboard.current.f11Key;
+                    return Keyboard.current?.f11Key;
                 case KeyCode.F12:
-                    return Keyboard.current.f12Key;
+                    return Keyboard.current?.f12Key;
                 case KeyCode.F13:
                     break;
                 case KeyCode.F14:
@@ -313,25 +405,25 @@ namespace XUnity.Common.Utilities
                 case KeyCode.F15:
                     break;
                 case KeyCode.Alpha0:
-                    return Keyboard.current.digit0Key;
+                    return Keyboard.current?.digit0Key;
                 case KeyCode.Alpha1:
-                    return Keyboard.current.digit1Key;
+                    return Keyboard.current?.digit1Key;
                 case KeyCode.Alpha2:
-                    return Keyboard.current.digit2Key;
+                    return Keyboard.current?.digit2Key;
                 case KeyCode.Alpha3:
-                    return Keyboard.current.digit3Key;
+                    return Keyboard.current?.digit3Key;
                 case KeyCode.Alpha4:
-                    return Keyboard.current.digit4Key;
+                    return Keyboard.current?.digit4Key;
                 case KeyCode.Alpha5:
-                    return Keyboard.current.digit5Key;
+                    return Keyboard.current?.digit5Key;
                 case KeyCode.Alpha6:
-                    return Keyboard.current.digit6Key;
+                    return Keyboard.current?.digit6Key;
                 case KeyCode.Alpha7:
-                    return Keyboard.current.digit7Key;
+                    return Keyboard.current?.digit7Key;
                 case KeyCode.Alpha8:
-                    return Keyboard.current.digit8Key;
+                    return Keyboard.current?.digit8Key;
                 case KeyCode.Alpha9:
-                    return Keyboard.current.digit9Key;
+                    return Keyboard.current?.digit9Key;
                 case KeyCode.Exclaim:
                     break;
                 case KeyCode.DoubleQuote:
@@ -343,7 +435,7 @@ namespace XUnity.Common.Utilities
                 case KeyCode.Ampersand:
                     break;
                 case KeyCode.Quote:
-                    return Keyboard.current.quoteKey;
+                    return Keyboard.current?.quoteKey;
                 case KeyCode.LeftParen:
                     break;
                 case KeyCode.RightParen:
@@ -351,23 +443,23 @@ namespace XUnity.Common.Utilities
                 case KeyCode.Asterisk:
                     break;
                 case KeyCode.Plus:
-                    return Keyboard.current.numpadPlusKey;
+                    return Keyboard.current?.numpadPlusKey;
                 case KeyCode.Comma:
-                    return Keyboard.current.commaKey;
+                    return Keyboard.current?.commaKey;
                 case KeyCode.Minus:
-                    return Keyboard.current.minusKey;
+                    return Keyboard.current?.minusKey;
                 case KeyCode.Period:
-                    return Keyboard.current.periodKey;
+                    return Keyboard.current?.periodKey;
                 case KeyCode.Slash:
-                    return Keyboard.current.slashKey;
+                    return Keyboard.current?.slashKey;
                 case KeyCode.Colon:
                     break;
                 case KeyCode.Semicolon:
-                    return Keyboard.current.semicolonKey;
+                    return Keyboard.current?.semicolonKey;
                 case KeyCode.Less:
                     break;
                 case KeyCode.Equals:
-                    return Keyboard.current.equalsKey;
+                    return Keyboard.current?.equalsKey;
                 case KeyCode.Greater:
                     break;
                 case KeyCode.Question:
@@ -375,117 +467,117 @@ namespace XUnity.Common.Utilities
                 case KeyCode.At:
                     break;
                 case KeyCode.LeftBracket:
-                    return Keyboard.current.leftBracketKey;
+                    return Keyboard.current?.leftBracketKey;
                 case KeyCode.Backslash:
-                    return Keyboard.current.backslashKey;
+                    return Keyboard.current?.backslashKey;
                 case KeyCode.RightBracket:
-                    return Keyboard.current.rightBracketKey;
+                    return Keyboard.current?.rightBracketKey;
                 case KeyCode.Caret:
                     break;
                 case KeyCode.Underscore:
                     break;
                 case KeyCode.BackQuote:
-                    return Keyboard.current.backquoteKey;
+                    return Keyboard.current?.backquoteKey;
                 case KeyCode.A:
-                    return Keyboard.current.aKey;
+                    return Keyboard.current?.aKey;
                 case KeyCode.B:
-                    return Keyboard.current.bKey;
+                    return Keyboard.current?.bKey;
                 case KeyCode.C:
-                    return Keyboard.current.cKey;
+                    return Keyboard.current?.cKey;
                 case KeyCode.D:
-                    return Keyboard.current.dKey;
+                    return Keyboard.current?.dKey;
                 case KeyCode.E:
-                    return Keyboard.current.eKey;
+                    return Keyboard.current?.eKey;
                 case KeyCode.F:
-                    return Keyboard.current.fKey;
+                    return Keyboard.current?.fKey;
                 case KeyCode.G:
-                    return Keyboard.current.gKey;
+                    return Keyboard.current?.gKey;
                 case KeyCode.H:
-                    return Keyboard.current.hKey;
+                    return Keyboard.current?.hKey;
                 case KeyCode.I:
-                    return Keyboard.current.iKey;
+                    return Keyboard.current?.iKey;
                 case KeyCode.J:
-                    return Keyboard.current.jKey;
+                    return Keyboard.current?.jKey;
                 case KeyCode.K:
-                    return Keyboard.current.kKey;
+                    return Keyboard.current?.kKey;
                 case KeyCode.L:
-                    return Keyboard.current.lKey;
+                    return Keyboard.current?.lKey;
                 case KeyCode.M:
-                    return Keyboard.current.mKey;
+                    return Keyboard.current?.mKey;
                 case KeyCode.N:
-                    return Keyboard.current.nKey;
+                    return Keyboard.current?.nKey;
                 case KeyCode.O:
-                    return Keyboard.current.oKey;
+                    return Keyboard.current?.oKey;
                 case KeyCode.P:
-                    return Keyboard.current.pKey;
+                    return Keyboard.current?.pKey;
                 case KeyCode.Q:
-                    return Keyboard.current.qKey;
+                    return Keyboard.current?.qKey;
                 case KeyCode.R:
-                    return Keyboard.current.rKey;
+                    return Keyboard.current?.rKey;
                 case KeyCode.S:
-                    return Keyboard.current.sKey;
+                    return Keyboard.current?.sKey;
                 case KeyCode.T:
-                    return Keyboard.current.tKey;
+                    return Keyboard.current?.tKey;
                 case KeyCode.U:
-                    return Keyboard.current.uKey;
+                    return Keyboard.current?.uKey;
                 case KeyCode.V:
-                    return Keyboard.current.vKey;
+                    return Keyboard.current?.vKey;
                 case KeyCode.W:
-                    return Keyboard.current.wKey;
+                    return Keyboard.current?.wKey;
                 case KeyCode.X:
-                    return Keyboard.current.xKey;
+                    return Keyboard.current?.xKey;
                 case KeyCode.Y:
-                    return Keyboard.current.yKey;
+                    return Keyboard.current?.yKey;
                 case KeyCode.Z:
-                    return Keyboard.current.zKey;
+                    return Keyboard.current?.zKey;
                 case KeyCode.Numlock:
-                    return Keyboard.current.numLockKey;
+                    return Keyboard.current?.numLockKey;
                 case KeyCode.CapsLock:
-                    return Keyboard.current.capsLockKey;
+                    return Keyboard.current?.capsLockKey;
                 case KeyCode.ScrollLock:
-                    return Keyboard.current.scrollLockKey;
+                    return Keyboard.current?.scrollLockKey;
                 case KeyCode.RightShift:
-                    return Keyboard.current.rightShiftKey;
+                    return Keyboard.current?.rightShiftKey;
                 case KeyCode.LeftShift:
-                    return Keyboard.current.leftShiftKey;
+                    return Keyboard.current?.leftShiftKey;
                 case KeyCode.RightControl:
-                    return Keyboard.current.rightCtrlKey;
+                    return Keyboard.current?.rightCtrlKey;
                 case KeyCode.LeftControl:
-                    return Keyboard.current.leftCtrlKey;
+                    return Keyboard.current?.leftCtrlKey;
                 case KeyCode.RightAlt:
-                    return Keyboard.current.rightAltKey;
+                    return Keyboard.current?.rightAltKey;
                 case KeyCode.LeftAlt:
-                    return Keyboard.current.leftAltKey;
+                    return Keyboard.current?.leftAltKey;
                 case KeyCode.LeftCommand:
-                    return Keyboard.current.leftCommandKey;
+                    return Keyboard.current?.leftCommandKey;
                 case KeyCode.LeftWindows:
-                    return Keyboard.current.leftWindowsKey;
+                    return Keyboard.current?.leftWindowsKey;
                 case KeyCode.RightCommand:
-                    return Keyboard.current.rightCommandKey;
+                    return Keyboard.current?.rightCommandKey;
                 case KeyCode.RightWindows:
-                    return Keyboard.current.rightWindowsKey;
+                    return Keyboard.current?.rightWindowsKey;
                 case KeyCode.AltGr:
                     break;
                 case KeyCode.Help:
                     break;
                 case KeyCode.Print:
-                    return Keyboard.current.printScreenKey;
+                    return Keyboard.current?.printScreenKey;
                 case KeyCode.SysReq:
                     break;
                 case KeyCode.Break:
                     break;
                 case KeyCode.Menu:
-                    return Keyboard.current.contextMenuKey;
+                    return Keyboard.current?.contextMenuKey;
                 case KeyCode.Mouse0:
-                    return Mouse.current.leftButton;
+                    return Mouse.current?.leftButton;
                 case KeyCode.Mouse1:
-                    return Mouse.current.rightButton;
+                    return Mouse.current?.rightButton;
                 case KeyCode.Mouse2:
-                    return Mouse.current.middleButton;
+                    return Mouse.current?.middleButton;
                 case KeyCode.Mouse3:
-                    return Mouse.current.backButton;
+                    return Mouse.current?.backButton;
                 case KeyCode.Mouse4:
-                    return Mouse.current.forwardButton;
+                    return Mouse.current?.forwardButton;
                 case KeyCode.Mouse5:
                     break;
                 case KeyCode.Mouse6:
@@ -861,11 +953,85 @@ namespace XUnity.Common.Utilities
         }
     }
 
+    internal class ReflectionLegacyInputSystem : IInputSystem
+    {
+        private System.Reflection.MethodInfo _getKeyStr;
+        private System.Reflection.MethodInfo _getKeyKC;
+        private System.Reflection.MethodInfo _getKeyDownStr;
+        private System.Reflection.MethodInfo _getKeyDownKC;
+        private System.Reflection.MethodInfo _getKeyUpStr;
+        private System.Reflection.MethodInfo _getKeyUpKC;
+        private System.Reflection.MethodInfo _getMouseButton;
+        private System.Reflection.MethodInfo _getMouseButtonDown;
+        private System.Reflection.MethodInfo _getMouseButtonUp;
+        private System.Reflection.MethodInfo _resetInputAxes;
+
+        private System.Reflection.PropertyInfo _mousePosition;
+        private System.Reflection.PropertyInfo _mouseScrollDelta;
+        private System.Reflection.PropertyInfo _mousePresent;
+        private System.Reflection.PropertyInfo _anyKey;
+        private System.Reflection.PropertyInfo _anyKeyDown;
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public ReflectionLegacyInputSystem()
+        {
+            var type = XUnity.Common.Constants.UnityTypes.Input?.ClrType;
+            if (type == null) throw new Exception("Could not find UnityEngine.Input type via Reflection.");
+
+            _getKeyStr = type.GetMethod("GetKey", new[] { typeof(string) });
+            _getKeyKC = type.GetMethod("GetKey", new[] { typeof(KeyCode) });
+            _getKeyDownStr = type.GetMethod("GetKeyDown", new[] { typeof(string) });
+            _getKeyDownKC = type.GetMethod("GetKeyDown", new[] { typeof(KeyCode) });
+            _getKeyUpStr = type.GetMethod("GetKeyUp", new[] { typeof(string) });
+            _getKeyUpKC = type.GetMethod("GetKeyUp", new[] { typeof(KeyCode) });
+            _getMouseButton = type.GetMethod("GetMouseButton", new[] { typeof(int) });
+            _getMouseButtonDown = type.GetMethod("GetMouseButtonDown", new[] { typeof(int) });
+            _getMouseButtonUp = type.GetMethod("GetMouseButtonUp", new[] { typeof(int) });
+            _resetInputAxes = type.GetMethod("ResetInputAxes", Type.EmptyTypes);
+
+            _mousePosition = type.GetProperty("mousePosition");
+            _mouseScrollDelta = type.GetProperty("mouseScrollDelta");
+            _mousePresent = type.GetProperty("mousePresent");
+            _anyKey = type.GetProperty("anyKey");
+            _anyKeyDown = type.GetProperty("anyKeyDown");
+
+            if (_getKeyDownKC == null) throw new Exception("Could not find GetKeyDown(KeyCode) on UnityEngine.Input.");
+            _getKeyDownKC.Invoke(null, new object[] { KeyCode.A });
+        }
+
+        public bool GetKey(string name) => _getKeyStr != null && (bool)_getKeyStr.Invoke(null, new object[] { name });
+        public bool GetKey(KeyCode key) => _getKeyKC != null && (bool)_getKeyKC.Invoke(null, new object[] { key });
+        public bool GetKeyDown(string name) => _getKeyDownStr != null && (bool)_getKeyDownStr.Invoke(null, new object[] { name });
+        public bool GetKeyDown(KeyCode key) => _getKeyDownKC != null && (bool)_getKeyDownKC.Invoke(null, new object[] { key });
+        public bool GetKeyUp(string name) => _getKeyUpStr != null && (bool)_getKeyUpStr.Invoke(null, new object[] { name });
+        public bool GetKeyUp(KeyCode key) => _getKeyUpKC != null && (bool)_getKeyUpKC.Invoke(null, new object[] { key });
+
+        public bool GetMouseButton(int button) => _getMouseButton != null && (bool)_getMouseButton.Invoke(null, new object[] { button });
+        public bool GetMouseButtonDown(int button) => _getMouseButtonDown != null && (bool)_getMouseButtonDown.Invoke(null, new object[] { button });
+        public bool GetMouseButtonUp(int button) => _getMouseButtonUp != null && (bool)_getMouseButtonUp.Invoke(null, new object[] { button });
+
+        public void ResetInputAxes() => _resetInputAxes?.Invoke(null, null);
+
+        public Vector3 mousePosition => _mousePosition != null ? (Vector3)_mousePosition.GetValue(null, null) : Vector3.zero;
+        public Vector2 mouseScrollDelta => _mouseScrollDelta != null ? (Vector2)_mouseScrollDelta.GetValue(null, null) : Vector2.zero;
+        public bool mousePresent => _mousePresent != null && (bool)_mousePresent.GetValue(null, null);
+        public bool anyKey => _anyKey != null && (bool)_anyKey.GetValue(null, null);
+        public bool anyKeyDown => _anyKeyDown != null && (bool)_anyKeyDown.GetValue(null, null);
+
+        public IEnumerable<KeyCode> SupportedKeyCodes { get; } = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+    }
+
     internal class LegacyInputSystem : IInputSystem
     {
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public LegacyInputSystem() => Input.GetKeyDown(KeyCode.A);
-        
+        public LegacyInputSystem() => Ping();
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void Ping()
+        {
+            var key = Input.GetKeyDown(KeyCode.A);
+        }
+
         public bool GetKey(string name) => Input.GetKey(name);
 
         public bool GetKey(KeyCode key) => Input.GetKey(key);

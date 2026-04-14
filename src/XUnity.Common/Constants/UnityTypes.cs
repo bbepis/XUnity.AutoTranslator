@@ -567,19 +567,26 @@ namespace XUnity.Common.Constants
 
             if( wrapperType != null )
             {
-               var nativeType = ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : Il2CppType.From( wrapperType );
+               Il2CppSystem.Type nativeType = null;
+               try
+               {
+                  nativeType = ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : Il2CppType.From( wrapperType );
+               }
+               catch( Exception )
+               {
+               }
 
                if (nativeType == null)
                {    
-                  XuaLogger.AutoTranslator.Warn( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
+                  XuaLogger.AutoTranslator.Debug( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
+                  return null;
                }
 
                return new TypeContainer( nativeType, wrapperType, ptr );
             }
          }
-         catch( Exception e )
+         catch( Exception )
          {
-            XuaLogger.AutoTranslator.Warn( e, "An error occurred while resolving type: " + name );
          }
 
          return null;

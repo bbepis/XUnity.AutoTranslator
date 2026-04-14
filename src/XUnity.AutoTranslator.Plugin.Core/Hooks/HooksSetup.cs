@@ -151,7 +151,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
 #if MANAGED
                HookingHelper.PatchAll( IMGUIHooks.All, Settings.ForceMonoModHooks );
 #else
-               throw new NotImplementedException("EnableIMGUI is not supported in IL2CPP.");
+               XuaLogger.AutoTranslator.Warn( "EnableIMGUI is not supported in IL2CPP." );
 #endif
             }
          }
