@@ -21,6 +21,20 @@ namespace XUnity.Common.Utilities
         /// <summary>
         /// Best currently supported input system.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem CreateLegacyInputSystem() => new LegacyInputSystem();
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static IInputSystem CreateNewInputSystem()
+        {
+#if MANAGED
+            return new NewInputSystem();
+#else
+            XuaLogger.AutoTranslator.Warn( "NewInputSystem is not supported in IL2CPP." );
+            throw new NotSupportedException("NewInputSystem is not supported in IL2CPP.");
+#endif
+        }
+
         public static IInputSystem Current
         {
             get
@@ -31,12 +45,12 @@ namespace XUnity.Common.Utilities
                     {
                         try
                         {
-                            _current = new LegacyInputSystem();
+                            _current = CreateLegacyInputSystem();
                             XuaLogger.AutoTranslator.Debug( "[UnityInput] Using LegacyInputSystem" );
                         }
                         catch
                         {
-                            var newInputSystem = new NewInputSystem();
+                            var newInputSystem = CreateNewInputSystem();
                             _current = newInputSystem;
                             XuaLogger.AutoTranslator.Debug( "[UnityInput] Using NewInputSystem");
                         }
@@ -863,9 +877,10 @@ namespace XUnity.Common.Utilities
 
     internal class LegacyInputSystem : IInputSystem
     {
+#if MANAGED
         [MethodImpl(MethodImplOptions.NoInlining)]
         public LegacyInputSystem() => Input.GetKeyDown(KeyCode.A);
-        
+
         public bool GetKey(string name) => Input.GetKey(name);
 
         public bool GetKey(KeyCode key) => Input.GetKey(key);
@@ -893,5 +908,29 @@ namespace XUnity.Common.Utilities
         public bool anyKeyDown => Input.anyKeyDown;
 
         public IEnumerable<KeyCode> SupportedKeyCodes { get; } = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+#else
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public LegacyInputSystem()
+        {
+            if (XUnity.Common.Constants.UnityTypes.Input?.ClrType == null) throw new NotSupportedException("Legacy input system missing.");
+        }
+
+        public bool GetKey(string name) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKey", new[] { typeof(string) })?.Invoke(null, new object[] { name });
+        public bool GetKey(KeyCode key) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKey", new[] { typeof(KeyCode) })?.Invoke(null, new object[] { key });
+        public bool GetKeyDown(string name) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKeyDown", new[] { typeof(string) })?.Invoke(null, new object[] { name });
+        public bool GetKeyDown(KeyCode key) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKeyDown", new[] { typeof(KeyCode) })?.Invoke(null, new object[] { key });
+        public bool GetKeyUp(string name) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKeyUp", new[] { typeof(string) })?.Invoke(null, new object[] { name });
+        public bool GetKeyUp(KeyCode key) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetKeyUp", new[] { typeof(KeyCode) })?.Invoke(null, new object[] { key });
+        public bool GetMouseButton(int button) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetMouseButton", new[] { typeof(int) })?.Invoke(null, new object[] { button });
+        public bool GetMouseButtonDown(int button) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetMouseButtonDown", new[] { typeof(int) })?.Invoke(null, new object[] { button });
+        public bool GetMouseButtonUp(int button) => (bool)XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("GetMouseButtonUp", new[] { typeof(int) })?.Invoke(null, new object[] { button });
+        public void ResetInputAxes() => XUnity.Common.Constants.UnityTypes.Input.ClrType.GetMethod("ResetInputAxes")?.Invoke(null, null);
+        public Vector3 mousePosition => (Vector3)(XUnity.Common.Constants.UnityTypes.Input.ClrType.GetProperty("mousePosition")?.GetValue(null) ?? Vector3.zero);
+        public Vector2 mouseScrollDelta => (Vector2)(XUnity.Common.Constants.UnityTypes.Input.ClrType.GetProperty("mouseScrollDelta")?.GetValue(null) ?? Vector2.zero);
+        public bool mousePresent => (bool)(XUnity.Common.Constants.UnityTypes.Input.ClrType.GetProperty("mousePresent")?.GetValue(null) ?? false);
+        public bool anyKey => (bool)(XUnity.Common.Constants.UnityTypes.Input.ClrType.GetProperty("anyKey")?.GetValue(null) ?? false);
+        public bool anyKeyDown => (bool)(XUnity.Common.Constants.UnityTypes.Input.ClrType.GetProperty("anyKeyDown")?.GetValue(null) ?? false);
+        public IEnumerable<KeyCode> SupportedKeyCodes { get; } = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+#endif
     }
 }

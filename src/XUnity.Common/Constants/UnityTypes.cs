@@ -378,6 +378,30 @@ namespace XUnity.Common.Constants
 #endif
       }
 
+      public static class Input_Methods
+      {
+#if IL2CPP
+         public static class IL2CPP
+         {
+            public static readonly IntPtr GetKeyString = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKey", typeof( bool ), typeof( string ) );
+            public static readonly IntPtr GetKeyCode = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKey", typeof( bool ), typeof( KeyCode ) );
+            public static readonly IntPtr GetKeyDownString = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKeyDown", typeof( bool ), typeof( string ) );
+            public static readonly IntPtr GetKeyDownCode = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKeyDown", typeof( bool ), typeof( KeyCode ) );
+            public static readonly IntPtr GetKeyUpString = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKeyUp", typeof( bool ), typeof( string ) );
+            public static readonly IntPtr GetKeyUpCode = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetKeyUp", typeof( bool ), typeof( KeyCode ) );
+            public static readonly IntPtr GetMouseButton = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetMouseButton", typeof( bool ), typeof( int ) );
+            public static readonly IntPtr GetMouseButtonDown = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetMouseButtonDown", typeof( bool ), typeof( int ) );
+            public static readonly IntPtr GetMouseButtonUp = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "GetMouseButtonUp", typeof( bool ), typeof( int ) );
+            public static readonly IntPtr ResetInputAxes = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "ResetInputAxes", typeof( void ) );
+            public static readonly IntPtr get_mousePosition = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "get_mousePosition", typeof( Vector3 ) );
+            public static readonly IntPtr get_mouseScrollDelta = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "get_mouseScrollDelta", typeof( Vector2 ) );
+            public static readonly IntPtr get_mousePresent = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "get_mousePresent", typeof( bool ) );
+            public static readonly IntPtr get_anyKey = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "get_anyKey", typeof( bool ) );
+            public static readonly IntPtr get_anyKeyDown = Il2CppUtilities.GetIl2CppMethod( UnityTypes.Input?.ClassPointer, "get_anyKeyDown", typeof( bool ) );
+         }
+#endif
+      }
+
       public static class UILabel_Methods
       {
 #if IL2CPP
@@ -567,19 +591,27 @@ namespace XUnity.Common.Constants
 
             if( wrapperType != null )
             {
-               var nativeType = ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : Il2CppType.From( wrapperType );
+                Il2CppSystem.Type nativeType = null;
+               try
+               {
+                  nativeType = ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : Il2CppType.From( wrapperType );
+               }
+               catch( Exception )
+               {
+               }
 
                if (nativeType == null)
                {    
-                  XuaLogger.AutoTranslator.Warn( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
+               XuaLogger.AutoTranslator.Debug( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
+                  return null;
                }
 
                return new TypeContainer( nativeType, wrapperType, ptr );
             }
          }
-         catch( Exception e )
+         catch( Exception )
          {
-            XuaLogger.AutoTranslator.Warn( e, "An error occurred while resolving type: " + name );
+           
          }
 
          return null;
