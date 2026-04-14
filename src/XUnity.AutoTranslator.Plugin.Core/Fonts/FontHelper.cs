@@ -31,8 +31,12 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
             }
             else
             {
+#if IL2CPP
+               return GetTextMeshProFontByCustomProxies( assetBundle );
+#else
                XuaLogger.AutoTranslator.Error( "Could not find an appropriate asset bundle load method while loading font: " + overrideFontPath );
                return null;
+#endif
             }
 
             if( bundle == null )
