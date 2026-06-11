@@ -1,9 +1,31 @@
 ﻿# XUnity Auto Translator
 
+## About this fork (Dual Subtitles)
+This fork adds a **bilingual / dual-subtitles mode** to XUnity.AutoTranslator. Instead of replacing in-game text with its translation, it can display both the original text and the translation at the same time, e.g.:
+
+```
+日本語のテキスト
+[This is the English translation]
+```
+
+Enable it in the `[Behaviour]` section of the plugin's config file:
+
+```ini
+[Behaviour]
+BilingualMode=True
+BilingualFormat={original}\n[{translation}]
+ForceUIResizing=True
+```
+
+See [`BilingualMode` and `BilingualFormat`](#other-options) under the Configuration section for details, including how to customize the format string (e.g. inline `{original} ({translation})`, or translation-first ordering).
+
+Everything else below is the documentation for the upstream XUnity.AutoTranslator project, which this fork is based on.
+
 ## Index
  * [Introduction](#introduction)
  * [Plugin Frameworks](#plugin-frameworks)
  * [Installation](#installation)
+ * [Building from Source](#building-from-source)
  * [Key Mapping](#key-mapping)
  * [Translators](#translators)
  * [Text Frameworks](#text-frameworks)
@@ -175,7 +197,24 @@ The file structure should like like this
  ```
 
 **NOTE:** MonoMod hooks are not supported with this installation method because an outdated version of `Mono.Cecil.dll` is being used with Sybaris.
- 
+
+## Building from Source
+The repository can be built on Windows using Visual Studio 2022 (or MSBuild) by opening `XUnity.AutoTranslator.sln` (or `XUnity.AutoTranslator.Koikatsu.sln` for a smaller, Koikatsu-focused build) and building in `Release` configuration. All required reference assemblies are included in the `libs` folder.
+
+Building in `Release` runs each plugin project's `PostBuild` step, which assembles the correct folder layout for each mod loader and zips it via `tools/xzip.exe`, producing the same packages found on the [releases](../../releases) page in the `dist` folder:
+ * `XUnity.AutoTranslator-BepInEx-{VERSION}.zip`
+ * `XUnity.AutoTranslator-BepInEx-IL2CPP-{VERSION}.zip`
+ * `XUnity.AutoTranslator-MelonMod-{VERSION}.zip`
+ * `XUnity.AutoTranslator-MelonMod-IL2CPP-{VERSION}.zip`
+ * `XUnity.AutoTranslator-IPA-{VERSION}.zip`
+ * `XUnity.AutoTranslator-UnityInjector-{VERSION}.zip`
+ * `XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip`
+ * `XUnity.AutoTranslator-Developer-{VERSION}.zip` and `XUnity.AutoTranslator-Developer-IL2CPP-{VERSION}.zip`
+
+The `{VERSION}` in each package name comes from the `Version` property in `Directory.Build.props`.
+
+A GitHub Actions workflow (`.github/workflows/build-release.yml`) automates this on `windows-latest`: it builds the solution in `Release` on every push/PR to `master`, uploads the `dist/*.zip` files as a workflow artifact, and additionally creates a GitHub release with these zips attached when a tag matching `v*` is pushed.
+
 ## Key Mapping
 The following key inputs are mapped:
  * ALT + 0: Toggle XUnity AutoTranslator UI. (That's a zero, not an O)
