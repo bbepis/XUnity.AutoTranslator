@@ -363,6 +363,8 @@ ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hoo
 InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)
 RedirectedResourceDetectionStrategy=AppendMongolianVowelSeparatorAndRemoveAll ;Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
 OutputTooLongText=False          ;Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
+BilingualMode=False              ;If True, displays both the original text and the translation simultaneously, formatted according to 'BilingualFormat'
+BilingualFormat={original}\n[{translation}] ;Format string used to combine the original and translated text when 'BilingualMode' is enabled. Use '{original}' and '{translation}' as placeholders
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -478,6 +480,8 @@ Resizing of a UI component does not refer to changing of it's dimensions, but ra
 
 The configuratiaon `EnableUIResizing` and `ForceUIResizing` also control whether or not manual UI resize behaviour is enabled. See [this section](#ui-font-resizing) for more information.
 
+Note: When `BilingualMode=True` is enabled, `ForceUIResizing` is automatically enabled as well, since text components will need to display both the original and translated text.
+
 #### Font overriding
 When translating to languages that use non-ASCII letters the game's default font might not be able to display some of those characters. This is the most common when translating to Chinese. To fix this you can supply your own ccustom font that will be used to display the missing characters (or all text in the game).
 
@@ -542,6 +546,8 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `IgnoreVirtualTextSetterCallingRules`: Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components.
  * `RedirectedResourceDetectionStrategy`: Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
  * `OutputTooLongText`: Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
+ * `BilingualMode`: If enabled, displays both the original text and its translation at the same time, instead of replacing the original. The combined text is formatted according to `BilingualFormat`. Enabling this also forces `ForceUIResizing` on, since text components will need to fit more content.
+ * `BilingualFormat`: Controls how the original and translated text are combined when `BilingualMode` is enabled. Use `{original}` and `{translation}` as placeholders, e.g. `{original}\n[{translation}]` (translation on a new line, in brackets) or `{original} ({translation})` (inline).
 
 ## IL2CPP Support
 While this plugin offers some level of IL2CPP support, it is by no means complete. The following differences can be observed/features are missing:
