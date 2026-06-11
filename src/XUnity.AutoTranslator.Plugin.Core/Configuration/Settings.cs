@@ -294,7 +294,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             DisableTextMeshProScrollInEffects = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "DisableTextMeshProScrollInEffects", ApplicationName.Equals( "SamuraiVandalism", StringComparison.OrdinalIgnoreCase ) || UnityTypes.UguiNovelText != null );
             CacheParsedTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheParsedTranslations", false );
             BilingualMode = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BilingualMode", false );
-            BilingualFormat = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BilingualFormat", "{original}\n[{translation}]" );
+            BilingualFormat = JsonHelper.Unescape( PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BilingualFormat", "{original}\\n[{translation}]" ) );
 
             if( BilingualMode )
             {
