@@ -1,26 +1,5 @@
 ﻿# XUnity Auto Translator
 
-## About this fork (Dual Subtitles)
-This fork adds a **bilingual / dual-subtitles mode** to XUnity.AutoTranslator. Instead of replacing in-game text with its translation, it can display both the original text and the translation at the same time, e.g.:
-
-```
-日本語のテキスト
-[This is the English translation]
-```
-
-Enable it in the `[Behaviour]` section of the plugin's config file:
-
-```ini
-[Behaviour]
-BilingualMode=True
-BilingualFormat={original}\n[{translation}]
-ForceUIResizing=True
-```
-
-See [`BilingualMode` and `BilingualFormat`](#other-options) under the Configuration section for details, including how to customize the format string (e.g. inline `{original} ({translation})`, or translation-first ordering).
-
-Everything else below is the documentation for the upstream XUnity.AutoTranslator project, which this fork is based on.
-
 ## Index
  * [Introduction](#introduction)
  * [Plugin Frameworks](#plugin-frameworks)
@@ -44,6 +23,15 @@ Everything else below is the documentation for the upstream XUnity.AutoTranslato
 This is an advanced translator plugin that can be used to translate Unity-based games automatically and also provides the tools required to translate games manually.
 
 It does (obviously) go to the internet, in order to provide the automated translation, so if you are not comfortable with that, don't use it.
+
+The plugin also supports a **bilingual / dual-subtitles mode**, which displays both the original text and its translation at the same time instead of replacing it, e.g.:
+
+```
+日本語のテキスト
+[This is the English translation]
+```
+
+See [`BilingualMode` and `BilingualFormat`](#other-options) under [Configuration](#configuration) for details on enabling and customizing this.
 
 If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution) and the section regarding [manual translations](#manual-translations) so you understand how the plugin operates.
 
