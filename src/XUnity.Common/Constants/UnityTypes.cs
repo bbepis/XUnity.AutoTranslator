@@ -336,6 +336,11 @@ namespace XUnity.Common.Constants
 #endif
       }
 
+      public static class TMP_FontAsset_Methods
+      {
+         public static CachedMethod CreateFontAsset = UnityTypes.TMP_FontAsset?.ClrType.CachedMethod( "CreateFontAsset", typeof( string ), typeof( string ), typeof( int ) );
+      }
+
       public static class TMP_Text_Methods
       {
 #if IL2CPP
@@ -569,8 +574,8 @@ namespace XUnity.Common.Constants
             {
                var nativeType = ptr != IntPtr.Zero ? Il2CppType.TypeFromPointer( ptr ) : Il2CppType.From( wrapperType );
 
-               if (nativeType == null)
-               {    
+               if( nativeType == null )
+               {
                   XuaLogger.AutoTranslator.Warn( "Could not find '" + name + "' in IL2CPP domain even though it could be found in the managed domain." );
                }
 

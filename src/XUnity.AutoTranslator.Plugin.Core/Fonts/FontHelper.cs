@@ -69,9 +69,30 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          }
          else
          {
-            XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from internal Resources API." );
+            string[] systemFontNames = GetOSInstalledFontNames();
+            bool isAssetBundleNameInsideSystemFont = false;
+            for( int i = 0; i < systemFontNames.Length; i++ )
+            {
+               if( systemFontNames[ i ] == assetBundle )
+               {
+                  isAssetBundleNameInsideSystemFont = true;
+               }
+            }
 
-            font = Resources.Load( assetBundle );
+            if( isAssetBundleNameInsideSystemFont )
+            {
+               XuaLogger.AutoTranslator.Info( "The font name is installed on the system. Attempting to create TextMesh Pro font." );
+
+               if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset != null )
+               {
+                  font = (UnityEngine.Object)UnityTypes.TMP_FontAsset_Methods.CreateFontAsset.Invoke( null, new object[] { assetBundle, "", 90 } );
+                  XuaLogger.AutoTranslator.Info( $"TextMeshPro font from '{assetBundle}' created successfully." );
+               }
+            }
+            else
+            {
+               font = Resources.Load( assetBundle );
+            }
          }
 
          if( font != null )
