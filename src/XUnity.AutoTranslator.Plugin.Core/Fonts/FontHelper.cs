@@ -69,28 +69,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          }
          else
          {
-            string[] systemFontNames = GetOSInstalledFontNames();
             bool isAssetBundleNameInsideSystemFont = false;
-            for( int i = 0; i < systemFontNames.Length; i++ )
+            try
             {
-               if( systemFontNames[ i ] == assetBundle )
+               string[] systemFontNames = GetOSInstalledFontNames();
+               for( int i = 0; i < systemFontNames.Length; i++ )
                {
-                  isAssetBundleNameInsideSystemFont = true;
+                  if( systemFontNames[ i ] == assetBundle )
+                  {
+                     isAssetBundleNameInsideSystemFont = true;
+                     break;
+                  }
                }
             }
-
-            if( isAssetBundleNameInsideSystemFont )
+            catch( Exception ex )
             {
-               XuaLogger.AutoTranslator.Info( "The font name is installed on the system. Attempting to create TextMesh Pro font." );
+               XuaLogger.AutoTranslator.Error( $"Unable to fetch installed font names: {ex.Message}" );
+            }
 
-               if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset != null )
-               {
-                  font = (UnityEngine.Object)UnityTypes.TMP_FontAsset_Methods.CreateFontAsset.Invoke( null, new object[] { assetBundle, "", 90 } );
-                  XuaLogger.AutoTranslator.Info( $"TextMeshPro font from '{assetBundle}' created successfully." );
-               }
+            if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset != null && isAssetBundleNameInsideSystemFont )
+            {
+               XuaLogger.AutoTranslator.Info( "The asset bundle name is installed on the system. Attempting to create TextMesh Pro font." );
+               font = (UnityEngine.Object)UnityTypes.TMP_FontAsset_Methods.CreateFontAsset.Invoke( null, new object[] { assetBundle, "", 90 } );
             }
             else
             {
+               if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset == null )
+               {
+                  XuaLogger.AutoTranslator.Warn( "TMP_FontAsset.CreateFontAsset not found. TextMeshPro version might be below 3.2.0." );
+               }
+
+               XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from internal Resources API." );
                font = Resources.Load( assetBundle );
             }
          }
@@ -125,7 +134,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          if( File.Exists( overrideFontPath ) )
          {
             XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from asset bundle." );
-            
+
             var bundle = AssetBundleProxy.LoadFromFile( overrideFontPath );
 
             if( bundle == null )
