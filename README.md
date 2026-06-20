@@ -482,7 +482,11 @@ The configuratiaon `EnableUIResizing` and `ForceUIResizing` also control whether
 When translating to languages that use non-ASCII letters the game's default font might not be able to display some of those characters. This is the most common when translating to Chinese. To fix this you can supply your own ccustom font that will be used to display the missing characters (or all text in the game).
 
  * `OverrideFont`: Changes the font of all text components. UGUI only.
- * `OverrideFontTextMeshPro`: Consider using `FallbackFontTextMeshPro` instead. Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only. This option is able to load a font in two different ways. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle (requires Unity 2018 or greater (or alternatively a custom asset bundle built specifically for the targeted game)). If not, it will be attempted to be loaded through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
+ * `OverrideFontTextMeshPro`: Consider using `FallbackFontTextMeshPro` instead. Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only.
+     This option is able to load a font in three different ways:
+     1. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle. Requires a custom asset bundle built specifically for the targeted game.
+     2. If the specified string matches name of a font installed on the system (e.g. Arial), the font will be attempted to be loaded as a TMP font. Requires TextMeshPro 3.2.0+ (see #854).
+     3. Otherwise, the string will be used to attempt to load a font through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
  * `FallbackFontTextMeshPro`: Adds a fallback font that TextMesh Pro can use in case a specific character is not supported.
 
 These settings are not affected by `EnableUIResizing` and `ForceUIResizing`, but the resizing behavior may change how the custom font is displayed.
