@@ -182,7 +182,7 @@ The following key inputs are mapped:
  * ALT + 1: Toggle Translation Aggregator UI.
  * ALT + T: Alternate between translated and untranslated versions of all texts provided by this plugin.
  * ALT + R: Reload translation files. Useful if you change the text and texture files on the fly. Not guaranteed to work for all textures.
- * ALT + U: Manual hooking. The default hooks wont always pick up texts. This will attempt to make lookups manually. Will not hook text components from frameworks not enabled.
+ * ALT + U: Manual hooking. The default hooks won't always pick up texts. This will attempt to make lookups manually. Will not hook text components from frameworks not enabled.
  * ALT + F: If OverrideFont is configured, will toggle between overridden and default font.
  * ALT + Q: Reboot the plugin if it was shutdown. This will only work if the plugin was shut down due to consecutive errors towards the translation endpoint. Should only be used if you have reason to believe you have remedied the problem (such as changed VPN endpoint etc.) otherwise it will just shut down again.
 
@@ -338,10 +338,10 @@ OverrideFontTextMeshPro=         ;Consider using FallbackFontTextMeshPro instead
 FallbackFontTextMeshPro=         ;Adds a fallback font for TextMeshPro in case a specific character is not supported. This is recommended over OverrideFontTextMeshPro
 ResizeUILineSpacingScale=        ;A decimal value that the default line spacing should be scaled by during UI resizing, for example: 0.80. NOTE: Only works for UGUI
 ForceUIResizing=True             ;Indicates whether the UI resize behavior should be applied to all UI components regardless of them being translated.
-IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list seperated by ';'.
+IgnoreTextStartingWith=\u180e;   ;Indicates that the plugin should ignore any strings starting with certain characters. This is a list separated by ';'.
 TextGetterCompatibilityMode=False ;Indicates whether or not to enable "Text Getter Compatibility Mode". Should only be enabled if required by the game. 
-GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list seperated by ';'.
-RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list seperated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
+GameLogTextPaths=                ;Indicates specific paths for game objects that the game uses as "log components", where it continuously appends or prepends text to. Requires expert knowledge to setup. This is a list separated by ';'.
+RomajiPostProcessing=ReplaceMacronWithCircumflex;RemoveApostrophes;ReplaceHtmlEntities ;Indicates what type of post processing to do on 'translated' romaji texts. This can be important in certain games because the font used does not support various diacritics properly. This is a list separated by ';'. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceHtmlEntities"]
 TranslationPostProcessing=ReplaceMacronWithCircumflex;ReplaceHtmlEntities ;Indicates what type of post processing to do on translated texts (not romaji). Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
 RegexPostProcessing=None         ;Indicates what type of post processing to perform on the capture groups of regexes. Possible values: ["RemoveAllDiacritics", "ReplaceMacronWithCircumflex", "RemoveApostrophes", "ReplaceWideCharacters", "ReplaceHtmlEntities"]
 CacheRegexLookups=False          ;Indicates whether or not results of regex lookups should be output to the specified OutputFile
@@ -351,14 +351,14 @@ GenerateStaticSubstitutionTranslations=False ;Indicates that the plugin should g
 GeneratePartialTranslations=False ;Indicates that the plugin should generate partial translations to support text translations as it is "scrolling in"
 EnableTranslationScoping=False   ;Indicates the plugin should parse 'TARC' directives and scope translations based on these
 EnableSilentMode=False           ;Indicates the plugin should not print out success messages in relation to translations
-BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'
+BlacklistedIMGUIPlugins=         ;If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list separated by ';'
 OutputUntranslatableText=False   ;Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile
 IgnoreVirtualTextSetterCallingRules=False; Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components
 MaxTextParserRecursion=1         ;Indicates how many levels of recursion are allowed when text is parsed so it can be translated in different parts. This can be used with splitter-regexes in advanced scenarios. The default value of one essentially means that recursion is disabled.
 HtmlEntityPreprocessing=True     ;Will preprocess and decode html entities before they are send for translation. Some translators will fail when html entities are sent.
 HandleRichText=True              ;Will enable automated handling of rich text (text with markup)
-PersistRichTextMode=Final        ;Indicates how parsed rich text should be persisted. Either 'Fragment' to store the the text piecemeal or 'Final' to store the entire translated string (does not support substitutions!)
-EnableTranslationHelper=False    ;Indicates if translator-related helpful log messages should be enabled. May be useful when tranlating based on redirected resources
+PersistRichTextMode=Final        ;Indicates how parsed rich text should be persisted. Either 'Fragment' to store the text piecemeal or 'Final' to store the entire translated string (does not support substitutions!)
+EnableTranslationHelper=False    ;Indicates if translator-related helpful log messages should be enabled. May be useful when translating based on redirected resources
 ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hooks instead of harmony hooks
 InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)
 RedirectedResourceDetectionStrategy=AppendMongolianVowelSeparatorAndRemoveAll ;Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
@@ -370,7 +370,7 @@ EnableTextureTranslation=False   ;Indicates whether the plugin will attempt to r
 EnableTextureDumping=False       ;Indicates whether the plugin will dump texture it is capable of replacing to the TextureDirectory. Has significant performance impact
 EnableTextureToggling=False      ;Indicates whether or not toggling the translation with the ALT+T hotkey will also affect textures. Not guaranteed to work for all textures. Has significant performance impact
 EnableTextureScanOnSceneLoad=False ;Indicates whether or not the plugin should scan for textures on scene load. This enables the plugin to find and (possibly) replace more texture
-EnableSpriteRendererHooking=False ;Indicates whether or not the plugin should attempt to hook SpriteRenderer. This is a seperate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations
+EnableSpriteRendererHooking=False ;Indicates whether or not the plugin should attempt to hook SpriteRenderer. This is a separate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations
 LoadUnmodifiedTextures=False     ;Indicates whether or not unmodified textures should be loaded. Modifications are determined based on the hash in the file name. Only enable this for debugging purposes as it is likely to cause oddities
 TextureHashGenerationStrategy=FromImageName ;Indicates how the mod identifies pictures through hashes. Can be ["FromImageName", "FromImageData", "FromImageNameAndScene"]
 DuplicateTextureNames=           ;Indicates specific texture names that are duplicated in the game. List is separated by ';'.
@@ -387,7 +387,7 @@ CacheMetadataForAllFiles=True    ;When files are in ZIP files in the PreferredSt
 
 [Http]
 UserAgent=                       ;Override the user agent used by APIs requiring a user agent
-DisableCertificateValidation=False ;Indiciates whether certificate validations for the .NET API should be disabled
+DisableCertificateValidation=False ;Indicates whether certificate validations for the .NET API should be disabled
 
 [TranslationAggregator]
 Width=400                        ;The total width of the translation aggregator window.
@@ -457,7 +457,7 @@ The plugin first determines whether or not it should perform a special whitespac
 
 After the text has been translated by the configured service, `ForceSplitTextAfterCharacters` is used to determine if the plugin should force the result into multiple lines after a certain number of characters.
 
-The main reason that this type of handling can make or break a translation really comes down to whether or not whitespace is removed from the source text before sending it to the endpoint. Most endpoints (such as GoogleTranslate) consider text on multiple lines seperately, which can often result in terrible translation if an unnecessary newline is included.
+The main reason that this type of handling can make or break a translation really comes down to whether or not whitespace is removed from the source text before sending it to the endpoint. Most endpoints (such as GoogleTranslate) consider text on multiple lines separately, which can often result in terrible translation if an unnecessary newline is included.
 
 #### Text post/pre-processing
 While proper whitespace handling goes a long way in ensuring better translations, it is not always enough.
@@ -476,10 +476,10 @@ By default, the plugin will attempt some basic auto-resizing behaviour, which ar
 
 Resizing of a UI component does not refer to changing of it's dimensions, but rather how the component handles overflow. The plugin changes the overflow parameters such that text is more likely to be displayed.
 
-The configuratiaon `EnableUIResizing` and `ForceUIResizing` also control whether or not manual UI resize behaviour is enabled. See [this section](#ui-font-resizing) for more information.
+The `EnableUIResizing` and `ForceUIResizing` configuration options also control whether or not manual UI resize behaviour is enabled. See [this section](#ui-font-resizing) for more information.
 
 #### Font overriding
-When translating to languages that use non-ASCII letters the game's default font might not be able to display some of those characters. This is the most common when translating to Chinese. To fix this you can supply your own ccustom font that will be used to display the missing characters (or all text in the game).
+When translating to languages that use non-ASCII letters the game's default font might not be able to display some of those characters. This is the most common when translating to Chinese. To fix this you can supply your own custom font that will be used to display the missing characters (or all text in the game).
 
  * `OverrideFont`: Changes the font of all text components. UGUI only.
  * `OverrideFontTextMeshPro`: Consider using `FallbackFontTextMeshPro` instead. Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only.
@@ -493,7 +493,7 @@ These settings are not affected by `EnableUIResizing` and `ForceUIResizing`, but
 
 ##### Where to get custom fonts
 - You can download some pre-built asset bundles with TextMeshPro fonts in the release tab (TMP_Font_AssetBundles), but for now, they are not particularly well tested. If you want to try them out, simply download the .zip folder and put one of the font assets into the game folder. Then configure it up by writing the name of the file in the configuration file in `OverrideFontTextMeshPro` or `FallbackFontTextMeshPro`.
-- [sorrowmoil-MoeFont-for-XUnity.AutoTranslator](https://github.com/sorrowmoil/sorrowmoil-MoeFont-for-XUnity.AutoTranslator) - Repository full of fonts for variuous versions of Unity (zh-CN), more information in https://github.com/bbepis/XUnity.AutoTranslator/issues/842.
+- [sorrowmoil-MoeFont-for-XUnity.AutoTranslator](https://github.com/sorrowmoil/sorrowmoil-MoeFont-for-XUnity.AutoTranslator) - Repository full of fonts for various versions of Unity (zh-CN), more information in https://github.com/bbepis/XUnity.AutoTranslator/issues/842.
 
 ##### How to create new custom fonts
 You will have to create the font in the same version of Unity Editor as your game and then add it to an AssetBundle. Check [this guide](https://github.com/bbepis/XUnity.AutoTranslator/wiki/TextMeshPro-Font-Asset-Creation-&-Packaging-Guide) for detailed steps.
@@ -507,7 +507,7 @@ The following aims at reducing the number of requests sent to the translation en
 #### Romaji 'translation'
 One of the possible values as output `Language` is 'romaji'. If you choose this as language, you will find that games often has problems showing the translations because the font does not understand the special characters used, for example the [macron diacritic](https://en.wikipedia.org/wiki/Macron_(diacritic)).
 
-To rememdy this, post processing can be applied to translations when 'romaji' is chosen as `Language`. This is done through the option `RomajiPostProcessing`. This option is a ';'-seperated list of values:
+To remedy this, post processing can be applied to translations when 'romaji' is chosen as `Language`. This is done through the option `RomajiPostProcessing`. This option is a ';'-separated list of values:
  * `RemoveAllDiacritics`: Remove all diacritics from the translated text
  * `ReplaceMacronWithCircumflex`: Replaces the macron diacritic with a circumflex.
  * `RemoveApostrophes`: Some translators might decide to include apostrophes after the 'n'-character. Applying this option removes those.
@@ -541,7 +541,7 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `CopyToClipboard`: Copy text to translate to the clipboard to support tools such as Translation Aggregator.
  * `ClipboardDebounceTime`: The delay between hooking a text and it being copied to clipboard. This is to avoid spamming the clipboard. If multiple texts appear in this period they will be concatenated.
  * `EnableSilentMode`: Indicates the plugin should not print out success messages in relation to translations.
- * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list seperated by ';'.
+ * `BlacklistedIMGUIPlugins`: If an IMGUI window assembly/class/method name contains any of the strings in this list (case insensitive) that UI will not be translated. Requires MonoMod hooks. This is a list separated by ';'.
  * `OutputUntranslatableText`: Indicates if texts that are considered by the plugin to be untranslatable should be output to the specified OutputFile. Enabling this may also output a lot of garbage to the `OutputFile` that should be deleted before potential redistribution. **Never redistribute the mod with this enabled.**
  * `IgnoreVirtualTextSetterCallingRules`: Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components.
  * `RedirectedResourceDetectionStrategy`: Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
@@ -706,7 +706,7 @@ sr:"^\[(?<stat>[\w\s]+)(?<num_i>[\+\-]{1}[0-9]+)?\](?<after>[\s\S]+)?$"="[${stat
 
 In this example there are 3 named groups, two of which are optional (standard regex syntax). The replacement pattern identifies these named group by surrounding the name with `${}`.
 
-If the identifier name ends in `_i` it means that the string will not be attempted to be translated, but rather transfered as is. Generally this is not really needed as the plugin is smart enough to determine if something should be translated or not.
+If the identifier name ends in `_i` it means that the string will not be attempted to be translated, but rather transferred as is. Generally this is not really needed as the plugin is smart enough to determine if something should be translated or not.
 
 So what would this regex split? It would split strings like this:
 
@@ -714,7 +714,7 @@ So what would this regex split? It would split strings like this:
 [DEF+14][ATK+64][DEX+34][AGI]
 ```
 
-The group(s) `(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?` matches the text inside the `[]`. As you can see there are two groups. The first is requried and represents the text. The second is optional and represents the plus-/minus sign and number that comes after.
+The group(s) `(?<stat>[\w]+)(?<num_i>[\+\-]{1}[0-9]+)?` matches the text inside the `[]`. As you can see there are two groups. The first is required and represents the text. The second is optional and represents the plus-/minus sign and number that comes after.
 
 The group `(?<after>[\s\S]+)` matches whatever comes after. Because of this, it will attempt to translate that text like any other, and that may flow directly back into this splitter regex.
 
@@ -734,7 +734,7 @@ In these files, the left-hand side of the equals sign represents a (partial) pat
 
 In the shown example it will reduce the font size of all texts below the specified path to 50%.
 
-Like any other translation file, these files also support translation scoping, as decribed in [this section](#translation-scoping).
+Like any other translation file, these files also support translation scoping, as described in [this section](#translation-scoping).
 
 The following types of commands exists:
  * Commands that change the font size to a static size:
@@ -786,7 +786,7 @@ You can always see which levels are loaded by using the hotkey CTRL+ALT+NP7.
 
 Another way of scoping translations are through file names. It is possible to tell the plugin where to look for translation files. It is possible to parameterize these paths with the variable {GameExeName}.
 
-Example configuration that seperates translations for each executable:
+Example configuration that separates translations for each executable:
 
 ```
 [Files]
@@ -845,7 +845,7 @@ This means you can get away with providing a single translation for both of thes
 
 Another thing to note is that the plugin will always output the original text without modifications in the translation file. But if it sees another text afterwards that is "compatible" with that text-string (due to the above mentioned text modifications) it will not output this new text by default.
 
-This is controlled by the configuration option `CacheWhitespaceDifferences=False`. You can change this to true, and it will output a new entry for each unique text, even if the only differences are whitespace. Obviously, translations-pairs actually appearing in the translation file will always that precendent over translations-pairs that are generated based on an exinsting translation-pair.
+This is controlled by the configuration option `CacheWhitespaceDifferences=False`. You can change this to true, and it will output a new entry for each unique text, even if the only differences are whitespace. Obviously, translation pairs actually appearing in the translation file will always take precedence over translation pairs that are generated based on an existing translation pair.
 
 *NOTE: Whitespace differences in relation to level-scoped translations will never be output regardless of this setting.*
 
@@ -913,9 +913,9 @@ CacheTexturesInMemory=True
 
 `EnableTextureDumping` enables texture dumping. This means that the mod will dump any images it has not already dumped to the `TextureDirectory`. When dumping textures, it may also be worth enabling `EnableTextureScanOnSceneLoad` to more quickly find all textures that require translating. **Never redistribute the mod with this enabled.**
 
-`EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more texture at a tiny performance cost during scene load (which is often during loading screens, etc.). However, because of the way Unity works not all of these are guaranteed to be replacable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
+`EnableTextureScanOnSceneLoad` allows the plugin to scan for texture objects on the sceneLoad event. This enables the plugin to find more textures at a tiny performance cost during scene load (which is often during loading screens, etc.). However, because of the way Unity works not all of these are guaranteed to be replaceable. If you find an image that is dumped but cannot be translated, please report it. However, please recognize this mod is primarily intended for replacing UI textures, not textures for 3D meshes.
 
-`EnableSpriteRendererHooking` allows the plugin to attempt to hook SpriteRenderer. This is a seperate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations.
+`EnableSpriteRendererHooking` allows the plugin to attempt to hook SpriteRenderer. This is a separate option because SpriteRenderer can't actually be hooked properly and the implemented workaround could have a theoretical impact on performance in certain situations.
 
 `LoadUnmodifiedTextures` enables whether or not the plugin should load textures that has not been modified. This is only useful for debugging, and likely to cause various visual glitches, especially if `EnableTextureScanOnSceneLoad` is also enabled. **Never redistribute the mod with this enabled.**
 
@@ -1220,8 +1220,8 @@ After implementing the class, simply build the project and place the generated D
 For more examples of implementations, you can simply take a look at this projects source code.
 
 **NOTE**: If you implement a class based on the `HttpEndpoint` and you get an error where the web request is never completed, then it is likely due to the web server requiring Tls1.2. Unity-mono has issues with this spec and it will cause the request to lock up forever. The only solutions to this for now are:
- * Disable SSL, if you can. There are many situations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endoint.
- * Use the `WwwEndpoint` instead. I highly advice against this though, unless it is an authenticated endpoint.
+ * Disable SSL, if you can. There are many situations where it is simply not possible to do this because the web server will simply redirect back to the HTTPS endpoint.
+ * Use the `WwwEndpoint` instead. I highly advise against this though, unless it is an authenticated endpoint.
 
 Another way to implement a translator is to implement the `ExtProtocolEndpoint` class. This can be used to delegate the actual translation logic to an external process. Currently there is no documentation on this, but you can take a look at the LEC implementation, which uses it.
 
@@ -1337,7 +1337,7 @@ public static class ResourceRedirection
     public static void UnregisterAsyncAndSyncAssetBundleLoadingHook( Action<IAssetBundleLoadingContext> action );
 
     /// <summary>
-    /// Register a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+    /// Register a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="behaviour">The behaviour of the callback.</param>
     /// <param name="priority">The priority of the callback, the higher the sooner it will be called.</param>
@@ -1345,7 +1345,7 @@ public static class ResourceRedirection
     public static void RegisterResourceLoadedHook( HookBehaviour behaviour, int priority, Action<ResourceLoadedContext> action );
 
     /// <summary>
-    /// Unregister a ReourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
+    /// Unregister a ResourceLoaded hook (postfix to loading a resource from the Resources API (both synchronous and asynchronous)).
     /// </summary>
     /// <param name="action">The callback.</param>
     public static void UnregisterResourceLoadedHook( Action<ResourceLoadedContext> action );
@@ -1404,7 +1404,7 @@ The event callback chain looks like this `[AssetLoading / AsyncAssetLoading hook
 #### Asset Loading Methods
 The methods `RegisterAssetLoadingHook( HookBehaviour behaviour, Action<AssetLoadingContext> action )` and `RegisterAsyncAssetLoadingHook( int priority, Action<AsyncAssetLoadingContext> action )` hooks into the `AssetBundle` API when loading assets.
 
-These methods registers prefix callbacks, which means the assets themselves wont be loaded yet when they are called.
+These methods register prefix callbacks, which means the assets themselves won't be loaded yet when they are called.
 
 The callbacks take the types `AssetLoadingContext` and `AsyncAssetLoadingContext` as an argument, respectively. Let's take a look at their definitions:
 
@@ -1543,7 +1543,7 @@ The only difference between these two contexts is that one has an `Asset/Assets`
 
 Now if you actually paid attention to what you were reading(!?), you would notice that both of the above context objects has an `Asset/Assets` property that can be set.
 
-Under normal circumstances, however, you cannot use the `Assets/Asset` property on the the `AsyncAssetLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the asset directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
+Under normal circumstances, however, you cannot use the `Assets/Asset` property on the `AsyncAssetLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the asset directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
 
 It is, however, recommended that if you can that you set the `Request` property instead of the `Assets/Asset` property as that will keep the operation asynchronous and not block the game while the asset is being loaded.
 
@@ -1552,7 +1552,7 @@ If you can handle the loading of the asset remember to call the `Complete` metho
  * Whether the original method should be skipped.
  * Whether all the postfixes should be skipped.
 
-An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following condition apply:
+An important point to make here is that there are both an `Asset` and an `Assets` property on the context object. These can be used interchangeably, but an array will only ever be used if the following condition applies:
  * The `LoadType` in the `Parameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
 
 Finally, if we take a look at the `Parameters` property of the context object, we will find the following definition:
@@ -1616,7 +1616,7 @@ Do note, that if you want to use this method you must first call the method `Ena
 #### Asset Loaded Methods
 The method `RegisterAssetLoadedHook( HookBehaviour behaviour, Action<AssetLoadedContext> action )` hooks into the `AssetBundle` API in the UnityEngine. Any time an asset is loaded through this API a callback is sent to these hooks.
 
-This API is a postfix hook to the `AssetBundle` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+This API is a postfix hook to the `AssetBundle` API, which means that it is first called once the original asset has already been loaded, but is still replaceable.
 
 The `AssetLoadedContext` class has the following definition:
 
@@ -1632,7 +1632,7 @@ public class AssetLoadedContext : IAssetOrResourceLoadedContext
     public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
 
     /// <summary>
-    /// Gets a file system path for the specfic asset that should be unique.
+    /// Gets a file system path for the specific asset that should be unique.
     /// </summary>
     /// <param name="asset"></param>
     /// <returns></returns>
@@ -1714,13 +1714,13 @@ public enum HookBehaviour
 }
 ```
 
-An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
+An important point to make here is that there are both an `Asset` and an `Assets` property on the context object. These can be used interchangeably, but an array will only ever be used if the following two conditions apply:
  * You've subscribed with `OneCallbackPerLoadCall`.
  * The `LoadType` in the `Parameters` property is `LoadByType` or `LoadNamedWithSubAssets`, which are the only types of resource loading that may return multiple resources.
 
 In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
 
-If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
+If you update or replace the asset being loaded remember to call the `Complete` method to indicate your intentions regarding:
  * Whether the remaining postfixes should be called.
 
 In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
@@ -1775,7 +1775,7 @@ public enum AssetLoadType
 }
 ```
 
-It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of assets.
+It is also worth mentioning that these hooks handle both synchronous and asynchronous loading of assets.
 
 Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
 
@@ -1787,7 +1787,7 @@ The event callback chain looks like this `[Original Method] => [ResourceLoaded h
 #### Resource Loaded Methods
 The method `RegisterResourceLoadedHook( HookBehaviour behaviour, Action<ResourceLoadedContext> action )` hooks into the `Resources` API in the UnityEngine. Any time a resource is loaded through this API a callback is sent to these hooks.
 
-This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replacable.
+This API is a postfix hook to the `Resources` API, which means that it is first called once the original asset has already been loaded, but is still replaceable.
 
 The `ResourceLoadedContext` class has the following definition:
 
@@ -1803,7 +1803,7 @@ public class ResourceLoadedContext : IAssetOrResourceLoadedContext
     public bool HasReferenceBeenRedirectedBefore( UnityEngine.Object asset );
 
     /// <summary>
-    /// Gets a file system path for the specfic asset that should be unique.
+    /// Gets a file system path for the specific asset that should be unique.
     /// </summary>
     /// <param name="asset"></param>
     /// <returns></returns>
@@ -1865,13 +1865,13 @@ public enum HookBehaviour
 }
 ```
 
-An important points to make here, is that there is both an `Asset` and an `Assets` property on the context object. These can be used interchangably, but an array will only ever be used if the following two conditions apply:
+An important point to make here is that there are both an `Asset` and an `Assets` property on the context object. These can be used interchangeably, but an array will only ever be used if the following two conditions apply:
  * You've subscribed with `OneCallbackPerLoadCall`.
  * The `LoadType` in the `Parameters` property is `LoadByType`, which is the only type of resource loading that may return multiple resources.
 
 In relation to this, it is worth mentioning that if a call to load assets returns 0 assets, you will not receive any callbacks if you subscribe through `OneCallbackPerResourceLoaded` where as if you subscribe through `OneCallbackPerLoadCall` you would still get your one callback.
 
-If you update or replace the asset being loaded remember to call to `Complete` method to indicate your intentions regarding:
+If you update or replace the asset being loaded remember to call the `Complete` method to indicate your intentions regarding:
  * Whether the remaining postfixes should be called.
 
 In addition, if we take a look at the `Parameters` property of the context object, we will find the following definition:
@@ -1921,7 +1921,7 @@ public enum ResourceLoadType
 }
 ```
 
-It is also worth mentioning that these hooks handles both synchronous and asynchronous loading of resources.
+It is also worth mentioning that these hooks handle both synchronous and asynchronous loading of resources.
 
 Hooks subscribed through hook behaviour `OneCallbackPerLoadCall` will be called before hooks with the behaviour `OneCallbackPerResourceLoaded`.
 
@@ -1980,7 +1980,7 @@ public class AssetBundleLoadingContext : IAssetBundleLoadingContext
 
 Because this is a prefix API, the `Bundle` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
 
-If you update the `Bundle` property, remember to call the `Complete` to indicate your intentions regarding:
+If you update the `Bundle` property, remember to call the `Complete` method to indicate your intentions regarding:
  * Whether or not the remaining prefixes should be skipped.
  * Whether or not the original method should be skipped.
 
@@ -2034,7 +2034,7 @@ It may also be worth looking at the `GetNormalizedPath()` method instead of the 
  
 Another way to change the result of the asset bundle load operation is to change the value of the `Path`, `Crc` and `Offset` properties in the `Parameters` property. If you do this, you likely will not want to call the Complete method, as you will want the original method to still be called.
 
-#### AssetBundle Asynchrounous Load Methods
+#### AssetBundle Asynchronous Load Methods
 The method `RegisterAsyncAssetBundleLoadingHook( Action<AsyncAssetBundleLoadingContext> action )` is used to hook the asynchronous AssetBundle load methods.
 
 This API is a prefix to the `AssetBundle` API, which means that it is called before the `AssetBundleCreateRequest` is created.
@@ -2095,11 +2095,11 @@ public class AsyncAssetBundleLoadingContext : IAssetBundleLoadingContext
 
 Because this is a prefix API, the `Request` property will be null when the method is called and it is up to you to set it to a different value if you can handle the specified path.
 
-As you can see there is actually also a `Bundle` property available on the context object. Under normal circumstances, however, you cannot use the `Bundle` property on the the `AsyncAssetBundleLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the bundle directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
+As you can see there is actually also a `Bundle` property available on the context object. Under normal circumstances, however, you cannot use the `Bundle` property on the `AsyncAssetBundleLoadingContext`. In order to be able to use these, you must first call `ResourceRedirection.EnableSyncOverAsyncAssetLoads` once during your initialization logic. This will allow you to set the bundle directly so you don't have to go through the standard `AssetBundle` API to obtain a request object.
 
 It is, however, recommended that if you can that you set the `Request` property instead of the `Bundle` property as that will keep the operation asynchronous and not block the game while the asset is being loaded.
 
-If you update the `Request` property, remember to call the `Complete` to indicate your intentions regarding:
+If you update the `Request` property, remember to call the `Complete` method to indicate your intentions regarding:
  * Whether or not the remaining prefixes should be skipped.
  * Whether or not the original method should be skipped.
 
@@ -2200,8 +2200,8 @@ class TextureReplacementPlugin
 }
 ```
 
-### Implemting an AssetBundle Redirector
-Here's an example of how a resource redirection may be implemented to redirect non-existing resources to a seperate 'mods' directory.
+### Implementing an AssetBundle Redirector
+Here's an example of how a resource redirection may be implemented to redirect non-existing resources to a separate 'mods' directory.
 
 ```C#
 class AssetBundleRedirectorPlugin
@@ -2265,7 +2265,7 @@ class AssetBundleRedirectorPlugin
 }
 ```
 
-Here's a smart way to implement the same thing, by having a single method that hooks both the synchronous and asynchronous method at the same time:
+Here's a smart way to implement the same thing, by having a single method that hooks both the synchronous and asynchronous methods at the same time:
 
 ```C#
 class AssetBundleRedirectorSyncOverAsyncPlugin
