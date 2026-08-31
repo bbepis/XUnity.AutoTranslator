@@ -4,6 +4,7 @@
  * [Introduction](#introduction)
  * [Plugin Frameworks](#plugin-frameworks)
  * [Installation](#installation)
+ * [Building from Source](#building-from-source)
  * [Key Mapping](#key-mapping)
  * [Translators](#translators)
  * [Text Frameworks](#text-frameworks)
@@ -22,6 +23,15 @@
 This is an advanced translator plugin that can be used to translate Unity-based games automatically and also provides the tools required to translate games manually.
 
 It does (obviously) go to the internet, in order to provide the automated translation, so if you are not comfortable with that, don't use it.
+
+The plugin also supports a **bilingual / dual-subtitles mode**, which displays both the original text and its translation at the same time instead of replacing it, e.g.:
+
+```
+日本語のテキスト
+[This is the English translation]
+```
+
+See [`BilingualMode` and `BilingualFormat`](#other-options) under [Configuration](#configuration) for details on enabling and customizing this.
 
 If you intend on redistributing this plugin as part of a translation suite for a game, please read [this section](#regarding-redistribution) and the section regarding [manual translations](#manual-translations) so you understand how the plugin operates.
 
@@ -175,7 +185,24 @@ The file structure should like like this
  ```
 
 **NOTE:** MonoMod hooks are not supported with this installation method because an outdated version of `Mono.Cecil.dll` is being used with Sybaris.
- 
+
+## Building from Source
+The repository can be built on Windows using Visual Studio 2022 (or MSBuild) by opening `XUnity.AutoTranslator.sln` (or `XUnity.AutoTranslator.Koikatsu.sln` for a smaller, Koikatsu-focused build) and building in `Release` configuration. All required reference assemblies are included in the `libs` folder.
+
+Building in `Release` runs each plugin project's `PostBuild` step, which assembles the correct folder layout for each mod loader and zips it via `tools/xzip.exe`, producing the same packages found on the [releases](../../releases) page in the `dist` folder:
+ * `XUnity.AutoTranslator-BepInEx-{VERSION}.zip`
+ * `XUnity.AutoTranslator-BepInEx-IL2CPP-{VERSION}.zip`
+ * `XUnity.AutoTranslator-MelonMod-{VERSION}.zip`
+ * `XUnity.AutoTranslator-MelonMod-IL2CPP-{VERSION}.zip`
+ * `XUnity.AutoTranslator-IPA-{VERSION}.zip`
+ * `XUnity.AutoTranslator-UnityInjector-{VERSION}.zip`
+ * `XUnity.AutoTranslator-ReiPatcher-{VERSION}.zip`
+ * `XUnity.AutoTranslator-Developer-{VERSION}.zip` and `XUnity.AutoTranslator-Developer-IL2CPP-{VERSION}.zip`
+
+The `{VERSION}` in each package name comes from the `Version` property in `Directory.Build.props`.
+
+A GitHub Actions workflow (`.github/workflows/build-release.yml`) automates this on `windows-latest`: it builds the solution in `Release` on every push/PR to `master`, uploads the `dist/*.zip` files as a workflow artifact, and additionally creates a GitHub release with these zips attached when a tag matching `v*` is pushed.
+
 ## Key Mapping
 The following key inputs are mapped:
  * ALT + 0: Toggle XUnity AutoTranslator UI. (That's a zero, not an O)
@@ -363,6 +390,8 @@ ForceMonoModHooks=False          ;Indicates that the plugin must use MonoMod hoo
 InitializeHarmonyDetourBridge=False ;Indicates the plugin should initial harmony detour bridge which allows harmony hooks to work in an environment where System.Reflection.Emit does not exist (usually such settings are handled by plugin managers, so don't use when using a plugin manager)
 RedirectedResourceDetectionStrategy=AppendMongolianVowelSeparatorAndRemoveAll ;Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
 OutputTooLongText=False          ;Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
+BilingualMode=False              ;If True, displays both the original text and the translation simultaneously, formatted according to 'BilingualFormat'
+BilingualFormat={original}\n[{translation}] ;Format string used to combine the original and translated text when 'BilingualMode' is enabled. Use '{original}' and '{translation}' as placeholders
 
 [Texture]
 TextureDirectory=Translation\{Lang}\Texture ;Directory to dump textures to, and root of directories to load images from. Can use placeholder: {GameExeName}, {Lang}
@@ -478,6 +507,8 @@ Resizing of a UI component does not refer to changing of it's dimensions, but ra
 
 The `EnableUIResizing` and `ForceUIResizing` configuration options also control whether or not manual UI resize behaviour is enabled. See [this section](#ui-font-resizing) for more information.
 
+Note: When `BilingualMode=True` is enabled, `ForceUIResizing` is automatically enabled as well, since text components will need to display both the original and translated text.
+
 #### Font overriding
 When translating to languages that use non-ASCII letters the game's default font might not be able to display some of those characters. This is the most common when translating to Chinese. To fix this you can supply your own custom font that will be used to display the missing characters (or all text in the game).
 
@@ -546,6 +577,8 @@ If MonoMod hooks are not forced they are only used if available and a given meth
  * `IgnoreVirtualTextSetterCallingRules`: Indicates that rules for virtual method calls should be ignored when trying to set the text of a text component. May in some cases help setting the text of stubborn components.
  * `RedirectedResourceDetectionStrategy`: Indicates if and how the plugin should attempt to recognize redirected resources in order to prevent double translations. Can be ["None", "AppendMongolianVowelSeparator", "AppendMongolianVowelSeparatorAndRemoveAppended", "AppendMongolianVowelSeparatorAndRemoveAll"]
  * `OutputTooLongText`: Indicates if the plugin should output text that exceeds 'MaxCharactersPerTranslation' without translating it
+ * `BilingualMode`: If enabled, displays both the original text and its translation at the same time, instead of replacing the original. The combined text is formatted according to `BilingualFormat`. Enabling this also forces `ForceUIResizing` on, since text components will need to fit more content.
+ * `BilingualFormat`: Controls how the original and translated text are combined when `BilingualMode` is enabled. Use `{original}` and `{translation}` as placeholders, e.g. `{original}\n[{translation}]` (translation on a new line, in brackets) or `{original} ({translation})` (inline).
 
 ## IL2CPP Support
 While this plugin offers some level of IL2CPP support, it is by no means complete. The following differences can be observed/features are missing:
