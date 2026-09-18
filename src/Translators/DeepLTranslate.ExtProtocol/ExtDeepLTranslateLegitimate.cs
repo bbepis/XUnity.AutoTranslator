@@ -44,6 +44,15 @@ namespace DeepLTranslate.ExtProtocol
          public string text { get; set; }
       }
 
+      private class LanguageInfo
+      {
+         public string lang { get; set; }
+
+         public bool usable_as_source { get; set; }
+
+         public bool usable_as_target { get; set; }
+      }
+
       static ExtDeepLTranslateLegitimate()
       {
          ServicePointManager.SecurityProtocol |=
@@ -54,6 +63,12 @@ namespace DeepLTranslate.ExtProtocol
       }
 
       private string _httpsServicePointTemplateUrl = "https://api.deepl.com/v2/translate";
+      private string _httpsLanguagesUrl = "https://api.deepl.com/v3/languages?resource=translate_text";
+
+      private readonly SemaphoreSlim _languagesSemaphore = new SemaphoreSlim( 1, 1 );
+      private HashSet<string> _sourceLanguages;
+      private HashSet<string> _targetLanguages;
+      private DateTime _languagesExpiryUtc;
 
       private HttpClient _client;
       private HttpClientHandler _handler;
@@ -74,10 +89,12 @@ namespace DeepLTranslate.ExtProtocol
          if(string.Equals(free, "true", StringComparison.OrdinalIgnoreCase))
          {
             _httpsServicePointTemplateUrl = "https://api-free.deepl.com/v2/translate";
+            _httpsLanguagesUrl = "https://api-free.deepl.com/v3/languages?resource=translate_text";
          }
          else
          {
             _httpsServicePointTemplateUrl = "https://api.deepl.com/v2/translate";
+            _httpsLanguagesUrl = "https://api.deepl.com/v3/languages?resource=translate_text";
          }
       }
 
@@ -103,14 +120,54 @@ namespace DeepLTranslate.ExtProtocol
          {
             case "zh-Hans":
             case "zh-CN":
-               return "zh";
+               return "zh-hans";
             default:
                return lang;
          }
       }
 
+      private async Task EnsureLanguagesAsync( ITranslationContext context )
+      {
+         await _languagesSemaphore.WaitAsync();
+         try
+         {
+            if( _sourceLanguages == null || DateTime.UtcNow >= _languagesExpiryUtc )
+            {
+               using( var request = new HttpRequestMessage( HttpMethod.Get, _httpsLanguagesUrl ) )
+               {
+                  request.Headers.Add( "Authorization", "DeepL-Auth-Key " + _apiKey );
+                  using( var response = await _client.SendAsync( request ) )
+                  {
+                     response.ThrowIfBlocked();
+                     response.EnsureSuccessStatusCode();
+
+                     var languages = JsonConvert.DeserializeObject<List<LanguageInfo>>( await response.Content.ReadAsStringAsync() );
+                     if( languages == null ) throw new Exception( "DeepL returned no language information." );
+
+                     _sourceLanguages = new HashSet<string>( languages.Where( x => x.usable_as_source ).Select( x => x.lang ), StringComparer.OrdinalIgnoreCase );
+                     _targetLanguages = new HashSet<string>( languages.Where( x => x.usable_as_target ).Select( x => x.lang ), StringComparer.OrdinalIgnoreCase );
+                     _languagesExpiryUtc = DateTime.UtcNow.AddHours( 24 );
+                  }
+               }
+            }
+         }
+         finally
+         {
+            _languagesSemaphore.Release();
+         }
+
+         var sourceLanguage = FixLanguage( context.SourceLanguage );
+         var targetLanguage = FixLanguage( context.DestinationLanguage );
+         if( !string.Equals( sourceLanguage, "auto", StringComparison.OrdinalIgnoreCase ) && !_sourceLanguages.Contains( sourceLanguage ) )
+            throw new Exception( $"DeepL does not support '{context.SourceLanguage}' as a source language." );
+         if( !_targetLanguages.Contains( targetLanguage ) )
+            throw new Exception( $"DeepL does not support '{context.DestinationLanguage}' as a target language." );
+      }
+
       public async Task Translate( ITranslationContext context )
       {
+         await EnsureLanguagesAsync( context );
+
          List<UntranslatedTextInfo> untranslatedTextInfos = new List<UntranslatedTextInfo>();
 
          var parameters = new List<KeyValuePair<string, string>>();
@@ -180,6 +237,7 @@ namespace DeepLTranslate.ExtProtocol
       public void Dispose()
       {
          _client?.Dispose();
+         _languagesSemaphore.Dispose();
       }
    }
 }

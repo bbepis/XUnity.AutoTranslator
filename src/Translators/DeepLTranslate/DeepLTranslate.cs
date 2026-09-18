@@ -18,11 +18,6 @@ namespace DeepLTranslate
       private const float MinimumMinDelaySeconds = 1;
       private const float MinimumMaxDelaySeconds = 3;
 
-      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
-      {
-         "ar", "bg", "cs", "da", "de", "el", "en", "en-gb", "en-us","es", "et", "fi", "fr", "hu", "id", "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "pt-br", "pt-pt", "ro", "ru", "sk", "sl", "sv", "tr", "uk", "zh", "zh-hans", "zh-hant"
-      };
-
       public override string Id => "DeepLTranslate";
 
       public override string FriendlyName => "DeepL Translator";
@@ -32,18 +27,6 @@ namespace DeepLTranslate
       public override int MaxTranslationsPerRequest => 25;
 
       protected override string ConfigurationSectionName => "DeepL";
-
-      private string FixLanguage( string lang )
-      {
-         switch( lang )
-         {
-            case "zh-Hans":
-            case "zh-CN":
-               return "zh";
-            default:
-               return lang;
-         }
-      }
 
       public override void Initialize( IInitializationContext context )
       {
@@ -62,9 +45,6 @@ namespace DeepLTranslate
             XuaLogger.AutoTranslator.Warn( $"[DeepL] Cannot set MaxDelaySeconds below {MinimumMaxDelaySeconds} second(s). Setting MaxDelaySeconds={MinimumMaxDelaySeconds}" );
             context.SetSetting( "DeepL", "MaxDelaySeconds", MinimumMaxDelaySeconds );
          }
-
-         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
 
          Arguments = Convert.ToBase64String( Encoding.UTF8.GetBytes( "DeepLTranslate.ExtProtocol.ExtDeepLTranslate, DeepLTranslate.ExtProtocol" ), Base64FormattingOptions.None );
       }
