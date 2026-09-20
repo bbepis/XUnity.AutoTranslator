@@ -15,11 +15,6 @@ namespace DeepLTranslate
 {
    public class DeepLTranslateLegitimate : ExtProtocolEndpoint
    {
-      private static readonly HashSet<string> SupportedLanguages = new HashSet<string>
-      {
-         "auto", "ar", "bg", "cs", "da", "de", "el", "en", "en-gb", "en-us","es", "et", "fi", "fr", "hu", "id", "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "pt-br", "pt-pt", "ro", "ru", "sk", "sl", "sv", "tr", "uk", "zh", "zh-hans", "zh-hant"
-      };
-
       public override string Id => "DeepLTranslateLegitimate";
 
       public override string FriendlyName => "DeepL Translator (Authenticated)";
@@ -30,24 +25,9 @@ namespace DeepLTranslate
 
       protected override string ConfigurationSectionName => "DeepLLegitimate";
 
-      private string FixLanguage( string lang )
-      {
-         switch( lang )
-         {
-            case "zh-Hans":
-            case "zh-CN":
-               return "zh";
-            default:
-               return lang;
-         }
-      }
-
       public override void Initialize( IInitializationContext context )
       {
          base.Initialize( context );
-
-         if( !SupportedLanguages.Contains( FixLanguage( context.SourceLanguage ) ) ) throw new EndpointInitializationException( $"The source language '{context.SourceLanguage}' is not supported." );
-         if( !SupportedLanguages.Contains( FixLanguage( context.DestinationLanguage ) ) ) throw new EndpointInitializationException( $"The destination language '{context.DestinationLanguage}' is not supported." );
 
          var apiKey = context.GetOrCreateSetting( ConfigurationSectionName, "ApiKey", "" );
          var isFree = context.GetOrCreateSetting( ConfigurationSectionName, "Free", false );
