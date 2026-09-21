@@ -87,6 +87,7 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
       private bool _isInTranslatedMode = true;
       private bool _textHooksEnabled = true;
+      private readonly HashSet<string> _knownBilingualStrings = new HashSet<string>();
 
       private float _batchOperationSecondCounter = 0;
 
@@ -892,8 +893,34 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          if( _isInTranslatedMode && !CallOrigin.ExpectsTextToBeReturned )
          {
-            SetText( ui, translatedText, true, originalText, info );
+            var textToSet = ComposeBilingualText( originalText, translatedText );
+            SetText( ui, textToSet, true, originalText, info );
          }
+      }
+
+      private string ComposeBilingualText( string originalText, string translatedText )
+      {
+         if( !Settings.BilingualMode )
+            return translatedText;
+
+         if( originalText == null || translatedText == null )
+            return translatedText;
+
+         if( string.Equals( originalText, translatedText, StringComparison.Ordinal ) )
+            return translatedText;
+
+         var composed = Settings.BilingualFormat
+            .Replace( "{original}", originalText )
+            .Replace( "{translation}", translatedText );
+
+         _knownBilingualStrings.Add( composed );
+
+         return composed;
+      }
+
+      private bool IsKnownBilingualComposite( string text )
+      {
+         return Settings.BilingualMode && _knownBilingualStrings.Contains( text );
       }
 
       /// <summary>
@@ -1405,6 +1432,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          // this only happens if the game sets the text of a component to our translation
          if( info?.IsTranslated == true && originalText == info.TranslatedText )
+         {
+            return null;
+         }
+
+         // in bilingual mode, the text read back from the component may be the composed
+         // bilingual string instead of the raw translation; treat that the same way
+         if( IsKnownBilingualComposite( originalText ) )
          {
             return null;
          }
@@ -2026,6 +2060,13 @@ namespace XUnity.AutoTranslator.Plugin.Core
 
          // this only happens if the game sets the text of a component to our translation
          if( info?.IsTranslated == true && text == info.TranslatedText )
+         {
+            return null;
+         }
+
+         // in bilingual mode, the text read back from the component may be the composed
+         // bilingual string instead of the raw translation; treat that the same way
+         if( IsKnownBilingualComposite( text ) )
          {
             return null;
          }
@@ -3384,7 +3425,8 @@ namespace XUnity.AutoTranslator.Plugin.Core
                   {
                      if( tti != null && tti.IsTranslated )
                      {
-                        SetText( ui, tti.TranslatedText, true, null, tti );
+                        var composed = ComposeBilingualText( tti.OriginalText, tti.TranslatedText );
+                        SetText( ui, composed, true, null, tti );
                      }
                   }
 
