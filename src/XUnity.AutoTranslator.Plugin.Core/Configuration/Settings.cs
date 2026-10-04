@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ExIni;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Constants;
 using XUnity.AutoTranslator.Plugin.Core.Debugging;
@@ -43,7 +44,6 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static float Timeout = 150.0f;
       public static string RedirectedResourcesPath;
       public static readonly int MaxImguiKeyCacheCount = 10000;
-      public static readonly float DefaultTranslationDelay = 0.9f;
       public static readonly int DefaultMaxRetries = 67;
 
       public static Dictionary<string, string> Replacements = new Dictionary<string, string>();
@@ -67,6 +67,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static readonly int TranslationQueueWatchWindow = 6;
 
       // can be changed
+      public static float DefaultTranslationDelay = 0.9f;
       public static string ServiceEndpoint;
       public static string FallbackServiceEndpoint;
       public static string Language;
@@ -168,6 +169,18 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int MaxClipboardCopyCharacters;
       public static float ClipboardDebounceTime;
 
+      internal static float ReadDefaultTranslationDelay( IniFile preferences )
+      {
+         var delay = preferences.GetOrDefault( "Behaviour", "DefaultTranslationDelay", 0.9f );
+         if( delay < 0.1f || float.IsNaN( delay ) || float.IsInfinity( delay ) )
+         {
+            XuaLogger.AutoTranslator.Warn( "DefaultTranslationDelay must be a finite number of at least 0.1 seconds. Using the default of 0.9 seconds." );
+            delay = 0.9f;
+            preferences.Set( "Behaviour", "DefaultTranslationDelay", delay );
+         }
+         return delay;
+      }
+
       public static void Configure()
       {
          try
@@ -237,6 +250,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             EnableTextMesh = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableTextMesh", false );
             EnableFairyGUI = PluginEnvironment.Current.Preferences.GetOrDefault( "TextFrameworks", "EnableFairyGUI", true );
 
+            DefaultTranslationDelay = ReadDefaultTranslationDelay( PluginEnvironment.Current.Preferences );
             MaxCharactersPerTranslation = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MaxCharactersPerTranslation", 200 );
             IgnoreWhitespaceInDialogue = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "IgnoreWhitespaceInDialogue", true );
             MinDialogueChars = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "MinDialogueChars", 20 );

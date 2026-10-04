@@ -267,7 +267,7 @@ How the plugin attempts to minimize the number of requests it sends out is outli
 
 ### Spam Prevention
 The plugin employs the following spam prevention mechanisms:
- 1. When it sees a new text, it will always wait one second before it queues a translation request, to check if that same text changes. It will not send out any request until the text has not changed for 1 second.
+ 1. When it sees a new text, it waits for the text to stabilize before it queues a translation request. The default interval is 0.9 seconds and can be configured with `DefaultTranslationDelay`. Translation endpoints can override this interval.
  2. It will never send out more than 8000 requests (max 200 characters each (configurable)) during a single game session.
  3. It will never send out more than 1 request at a time (no concurrency!).
  4. If it detects an increasing number of queued translations (4000), the plugin will shutdown.
@@ -322,6 +322,7 @@ EnableTextMesh=False             ;Enable or disable TextMesh translation
 EnableIMGUI=False                ;Enable or disable IMGUI translation
 
 [Behaviour]
+DefaultTranslationDelay=0.9      ;Seconds to wait for text to stabilize. Minimum 0.1. Endpoints can override this.
 MaxCharactersPerTranslation=200  ;Max characters per text to translate. Max 2500.
 IgnoreWhitespaceInDialogue=True  ;Whether or not to ignore whitespace, including newlines, in dialogue keys
 IgnoreWhitespaceInNGUI=True      ;Whether or not to ignore whitespace, including newlines, in NGUI
@@ -500,6 +501,7 @@ You will have to create the font in the same version of Unity Editor as your gam
 
 #### Reducing Translation Requests
 The following aims at reducing the number of requests sent to the translation endpoint:
+ * `DefaultTranslationDelay`: The default text stabilization interval in seconds (0.9 by default, minimum 0.1). For games that display complete phrases immediately, a shorter interval such as 0.1 may help capture short-lived text before it changes or disappears. Lower values can cause incomplete typewriter text or frequently changing counters to be queued for translation, so keep the default unless the game requires a shorter interval. This does not disable stabilization, spam checks, or endpoint request limits. Endpoints that call `SetTranslationDelay` still use their own interval. Invalid values are reset to 0.9. Restart the game after changing this setting; ALT+R only reloads translations.
  * `EnableBatching`: Batches several translation requests into a single with supported endpoints.
  * `UseStaticTranslations`: Enables usage of internal lookup dictionary of various english-to-japanese terms.
  * `MaxCharactersPerTranslation`: Specifies the maximum length of a text to translate. Any texts longer than this is ignored by the plugin. Cannot be greater than 1000. **Never redistribute this mod with this value greater than 400**
