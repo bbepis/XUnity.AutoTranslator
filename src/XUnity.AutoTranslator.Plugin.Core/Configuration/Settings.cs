@@ -339,7 +339,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             }
 
             UserAgent = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "UserAgent", string.Empty );
-            DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", true );
+            DisableCertificateValidation = PluginEnvironment.Current.Preferences.GetOrDefault( "Http", "DisableCertificateValidation", false );
 
 
             Width = PluginEnvironment.Current.Preferences.GetOrDefault( "TranslationAggregator", "Width", 400.0f );

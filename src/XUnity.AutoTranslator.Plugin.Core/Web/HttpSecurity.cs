@@ -26,12 +26,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Web
 
          return ( sender, certificate, chain, sslPolicyErrors ) =>
          {
-            var request = sender as HttpWebRequest;
-            if( request != null )
-            {
-               return _hosts.Contains( request.Address.Host );
-            }
-            return false;
+            return sslPolicyErrors == SslPolicyErrors.None;
          };
       }
    }
