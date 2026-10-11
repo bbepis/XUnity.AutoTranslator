@@ -17,13 +17,18 @@ namespace XZipper
             File.Delete( args[ 1 ] );
          }
 
-         using( var zip = ZipArchive.Create() )
+         using var zip = ZipArchive.CreateArchive();
+         zip.AddAllFromDirectory( args[ 0 ] );
+         zip.SaveTo( args[ 1 ], new ZipWriterOptions( CompressionType.Deflate )
          {
-            zip.DeflateCompressionLevel = CompressionLevel.BestCompression;
-
-            zip.AddAllFromDirectory( args[ 0 ] );
-            zip.SaveTo( args[ 1 ], new ZipWriterOptions( CompressionType.Deflate ) { ArchiveEncoding = new ArchiveEncoding( Encoding.UTF8, Encoding.UTF8 ), CompressionType = CompressionType.Deflate, DeflateCompressionLevel = CompressionLevel.BestCompression, UseZip64 = false } );
-         }
+            ArchiveEncoding = new ArchiveEncoding()
+            {
+               Default = Encoding.UTF8,
+               Password = Encoding.UTF8
+            },
+            CompressionLevel = (int)CompressionLevel.BestCompression,
+            UseZip64 = false
+         } );
       }
    }
 }

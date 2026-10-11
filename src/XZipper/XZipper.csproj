@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net461</TargetFramework>
     <AssemblyName>xzip</AssemblyName>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
