@@ -25,7 +25,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          if( AutoTranslationPlugin.Current.PluginTextCaches.Count == 0 ) return;
 
-         HookIfConfigured( function.Method );
+         HookIfConfigured( IMGUIWindowFunctions.GetPluginFunction( function ).Method );
       }
 
       public static void ResetHandledForAllInAssembly( Assembly assembly )

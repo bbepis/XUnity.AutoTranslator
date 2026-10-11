@@ -22,7 +22,7 @@ namespace XUnity.AutoTranslator.Plugin.Core.Hooks
       {
          if( Settings.BlacklistedIMGUIPlugins.Count == 0 ) return;
 
-         var method = function.Method;
+         var method = IMGUIWindowFunctions.GetPluginFunction( function ).Method;
          if( !HandledMethods.Contains( method ) )
          {
             HandledMethods.Add( method );
