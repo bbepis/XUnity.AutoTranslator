@@ -1,0 +1,43 @@
+name: Build Release Packages
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore solution
+        run: msbuild XUnity.AutoTranslator.sln /t:Restore /p:Configuration=Release
+
+      - name: Build solution (Release)
+        run: msbuild XUnity.AutoTranslator.sln /p:Configuration=Release /m
+
+      - name: Upload release packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: XUnity.AutoTranslator-packages
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
