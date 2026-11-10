@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using XUnity.AutoTranslator.Plugin.Core.Configuration;
 using XUnity.Common.Constants;
@@ -87,18 +88,37 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
                XuaLogger.AutoTranslator.Error( $"Unable to fetch installed font names: {ex.Message}" );
             }
 
-            if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset != null && isAssetBundleNameInsideSystemFont )
+            if( isAssetBundleNameInsideSystemFont )
             {
                XuaLogger.AutoTranslator.Info( $"A font {assetBundle} is installed on the system. Attempting to create a TextMesh Pro font from it." );
-               font = (UnityEngine.Object)UnityTypes.TMP_FontAsset_Methods.CreateFontAsset.Invoke( null, new object[] { assetBundle, "", 90 } );
-            }
-            else
-            {
-               if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset == null )
+               if( UnityTypes.TMP_FontAsset_Methods.CreateFontAsset != null )
                {
-                  XuaLogger.AutoTranslator.Warn( "TMP_FontAsset.CreateFontAsset not found. TextMeshPro version might be below 3.2.0." );
+                  try
+                  {
+                     font = (UnityEngine.Object)UnityTypes.TMP_FontAsset_Methods.CreateFontAsset.Invoke( null, new object[] { assetBundle, "", 90 } );
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.AutoTranslator.Warn( ex, "Could not create a TextMesh Pro font using the system-font API: " + assetBundle );
+                  }
                }
 
+               if( font == null )
+               {
+                  XuaLogger.AutoTranslator.Info( "Attempting to create a TextMesh Pro font using a Unity font." );
+                  try
+                  {
+                     font = CreateTextMeshProFontFromSystemFont( assetBundle );
+                  }
+                  catch( Exception ex )
+                  {
+                     XuaLogger.AutoTranslator.Warn( ex, "Could not create a TextMesh Pro font using a Unity font: " + assetBundle );
+                  }
+               }
+            }
+
+            if( font == null )
+            {
                XuaLogger.AutoTranslator.Info( "Attempting to load TextMesh Pro font from internal Resources API." );
                font = Resources.Load( assetBundle );
             }
@@ -123,6 +143,71 @@ namespace XUnity.AutoTranslator.Plugin.Core.Fonts
          }
 
          return font;
+      }
+
+      private static UnityEngine.Object CreateTextMeshProFontFromSystemFont( string fontName )
+      {
+         var fontType = UnityTypes.TMP_FontAsset?.ClrType;
+         if( fontType == null ) return null;
+
+         // TMP versions before the system-font overload can create a dynamic asset from a Unity Font.
+         var method = FindLegacyFontCreationMethod( fontType, typeof( Font ) );
+         if( method == null )
+         {
+            XuaLogger.AutoTranslator.Warn( "TextMesh Pro does not expose a compatible runtime font creation method." );
+            return null;
+         }
+
+         var parameters = method.GetParameters();
+         var args = new object[ parameters.Length ];
+         args[ 1 ] = 90;
+         args[ 2 ] = 9;
+         args[ 3 ] = Enum.Parse( parameters[ 3 ].ParameterType, "SDFAA" );
+         args[ 4 ] = 1024;
+         args[ 5 ] = 1024;
+         args[ 6 ] = Enum.Parse( parameters[ 6 ].ParameterType, "Dynamic" );
+         args[ 7 ] = true;
+         for( int i = 8; i < args.Length; i++ )
+         {
+            var value = parameters[ i ].DefaultValue;
+            args[ i ] = value == DBNull.Value || value == Missing.Value ? Type.Missing : value;
+         }
+
+         var source = Font.CreateDynamicFontFromOSFont( fontName, 90 );
+         if( source == null ) return null;
+         try
+         {
+            args[ 0 ] = source;
+            var result = (UnityEngine.Object)method.Invoke( null, args );
+            if( result != null )
+            {
+               source.hideFlags |= HideFlags.DontUnloadUnusedAsset;
+               return result;
+            }
+         }
+         catch
+         {
+            UnityEngine.Object.Destroy( source );
+            throw;
+         }
+         UnityEngine.Object.Destroy( source );
+         return null;
+      }
+
+      internal static MethodInfo FindLegacyFontCreationMethod( Type fontAssetType, Type unityFontType )
+      {
+         return fontAssetType.GetMethods( BindingFlags.Public | BindingFlags.Static ).FirstOrDefault( candidate =>
+         {
+            var p = candidate.GetParameters();
+            return candidate.Name == "CreateFontAsset" && p.Length >= 8
+               && p[ 0 ].ParameterType == unityFontType && p[ 1 ].ParameterType == typeof( int )
+               && p[ 2 ].ParameterType == typeof( int ) && p[ 3 ].ParameterType.IsEnum
+               && p[ 4 ].ParameterType == typeof( int ) && p[ 5 ].ParameterType == typeof( int )
+               && p[ 6 ].ParameterType.IsEnum && p[ 7 ].ParameterType == typeof( bool )
+               && Enum.IsDefined( p[ 3 ].ParameterType, "SDFAA" )
+               && Enum.IsDefined( p[ 6 ].ParameterType, "Dynamic" )
+               && p.Skip( 8 ).All( parameter => parameter.IsOptional );
+         } );
       }
 
 #if IL2CPP
