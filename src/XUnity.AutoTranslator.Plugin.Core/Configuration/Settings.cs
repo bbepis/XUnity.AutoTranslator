@@ -168,6 +168,9 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
       public static int MaxClipboardCopyCharacters;
       public static float ClipboardDebounceTime;
 
+      public static bool BilingualMode = false;
+      public static string BilingualFormat = "{original}\n[{translation}]";
+
       public static void Configure()
       {
          try
@@ -290,6 +293,13 @@ namespace XUnity.AutoTranslator.Plugin.Core.Configuration
             ReloadTranslationsOnFileChange = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "ReloadTranslationsOnFileChange", false );
             DisableTextMeshProScrollInEffects = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "DisableTextMeshProScrollInEffects", ApplicationName.Equals( "SamuraiVandalism", StringComparison.OrdinalIgnoreCase ) || UnityTypes.UguiNovelText != null );
             CacheParsedTranslations = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "CacheParsedTranslations", false );
+            BilingualMode = PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BilingualMode", false );
+            BilingualFormat = JsonHelper.Unescape( PluginEnvironment.Current.Preferences.GetOrDefault( "Behaviour", "BilingualFormat", "{original}\\n[{translation}]" ) );
+
+            if( BilingualMode )
+            {
+               ForceUIResizing = true;
+            }
 
             TextureDirectory = PluginEnvironment.Current.Preferences.GetOrDefault( "Texture", "TextureDirectory", Path.Combine( "Translation", Path.Combine( "{Lang}", "Texture" ) ) );
             TexturesPath = Path.Combine( PluginEnvironment.Current.TranslationPath, Settings.TextureDirectory ).Parameterize();
