@@ -485,7 +485,7 @@ When translating to languages that use non-ASCII letters the game's default font
  * `OverrideFontTextMeshPro`: Consider using `FallbackFontTextMeshPro` instead. Changes the font of all text components regardless of `EnableUIResizing` and `ForceUIResizing`. TextMeshPro only.
      This option is able to load a font in three different ways:
      1. If the specified string indicates a path within the game folder, then that file will be attempted to be loaded as an asset bundle. Requires a custom asset bundle built specifically for the targeted game.
-     2. If the specified string matches name of a font installed on the system (e.g. Arial), the font will be attempted to be loaded as a TMP font. Requires TextMeshPro 3.2.0+ (see #854).
+     2. If the specified string matches the name of a font installed on the system (e.g. Arial), the font will be attempted to be loaded as a dynamic TMP font. Older TextMeshPro versions are supported when they provide a compatible runtime font creation API; versions without it require an asset bundle or Resources font instead.
      3. Otherwise, the string will be used to attempt to load a font through the Resources API. Default resources that are often distributed with TextMeshPro are: `Fonts & Materials/LiberationSans SDF` or `Fonts & Materials/ARIAL SDF`.
  * `FallbackFontTextMeshPro`: Adds a fallback font that TextMesh Pro can use in case a specific character is not supported.
 
